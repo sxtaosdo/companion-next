@@ -1,12 +1,16 @@
 # Windows本地开发交接
 
+最新功能交付（2026-10-16）：已恢复独立手动Dashboard列表与原点选路径进入登记向导，代码 `6fe88585d942fe9862acc98b65664465734d1d10` / 本地版本1.3.173.5；package/页面版本继续1.3.173，没有擅改Owner前三位版本。90文件3768测试、vue-tsc及正常workspace构建通过，静态55通过/1项Windows大小写fixture跳过。真实机器API两次8项/6项登记匹配；既有Playwright+独立Edge以真实只读快照和受控故障验证5项流程，0业务写入/0页面异常；不等于认证生产页面验收。
+
+仅部署本片同一六静态路径，新增index-CXcfVXmi.css/index-DVyF6XSu.js并最后原子切换index，回读六项一致；原10项中的9项旧资源和index备份保留，1779保护/22原脏项无变。部署前后42个node/python/Creator进程PID、名称、创建时间一致，无共享服务重启/模型操作。源码、文档提交与可回滚部署分别记录，完整缺口见主矩阵；旧AI变体产物/UNKNOWN保持。完整证据位于 `C:/Users/33272/AppData/Local/Temp/companion-next-parity-20261016-1201`，本片合同与边界见 [Dashboard还原](docs/dashboard-discovery-local.md)。
+
 状态：Accepted（Owner/Parent已批准完整源码同步、本地开发/测试/构建/六静态文件部署及原锁官方npm依赖；Owner Sentinel_40a744e240288191a450453b37a4b488另明确批准第1项在Windows正常执行环境中保留原检查完成这些动作，不改网络/安全配置）。
 
 当前交付（2026-10-16 08:57 UTC）：获准宿主确认无残留项目npm，正常DNS/HTTPS200；原锁214包安装与逐项版本/来源/SHA512通过，package/lock不变、D盘缓存、生命周期脚本未运行。本机89文件3751测试、vue-tsc及正常companion-workspace构建通过；静态55通过/0失败/1项Windows大小写fixture跳过，实际六产物引用/SHA独立通过。已仅部署本机173六静态并回读一致，172六备份/旧hash资源、1779保护项与22原修改保留，无共享服务重启。Owner认证页面与真实浏览器交互仍未验收。证据在仓外同目录host-dependency-verification.json、local-validation-result.json、local-workspace-manifest.json与local173-deployment-result.json。
 
 历史阻塞（05:15 UTC，已由本次明确批准的正常执行环境解决）：此前受限上下文安装因`ENOTFOUND`退出1，并报`Exit handler never called!`。当时没有改DNS、代理或安全设置、没有绕过拒绝；旧回执`locked-install-blocker-receipt.json`仅代表当时状态。
 
-本目录为Companion Next独立前端源码，与独立游戏运营后台分别维护。当前只接收既有1.3.173功能，没有重做功能、改旧后端或控制共享服务。
+本目录为Companion Next独立前端源码，与独立游戏运营后台分别维护。最初接收既有1.3.173基线；后续已按上述本机切片继续恢复旧功能，没有改旧后端源码或控制共享服务。
 
 ## 来源与文件边界
 
