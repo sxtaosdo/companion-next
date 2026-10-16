@@ -1,0 +1,80 @@
+/* Only the setup dialog and its teleported select. Palette: original v148 web/app.css
+   858–885 controls, 1139/1154–1155 muted/confirmation, 1192–1193 selection,
+   1239–1245 labels/select, 1530–1544 modal. No global theme or flow changes. */
+.project-setup-dialog,
+.project-setup-select-popper {
+  color-scheme: dark;
+  --el-bg-color: #202329;
+  --el-bg-color-overlay: #202329;
+  --el-fill-color-blank: #15171b;
+  --el-fill-color-light: #242933;
+  --el-fill-color: #191c21;
+  --el-text-color-primary: #e7e9ed;
+  --el-text-color-regular: #c4c9d2;
+  --el-text-color-secondary: #9299a6;
+  --el-text-color-placeholder: #9299a6;
+  --el-text-color-disabled: #9299a6;
+  --el-border-color: #4a4f5a;
+  --el-border-color-light: #383c45;
+  --el-border-color-lighter: #383c45;
+  --el-disabled-bg-color: #191c21;
+  --el-disabled-text-color: #9299a6;
+  --el-disabled-border-color: #383c45;
+  --el-color-primary: #3d6df2;
+  --el-color-primary-light-3: #537ef7;
+  --el-color-primary-light-5: #537ef7;
+  --el-color-primary-light-9: #243056;
+  --el-color-primary-dark-2: #3d6df2;
+  --border-color: #383c45;
+  --text-secondary: #9299a6;
+  color: #e7e9ed;
+}
+.project-setup-overlay { background: rgba(8, 10, 14, .62); }
+.project-setup-dialog {
+  --el-dialog-bg-color: #202329;
+  border: 1px solid #383c45;
+  background: #202329;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .45);
+}
+.project-setup-dialog .el-dialog__body { color: #c4c9d2; }
+.project-setup-dialog .el-dialog__title,
+.project-setup-dialog h3,
+.project-setup-dialog strong { color: #e7e9ed; }
+.project-setup-dialog .el-input__wrapper,
+.project-setup-dialog .el-select__wrapper {
+  background: #15171b;
+  box-shadow: 0 0 0 1px #4a4f5a inset;
+}
+.project-setup-dialog .el-input__wrapper.is-focus,
+.project-setup-dialog .el-select__wrapper.is-focused { box-shadow: 0 0 0 1px #537ef7 inset; }
+.project-setup-dialog .el-input__inner,
+.project-setup-dialog .el-select__selected-item { color: #e7e9ed; }
+.project-setup-dialog .el-select__placeholder.is-transparent { color: #9299a6; }
+.project-setup-dialog .setup-confirm { background: #191c21; border-color: #383c45; }
+.project-setup-dialog .el-checkbox { --el-checkbox-input-border: 1px solid #4a4f5a; --el-checkbox-text-color: #c4c9d2; --el-checkbox-checked-text-color: #e7e9ed; }
+.project-setup-dialog .el-checkbox__inner { border-color: #4a4f5a; background-color: #15171b; }
+.project-setup-dialog .el-checkbox__input.is-checked:not(.is-disabled) .el-checkbox__inner { background-color: #537ef7; border-color: #537ef7; }
+.project-setup-dialog .el-checkbox__input.is-disabled .el-checkbox__inner { background-color: #191c21; border-color: #383c45; }
+.project-setup-dialog .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after { border-color: #9299a6; }
+.project-setup-dialog .el-button {
+  --el-button-bg-color: #3d6df2;
+  --el-button-border-color: #3d6df2;
+  --el-button-text-color: #fff;
+  --el-button-hover-bg-color: #3d6df2;
+  --el-button-hover-border-color: #537ef7;
+  --el-button-hover-text-color: #fff;
+  --el-button-active-bg-color: #3d6df2;
+  --el-button-active-border-color: #3d6df2;
+  --el-button-active-text-color: #fff;
+  --el-button-disabled-bg-color: #3d6df2;
+  --el-button-disabled-border-color: #3d6df2;
+  --el-button-disabled-text-color: #fff;
+}
+.project-setup-dialog .el-button:disabled { opacity: .55; }
+.project-setup-dialog .el-alert--info { --el-alert-bg-color: #222a3a; --el-alert-border-color: #3a4f7a; --el-alert-text-color: #c4d4f0; color: #c4d4f0; }
+.project-setup-dialog .el-alert--warning { --el-alert-bg-color: #302513; --el-alert-border-color: #8a6430; --el-alert-text-color: #ffd888; color: #ffd888; }
+.project-setup-select-popper { background: #202329; border-color: #383c45; }
+.project-setup-select-popper .el-select-dropdown__item { color: #e7e9ed; }
+.project-setup-select-popper .el-select-dropdown__item.is-hovering { background: #242933; }
+.project-setup-select-popper .el-select-dropdown__item.is-selected { color: #e7e9ed; background: #243056; }
+.project-setup-select-popper .el-popper__arrow::before { background: #202329; border-color: #383c45; }

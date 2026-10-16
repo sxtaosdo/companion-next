@@ -1,0 +1,128 @@
+{
+  "dateUtc": "2026-10-15",
+  "version": "0.1.16",
+  "baseline": "c5e1d929ff261d24ba42b5dfd20cd81ac17c4a70",
+  "checkpoint": "707dc8c",
+  "scope": "dot source / fake / jsdom only; no real API, native app, Windows, deployment or upload",
+  "managementContract": "checked own v148 source; v150 management endpoints not live-verified",
+  "focused": {
+    "files": 4,
+    "passed": 552
+  },
+  "final": {
+    "session": 19050,
+    "exitCode": 0,
+    "files": 58,
+    "passed": 2620,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 57.09
+  },
+  "builds": [
+    "default",
+    "companion-readonly",
+    "companion-config-editor",
+    "companion-knowledge-chat",
+    "companion-workspace"
+  ],
+  "staticTests": 56,
+  "independentReview": "passed; two misleading documentation phrases corrected; source and readback protections had no unresolved findings",
+  "initialValidation": "Full2620 passed, then first build blocked by TS2352 in intentional invalid removed fixture; changed only assertion cast via unknown. Re-ran final full2620 and all five builds/static successfully. No timeout/expectation relaxation.",
+  "dependenciesUnchanged": true,
+  "preserved014": {
+    "bytes": 682939,
+    "sha256": "e1c24005d8c17678a465d5ef9cc47ce2b4b8bf47c67031a4aba906f4ea37c4e4",
+    "uploaded": false,
+    "deployed": false
+  },
+  "normalBuild": {
+    "mode": "companion-workspace",
+    "base": "./",
+    "entry": "/next/index.html#/projects",
+    "files": [
+      {
+        "path": "assets/about-icon-BaVeClOr.svg",
+        "bytes": 230,
+        "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+      },
+      {
+        "path": "assets/donation-qr-D7kdLLAm.png",
+        "bytes": 106967,
+        "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+      },
+      {
+        "path": "assets/index-03M-Hp76.css",
+        "bytes": 403661,
+        "sha256": "c492451ba473398055b56988a80471dd86cb18f1f660ddcd04b14810b7dc1617"
+      },
+      {
+        "path": "assets/index-C3PFxBhl.js",
+        "bytes": 1513619,
+        "sha256": "03ec99c094cd2cb2a9fb3f83b8f1ffd35bccb8dcc5a4739319f5a1655de7eeae"
+      },
+      {
+        "path": "favicon.svg",
+        "bytes": 245,
+        "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+      },
+      {
+        "path": "index.html",
+        "bytes": 573,
+        "sha256": "6339ff1a12cfd9a201cba544d3950045ff7840d5e883879bd9337478e148f6b4"
+      }
+    ],
+    "published": false
+  },
+  "logs": [
+    {
+      "name": "project-management-focused.log",
+      "bytes": 1966,
+      "sha256": "779562845874c8e93d64fc57e6a8d363b3d9a380b19df7392d01f25bff44856d"
+    },
+    {
+      "name": "project-management-full.log",
+      "bytes": 5911,
+      "sha256": "98fddf8e016671facc2b4e47fb7eaaf70ddf73eae1b8e59f55194b68d83c812b"
+    },
+    {
+      "name": "project-management-build-default.log",
+      "bytes": 1076,
+      "sha256": "2d5d07355ad5eef1c2c2411fa319e65e4cdebf5ae1307f074e562562b312112c"
+    },
+    {
+      "name": "project-management-final-full.log",
+      "bytes": 5911,
+      "sha256": "fe96df1ae7f56a6a46f80eac44d47c6ee0900ef3da18bf9f3714da79a7afdbf7"
+    },
+    {
+      "name": "project-management-final-build-default.log",
+      "bytes": 1182,
+      "sha256": "52e3be48981aedf6785edb3739d04b34c8d3cbc067b98e0bc906475a0679b939"
+    },
+    {
+      "name": "project-management-final-build-readonly.log",
+      "bytes": 1309,
+      "sha256": "c17451263f61879cf45a8509ca77aa85c36c4d7e3ec9217c26810e492431daf0"
+    },
+    {
+      "name": "project-management-final-build-editor.log",
+      "bytes": 1366,
+      "sha256": "a31141cc93c52131277e42c61507b9abc5984b25571a05bb28cafc9ed08c211f"
+    },
+    {
+      "name": "project-management-final-build-chat.log",
+      "bytes": 1357,
+      "sha256": "8459dea848eaa1f750a38c063ce66a7bcd9102b63097563507385c98616b10a1"
+    },
+    {
+      "name": "project-management-final-build-workspace.log",
+      "bytes": 1382,
+      "sha256": "2118c192dde49010cb355d5cb2fdda084f30763b687ba0f3a1ac60a10fb14587"
+    },
+    {
+      "name": "project-management-final-static.log",
+      "bytes": 3829,
+      "sha256": "c507d8c67ee4a7f912954de1ab1804b55412b60826780a2908293eba2599f1da"
+    }
+  ]
+}

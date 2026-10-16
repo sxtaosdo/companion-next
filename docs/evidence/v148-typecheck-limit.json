@@ -1,0 +1,27 @@
+{
+  "originalBuildOptions": true,
+  "scope": "binder plus its imported original-source graph",
+  "compilerVersion": "5.8.3",
+  "completeOriginalTypecheckPassed": false,
+  "totalDiagnostics": 214,
+  "byCode": {
+    "2304": 1,
+    "2307": 69,
+    "2339": 8,
+    "2345": 1,
+    "2503": 21,
+    "2591": 96,
+    "2663": 2,
+    "2688": 1,
+    "7006": 14,
+    "7016": 1
+  },
+  "binderDiagnostics": [
+    {
+      "code": 2307,
+      "line": 6,
+      "message": "Cannot find module 'node:path' or its corresponding type declarations."
+    }
+  ],
+  "missingNodeTypes": true
+}

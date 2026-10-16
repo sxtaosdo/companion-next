@@ -1,0 +1,83 @@
+{
+  "dateUtc": "2026-10-14",
+  "version": "0.1.15",
+  "checkpoint": "333cf7f",
+  "sourceScope": "dot source/fake/jsdom only; no real requests, Windows or deployment",
+  "focused": {
+    "files": 7,
+    "tests": 370
+  },
+  "full": {
+    "files": 58,
+    "passed": 2408,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 63.84
+  },
+  "builds": [
+    "default",
+    "companion-readonly",
+    "companion-config-editor",
+    "companion-knowledge-chat",
+    "companion-workspace"
+  ],
+  "staticTests": 56,
+  "independentReview": "passed after full Dashboard error code and same-code multi-stage ambiguity corrections",
+  "v150Unverified": [
+    "precise unsaved-error text and hasUnsavedChanges Boolean conversion",
+    "waitForStopped internal observation vs OS exit proof"
+  ],
+  "preserved014": {
+    "commit": "41454be463081fca6e3edbc3588d48f97894d91d",
+    "zipBytes": 682939,
+    "zipSha256": "e1c24005d8c17678a465d5ef9cc47ce2b4b8bf47c67031a4aba906f4ea37c4e4",
+    "uploaded": false,
+    "deployed": false
+  },
+  "reviewCorrections": [
+    "Use DASHBOARD_OPEN_WITHOUT_BRIDGE, never shorthand OPEN_WITHOUT_BRIDGE.",
+    "Same code may be pre-restart refusal or post-reopen Bridge wait failure; keep stage unknown."
+  ],
+  "logs": [
+    {
+      "name": "stop-restart-focused.log",
+      "bytes": 281,
+      "sha256": "cb272df5b0d0ba53c4da57a3b32c253eea7a24da990c45f5fad3b946f7cdfbba"
+    },
+    {
+      "name": "stop-restart-full.log",
+      "bytes": 289,
+      "sha256": "c8ac5afb306800fc59ad0031d80626627715d3a7c6989ba06033d304b9e71500"
+    },
+    {
+      "name": "stop-restart-build-default.log",
+      "bytes": 1182,
+      "sha256": "d2917bd4d76a18df5bf396c6ee667b3b095e39eb40ebb303268aca31857024ad"
+    },
+    {
+      "name": "stop-restart-build-readonly.log",
+      "bytes": 1309,
+      "sha256": "3cf16e3e3e0764f2d8c6f448f1b281f6a1ced7a275837e7f3933382ab8c8d72b"
+    },
+    {
+      "name": "stop-restart-build-editor.log",
+      "bytes": 1366,
+      "sha256": "5f4a59adf45a0afca2c34773341eaad18e9a92b8100226fcad5ec5cbf80a9cfc"
+    },
+    {
+      "name": "stop-restart-build-chat.log",
+      "bytes": 1357,
+      "sha256": "b6c34d9883f2d1de87e7d165b67de964f2ae58675f415c171fc4c8dc6a0e5881"
+    },
+    {
+      "name": "stop-restart-build-workspace.log",
+      "bytes": 1382,
+      "sha256": "3f9bf8ae45229d389bc7dd158ad9787ec844481db0b0318afc6b73e9c305baa6"
+    },
+    {
+      "name": "stop-restart-static.log",
+      "bytes": 3829,
+      "sha256": "8c8c639ca8cc6bca22efbd88ef9f23e25c378934844ea826be903eea77646110"
+    }
+  ]
+}

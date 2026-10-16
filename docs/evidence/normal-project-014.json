@@ -1,0 +1,78 @@
+{
+  "dateUtc": "2026-10-14",
+  "version": "0.1.14",
+  "scope": "dot source and fake/jsdom only; no real Creator/Windows/network/deployment",
+  "checkpoint": "4896086",
+  "fullTests": {
+    "files": 58,
+    "passed": 2256,
+    "failed": 0,
+    "command": "vitest run --maxWorkers=1"
+  },
+  "focusedTests": {
+    "files": 8,
+    "passed": 327
+  },
+  "builds": [
+    "default",
+    "companion-readonly",
+    "companion-config-editor",
+    "companion-knowledge-chat",
+    "companion-workspace"
+  ],
+  "staticTests": 56,
+  "review": "read-only independent source review passed after polling/identity/late-read fixes",
+  "browserPixelValidation": false,
+  "realNativeActionValidation": false,
+  "failuresPreserved": [
+    "Initial new UI assertions queried wrapper instead of ElementPlus teleported body: 4 failures; fixed test DOM lookup, no approval gate weakened.",
+    "First full run:2255 pass,1 fail: old test literal v148 vs now confirmed v150 backend target; corrected exact expectation, then final full run2256 passed."
+  ],
+  "logs": [
+    {
+      "name": "normal-project-focused-final.log",
+      "bytes": 281,
+      "sha256": "49178aa078deb3e31544e85615bfd0fd9d28b2a4d8429722b675a4d04047e924"
+    },
+    {
+      "name": "normal-project-full-final.log",
+      "bytes": 3137,
+      "sha256": "5a61a792363d122890294e5ee52ff121107c7cff0edb41ac963a71f1f5d9351b"
+    },
+    {
+      "name": "normal-project-full-verified.log",
+      "bytes": 289,
+      "sha256": "7695975679c27f45b8431f4fffcee43f5a3b73f25d6d803aad6e3b959ccb431b"
+    },
+    {
+      "name": "normal-project-build-default.log",
+      "bytes": 1182,
+      "sha256": "18c2213f432478cec259560971bb0fd4b8ffc7efdb922c799c480935e3795855"
+    },
+    {
+      "name": "normal-project-build-readonly.log",
+      "bytes": 1309,
+      "sha256": "eab750c16786243cddc090845b5107832e73105d473ed918c5fc8ebdee652006"
+    },
+    {
+      "name": "normal-project-build-editor.log",
+      "bytes": 1366,
+      "sha256": "b742289fd05388dba088e46c141e91b05d3ebac4a404dcb4ef7d32119fd432a6"
+    },
+    {
+      "name": "normal-project-build-chat.log",
+      "bytes": 1357,
+      "sha256": "e42c92ccb4c002348095d101456e1f0b916c7c79fa82f756624ec33a0958a293"
+    },
+    {
+      "name": "normal-project-build-workspace.log",
+      "bytes": 1382,
+      "sha256": "8c38fa46c14c1adbaae1a553bf86cc9ce478ac9816b907f2cde29bc678420ecb"
+    },
+    {
+      "name": "normal-project-static.log",
+      "bytes": 3825,
+      "sha256": "7d89a377e4e09a193029bfb3ed828217db81477c076c4249abfa7ddeda93e8dc"
+    }
+  ]
+}

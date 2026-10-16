@@ -1,0 +1,60 @@
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Search, ArrowRight, Lock, Warning, Document, CircleCheck, MagicStick } from '@element-plus/icons-vue'
+import { useWorkspaceStore } from '../stores/workspace'
+import RegisteredProjectResources from '../components/RegisteredProjectResources.vue'
+import { useRegisteredProjectPage } from '../composables/use-registered-project-page'
+import { allowsLegacyWorkspace } from '../domain/project-workspace'
+import { companionBrowserProvider } from '../companion-browser-integration'
+import type { ResourceItem, ResourceState } from '../domain/contracts'
+import EmptyState from '../components/EmptyState.vue'
+import SpecSummary from '../components/SpecSummary.vue'
+import SpecDialog from '../components/SpecDialog.vue'
+import AssetArt from '../components/AssetArt.vue'
+import ResourcePlanner from '../components/ResourcePlanner.vue'
+import GenerationSourcePanel from '../components/GenerationSourcePanel.vue'
+import GenerationReceiptPanel from '../components/GenerationReceiptPanel.vue'
+const store = useWorkspaceStore()
+useRegisteredProjectPage()
+const legacyWorkspace = computed(() => allowsLegacyWorkspace(import.meta.env.MODE, Boolean(companionBrowserProvider.value)) && store.mode !== 'disconnected')
+const route = useRoute()
+const router = useRouter()
+const steps = ['项目规范', '资源规划', '生成素材', '视觉审阅', '导入绑定', '运行验收']
+const step = ref(2)
+const editOpen = ref(false)
+const category = ref('全部')
+const query = ref('')
+const selectedIds = ref<string[]>([])
+const focusedId = ref('')
+const categories = ['全部', '图标', '按钮', '面板', '角色', '背景', '特效', '字体']
+const filtered = computed(() => store.resources.filter((r) => (category.value === '全部' || r.category === category.value) && (!query.value || `${r.name} ${r.purpose}`.includes(query.value.trim()))))
+const focused = computed(() => store.resources.find((r) => r.id === focusedId.value) ?? filtered.value[0])
+const heading = computed(() => ['先定义项目的视觉语言', '为每份资源建立清晰清单', '本次生成资源', '在同一背景下，审阅候选素材', '分别确认导入与绑定', '回到实际页面，验证最终效果'][step.value])
+watch(() => route.query.step, (value) => { const number = Number(value); step.value = Number.isInteger(number) && number >= 1 && number <= 6 ? number - 1 : 2 }, { immediate: true })
+watch(() => store.selectedProjectId, () => { selectedIds.value = []; focusedId.value = ''; category.value = '全部'; query.value = '' })
+function chooseStep(index: number) { router.replace({ path: '/resources', query: { ...route.query, step: index + 1 } }) }
+function toggle(resource: ResourceItem, checked: boolean) {
+  if (resource.ownerProtected) return
+  selectedIds.value = checked ? [...new Set([...selectedIds.value, resource.id])] : selectedIds.value.filter((id) => id !== resource.id)
+  focusedId.value = resource.id
+}
+function stateLabel(state: ResourceState) { return ({ planned: '待生成', candidate: '待审阅', approved: '已批准', rework: '待返工', 'owner-protected': 'Owner 保护' })[state] }
+function stateType(state: ResourceState): 'info' | 'success' | 'warning' | 'primary' { return ({ planned: 'primary', candidate: 'info', approved: 'success', rework: 'warning', 'owner-protected': 'warning' })[state] as 'info' | 'success' | 'warning' | 'primary' }
+</script>
+<template>
+  <RegisteredProjectResources v-if="!legacyWorkspace"/>
+  <EmptyState v-else-if="!store.project"/>
+  <template v-else>
+    <SpecSummary @edit="editOpen = true"/>
+    <nav class="resource-steps panel" aria-label="资源生产步骤"><button v-for="(title,index) in steps" :key="title" :class="{ active: step === index }" :aria-current="step === index ? 'step' : undefined" @click="chooseStep(index)"><span>{{ index + 1 }}</span><strong>{{ title }}</strong><i v-if="index < steps.length - 1"></i></button></nav>
+    <div class="section-heading resource-heading"><h2>{{ heading }}</h2><span>{{ step === 2 ? '默认单尺寸 · 批准后再扩展尺寸' : step === 3 ? '视觉批准与技术检查独立留证' : '阶段独立 · 不自动判定通过' }}</span></div>
+    <template v-if="step === 0"><div class="spec-stage-grid"><section class="panel spec-stage-main"><span class="section-kicker">PROJECT SPEC</span><h2>{{ store.spec?.styleName || '尚未建立风格样板' }}</h2><p>{{ store.spec?.styleKeywords || '请先在本地草稿中定义本项目的视觉方向。' }}</p><div class="spec-detail-grid"><div><span>设计画布</span><strong>{{ store.spec ? `${store.spec.width} × ${store.spec.height}` : '待确认' }}</strong></div><div><span>安全边距</span><strong>{{ store.spec ? `左右 ${store.spec.safeHorizontal} · 上下 ${store.spec.safeVertical}` : '待确认' }}</strong></div><div><span>尺寸策略</span><strong>每资源一个默认尺寸</strong></div><div><span>面板规则</span><strong>{{ store.spec?.panelPolicy || '待确认' }}</strong></div></div><el-button type="primary" @click="editOpen = true">{{ store.spec ? '编辑本地规范草稿' : '新建本地规范草稿' }}</el-button></section><section class="panel stage-guidance"><span class="round-icon"><el-icon><Document/></el-icon></span><h3>规范是唯一的设计入口</h3><p>画布、样板、文字与按钮、弹窗层级在同一处维护。每个项目独立配置。</p><div class="guidance-box">本地草稿不会改变真实项目规范，也不会产生样板批准记录。</div></section></div></template>
+    <ResourcePlanner v-else-if="step === 1"/>
+    <template v-else-if="step === 2"><GenerationSourcePanel/><GenerationReceiptPanel/><div class="resource-workspace"><section class="resource-list panel"><div class="resource-tabs" role="group" aria-label="资源分类"><el-button v-for="item in categories" :key="item" :class="{ selected: category === item }" text @click="category = item">{{ item }}<small v-if="item === '全部'">{{ store.resourceInventoryKnown ? store.resources.length : '—' }}</small></el-button></div><div class="resource-search"><el-input v-model="query" :prefix-icon="Search" placeholder="搜索资源名称或用途" clearable aria-label="搜索资源"/><span>{{ store.resourceInventoryKnown ? `${filtered.length} 项${store.isDemo ? '示例' : '资源'}` : '资源清单未读取' }}</span></div><div class="resource-table-head"><span>资源 / 用途 / 缺口</span><span>默认尺寸</span><span>记录状态</span></div><div v-for="resource in filtered" :key="resource.id" class="resource-row" :class="{ focused: focused?.id === resource.id }" @click="focusedId = resource.id"><div class="resource-identity"><el-checkbox :model-value="selectedIds.includes(resource.id)" :disabled="resource.ownerProtected" :aria-label="`选择${resource.name}`" @click.stop @change="toggle(resource, Boolean($event))"><span class="sr-only">选择{{ resource.name }}</span></el-checkbox><AssetArt :kind="resource.illustration"/><button class="resource-name-button" @click.stop="focusedId = resource.id"><strong>{{ resource.name }}</strong><span>{{ resource.category }} / {{ resource.purpose }}</span></button></div><span class="resource-size">{{ resource.width }} × {{ resource.height }}</span><el-tag :type="stateType(resource.state)" effect="light">{{ stateLabel(resource.state) }}{{ store.isDemo ? ' · 示例' : '' }}</el-tag></div><el-empty v-if="!filtered.length" :description="store.resources.length ? '没有符合筛选的资源' : store.resourceInventoryKnown ? '当前项目尚无资源清单' : '真实资源清单尚未读取'" :image-size="90"/><div class="list-footer"><el-icon><Lock/></el-icon><span>Owner 资产保留 · UUID 与运行证据在交付阶段展示</span></div></section><aside class="resource-detail panel"><template v-if="focused"><span class="field-label">所选资源需求</span><h2>{{ focused.name }}</h2><dl class="detail-list"><div><dt>用途</dt><dd>{{ focused.purpose }}</dd></div><div><dt>默认尺寸</dt><dd>{{ focused.width }} × {{ focused.height }}</dd></div><div><dt>输出格式</dt><dd>{{ focused.format }}</dd></div><div><dt>规范版本</dt><dd>{{ focused.specVersion || '待确认' }}</dd></div></dl><div class="detail-divider"></div><div class="detail-title"><h3>参考与主体</h3><el-tag type="info" size="small">示意插画</el-tag></div><div class="reference-stage"><div class="reference-small"><AssetArt kind="coin"/></div><div class="roi-frame"><span>主体 ROI · 示例</span><AssetArt :kind="focused.illustration"/></div><div class="reference-small"><AssetArt kind="sword"/></div></div><p class="form-help">界面占位图，未读取任何真实截图或 ROI。</p><div class="guidance-box">{{ focused.note || '尚无资源备注。' }}</div></template><el-empty v-else description="选择资源后查看需求" :image-size="80"/></aside></div><section class="action-bar panel"><div><h3>生成队列<el-tag type="info" size="small">未接通</el-tag></h3><p>已选 {{ selectedIds.length }} 项 · 尚未提交任何生成任务</p></div><div><el-tooltip content="生成接口尚未接通。本阶段不提交任务。"><span><el-button disabled>查看真实队列</el-button></span></el-tooltip><el-button type="primary" :icon="MagicStick" disabled>生成所选（未接通）</el-button></div></section></template>
+    <template v-else-if="step === 3"><div class="review-toolbar"><div><el-tag type="info">统一背景</el-tag><span>{{ store.resourceInventoryKnown ? `${filtered.length} 项` : '资源清单未读取' }} · {{ store.isDemo ? '全部为示例占位' : '只读资源记录' }}</span></div><el-select v-model="category" aria-label="审阅分类"><el-option v-for="item in categories" :key="item" :label="item" :value="item"/></el-select></div><div class="review-grid"><article v-for="resource in filtered" :key="resource.id" class="review-card panel" :class="{ selected: selectedIds.includes(resource.id) }"><div class="review-card-top"><el-checkbox :model-value="selectedIds.includes(resource.id)" :disabled="resource.ownerProtected" :aria-label="`审阅选择${resource.name}`" @change="toggle(resource, Boolean($event))"><span class="sr-only">审阅选择{{ resource.name }}</span></el-checkbox><el-tag :type="stateType(resource.state)">{{ stateLabel(resource.state) }}{{ store.isDemo ? ' · 示例' : '' }}</el-tag></div><AssetArt :kind="resource.illustration" large/><div class="review-card-body"><h3>{{ resource.name }}</h3><p>{{ resource.width }} × {{ resource.height }} · 默认尺寸</p><p>{{ resource.specVersion || '规范待确认' }} · {{ resource.ownerProtected ? 'Owner 保留' : '候选记录' }}</p></div><div class="review-card-note">{{ resource.note }}</div></article></div><el-empty v-if="!filtered.length" description="当前分类没有可审阅资源"/><section class="action-bar panel"><div><h3>已选择 {{ selectedIds.length }} 项</h3><p>批准仅作用于所选项；保护已有 Owner 资产</p></div><div><el-button disabled>返工并备注（未接通）</el-button><el-button type="primary" disabled>批准所选（未接通）</el-button></div></section><div class="stage-warning"><el-icon><Warning/></el-icon>技术检查不等于视觉批准。此页没有执行任何真实批准。</div></template>
+    <template v-else-if="step === 4"><section class="panel delivery-panel"><div class="section-heading"><h2>批准后的交付</h2><el-tag type="info">独立状态</el-tag></div><div class="delivery-flow"><div><span class="delivery-icon"><el-icon><Document/></el-icon></span><el-tag type="info">{{ store.isDemo ? '未执行 · 示例' : '尚无证据' }}</el-tag><h3>Cocos 资源导入</h3><p>记录源文件、UUID 与版本</p></div><el-icon class="flow-arrow"><ArrowRight/></el-icon><div><span class="delivery-icon"><el-icon><Lock/></el-icon></span><el-tag type="info">{{ store.isDemo ? '未执行 · 示例' : '尚无证据' }}</el-tag><h3>Prefab 组件绑定</h3><p>检查目标、引用与保护范围</p></div><el-icon class="flow-arrow"><ArrowRight/></el-icon><div><span class="delivery-icon"><el-icon><CircleCheck/></el-icon></span><el-tag type="info">{{ store.isDemo ? '未执行 · 示例' : '尚无证据' }}</el-tag><h3>设计尺寸验收</h3><p>{{ store.spec ? `${store.spec.width} × ${store.spec.height}` : '待确认画布' }} 实际运行检查</p></div></div><div class="stage-warning"><el-icon><Warning/></el-icon>导入成功 ≠ 已绑定 ≠ 已验收。失败停在当前阶段。</div><div class="delivery-footer"><span>批准母图 → 扩展尺寸导出 → 工程交接</span><el-button type="primary" disabled>导入与绑定（未接通）</el-button></div></section><section class="panel evidence-panel"><h3>交接证据</h3><el-empty description="尚无真实导入记录、UUID 或 Prefab 绑定证据" :image-size="85"/></section></template>
+    <template v-else><section class="panel runtime-panel"><div class="runtime-intro"><span class="round-icon"><el-icon><CircleCheck/></el-icon></span><div><span class="section-kicker">RUNTIME ACCEPTANCE</span><h2>最终效果，需要在真实页面确认</h2><p>截图、运行日志与规范版本一起归档。界面测试通过不能替代引擎运行验收。</p></div></div><div class="runtime-checks"><div v-for="item in ['设计尺寸与安全区', '文字、输入与状态', '透明边缘与九切片', 'Prefab 引用与 Owner 保护']" :key="item"><span>{{ item }}</span><el-tag type="info">未检查</el-tag></div></div><div class="stage-warning"><el-icon><Warning/></el-icon>当前没有 Creator / Bridge 实机运行证据，不生成“已通过”结论。</div><div class="delivery-footer"><span>验收画布：{{ store.spec ? `${store.spec.width} × ${store.spec.height}` : '待确认' }}</span><el-button type="primary" disabled>运行并验收（未接通）</el-button></div></section></template>
+    <SpecDialog v-model="editOpen"/>
+  </template>
+</template>

@@ -1,0 +1,392 @@
+{
+  "profiler": [
+    {
+      "kind": "heading",
+      "text": "性能诊断与 Cocos Profiler"
+    },
+    {
+      "kind": "note",
+      "text": "可通过 profiler_capture 采集性能证据，或在 playtest_run 中启用 profilerCapture。终端入口为 creator-ai profiler capture；人工深诊断在 Edge DevTools 的 Cocos Profiler 面板完成。"
+    },
+    {
+      "kind": "paragraph",
+      "text": "检查卡顿、运行时错误、渲染和 2D 批次问题。"
+    },
+    {
+      "kind": "code",
+      "text": "请检查当前工程的卡顿原因、运行时报错和渲染批次问题，并给出修复建议。请按复现步骤试玩后采集一次性能证据；修改后再采集一次，说明前后的变化。"
+    }
+  ],
+  "playtest": [
+    {
+      "kind": "heading",
+      "text": "自动试玩与构建验收"
+    },
+    {
+      "kind": "note",
+      "text": "可通过 playtest_probe 和 playtest_run 查看试玩。步骤成功时调用记为成功并保留报告，但这不是验收通过。构建验收用 build_start、build_get_status 与 build_smoke。终端入口为 creator-ai playtest run 和 creator-ai build smoke。"
+    },
+    {
+      "kind": "paragraph",
+      "text": "按真实操作路径试玩，并检查构建是否可用。步骤成功会保留试玩报告；这仍不能当作验收通过，因为还不能确认预览页面跑的是这次编译。构建冒烟仍按构建产物验收。"
+    },
+    {
+      "kind": "code",
+      "text": "请按真实操作路径查看当前工程，记录截图和错误。试玩结果目前不能当作通过。确认 Web Mobile 构建已完成且产物没有变化后，再检查构建能否正常打开，并汇报构建验收结果。"
+    }
+  ],
+  "animation": [
+    {
+      "kind": "heading",
+      "text": "动画与输入模拟"
+    },
+    {
+      "kind": "note",
+      "text": "可使用 animation_*、spine_*、simulate_* 与 bind_button_click_event；CLI 对应 creator-ai animation、spine、input。Spine 未启用模块时返回不支持，输入模拟需要可用 Preview。"
+    },
+    {
+      "kind": "paragraph",
+      "text": "控制动画，并模拟按钮、键盘和鼠标操作。"
+    },
+    {
+      "kind": "code",
+      "text": "请检查 Preview 和目标动画组件是否可用，然后对目标节点执行这项操作：<写入具体要求>。记录操作结果；如果当前工程不支持，请说明原因。"
+    }
+  ],
+  "projects": [
+    {
+      "kind": "heading",
+      "text": "什么是工程管理"
+    },
+    {
+      "kind": "paragraph",
+      "text": "工程管理就是在本机浏览器打开的 Creator AI Companion 管理页里，用图形界面把 Cocos Creator 工程加进来，再通过 Cocos Dashboard 启动或复用 Creator。不需要记终端命令，也不必先手写 Agent 的 MCP 配置。"
+    },
+    {
+      "kind": "note",
+      "text": "工程管理负责在管理页把 Cocos Creator 工程接上并启动 Creator。需要让 Codex、Cursor 等 AI 使用工程时，再到「CLI 接入」或「MCP 接入」。"
+    },
+    {
+      "kind": "heading",
+      "text": "管理页一键接入"
+    },
+    {
+      "kind": "item",
+      "text": "点击工程列表搜索栏旁的 +，打开「添加项目」。"
+    },
+    {
+      "kind": "item",
+      "text": "第 1 步选择来源（自定义目录或 Cocos Dashboard），第 2 步选好工程路径后点「下一步」。"
+    },
+    {
+      "kind": "item",
+      "text": "在第 3 步确认后点击「通过 Dashboard 启动 Creator」，等待进度完成。"
+    },
+    {
+      "kind": "item",
+      "text": "第 4 步多选要接入的 Agent（Codex / Cursor / Trae / Kiro / VS Code，支持全选），或跳过。"
+    },
+    {
+      "kind": "item",
+      "text": "第 5 步会显示使用示例文本，点击提示词块中的「复制」后粘贴到 Agent 新建任务中。"
+    },
+    {
+      "kind": "heading",
+      "text": "接入后使用"
+    },
+    {
+      "kind": "item",
+      "text": "使用示例 位于「添加项目」弹窗时间线第 5 步「完成」，点击提示词块中的「复制」复制完整文本。"
+    },
+    {
+      "kind": "item",
+      "text": "Creator 重启后无需重新走向导；若 Bridge 断开，可在工程卡片中重新启动 Creator。"
+    },
+    {
+      "kind": "item",
+      "text": "工程处于 ready 时，卡片工具栏左侧会出现预览、聚焦、停止、重启、探针、状态、刷新、取证；悬停卡片可从右侧滑出打开目录、注册 MCP、使用 CLI 与移除。点击标题行工具/权限标签可设置工具范围。标题行显示 取证：与状态圆点；详情区显示最近一次调用和距今时间，点击打开调用记录；Preview 结果可隐藏收起。Creator 3.8.8 无官方停止接口。"
+    },
+    {
+      "kind": "item",
+      "text": "写入 Agent MCP 配置见「MCP 接入」；终端或 Agent 直接跑 creator-ai 见「CLI 接入」。"
+    }
+  ],
+  "cli": [
+    {
+      "kind": "paragraph",
+      "text": "工程已在“工程管理”中接好后，终端或 Agent 直接跑 creator-ai，无需写入 Agent MCP 配置。"
+    },
+    {
+      "kind": "heading",
+      "text": "CLI 一键接入"
+    },
+    {
+      "kind": "code",
+      "text": "creator-ai setup \"/absolute/path/to/cocos-project\""
+    },
+    {
+      "kind": "note",
+      "text": "无需写入 Agent 的 MCP 配置。把路径换成目标 Cocos 工程的绝对目录后再执行。"
+    },
+    {
+      "kind": "heading",
+      "text": "无需注册即可使用"
+    },
+    {
+      "kind": "paragraph",
+      "text": "先诊断并解析目标工程，再使用语义命令："
+    },
+    {
+      "kind": "code",
+      "text": "creator-ai doctor --json\ncreator-ai project resolve --project <projectId-or-absolute-path> --json\ncreator-ai creator info --project <projectId> --json\ncreator-ai scene tree --project <projectId> --json"
+    },
+    {
+      "kind": "paragraph",
+      "text": "--project 只接受精确 projectId 或已注册工程的绝对路径，不根据当前目录或最后打开的 Creator 猜测。之后优先使用 creator-ai <group> <action> 语义命令，并加上 --json。"
+    },
+    {
+      "kind": "heading",
+      "text": "工程卡片「使用 CLI」"
+    },
+    {
+      "kind": "paragraph",
+      "text": "点击工程卡片中紧邻「注册 MCP」的 使用 CLI，可复制绑定当前工程的四段内容：检查命令、短任务提示词、CLI 使用说明 SKILL.md、写入项目级 Skill 目录的安装提示词。通用模板见上方；绑定真实 projectId 的复制件只在该弹窗中生成。"
+    },
+    {
+      "kind": "heading",
+      "text": "安全要点"
+    },
+    {
+      "kind": "item",
+      "text": "禁止直接改写 .scene、.prefab 或 .meta；写入必须经 Daemon、Bridge 与 Creator 序列化。"
+    },
+    {
+      "kind": "item",
+      "text": "交互式 Creator 必须经 Cocos Dashboard 启动或复用，禁止直接执行 CocosCreator --project。"
+    },
+    {
+      "kind": "item",
+      "text": "Preview、截图、试玩、Build Smoke 与 Profiler 的浏览器自动化使用本机 Microsoft Edge。给你看的预览页在已经打开的 Edge 窗口里新建页签，不再另外弹出窗口。"
+    }
+  ],
+  "mcp": [
+    {
+      "kind": "paragraph",
+      "text": "工程已在“工程管理”中接好后，把绑定 projectId 的 MCP 写入 Codex / Cursor / Trae / Kiro / VS Code。"
+    },
+    {
+      "kind": "heading",
+      "text": "MCP 注册（每个工程单独一条）"
+    },
+    {
+      "kind": "paragraph",
+      "text": "在「工程列表」中，对目标工程卡片点击 注册 MCP，在弹出面板中选择目标："
+    },
+    {
+      "kind": "item",
+      "text": "Codex：执行 codex mcp add，按稳定 projectId 绑定该工程。"
+    },
+    {
+      "kind": "item",
+      "text": "Cursor：写入 ~/.cursor/mcp.json；若未立即出现，请在 Settings → MCP 刷新或重开 Agent 会话。"
+    },
+    {
+      "kind": "item",
+      "text": "Trae：写入 ~/.trae/mcp.json（Cursor 兼容格式）。"
+    },
+    {
+      "kind": "item",
+      "text": "Kiro：写入 ~/.kiro/settings/mcp.json（Cursor 兼容格式）。"
+    },
+    {
+      "kind": "item",
+      "text": "VS Code：写入工程内 .vscode/mcp.json。"
+    },
+    {
+      "kind": "item",
+      "text": "多工程需分别注册；同一工程重复注册一般为幂等（已存在则不改）。"
+    },
+    {
+      "kind": "heading",
+      "text": "手工注册"
+    },
+    {
+      "kind": "code",
+      "text": "codex mcp add <name> -- creator-ai mcp --project <projectId>"
+    },
+    {
+      "kind": "note",
+      "text": "projectId 可悬浮工程状态（stopped）查看；ready 时悬浮可见对应 setup 命令。把命令中的 <name> 与 <projectId> 换成实际值后再执行。"
+    },
+    {
+      "kind": "heading",
+      "text": "接入后使用"
+    },
+    {
+      "kind": "item",
+      "text": "在 Codex / Cursor / Trae / Kiro / VS Code 中新建任务，粘贴接入向导第 5 步「使用示例」得到的文本，并选用对应工程的 MCP。"
+    },
+    {
+      "kind": "item",
+      "text": "所有 MCP 工具调用均绑定该工程的 projectId，不会误操作其他工程。"
+    },
+    {
+      "kind": "item",
+      "text": "Creator 重启后无需重新注册；若 Bridge 断开，可在工程卡片中重新启动 Creator。"
+    },
+    {
+      "kind": "heading",
+      "text": "生成项目专用 Skill"
+    },
+    {
+      "kind": "note",
+      "text": "将下面的提示词复制到已接入本工程 MCP 的 Cursor、Codex 或其他 Agent。Agent 会先理解工程，再生成并校验可复用的项目级 Skill。"
+    },
+    {
+      "kind": "code",
+      "text": "你正在一个已接入 Creator AI MCP 的 Cocos Creator 项目中。请不要只提供教程或示例，直接为当前项目创建一个可被当前 Agent 自动发现和复用的项目专用 Skill。\n\n要求：\n1. 先阅读当前仓库的 AGENTS.md、README、package.json、已有 Skill 和关键目录，并通过本工程的 Creator AI MCP 确认绑定的 projectId、Creator/Bridge 状态及可用工具；不要操作其他工程。\n2. 识别当前运行环境（Cursor、Codex 或其他兼容 Agent）实际支持的项目级 Skill 目录与格式，优先使用该环境的项目级共享目录；不要凭空猜路径。若环境支持通用 Agent Skills，使用“<skill-name>/SKILL.md”结构。\n3. 根据工程中重复出现且有项目特性的工作流，归纳 2～4 个真实触发示例，再确定一个最值得复用的 Skill。Skill 名称使用 64 字符以内的小写字母、数字和连字符。\n4. SKILL.md 的 YAML frontmatter 只保留 name 和 description；description 同时写清“做什么”和“什么情况下触发”。正文使用简洁的命令式步骤，只保留 Agent 不容易自行推断的项目知识。\n5. Skill 必须要求执行前核对目标工程和真实 db://assets/... 场景；修改 Scene、Prefab、Meta 时只能使用 Creator AI MCP 的安全接口，遵守 revision/hash、保存后回读、Undo/回滚和验证要求，禁止直接改写序列化文件。\n6. 仅在确有重复价值时创建 scripts/、references/ 或 assets/；不要创建 README、安装指南、更新日志等额外文件。脚本必须实际运行测试。\n7. 若同名 Skill 已存在，先读取并做最小增量更新，不得覆盖无关内容。不要修改游戏功能代码，也不要提交或推送本次变更。\n8. 创建后运行当前环境可用的 Skill 校验器；若没有校验器，至少检查目录名、frontmatter、引用路径和触发描述，并用一个真实示例做只读演练。\n9. 最后汇报：Skill 路径、适用场景、触发示例、生成的资源、校验结果，以及在当前 Agent 中自动触发和显式调用各一个示例。\n\n现在开始检查当前工程并生成 Skill；只有目标位置或工作流存在会显著改变结果的歧义时才向我提一个简短问题。"
+    }
+  ],
+  "scene": [
+    {
+      "kind": "heading",
+      "text": "场景与 Prefab 编辑"
+    },
+    {
+      "kind": "note",
+      "text": "可使用 scene_*、prefab_* 和 node_ops；节点支持 UUID、路径或唯一名称。batch_execute 的 atomic 模式仅支持同一文档的补丁。CLI 对应 creator-ai scene、prefab、node、batch。写入需要 Creator 已连接，并受 revision、hash 与 Creator 权限保护。"
+    },
+    {
+      "kind": "paragraph",
+      "text": "安全读取、修改和校验场景或预制体。"
+    },
+    {
+      "kind": "code",
+      "text": "请读取目标场景或 Prefab，完成这项最小修改：<写入具体要求>。保存后重新读取并确认结果；不要直接编辑 .scene、.prefab 或 .meta 文件。"
+    }
+  ],
+  "assets": [
+    {
+      "kind": "heading",
+      "text": "资源与脚本检查"
+    },
+    {
+      "kind": "note",
+      "text": "可使用 asset_*、script_* 和 lsp_*；CLI 对应 creator-ai asset 和 script。删除资源或执行编辑器脚本需要满足额外权限与确认条件。"
+    },
+    {
+      "kind": "paragraph",
+      "text": "盘点资源、检查依赖，并确认脚本编译情况。"
+    },
+    {
+      "kind": "code",
+      "text": "请检查目标资源及其依赖：<写入具体范围>。如需修改脚本，只做必要改动；等待编译完成后检查错误，并汇报可以确认的结果。"
+    }
+  ],
+  "ui": [
+    {
+      "kind": "heading",
+      "text": "UI 制作与截图"
+    },
+    {
+      "kind": "note",
+      "text": "可使用 knowledge_query、ui_*、viewport_* 与 capture_*_screenshot；CLI 对应 creator-ai knowledge query、ui、viewport 和 capture。UI 构建会自动准备必要组件并返回设计范围与越界提醒；参考图登记后仍需用编辑器截图确认实际显示。"
+    },
+    {
+      "kind": "paragraph",
+      "text": "先查询界面规则，再按文字或参考图一次搭好层级，并检查显示范围。"
+    },
+    {
+      "kind": "code",
+      "text": "请先查询当前 Creator 版本的 UI 布局和坐标规则，再读取现有界面和可用字体。按这个要求制作界面：<写入具体要求或参考图路径>。一次创建完整层级，保存后检查是否超出画布，并截取编辑器或 Preview 图片确认结果。"
+    }
+  ],
+  "tools": [
+    {
+      "kind": "note",
+      "text": "所有工具均绑定当前工程 projectId；写入工具继续受 revision、hash 和 Creator 权限保护。“全部工具”开放所有 Creator MCP 工具，“核心工具”仅开放常用工具；工具范围不会提升 Creator 权限。"
+    },
+    {
+      "kind": "heading",
+      "text": "工具范围"
+    },
+    {
+      "kind": "note",
+      "text": "为工程选择默认工具范围；已连接的 MCP 客户端需重连后生效。"
+    },
+    {
+      "kind": "note",
+      "text": "当前新前端尚未接入工具动态目录与工具预设管理。这里只保留 v148 静态说明；不展示虚构工具清单或工程权限，不执行复制预设、改名、保存、删除、导入或导出。"
+    }
+  ],
+  "knowledge-can": [
+    {
+      "kind": "heading",
+      "text": "能做的事"
+    },
+    {
+      "kind": "paragraph",
+      "text": "顶栏「知识库」用来查看和使用本机知识库。服务没启动时只显示启动；启动后才出现检索、文档、提问和同步。允许嵌入时，本机知识库页面直接开在这里；不允许时改为新页签打开。"
+    },
+    {
+      "kind": "item",
+      "text": "列出并查看知识库。文档、混合检索和对知识库提问都作用在当前选中的库；没选时仍用默认库。"
+    },
+    {
+      "kind": "item",
+      "text": "按标题筛选并列出文档，查看一条文档，下载不超过 1 MiB 的原文，并查看该文档开头的分块。超过上限时会标明截断。"
+    },
+    {
+      "kind": "item",
+      "text": "混合检索同时使用向量和关键词，默认 10 条，最多 1000 条。结果显示来源通道与版本；缺少来源时标为未知。"
+    },
+    {
+      "kind": "item",
+      "text": "向当前库提问，回答带引用。追问沿用这次会话，也可以新开对话。"
+    },
+    {
+      "kind": "item",
+      "text": "列出自定义 Agent，选中后提问。追问沿用该 Agent 的会话。"
+    }
+  ],
+  "knowledge-cannot": [
+    {
+      "kind": "heading",
+      "text": "不会做的事"
+    },
+    {
+      "kind": "note",
+      "text": "关闭服务只结束本页拉起的知识库进程。端口被其他程序占用时，不会停掉对方。"
+    },
+    {
+      "kind": "item",
+      "text": "页面不提供创建、删除和上传。"
+    },
+    {
+      "kind": "item",
+      "text": "没有对话权限，或当前库没有配置对话模型时，只有提问会失败。检索、文档和列表仍可使用。"
+    },
+    {
+      "kind": "item",
+      "text": "同步默认收起，并且不跟随当前所选知识库。没有登记来源时，同步保持关闭，这不是检索失败。试运行只展示计划；执行同步默认关闭，页面不能自行打开写库。"
+    },
+    {
+      "kind": "item",
+      "text": "文档正文和回答只显示在本页，不写入工程日志。"
+    }
+  ],
+  "models": [
+    {
+      "kind": "heading",
+      "text": "模型服务"
+    },
+    {
+      "kind": "paragraph",
+      "text": "顶栏「模型服务」用来打开本机 AI 服务启动器。服务没启动时只显示启动按钮；启动后，启动器嵌入这一页。"
+    },
+    {
+      "kind": "paragraph",
+      "text": "关闭服务只结束这个启动器，不停止启动器面板里已经运行的模型。"
+    }
+  ]
+}

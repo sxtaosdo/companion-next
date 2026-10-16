@@ -1,0 +1,105 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { createPinia } from 'pinia'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { flushPromises, mount } from '@vue/test-utils'
+import type { VueWrapper } from '@vue/test-utils'
+import ElementPlus, { ElMessage } from 'element-plus'
+import { projectDisplayPathKey, projectDisplayRank } from '../src/domain/companion-project-display'
+import CompanionBrowserView from '../src/views/CompanionBrowserView.vue'
+import { useCompanionBrowserStore } from '../src/stores/companion-browser'
+import { companionBrowserProvider, companionEventProvider, registerCompanionBrowserProvider, isCompanionReadHost } from '../src/companion-browser-integration'
+import { creatorOperationsProvider } from '../src/creator-operations-integration'
+import { projectSetupProvider } from '../src/project-setup-integration'
+import type { CompanionEventHandlers } from '../src/domain/companion-live'
+import type { CompanionBrowserProvider } from '../src/domain/companion-browser'
+let wrapper:VueWrapper|undefined
+function fixture():CompanionBrowserProvider{return {label:'OFFLINE TEST',loadProjects:vi.fn(async()=>({projects:[{id:'p1',name:'有状态',path:'/p1'},{id:'p2',name:'未读状态',path:'/p2',requiredCreatorVersion:'3.8.8'}],statuses:[{projectId:'p1',state:'ready' as const,capabilityProfile:'read-only' as const}],dashboard:[],warnings:[]})),loadCounts:vi.fn(async()=>({sessionId:'s1',counts:{},latest:{}})),loadLogs:vi.fn(async()=>[]),loadCalls:vi.fn(async()=>({sessionId:'s1',total:0,retained:0,records:[]}))}}
+async function setup(path='/projects'){const pinia=createPinia(),router=createRouter({history:createMemoryHistory(),routes:[{path:'/projects',component:CompanionBrowserView}]});await router.push(path);await router.isReady();wrapper=mount(CompanionBrowserView,{attachTo:document.body,global:{plugins:[pinia,router,ElementPlus]}});await flushPromises();return {store:useCompanionBrowserStore(pinia),router}}
+function button(text:string){const found=wrapper!.findAll('button').find(b=>b.text().includes(text)||b.attributes('aria-label')===text);if(!found)throw Error(`Missing button ${text}`);return found}
+async function tip(label:string){const trigger=wrapper!.get(`button[aria-label="${label}"]`);await trigger.trigger('click');await flushPromises();const id=trigger.attributes('aria-describedby');expect(id).toBeTruthy();const content=document.getElementById(id!);expect(content).not.toBeNull();return content!.textContent??''}
+afterEach(()=>{wrapper?.unmount();wrapper=undefined;ElMessage.closeAll();creatorOperationsProvider.value=null;projectSetupProvider.value=null;companionBrowserProvider.value=null;companionEventProvider.value=null;vi.restoreAllMocks();sessionStorage.clear();document.body.innerHTML=''})
+describe('Companion read UI and host identity',()=>{
+ it('binds Dashboard tooltip data to its project without extra reads or permanent details',async()=>{
+  const p=fixture();vi.mocked(p.loadProjects).mockResolvedValue({projects:[{id:'p1',name:'Dashboard工程',path:'/p1'},{id:'p2',name:'另一工程',path:'/p2'}],statuses:[{projectId:'p1',state:'launching',capabilityProfile:'unknown',launchSource:'dashboard',dashboardVersion:'2.4.0',dashboardProgress:'waiting-dashboard'}],dashboard:[],warnings:[]})
+  registerCompanionBrowserProvider(p);const {store}=await setup();await store.connect(p);await flushPromises()
+  const cards=wrapper!.findAll('.companion-project-card'),calls=vi.mocked(p.loadProjects).mock.calls.length
+  const first=cards.find(card=>card.text().includes('Dashboard工程'))!,second=cards.find(card=>card.text().includes('另一工程'))!
+  expect(first.text()).not.toContain('Dashboard 状态');expect(first.text()).not.toContain('2.4.0')
+  const trigger=first.get('.project-status-trigger');await trigger.trigger('focus');await flushPromises()
+  expect(document.getElementById(trigger.attributes('aria-describedby')!)?.textContent).toBe('Dashboard 2.4.0\nDashboard 状态 waiting-dashboard')
+  expect(second.get('.project-status-trigger').attributes('tabindex')).toBeUndefined()
+  expect(vi.mocked(p.loadProjects).mock.calls.length).toBe(calls)
+  store.disconnect();await flushPromises();expect(wrapper!.findAll('.project-status-trigger')).toHaveLength(0)
+ })
+ it('labels passive connection as unprobed and keeps its explanation in a tooltip',async()=>{
+  const p={...fixture(),runtimeProbesEnabled:false};p.loadProjects=vi.fn(async()=>({projects:[{id:'p1',name:'只读登记',path:'/fixture'}],statuses:[],dashboard:[],warnings:['运行状态未探测']}));registerCompanionBrowserProvider(p);await setup();await button('连接 Companion').trigger('click');await flushPromises()
+  const card=wrapper!.get('.companion-project-card');expect(card.text()).toContain('运行状态未探测');expect(card.text()).not.toContain('已停止');expect(card.text()).toContain('最近打开未读取')
+  expect(wrapper!.text()).not.toContain('不探测 Bridge');expect(await tip('工程连接说明')).toContain('不探测 Bridge 或 Dashboard')
+ })
+ it('preserves opened-first ordering without treating missing or unknown state as opened',()=>{expect(projectDisplayRank('ready',100)).toEqual([1,100]);expect(projectDisplayRank('stopped',200)).toEqual([0,200]);expect(projectDisplayRank(undefined,undefined)).toEqual([0,0]);expect(projectDisplayRank('unknown',300)).toEqual([0,300])})
+ it('normalizes Windows display paths without changing POSIX case identity',()=>{expect(projectDisplayPathKey('C:\\Game\\')).toBe(projectDisplayPathKey('c:/Game'));expect(projectDisplayPathKey('/Game')).not.toBe(projectDisplayPathKey('/game'))})
+ it('registers only an explicit read build on the exact local host, never inferred from Picker path',()=>{for(const mode of ['development','production','picker'])expect(isCompanionReadHost(mode,{protocol:'http:',hostname:'127.0.0.1'})).toBe(false);expect(isCompanionReadHost('companion-readonly',{protocol:'http:',hostname:'127.0.0.1'})).toBe(true);for(const hostname of ['localhost','example.com','127.0.0.2'])expect(isCompanionReadHost('companion-readonly',{protocol:'http:',hostname})).toBe(false)})
+ it('does not fetch, embed the old UI or show fictitious zero counts on entry',async()=>{
+  const p=fixture();registerCompanionBrowserProvider(p);await setup();expect(p.loadProjects).not.toHaveBeenCalled();expect(p.loadCounts).not.toHaveBeenCalled();expect(p.loadLogs).not.toHaveBeenCalled();expect(p.loadCalls).not.toHaveBeenCalled()
+  expect(wrapper!.text()).toContain('工程数量未读取');expect(wrapper!.findAll('iframe')).toHaveLength(0);expect(wrapper!.findAll('[role="dialog"]').filter(item=>item.isVisible())).toHaveLength(0)
+ })
+ it('reads only after explicit connect and leaves missing runtime and counts unknown',async()=>{
+  const p=fixture();registerCompanionBrowserProvider(p);await setup();await button('连接 Companion').trigger('click');await flushPromises()
+  expect(wrapper!.findAll('.companion-project-card')).toHaveLength(2);const missing=wrapper!.findAll('.companion-project-card')[1]!
+  expect(missing.text()).toContain('未知');expect(missing.text()).toContain('调用总数未记录');expect(missing.text()).toContain('当前 Creator未读取工程要求版本3.8.8');expect(p.loadLogs).not.toHaveBeenCalled();expect(p.loadCalls).not.toHaveBeenCalled()
+  expect(await tip('调用统计说明')).toContain('没有记录不推断为零')
+ })
+ it('opens calls for the explicit project, shows empty only after actual response and never replays',async()=>{
+  const p=fixture();registerCompanionBrowserProvider(p);const {router}=await setup();await button('连接 Companion').trigger('click');await flushPromises();await button('查看调用记录').trigger('click');await flushPromises()
+  expect(router.currentRoute.value.query.tab).toBe('calls');expect(wrapper!.text()).toContain('本次查询没有匹配调用');expect(p.loadCalls).toHaveBeenCalledTimes(1);expect(p.loadCalls).toHaveBeenCalledWith('p1',{failed:false},expect.any(AbortSignal))
+  expect(wrapper!.text()).not.toContain('不执行或重放');expect(await tip('调用记录说明')).toContain('不执行或重放工具调用')
+ })
+ it('retains actual call pagination while moving capacity limits into an accessible tip',async()=>{
+  const p=fixture();vi.mocked(p.loadCalls).mockResolvedValueOnce({sessionId:'s1',total:80,retained:80,nextBefore:31,records:[]}).mockResolvedValueOnce({sessionId:'s1',total:80,retained:80,records:[]})
+  registerCompanionBrowserProvider(p);await setup();await button('连接 Companion').trigger('click');await flushPromises();await button('查看调用记录').trigger('click');await flushPromises()
+  expect(wrapper!.text()).toContain('累计 80 次');expect(wrapper!.text()).toContain('保留 80 条');expect(await tip('调用分页说明')).toContain('每页最多50条')
+  await button('加载更多（50 条）').trigger('click');await flushPromises();expect(p.loadCalls).toHaveBeenNthCalledWith(2,'p1',{failed:false,before:31},expect.any(AbortSignal));expect(wrapper!.text()).not.toContain('加载更多（50 条）')
+ })
+ it('keeps logs manual and invalidates old display after filter changes',async()=>{
+  const p=fixture();registerCompanionBrowserProvider(p);const {store}=await setup('/projects?tab=logs');await store.connect(p);await flushPromises();expect(p.loadLogs).not.toHaveBeenCalled()
+  await button('查询 / 刷新日志').trigger('click');await flushPromises();expect(wrapper!.text()).toContain('本次条件返回空日志');store.logFilter.search='new';await flushPromises();expect(wrapper!.text()).toContain('筛选已变');expect(p.loadLogs).toHaveBeenCalledTimes(1)
+  expect(await tip('日志范围说明')).toContain('最多最新200条');expect(await tip('日志范围说明')).toContain('无历史分页')
+ })
+ it('checks provider identity immediately after returning from another route',async()=>{
+  const old=fixture();registerCompanionBrowserProvider(old);const pinia=createPinia(),store=useCompanionBrowserStore(pinia);await store.connect(old);registerCompanionBrowserProvider(fixture());const router=createRouter({history:createMemoryHistory(),routes:[{path:'/projects',component:CompanionBrowserView}]});await router.push('/projects');await router.isReady();wrapper=mount(CompanionBrowserView,{global:{plugins:[pinia,router,ElementPlus]}});await flushPromises();expect(store.connected).toBe(false);expect(store.provider).toBeNull();expect(store.projects).toEqual([])
+ })
+ it('disconnects on composition-root changes and cancels pending reads on unmount',async()=>{
+  const p=fixture();registerCompanionBrowserProvider(p);const {store}=await setup();await store.connect(p);registerCompanionBrowserProvider(fixture());await flushPromises();expect(store.connected).toBe(false);expect(store.projects).toEqual([]);const cancel=vi.spyOn(store,'cancelReads');wrapper!.unmount();wrapper=undefined;expect(cancel).toHaveBeenCalledTimes(1)
+ })
+ it('requires a second explicit action for realtime and cleans it up on unmount',async()=>{
+  const p=fixture(),close=vi.fn();let handlers!:CompanionEventHandlers;const subscribe=vi.fn((h:CompanionEventHandlers)=>{handlers=h;return close});registerCompanionBrowserProvider(p,{label:'OFFLINE SSE',subscribe});const {store}=await setup()
+  expect(button('启用实时更新').attributes('disabled')).toBeDefined();await store.connect(p);await flushPromises();expect(subscribe).not.toHaveBeenCalled();await button('启用实时更新').trigger('click');expect(subscribe).toHaveBeenCalledTimes(1);handlers.onOpen();await flushPromises()
+  expect(wrapper!.get('[data-testid="live-state"]').text()).toBe('事件流已连接');expect(wrapper!.text()).not.toContain('没有回放或心跳');expect(await tip('实时更新说明')).toContain('没有回放或心跳')
+  wrapper!.unmount();wrapper=undefined;expect(close).toHaveBeenCalledTimes(1);expect(store.liveEnabled).toBe(false)
+ })
+ it('pauses only live logs through the visible controls',async()=>{
+  registerCompanionBrowserProvider(fixture(),{label:'OFFLINE SSE',subscribe:()=>()=>{}});const {store}=await setup('/projects?tab=logs');await store.connect(companionBrowserProvider.value!);await button('启用实时更新').trigger('click');await button('暂停实时日志').trigger('click')
+  expect(store.logsPaused).toBe(true);expect(store.liveEnabled).toBe(true);expect(wrapper!.text()).toContain('实时日志已暂停');expect(await tip('日志范围说明')).toContain('手动查询、工程和调用仍可读取');await button('恢复实时日志').trigger('click');expect(store.logsPaused).toBe(false)
+ })
+ it('obeys document visibility and detaches old-provider subscriptions',async()=>{
+  const close=vi.fn(),subscribe=vi.fn(()=>close);registerCompanionBrowserProvider(fixture(),{label:'OFFLINE SSE',subscribe});const {store}=await setup();await store.connect(companionBrowserProvider.value!);await button('启用实时更新').trigger('click');vi.spyOn(document,'visibilityState','get').mockReturnValue('hidden');document.dispatchEvent(new Event('visibilitychange'));await flushPromises();expect(store.liveState).toBe('suspended');expect(close).toHaveBeenCalledTimes(1);vi.spyOn(document,'visibilityState','get').mockReturnValue('visible');document.dispatchEvent(new Event('visibilitychange'));await flushPromises();expect(subscribe).toHaveBeenCalledTimes(2);companionEventProvider.value={label:'replacement',subscribe:()=>()=>{}};expect(store.liveEnabled).toBe(false);expect(close).toHaveBeenCalledTimes(2)
+ })
+ it('shows each Dashboard informational notice once per connection, not on every poll',async()=>{
+  const p=fixture(),info=vi.spyOn(ElMessage,'info');const first='Dashboard 发现未启用：本会话仅查询 Bridge 状态。',second='Dashboard 发现未启用：最近打开时间未读取。';let warnings=[first]
+  vi.mocked(p.loadProjects).mockImplementation(async()=>({projects:[{id:'p1',name:'工程',path:'/p1'}],statuses:[],dashboard:[],warnings:[...warnings]}));registerCompanionBrowserProvider(p);const {store}=await setup();await store.connect(p);await flushPromises()
+  expect(info).toHaveBeenCalledTimes(1);expect(wrapper!.findAll('.compact-warning')).toHaveLength(0);expect(wrapper!.text()).not.toContain(first)
+  await store.refreshProjects();await store.refreshProjects();await flushPromises();expect(info).toHaveBeenCalledTimes(1)
+  warnings=[first,second];await store.refreshProjects();await flushPromises();expect(info).toHaveBeenCalledTimes(2)
+  store.disconnect();await store.connect(p);await flushPromises();expect(info).toHaveBeenCalledTimes(4)
+ })
+ it('keeps important read failures persistently visible in compact form with full tooltip details',async()=>{
+  const p=fixture(),warning='运行状态未取得：Bridge 请求失败，请核对原后台日志。';vi.mocked(p.loadProjects).mockResolvedValue({projects:[{id:'p1',name:'状态失败',path:'/p1'}],statuses:[],dashboard:[],warnings:[warning]})
+  registerCompanionBrowserProvider(p);const {store}=await setup();await store.connect(p);await flushPromises()
+  expect(wrapper!.get('.compact-warning').text()).toBe('运行状态读取失败，请刷新重试。');expect(wrapper!.get('.companion-project-card').text()).toContain('未知');expect(wrapper!.text()).not.toContain('Bridge 请求失败')
+  expect(await tip('读取问题详情')).toBe(warning);await store.refreshProjects();await flushPromises();expect(wrapper!.get('.compact-warning').text()).toContain('运行状态读取失败')
+ })
+ it('retains actual connection errors instead of reducing them to transient success notices',async()=>{
+  const p=fixture();vi.mocked(p.loadProjects).mockRejectedValue(new Error('原服务不可达'));registerCompanionBrowserProvider(p);const {store}=await setup();await button('连接 Companion').trigger('click');await flushPromises()
+  expect(store.connected).toBe(false);expect(wrapper!.text()).toContain('工程读取失败');expect(wrapper!.text()).toContain('原服务不可达');expect(wrapper!.findAll('.companion-project-card')).toHaveLength(0)
+ })
+})

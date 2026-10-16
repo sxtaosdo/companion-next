@@ -1,0 +1,27 @@
+{
+  "filename": "companion-next-static-build.zip",
+  "libraryFileId": "libfile_a6f825ed053881919712986fe9301244",
+  "fileId": "file_00000000e44881fa83dcd383b3535545",
+  "version": 0,
+  "sizeBytes": 595208,
+  "sha256": "cfb423071e59ca82bfbb69cdf6a4814cb6aac3047310a61d90faa465c98a41f9",
+  "frontendVersion": "0.1.4",
+  "sourceCommit": "3a2ee1ff403f47ed73188f213f1158cc884068ac",
+  "entry": "/next/index.html#/projects",
+  "manifest": "companion-static-additions.json",
+  "manifestSha256": "4b58f32f357d06f43435ce6efc1b0dfbe46dec112333c7ae2ea4bd06696586df",
+  "archiveFileCount": 9,
+  "staticFileCount": 6,
+  "staticTotalBytes": 1795556,
+  "deployOnlyPrefix": "next/",
+  "keepOutsideWebRoot": [
+    "README.txt",
+    "STATIC-ADDITIONS.json",
+    "SHA256SUMS.txt"
+  ],
+  "independentArchiveReview": "passed",
+  "libraryMetadataApplied": true,
+  "windowsDeployedByThisTask": false,
+  "browserAcceptance": "pending",
+  "authorization": "Owner approved the four locked type/compiler packages and the create-only live webRoot next directory exception on 2026-10-12; execution-time identity, original hashes and path preflight remain required."
+}

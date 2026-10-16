@@ -1,0 +1,971 @@
+/** Creator AI Companion 交付更新日志。Agent 随功能变化维护；同一需求或 Bug 的连续修改合并，不接 API。 */
+/** 历史条目由 git 提交补记；面向用户行为描述，新版本插在 CHANGELOG_ENTRIES 最前。 */
+/** 展示前按北京时间日历日合并，保留当天最新条目的版本号与时间。 */
+
+export type ChangelogEntry = {
+  version: string;
+  updatedAt: string;
+  changes: string[];
+};
+
+/** 旧导出兼容；展示合并采用北京时间日历日。 */
+export const CHANGELOG_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  {
+    version: "0.3.148",
+    updatedAt: "2026-10-12T06:44:36.677Z",
+    changes: [
+      "Windows 打包固定采集脚本的 LF 原始字节，复制前后校验目标 manifest 的 pinned 哈希，避免复制一致却无法加载的包。旧包与历史报告保留；新 P1060 异常在终止证据不足时维持 UNKNOWN，修包不等于已释放租约或游戏验收",
+      "执行文档补齐原已批准的唯一第7关试玩行政放弃：两条旧请求的管理视图均为 ABANDONED，历史仍 UNKNOWN，原数据和完整报告保留，旧编号不能重放。副本核验新租约门已释放，后续仍使用新租约/编号及单写者、文件和运行窗口；本地 v0.3.147 文档检查点未部署，服务继续运行 v0.3.145",
+      "执行文档记录获准的 v0.3.145 部署与唯一图标测试请求审计：只读回查确认管理性放弃，原行、历史 UNKNOWN 和全部报告保留，另一条试玩未处置。v0.3.146 为本地文档检查点，服务继续运行 v0.3.145，未再次部署",
+      "单个图标测试工程的中断请求新增管理性恢复入口：精确核对原请求、派发、租约、主机启动与保留文件，仅追加不可改写的放弃审计，历史结果仍为 UNKNOWN，旧编号不能重放。恢复期间核验共享工作与并发请求，证据过期或变化时拒绝；CLI/MCP 保留业务编号并正确投影传输参数。Owner 已独立批准唯一图标测试请求的部署和管理性审计；授权不扩展至其他操作，原 4060 试玩恢复合同不变",
+      "更新日志按北京时间日历日合并，同一天保留最新版本与时间，跨零点的更新分别成组",
+    ],
+  },
+  {
+    version: "0.3.143",
+    updatedAt: "2026-10-11T11:10:41Z",
+    changes: [
+      "试玩大结果通过有界摘要回传，完整状态、Profiler 和诊断保留在带哈希的本地报告；不再因重复状态超过请求上限丢失完成回执。仅获 Owner 精确授权的 4060 历史操作可追加管理性放弃，保留 UNKNOWN、禁止旧编号重放，不把本地报告当作成功收据（本地窄修候选，部署待协调窗口）",
+      "4060 已授权的单个临时场景请求新增受控放弃入口：必须核对原租约、请求、账本与现文件，并取得本机重启边界或完整进程排除证明；证据不足继续阻断。只追加不可改写的决定，原结果仍为未知，旧编号不能重放。状态轮询也经过恢复门禁，避免观察期间插入编辑器请求",
+      "AI 图标配置首页改为只读摘要，新建与编辑共用弹窗；配置文件保存在对应工程内，自动识别已有归属，旧多预设需明确选择一个默认尺寸。支持独立批准上传参考图并保留原图，选图后可从同一母图导出默认或其他尺寸，放大单独确认；本地尺寸导出不调用模型，Creator 导入明确使用 1024 母图。设计尺寸、风格、留白、参考哈希和目录封存在新任务中，旧任务保持原规格。保存配置不会提交图像任务，已有目标禁止覆盖，浏览器保护记录保存失败时停止写操作",
+      "AI 图标原任务可关联独立验收回执，准确显示 Owner 手工确认的导入与运行可见；原导入待验收状态和自动化 UNKNOWN 保留，不能推导设计分辨率或自动 Preview/Build 通过。任务、导入、选图与收据 SHA 不符时显示证据不可用，刷新同一任务也会更新或移除关联结果",
+      "AI 图标支持采用已核验的现有 PNG：来源与原图保持不变，新工程需求和源提交重新封印；来源 SHA 或模式变化后撤销旧批准，选图与导入仍分别确认，离线模式关闭生成和 GPU 操作",
+      "Companion 停止与重启先核验准确运行实例并关闭新请求，等待已登记调用和后台工作完成；重复停止信号继续经过门禁，无法核验时保留服务，不再按进程名或端口强杀",
+      "新增 AI 图标页与统一 CLI：明确选择工程，分别批准生成、选图和导入；任务持久化，结果未知时保持原任务并关闭重复提交。固定 PNG 预算，已导入仍显示待验收",
+      "已接入工程点击「预览」不再被写租约或未结束的历史写操作拦住。场景、预制体和资源写入仍要等写租约结束",
+      "帮助改为左侧四个大标签：运行时、Cocos Bridge、知识库、模型服务。右侧只显示当前大标签的小标签和这一节正文。打开帮助默认停在运行时；工程卡片的工具范围打开 Cocos Bridge 的工具清单",
+      "知识库列表失败时仍保留默认库，文档、检索和提问继续可用。当前密钥不能列出自定义 Agent 时，只在 Agent 区域说明，检索不会因此被关掉",
+      "知识库帮助说明检索、文档、提问和同步的边界；模型服务说明启动后嵌入本页，关闭服务只结束启动器，不停止已经运行的模型",
+      "知识库页与 Agent 使用的 10 个 WeKnora 接口对齐：列出和查看知识库、文档与分块，下载不超过 1 MiB 的原文，混合检索，以及对当前库或自定义 Agent 提问。页面不提供创建、删除和上传",
+      "混合检索默认 10 条、最多 1000 条，文档、检索和提问作用在当前选中的知识库。同步不跟随换库。没有对话权限或库未配置模型时，只提示提问不可用",
+      "工程卡片已接入、启动中和异常的底色与边框再减淡，状态圆点保持原来的颜色",
+      "同一工程、同一方法、同一条 Bridge 失败在下一次成功或文案变化前只记一条。日志推送只刷新日志列表",
+      "帮助里不再单独说明管理页三个页面。知识库和模型服务的说明在对应大标签里，标题旁仍保留短提示",
+      "工程列表里，异常卡片改为淡红，已接入改为淡绿，启动中改为同等级的淡蓝",
+      "知识库和模型服务在已启动时可以关闭。知识库只结束本页拉起的进程；模型服务只结束启动器，不停止面板里的各个模型",
+      "知识库服务没启动时不显示关键词检索和同步",
+      "同一个工程的 Bridge 一直不可达时只记一条错误日志。轮询里的进程标识即使变化，也不会再把同一条报错写进日志中心",
+      "顶栏保持工程、知识库、模型服务。知识库和模型服务的详细说明在帮助的对应大标签里，标题旁保留短提示",
+      "知识库服务没启动时可以在本页启动。允许嵌入时直接打开本机知识库，不允许时改为新页签打开。检索仍在本页，同步默认收起",
+      "顶栏改为工程、知识库、模型服务三个页面。日志仍在工程页。模型服务未启动时显示启动按钮，启动后嵌入本机 AI 服务启动器",
+      "知识库在没有登记来源时说明同步默认关闭、检索仍可用，并按具体原因给出下一步，不再把这种情况显示成操作失败",
+      "场景打开核对目标 UUID、路径与场景模式，并在读取新树前后复核身份；创建父目录或场景后的异常保留未知结果（本地候选未部署）",
+      "Bridge 忙碌或暂不可达时显示未知与上次会话，只有确认已知进程退出才显示停止，避免误导重启（本地候选未部署）",
+      "异步任务可沿用现有 CLI 与策略独立有界续租，保存原身份回执；失效或未知结果阻止后续写入，真实 worker 接线仍待执行（本地候选未部署）",
+      "已授权的单次未知预制体请求可采用当前干净文档并释放后续写入门禁；原操作与派发记录保留未知结果，决议绑定原始摘要且不可改写，其他执行中或未知请求仍阻断（本地候选，运行维护另行验证）",
+      "打开预制体时准确核对目标 UUID、Prefab 模式和新鲜节点树；目标已打开且内容未变时直接建立上下文，不再因没有文档变化而超时，切换前保留未保存内容保护（本地候选未部署）",
+      "协调调用区分经过校验的远端错误与连接丢失；超时只停止本地等待，不声称取消 Native 调用或释放写锁，内部错误保留绑定操作的响应摘要；未知结果继续阻断，不据当前画面补造终态（本地候选未部署）",
+      "修正 CLI 文档中的 Profiler 使用说明链接",
+      "过期写操作可使用原持有者的持久终态收据恢复；没有回执的旧预制体打开请求可在明确接受当前干净文档后行政放弃，原结果保持未知、旧编号禁止重放；执行中或现场状态不确定时继续阻断，场景校验不再借URL隐式打开文档（本地未部署）",
+      "自动试玩调用可携带稳定操作编号，并保留重放和未知结果保护；工具自身需要的操作编号继续按原合同校验（本地未部署）",
+      "知识库检索被拒绝后撤销此前验证并禁用搜索，包括取消后收到的拒绝响应；空来源列表也显示同步策略拒绝提示，诊断内容不进入页面（本地未部署）",
+    ],
+  },
+  {
+    version: "0.3.121",
+    updatedAt: "2026-10-06T11:05:00Z",
+    changes: [
+      "记录里的 Creator 进程已经退出时，再次启动会通过 Dashboard 重新打开工程，不再把 PowerShell 的「进程不存在」整段报错当成启动失败（本地未发布）",
+      "新增统一知识库页面：按需关键词检索、来源通道与 SHA、同步试运行和持久化任务收据；独立服务保留原目录，写库与定时同步默认关闭（本地未部署）",
+      "试玩步骤失败统一返回失败状态并保留完整报告；执行后新鲜度冲突也保留报告，不遮蔽步骤失败（本地未发布）",
+      "保存预览页签与试玩报告现有改动的本地检查点；尚未发布或部署",
+      "页面初始化期间的试玩与性能采集不再因状态提示过早挂载而失败；提前结束或重复加载采集器时正常清理，继续记录真实错误（本地未发布）",
+      "预览改在已经打开的 Edge 窗口里新建页签，不再另外弹出一个浏览器窗口。自动点击、截图和预览日志在后台进行",
+      "试玩步骤成功时，调用记为成功并保留试玩报告。没有验收编号也可以直接试玩。Creator 3.8.8 仍不会把这次试玩签发成验收通过",
+      "帮助「自动试玩与构建验收」写明：试玩目前不能当作通过，因为还不能确认预览页面跑的是这次编译；构建冒烟仍按构建产物验收",
+      "详情区进行中的调用显示命令名和已运行毫秒；结束后保留命令名、本次耗时和距结束时间：1 分钟内为刚刚，不满 1 小时只显示分钟，满 1 小时显示小时和分钟，满 1 天只显示天数。刷新页面会恢复本次服务启动以来的最近一次调用，只有重启服务才清零",
+      "试玩要先经过服务端观察到的工程核验、脚本编译和预览刷新；不能自行提交通过。当前 Creator 3.8.8 还不能把编译产物和预览页面可靠对上，所以走完这些步骤也只会提示新鲜度未确认，不会签发通过",
+      "试玩步骤失败会返回失败、失败步骤和诊断摘要，不会再被记成通过",
+      "另一个任务不能沿用正在占用共享预览页的验收进度。游戏内重置会保留编译证据；整页重载后运行新鲜度作废，接着旧画面继续也不会被当成新的运行证据",
+      "试玩、截图、模拟输入和预览控制台日志在后台复用同一个 Edge 预览页；已经打开就直接用，没有才打开。给你看的预览页开在现有 Edge 窗口的新页签里",
+      "复用预览页时，试玩前先让游戏回到干净状态：游戏测试桥提供 resetForPlaytest 就调用它，否则刷新页面；试玩参数 pageState 设为 keep 时接着当前画面继续",
+      "试玩新增「等待状态」步骤：反复读取游戏状态，符合预期立刻进入下一步，超时才算失败，用来替代写死的等待时间",
+      "试玩报告记录每一步耗时，以及准备、执行和总耗时，并注明是否复用了浏览器和预览页",
+      "已接入工程的「预览」按钮移到工具栏最前",
+      "已接入工程的工具栏重新显示「预览」按钮，用来在浏览器中启动游戏预览",
+    ],
+  },
+  {
+    version: "0.3.111",
+    updatedAt: "2026-10-03T09:20:00+08:00",
+    changes: [
+      "补回已完成但未随 0.3.110 发布的 0.3.108 与 0.3.109",
+    ],
+  },
+  {
+    version: "0.3.110",
+    updatedAt: "2026-10-02T22:40:00+08:00",
+    changes: [
+      "组件属性可按子节点名字自动绑定仍为空的节点引用；重名、找不到或类型不符时不写入",
+      "设置组件属性时可用资源路径、枚举名，以及不带类型标记的坐标、颜色和尺寸",
+      "调整 Widget 对齐后会按引擎对齐标记重算保存用的对齐位",
+      "调试日志可以同时查看场景脚本和预览页面里的控制台输出",
+    ],
+  },
+  {
+    version: "0.3.109",
+    updatedAt: "2026-09-29T22:50:00+08:00",
+    changes: [
+      "修复工程卡片右侧悬停操作条因轮询重绘反复播放滑入动画而闪烁的问题",
+      "调用「进行中」命令最少显示 2 秒，并在详情区右侧以吸附动效出现 / 消失",
+      "悬停条只渲染可点操作；「打开项目目录」改为「打开目录」；工具范围改由标题行工具/权限标签点击设置",
+      "隐藏 Preview 结果时直接收起面板，不再保留「显示结果」",
+      "工程卡片去掉 ⋯：悬停或键盘聚焦时，打开目录 / 注册 MCP / 使用 CLI / 移除从右侧横滑入场；标题右侧默认显示短 projectId 与最近打开时间",
+      "调用记录改为详情区文字「调用：N」，进行中时追加命令中文名；聚焦 / 停止 / 重启并入左侧 Preview 操作段",
+      "工程已接入后不再显示「修复接入」与左侧展开按钮；工具栏去掉 Preview 字样并左对齐操作段",
+      "去掉工程卡片菜单「复制提示词」；接入向导第 5 步使用示例保留",
+      "「使用 CLI」弹板合并为两段：含检查命令的 Agent 提示词，以及写入 Skill 的提示词",
+    ],
+  },
+  {
+    version: "0.3.108",
+    updatedAt: "2026-09-28T18:00:00+08:00",
+    changes: [
+      "新增工程调用记录：Preview 后显示本次 Companion 启动以来的 MCP、CLI 和网页操作次数，名称显示中文并保留英文 ID；支持实时状态、失败筛选和摘要详情，每页 50 条、保留最近 1,000 条详情，刷新或停止工程不清零，重启服务清零；自动轮询、心跳及内部请求不重复计数",
+      "帮助页 MCP 工具清单逐项显示中文名称和英文 ID",
+      "Windows 可通过 Dashboard 自身的项目 IPC 自动启动已登记工程，并通过 Creator 进程与工程路径精确复用已运行工程；全程禁止绕过 Dashboard 直启编辑器",
+      "修复 Windows 路径在 Codex JSON 回读中被转义后误判配置失败的问题",
+      "修复 Windows 已安装 Codex 时仍提示找不到 CLI 的问题，现可识别 PATH 中的 codex.exe",
+    ],
+  },
+  {
+    version: "0.3.107",
+    updatedAt: "2026-09-21T18:30:00+08:00",
+    changes: [
+      "帮助将 Web 端独立为“工程管理”，将 CLI 和 MCP 收在“Agent 接入”；打开帮助时默认显示“产品特点”",
+      "帮助页签调整为产品特点、服务能力、接入指南和 MCP 工具清单；打开帮助时仍默认显示接入指南",
+      "产品特点的六张卡片支持点击、Enter 和空格跳到对应服务说明或 Web 端接入，并将焦点交给目标标题",
+
+      "帮助新增「产品特点」页签，概览 Creator 内安全写入、准确定位、UI 构建、事务保护、验证取证以及 Web / MCP / CLI 的统一入口",
+      "新增八项智能场景能力：严格节点定位、UI 组件自动补齐、真实视口与越界提醒、内置知识查询、事务式 UI 构建、Creator 参考图、可靠节点树缓存，以及单文档原子批量编辑与失败回滚",
+      "命令、提示词和 Skill 文本块新增发送到 Cursor / Codex；完整文本同步复制，超长内容可粘贴到 Agent 使用",
+      "左上角 Logo 可打开关于页；帮助新增服务能力页签，以直接的操作引导说明如何选择能力并复制提示词，同时统一命令、提示词和 Skill 的换行、展开与复制文本块",
+    ],
+  },
+  {
+    version: "0.3.100",
+    updatedAt: "2026-09-15T14:40:00+08:00",
+    changes: [
+      "Profiler：vendor 同步至 cocos-profiler 2.2.23；回执含 nextSteps / findingCodes / agentUsagePath",
+      "playtest_run / build_smoke 支持同窗 profilerCapture；Agent 文档入口指向 agent-usage",
+      "更新日志：距上一发布不足 24 小时的条目合并展示，保留最新版本号与时间",
+    ],
+  },
+  {
+    version: "0.3.98",
+    updatedAt: "2026-09-14T18:05:00+08:00",
+    changes: [
+      "去掉状态徽章虚线下划线，避免破坏「已接入」胶囊边框",
+    ],
+  },
+  {
+    version: "0.3.97",
+    updatedAt: "2026-09-14T18:00:00+08:00",
+    changes: [
+      "修复标签 tip 误加虚线下划线导致胶囊样式变化",
+    ],
+  },
+  {
+    version: "0.3.96",
+    updatedAt: "2026-09-14T17:55:00+08:00",
+    changes: [
+      "工程列表状态、工具权限与取证等标签均提供作用说明 tip",
+    ],
+  },
+  {
+    version: "0.3.95",
+    updatedAt: "2026-09-14T17:25:00+08:00",
+    changes: [
+      "修正日志「暂停实时刷新」按钮高亮与实时状态相反的问题",
+    ],
+  },
+  {
+    version: "0.3.94",
+    updatedAt: "2026-09-14T17:20:00+08:00",
+    changes: [
+      "工程列表「+」与搜索框之间增加间距与竖线分隔",
+    ],
+  },
+  {
+    version: "0.3.93",
+    updatedAt: "2026-09-14T17:15:00+08:00",
+    changes: [
+      "工程列表「+」移到搜索栏同一行",
+      "日志中心操作按钮样式对齐工程状态筛选芯片",
+    ],
+  },
+  {
+    version: "0.3.92",
+    updatedAt: "2026-09-14T17:10:00+08:00",
+    changes: [
+      "工程列表标题旁「+」与说明按钮对调位置",
+      "标题行取证状态前缀改为中文「取证：」",
+    ],
+  },
+  {
+    version: "0.3.91",
+    updatedAt: "2026-09-14T17:00:00+08:00",
+    changes: [
+      "标题行工具范围与 Creator 权限合并为单个芯片，中间用 | 分隔",
+    ],
+  },
+  {
+    version: "0.3.90",
+    updatedAt: "2026-09-14T16:55:00+08:00",
+    changes: [
+      "标题行 profiler 状态改为「profiler：」+ 与工程状态同款色圆点",
+    ],
+  },
+  {
+    version: "0.3.89",
+    updatedAt: "2026-09-14T16:50:00+08:00",
+    changes: [
+      "工程列表去掉独立 Profiler 分区，取证并入 Preview",
+      "标题行在 Creator 权限后显示 profiler 状态芯片",
+    ],
+  },
+  {
+    version: "0.3.88",
+    updatedAt: "2026-09-14T16:32:00+08:00",
+    changes: [
+      "点击页头标题打开关于弹窗；点击版本号打开更新日志",
+      "按 git 提交补记历史版本更新说明（自 v0.2.0 起）",
+    ],
+  },
+  {
+    version: "0.3.87",
+    updatedAt: "2026-09-14T16:27:01+08:00",
+    changes: [
+      "标题旁说明按钮对齐 Profiler block-info 弱化圆形感叹号样式",
+    ],
+  },
+  {
+    version: "0.3.86",
+    updatedAt: "2026-09-14T14:30:44+08:00",
+    changes: [
+      "Profiler statusHint、MCP 页内 Creator AI 角标与 Web 取证状态",
+    ],
+  },
+  {
+    version: "0.3.85",
+    updatedAt: "2026-09-14T10:52:50+08:00",
+    changes: [
+      "同步 Profiler 2.1.6 Headless collector",
+    ],
+  },
+  {
+    version: "0.3.84",
+    updatedAt: "2026-09-11T13:46:16+08:00",
+    changes: [
+      "同步 Profiler 2.1.5 Headless collector",
+      "补齐 v0.3.83 版本号与 Profiler findings 摘要测试",
+    ],
+  },
+  {
+    version: "0.3.83",
+    updatedAt: "2026-09-11T12:38:23+08:00",
+    changes: [
+      "同步 Profiler 2.0 Headless findings 契约",
+    ],
+  },
+  {
+    version: "0.3.82",
+    updatedAt: "2026-09-08T10:22:11+08:00",
+    changes: [
+      "补充静态 UI 组装流程与 Owner 需求澄清",
+    ],
+  },
+  {
+    version: "0.3.81",
+    updatedAt: "2026-09-07T12:17:58+08:00",
+    changes: [
+      "补充 AI UI 图片挂预制体 Review 供外部核验",
+    ],
+  },
+  {
+    version: "0.3.80",
+    updatedAt: "2026-09-07T12:09:25+08:00",
+    changes: [
+      "补充公开市场优化 Review 供核验",
+      "clarify agent instructions (local documentation commit)",
+    ],
+  },
+  {
+    version: "0.3.79",
+    updatedAt: "2026-09-07T11:41:32+08:00",
+    changes: [
+      "帮助弹窗固定 85vh 并说明 Web 端接入",
+    ],
+  },
+  {
+    version: "0.3.78",
+    updatedAt: "2026-09-03T17:36:43+08:00",
+    changes: [
+      "网页 favicon 改用关于图标",
+    ],
+  },
+  {
+    version: "0.3.77",
+    updatedAt: "2026-09-02T18:44:13+08:00",
+    changes: [
+      "工程列表把全部工具与完全控制放进标题行",
+    ],
+  },
+  {
+    version: "0.3.76",
+    updatedAt: "2026-09-02T18:20:12+08:00",
+    changes: [
+      "收起工程卡片时隐藏操作按钮",
+    ],
+  },
+  {
+    version: "0.3.75",
+    updatedAt: "2026-09-02T11:48:31+08:00",
+    changes: [
+      "工程卡片改回单排并收紧间距",
+    ],
+  },
+  {
+    version: "0.3.74",
+    updatedAt: "2026-09-02T10:58:11+08:00",
+    changes: [
+      "优化工程列表 UI",
+    ],
+  },
+  {
+    version: "0.3.73",
+    updatedAt: "2026-09-01T15:25:54+08:00",
+    changes: [
+      "添加 Cocos AI upgrade v2 M1 架构与调研文档",
+    ],
+  },
+  {
+    version: "0.3.72",
+    updatedAt: "2026-09-01T14:12:29+08:00",
+    changes: [
+      "整理 GitHub Cocos AI 方案对照 Review 文档",
+    ],
+  },
+  {
+    version: "0.3.71",
+    updatedAt: "2026-09-01T12:15:24+08:00",
+    changes: [
+      "帮助工具清单按入口隐藏范围，分类可折叠，弹窗复制最多5行",
+    ],
+  },
+  {
+    version: "0.3.70",
+    updatedAt: "2026-08-31T19:00:24+08:00",
+    changes: [
+      "帮助拆成 Web/CLI/MCP 三接入并增加 CLI Skill 复制",
+    ],
+  },
+  {
+    version: "0.3.69",
+    updatedAt: "2026-08-31T10:11:17+08:00",
+    changes: [
+      "日志中心下拉默认全选",
+    ],
+  },
+  {
+    version: "0.3.68",
+    updatedAt: "2026-08-27T17:44:47+08:00",
+    changes: [
+      "修复 Bridge 能力状态同步与查询",
+    ],
+  },
+  {
+    version: "0.3.67",
+    updatedAt: "2026-08-24T14:09:07+08:00",
+    changes: [
+      "新增 TypeScript LSP 工具并增强无 Bridge 试玩",
+    ],
+  },
+  {
+    version: "0.3.66",
+    updatedAt: "2026-08-18T10:54:23+08:00",
+    changes: [
+      "修复 Dashboard 手动选择与 Creator 实例复用",
+    ],
+  },
+  {
+    version: "0.3.65",
+    updatedAt: "2026-08-17T19:35:50+08:00",
+    changes: [
+      "交互式 Creator 改由 Dashboard 启动",
+    ],
+  },
+  {
+    version: "0.3.64",
+    updatedAt: "2026-08-12T11:25:43+08:00",
+    changes: [
+      "工程卡片新增 CLI 使用入口",
+    ],
+  },
+  {
+    version: "0.3.63",
+    updatedAt: "2026-08-12T11:14:51+08:00",
+    changes: [
+      "CLI 与 MCP 共享执行内核",
+      "add better-sqlite3 support and coordination features to MCP",
+    ],
+  },
+  {
+    version: "0.3.62",
+    updatedAt: "2026-08-11T12:00:28+08:00",
+    changes: [
+      "daemon 端口占用时交互确认并可选关闭后继续启动",
+    ],
+  },
+  {
+    version: "0.3.61",
+    updatedAt: "2026-08-10T21:02:16+08:00",
+    changes: [
+      "M6可恢复试玩与性能尾延迟指标",
+    ],
+  },
+  {
+    version: "0.3.60",
+    updatedAt: "2026-08-10T19:15:10+08:00",
+    changes: [
+      "修正 Creator 3.8 构建退出码判定",
+    ],
+  },
+  {
+    version: "0.3.59",
+    updatedAt: "2026-08-10T17:54:42+08:00",
+    changes: [
+      "补全构建与运行验收链路",
+    ],
+  },
+  {
+    version: "0.3.58",
+    updatedAt: "2026-08-10T14:38:46+08:00",
+    changes: [
+      "改版关于界面",
+    ],
+  },
+  {
+    version: "0.3.57",
+    updatedAt: "2026-08-10T14:17:28+08:00",
+    changes: [
+      "修复构建退出36导致Bridge断开",
+    ],
+  },
+  {
+    version: "0.3.56",
+    updatedAt: "2026-08-10T12:46:54+08:00",
+    changes: [
+      "补充方案作用说明并修正确认页间距",
+    ],
+  },
+  {
+    version: "0.3.55",
+    updatedAt: "2026-08-10T12:43:19+08:00",
+    changes: [
+      "修复场景打开后资产URL丢失",
+    ],
+  },
+  {
+    version: "0.3.54",
+    updatedAt: "2026-08-10T12:41:53+08:00",
+    changes: [
+      "工具方案默认full并支持添加时选择",
+    ],
+  },
+  {
+    version: "0.3.53",
+    updatedAt: "2026-08-10T12:31:16+08:00",
+    changes: [
+      "工程列表添加工具方案入口",
+    ],
+  },
+  {
+    version: "0.3.52",
+    updatedAt: "2026-08-10T12:17:29+08:00",
+    changes: [
+      "阻止未保存场景触发系统保存窗口",
+    ],
+  },
+  {
+    version: "0.3.51",
+    updatedAt: "2026-08-10T12:16:12+08:00",
+    changes: [
+      "优化日志与工程时间显示",
+    ],
+  },
+  {
+    version: "0.3.50",
+    updatedAt: "2026-08-10T12:03:36+08:00",
+    changes: [
+      "防止场景切换触发系统保存对话框",
+    ],
+  },
+  {
+    version: "0.3.49",
+    updatedAt: "2026-08-10T11:51:28+08:00",
+    changes: [
+      "兼容 Creator 内置组件注册名",
+    ],
+  },
+  {
+    version: "0.3.48",
+    updatedAt: "2026-08-10T11:42:09+08:00",
+    changes: [
+      "工程列表按打开状态和最近使用排序",
+    ],
+  },
+  {
+    version: "0.3.47",
+    updatedAt: "2026-08-10T11:37:56+08:00",
+    changes: [
+      "区分已有项目与创建新项目",
+    ],
+  },
+  {
+    version: "0.3.46",
+    updatedAt: "2026-08-10T11:24:44+08:00",
+    changes: [
+      "添加 Creator 项目创建与空目录初始化",
+    ],
+  },
+  {
+    version: "0.3.45",
+    updatedAt: "2026-08-10T11:08:49+08:00",
+    changes: [
+      "修正工具清单勾选框溢出",
+    ],
+  },
+  {
+    version: "0.3.44",
+    updatedAt: "2026-08-10T11:03:11+08:00",
+    changes: [
+      "修正项目 ID 与工具清单样式",
+    ],
+  },
+  {
+    version: "0.3.43",
+    updatedAt: "2026-08-10T10:57:07+08:00",
+    changes: [
+      "项目 ID 改为无样式可点击文本",
+    ],
+  },
+  {
+    version: "0.3.42",
+    updatedAt: "2026-08-10T10:54:59+08:00",
+    changes: [
+      "项目 ID 使用默认按钮样式",
+    ],
+  },
+  {
+    version: "0.3.41",
+    updatedAt: "2026-08-10T10:52:53+08:00",
+    changes: [
+      "工程列表显示可复制项目 ID",
+    ],
+  },
+  {
+    version: "0.3.40",
+    updatedAt: "2026-08-10T10:46:33+08:00",
+    changes: [
+      "工具方案、Scene View 与资源清单",
+    ],
+  },
+  {
+    version: "0.3.39",
+    updatedAt: "2026-08-06T19:04:12+08:00",
+    changes: [
+      "生态借鉴1-11：UI能力包、Preview模式、输入快照动画参考图与多客户端配置",
+      "add scene capture and validation features, enhance asset dependency inspection",
+      "日志筛选下拉支持全选，工具列表展示 core/full profile",
+    ],
+  },
+  {
+    version: "0.3.38",
+    updatedAt: "2026-08-06T12:11:10+08:00",
+    changes: [
+      "日志工具栏换行时按 8/4/2 列均衡排布",
+    ],
+  },
+  {
+    version: "0.3.37",
+    updatedAt: "2026-08-06T12:10:46+08:00",
+    changes: [
+      "工程卡片⋯菜单增加复制提示词",
+    ],
+  },
+  {
+    version: "0.3.36",
+    updatedAt: "2026-08-06T12:07:39+08:00",
+    changes: [
+      "日志工具栏宽度自适应，换行时铺满整行",
+    ],
+  },
+  {
+    version: "0.3.35",
+    updatedAt: "2026-08-06T12:03:58+08:00",
+    changes: [
+      "完成步骤合并为「复制到agent中使用」按钮",
+    ],
+  },
+  {
+    version: "0.3.34",
+    updatedAt: "2026-08-06T11:59:07+08:00",
+    changes: [
+      "统一卡片按钮高度并修复溢出菜单被刷新关闭",
+    ],
+  },
+  {
+    version: "0.3.33",
+    updatedAt: "2026-08-06T11:56:47+08:00",
+    changes: [
+      "修复添加项目弹板全选间距与步骤按钮卡住不可点",
+    ],
+  },
+  {
+    version: "0.3.32",
+    updatedAt: "2026-08-06T11:53:54+08:00",
+    changes: [
+      "工程卡片单行工具栏与 Preview 结果可隐藏",
+    ],
+  },
+  {
+    version: "0.3.31",
+    updatedAt: "2026-08-06T11:48:00+08:00",
+    changes: [
+      "添加项目弹板拆分启动与 Agent 多选接入",
+    ],
+  },
+  {
+    version: "0.3.30",
+    updatedAt: "2026-08-06T11:42:00+08:00",
+    changes: [
+      "Preview 调试并入工程卡片",
+    ],
+  },
+  {
+    version: "0.3.29",
+    updatedAt: "2026-08-06T11:35:56+08:00",
+    changes: [
+      "工程列表标题简化",
+    ],
+  },
+  {
+    version: "0.3.28",
+    updatedAt: "2026-08-06T11:34:18+08:00",
+    changes: [
+      "工程卡片合并 MCP 注册弹板",
+    ],
+  },
+  {
+    version: "0.3.27",
+    updatedAt: "2026-08-06T11:30:31+08:00",
+    changes: [
+      "MCP 注册迁入工程卡片并更新帮助",
+    ],
+  },
+  {
+    version: "0.3.26",
+    updatedAt: "2026-08-06T11:22:45+08:00",
+    changes: [
+      "帮助页新增 MCP 注册 Codex/Cursor",
+    ],
+  },
+  {
+    version: "0.3.25",
+    updatedAt: "2026-08-06T11:01:18+08:00",
+    changes: [
+      "工程状态 ready/stopped 悬浮 tip 收纳提示",
+    ],
+  },
+  {
+    version: "0.3.24",
+    updatedAt: "2026-08-06T10:58:18+08:00",
+    changes: [
+      "toast 同步控制台、修复安全停止与卡片接入弹窗",
+    ],
+  },
+  {
+    version: "0.3.23",
+    updatedAt: "2026-08-06T10:51:00+08:00",
+    changes: [
+      "添加项目四步来源分流与使用示例文本框",
+    ],
+  },
+  {
+    version: "0.3.22",
+    updatedAt: "2026-08-06T10:50:10+08:00",
+    changes: [
+      "修复误入发布的添加项目 HTML",
+    ],
+  },
+  {
+    version: "0.3.21",
+    updatedAt: "2026-08-06T10:49:11+08:00",
+    changes: [
+      "Bridge 状态移入各工程卡片",
+    ],
+  },
+  {
+    version: "0.3.20",
+    updatedAt: "2026-08-06T10:47:15+08:00",
+    changes: [
+      "Bridge 状态移入各工程卡片",
+    ],
+  },
+  {
+    version: "0.3.19",
+    updatedAt: "2026-08-06T10:37:36+08:00",
+    changes: [
+      "日志自适应换行与添加功能三步时间线",
+    ],
+  },
+  {
+    version: "0.3.18",
+    updatedAt: "2026-08-06T10:26:00+08:00",
+    changes: [
+      "Dashboard标已添加状态并强制接管未登记Bridge",
+    ],
+  },
+  {
+    version: "0.3.17",
+    updatedAt: "2026-08-06T10:21:06+08:00",
+    changes: [
+      "弹窗居中并增高添加功能弹窗",
+    ],
+  },
+  {
+    version: "0.3.16",
+    updatedAt: "2026-08-06T10:18:42+08:00",
+    changes: [
+      "接管未登记的 creator-ai-bridge 扩展以便重新接入",
+    ],
+  },
+  {
+    version: "0.3.15",
+    updatedAt: "2026-08-06T10:15:35+08:00",
+    changes: [
+      "帮助页签对调、命令复制与使用示例说明",
+    ],
+  },
+  {
+    version: "0.3.14",
+    updatedAt: "2026-08-06T10:09:42+08:00",
+    changes: [
+      "Web帮助页签、状态同步、清日志与tip布局",
+    ],
+  },
+  {
+    version: "0.3.13",
+    updatedAt: "2026-08-05T19:16:12+08:00",
+    changes: [
+      "Web UI：接入弹窗、工具弹窗、toast 与折叠区块",
+    ],
+  },
+  {
+    version: "0.3.12",
+    updatedAt: "2026-08-05T18:59:11+08:00",
+    changes: [
+      "聚焦在 Creator 未运行时禁用并给出中文提示",
+    ],
+  },
+  {
+    version: "0.3.11",
+    updatedAt: "2026-08-05T18:56:25+08:00",
+    changes: [
+      "Preview 在 Creator 未就绪时给出明确中文提示",
+    ],
+  },
+  {
+    version: "0.3.10",
+    updatedAt: "2026-08-05T18:53:00+08:00",
+    changes: [
+      "修复 daemon --restart 端口占用导致的 fetch failed",
+    ],
+  },
+  {
+    version: "0.3.9",
+    updatedAt: "2026-08-05T18:48:04+08:00",
+    changes: [
+      "修复旧 Daemon 复用导致的 Web 语法错误并支持重启",
+    ],
+  },
+  {
+    version: "0.3.8",
+    updatedAt: "2026-08-05T18:42:01+08:00",
+    changes: [
+      "两步接入支持系统选目录与 Dashboard 工程列表",
+    ],
+  },
+  {
+    version: "0.3.7",
+    updatedAt: "2026-08-05T18:38:18+08:00",
+    changes: [
+      "为类与主要方法补充 JSDoc 注释",
+    ],
+  },
+  {
+    version: "0.3.6",
+    updatedAt: "2026-08-05T18:25:47+08:00",
+    changes: [
+      "为类与主要方法补充 JSDoc 注释",
+    ],
+  },
+  {
+    version: "0.3.5",
+    updatedAt: "2026-08-05T18:17:43+08:00",
+    changes: [
+      "Web 前端改为 TypeScript 源码构建",
+    ],
+  },
+  {
+    version: "0.3.4",
+    updatedAt: "2026-08-05T18:11:47+08:00",
+    changes: [
+      "将 Companion Web 拆为独立 web 目录",
+    ],
+  },
+  {
+    version: "0.3.3",
+    updatedAt: "2026-08-05T18:09:30+08:00",
+    changes: [
+      "Node Daemon + 浏览器 Web 替代 macOS 原生壳",
+      "拆分目录，未验证",
+    ],
+  },
+  {
+    version: "0.3.2",
+    updatedAt: "2026-08-05T16:19:11+08:00",
+    changes: [
+      "macOS 原生界面与 DMG",
+    ],
+  },
+  {
+    version: "0.3.1",
+    updatedAt: "2026-08-05T15:52:00+08:00",
+    changes: [
+      "一键配置 Creator 与 Codex",
+    ],
+  },
+  {
+    version: "0.3.0",
+    updatedAt: "2026-08-05T11:37:00+08:00",
+    changes: [
+      "Creator AI Companion 独立应用",
+    ],
+  },
+  {
+    version: "0.2.5",
+    updatedAt: "2026-08-04T19:03:27+08:00",
+    changes: [
+      "面板用途说明与完整 MCP 工具清单",
+    ],
+  },
+  {
+    version: "0.2.4",
+    updatedAt: "2026-08-04T18:59:35+08:00",
+    changes: [
+      "顶部吸附与多工程 Creator 独立路由",
+    ],
+  },
+  {
+    version: "0.2.3",
+    updatedAt: "2026-08-04T18:51:10+08:00",
+    changes: [
+      "面板滚动、状态折叠与 Codex 接入修复",
+    ],
+  },
+  {
+    version: "0.2.2",
+    updatedAt: "2026-08-04T18:43:27+08:00",
+    changes: [
+      "早期面板迭代",
+    ],
+  },
+  {
+    version: "0.2.1",
+    updatedAt: "2026-08-04T18:04:34+08:00",
+    changes: [
+      "早期面板迭代",
+    ],
+  },
+  {
+    version: "0.2.0",
+    updatedAt: "2026-08-04T17:46:19+08:00",
+    changes: [
+      "首个正式发布版本",
+    ],
+  },
+];
+
+function beijingCalendarDay(time: number): string | undefined {
+  const shifted = new Date(time + 8 * 60 * 60 * 1000);
+  return Number.isFinite(shifted.getTime()) ? shifted.toISOString().slice(0, 10) : undefined;
+}
+
+/** 旧函数名/参数兼容；按北京时间日历日合并，保留当天最新 version / updatedAt。 */
+export function mergeChangelogWithinWindow(
+  entries: ChangelogEntry[],
+  _legacyWindowMs = CHANGELOG_WINDOW_MS,
+): ChangelogEntry[] {
+  const merged: ChangelogEntry[] = [];
+  for (const entry of entries) {
+    const time = Date.parse(entry.updatedAt);
+    const head = merged[merged.length - 1];
+    const headTime = head ? Date.parse(head.updatedAt) : Number.NaN;
+    if (
+      head &&
+      Number.isFinite(time) &&
+      Number.isFinite(headTime) &&
+      beijingCalendarDay(headTime) !== undefined &&
+      beijingCalendarDay(headTime) === beijingCalendarDay(time) &&
+      headTime - time >= 0
+    ) {
+      head.changes.push(...entry.changes);
+      continue;
+    }
+    merged.push({
+      version: entry.version,
+      updatedAt: entry.updatedAt,
+      changes: entry.changes.slice(),
+    });
+  }
+  return merged;
+}
+
+export const CHANGELOG = mergeChangelogWithinWindow(CHANGELOG_ENTRIES);
+
+/** 将 ISO 时间格式化为 YYYY-MM-DD HH:mm:ss。 */
+export function formatChangelogTime(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+/** 将 CHANGELOG 渲染到指定容器（每次打开弹窗时重建）。 */
+export function renderChangelogList(container: HTMLElement): void {
+  container.replaceChildren(...CHANGELOG.map((entry) => {
+    const item = document.createElement("li");
+    item.className = "changelog-entry";
+    const head = document.createElement("div");
+    head.className = "changelog-entry-head";
+    const version = document.createElement("strong");
+    version.className = "changelog-version";
+    version.textContent = `v${entry.version}`;
+    const time = document.createElement("time");
+    time.dateTime = entry.updatedAt;
+    time.textContent = formatChangelogTime(entry.updatedAt);
+    head.append(version, time);
+    const changes = document.createElement("ul");
+    for (const change of entry.changes) {
+      const changeItem = document.createElement("li");
+      changeItem.textContent = change;
+      changes.append(changeItem);
+    }
+    item.append(head, changes);
+    return item;
+  }));
+}

@@ -1,0 +1,157 @@
+{
+  "version": "0.1.19",
+  "dateUtc": "2026-10-15",
+  "baseline": "2e6f7d9336c13fb61a4bd6e567e1a9ebbb37bd28",
+  "checkpoint": "4b5f5ca",
+  "scope": "Approved six project UI/state fixes plus the owner clarification of title-tip spacing and stable live refresh; dot code/fake DOM only, no actual host, lifecycle, setup, Windows or deployment actions.",
+  "final": {
+    "session": 72035,
+    "exitCode": 0,
+    "startedUtc": "2026-10-15T06:23:01Z",
+    "finishedUtc": "2026-10-15T06:25:28Z",
+    "files": 66,
+    "passed": 3145,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 77.15
+  },
+  "builds": [
+    "default",
+    "companion-readonly",
+    "companion-config-editor",
+    "companion-knowledge-chat",
+    "companion-workspace"
+  ],
+  "staticTests": 56,
+  "focused": {
+    "entryIncludingRealRouterDom": 22,
+    "layoutIncludingThreeSlowLiveCycles": 15,
+    "existingBrowserDom": 17,
+    "navigation": 28,
+    "backgroundCleanup": 4
+  },
+  "review": "Independent source review closed the setup registration UNKNOWN auto-read gap; re-reviewed background presentation flag, old-source cleanup, ID-keyed DOM preservation and safe internal navigation. No remaining source blocker. Reviewer did not run tests or verify browser pixels.",
+  "preFinal": {
+    "session": 76638,
+    "exitCode": 2,
+    "files": 66,
+    "passed": 3145,
+    "seconds": 77.62,
+    "note": "All tests passed, first typecheck rejected a newly added fake status missing required capabilityProfile. Test fixture fixed to unknown, no production behavior changed; final session72035 reran all tests and five builds."
+  },
+  "browser": "No dot cloud browser tool exposed; user-computer CUA not used and previously denied exec Chromium not retried. jsdom/fake scroll metrics do not prove visual layout or native browser no-flicker.",
+  "hostEvidence": "Parent relayed Windows read-only 2026-10-15 06:06 UTC status diagnosis: ant-cook id04c4cde24ee76d83 ready/PID6632/Creator3.8.8/full-control. Common handler/v1/status success; anonymous /api 403 does not imply authenticated failure. No Windows reads/actions by this worker; not a unique diagnosis of the user original incident.",
+  "dependencies": "Lock identical to baseline excluding own application version",
+  "protectedPackages": [
+    {
+      "version": "0.1.14",
+      "path": "../../delivery-0.1.14/companion-next-0.1.14-normal-workspace-candidate.zip",
+      "bytes": 682939,
+      "sha256": "e1c24005d8c17678a465d5ef9cc47ce2b4b8bf47c67031a4aba906f4ea37c4e4"
+    },
+    {
+      "version": "0.1.17",
+      "path": "../../delivery-0.1.17/companion-next-0.1.17-workspace-static.zip",
+      "bytes": 684392,
+      "sha256": "f574487c16203b08a6042b3c3320b1328b43f7c2498652aac1cf3a981714bb33"
+    },
+    {
+      "version": "0.1.18",
+      "path": "../../delivery-0.1.18/companion-next-0.1.18-workspace-static.zip",
+      "bytes": 684427,
+      "sha256": "4161ccbf2930fa891c4849bbc976acec3ddf6f8ef71371c49b9e90675cfb52ad"
+    }
+  ],
+  "logs": [
+    {
+      "path": ".test-artifacts/ui-019/final-build-companion-config-editor.log",
+      "bytes": 1366,
+      "sha256": "a6fa6e854ed02f2584c22598e34a5207a0d74429389e1068e252daa551cf37a7"
+    },
+    {
+      "path": ".test-artifacts/ui-019/final-build-companion-knowledge-chat.log",
+      "bytes": 1357,
+      "sha256": "35366d853ac1508fec86f4217af943311d048207dc59299a0e2e9c8eada74b70"
+    },
+    {
+      "path": ".test-artifacts/ui-019/final-build-companion-readonly.log",
+      "bytes": 1309,
+      "sha256": "22785c23c2471658c8b98d18ef01b8719b317817f65c7aadc323d494ded3e301"
+    },
+    {
+      "path": ".test-artifacts/ui-019/final-build-companion-workspace.log",
+      "bytes": 1382,
+      "sha256": "230cf64ff55528e3dee6429d73ec11377b9af4e12cc93836c2f3b73201c8d07b"
+    },
+    {
+      "path": ".test-artifacts/ui-019/final-build.log",
+      "bytes": 1182,
+      "sha256": "f29bc0046ed2c3a6ea940feb51b1589fc547edf4a064947a3854c48e64f544fc"
+    },
+    {
+      "path": ".test-artifacts/ui-019/final-static.log",
+      "bytes": 3827,
+      "sha256": "51c16ba3612f307de8bc440e09abd2e73628d6eeae722e1eb50ab125baa07cc6"
+    },
+    {
+      "path": ".test-artifacts/ui-019/final-tests.log",
+      "bytes": 655,
+      "sha256": "d35de9fe1a4841d2d8ba541298e812bc1a6e4054931f3b7d41a369f6d4598849"
+    }
+  ],
+  "normalWorkspaceStatic": {
+    "mode": "companion-workspace",
+    "base": "./",
+    "entry": "/next/index.html#/projects",
+    "files": [
+      {
+        "path": "next/assets/about-icon-BaVeClOr.svg",
+        "size": 230,
+        "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+      },
+      {
+        "path": "next/assets/donation-qr-D7kdLLAm.png",
+        "size": 106967,
+        "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+      },
+      {
+        "path": "next/assets/index-CVJzYml5.js",
+        "size": 1560399,
+        "sha256": "ea8554d46ed20b584ebe3aa45b196fe9ada5a77c0b04a535f168413353fc23f5"
+      },
+      {
+        "path": "next/assets/index-RQ6JabiC.css",
+        "size": 409667,
+        "sha256": "2610e39590264506578d201994b468469cd0c59115e3916fcbb7471a94679dab"
+      },
+      {
+        "path": "next/favicon.svg",
+        "size": 245,
+        "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+      },
+      {
+        "path": "next/index.html",
+        "size": 573,
+        "sha256": "5811e8a8015e5382557b5ed56121d6e43d183633ba891f000fa529d9073828d9"
+      }
+    ],
+    "references": [
+      {
+        "from": "next/assets/index-CVJzYml5.js",
+        "to": "next/assets/about-icon-BaVeClOr.svg"
+      },
+      {
+        "from": "next/assets/index-CVJzYml5.js",
+        "to": "next/assets/donation-qr-D7kdLLAm.png"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-CVJzYml5.js"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-RQ6JabiC.css"
+      }
+    ]
+  }
+}

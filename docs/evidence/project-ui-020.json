@@ -1,0 +1,180 @@
+{
+  "version": "0.1.20",
+  "dateUtc": "2026-10-15",
+  "baseline": "bff3e733c7bd310bd38d4286b3ab7e81ffb2f158",
+  "checkpoint": "6d8afe9",
+  "scope": "Owner-approved running-card collapse, original setup dialog palette, real registered-project overview/resources selection, overview-first navigation. Dot offline code/tests only.",
+  "final": {
+    "session": 72228,
+    "exitCode": 0,
+    "startedUtc": "2026-10-15T11:32:08Z",
+    "finishedUtc": "2026-10-15T11:33:38Z",
+    "files": 67,
+    "passed": 3184,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 17.13
+  },
+  "builds": [
+    "default",
+    "companion-readonly",
+    "companion-config-editor",
+    "companion-knowledge-chat",
+    "companion-workspace"
+  ],
+  "staticTests": 56,
+  "focused": {
+    "collapseAndDialog": 43,
+    "newRealProjectViews": 33,
+    "newViewsAndExistingRegression": 81
+  },
+  "review": "Two independent scoped source reviews closed CSS disabled-state/contrast, cached-list deep-link restoration and modified-click reselection findings. No remaining scoped source blockers. Reviewers did not run tests or verify browser pixels.",
+  "browser": "No dot browser tool available; user-computer CUA not used; previously denied Chromium route not retried. No real host or pixel validation.",
+  "cssValidationLimit": "Early Node-loaded Element Plus base CSS run passed43. Frontend types lacked node:fs; subsequent Vite raw import rejected shared dependency CSS with Denied ID. That path stopped; no fs permission widening, dependency installation or alternate reread. Final tests load only task-owned CSS and actual component DOM. Complete final base CSS cascade/pixels not reverified.",
+  "dependencies": "Identical lock to baseline except frontend version; no dependencies added or installed.",
+  "protectedPackages": [
+    {
+      "version": "0.1.14",
+      "path": "../../delivery-0.1.14/companion-next-0.1.14-normal-workspace-candidate.zip",
+      "bytes": 682939,
+      "sha256": "e1c24005d8c17678a465d5ef9cc47ce2b4b8bf47c67031a4aba906f4ea37c4e4"
+    },
+    {
+      "version": "0.1.17",
+      "path": "../../delivery-0.1.17/companion-next-0.1.17-workspace-static.zip",
+      "bytes": 684392,
+      "sha256": "f574487c16203b08a6042b3c3320b1328b43f7c2498652aac1cf3a981714bb33"
+    },
+    {
+      "version": "0.1.18",
+      "path": "../../delivery-0.1.18/companion-next-0.1.18-workspace-static.zip",
+      "bytes": 684427,
+      "sha256": "4161ccbf2930fa891c4849bbc976acec3ddf6f8ef71371c49b9e90675cfb52ad"
+    },
+    {
+      "version": "0.1.19",
+      "path": "../../delivery-0.1.19/companion-next-0.1.19-workspace-static.zip",
+      "bytes": 687672,
+      "sha256": "9c932eaf0a27ea7d134fe01fafaf086224409d90666d09729283bbbde3f5e414"
+    }
+  ],
+  "staticAssets": {
+    "files": [
+      {
+        "path": "next/assets/about-icon-BaVeClOr.svg",
+        "size": 230,
+        "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+      },
+      {
+        "path": "next/assets/donation-qr-D7kdLLAm.png",
+        "size": 106967,
+        "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+      },
+      {
+        "path": "next/assets/index-CnnBDWQK.css",
+        "size": 416502,
+        "sha256": "4da68a41be2759ff04e103301ca090c51366df4c5b9c697d34fe391e9a106de0"
+      },
+      {
+        "path": "next/assets/index-D8_X97fm.js",
+        "size": 1576023,
+        "sha256": "982a94abe995d95bfbacc6f673c4f8a9f9e71b281c32371a48953aa399351165"
+      },
+      {
+        "path": "next/favicon.svg",
+        "size": 245,
+        "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+      },
+      {
+        "path": "next/index.html",
+        "size": 573,
+        "sha256": "5cdee6351f309fcb8addfccd05e9021b39c8906152977ce058b810cf260281e8"
+      }
+    ],
+    "references": [
+      {
+        "from": "next/assets/index-D8_X97fm.js",
+        "to": "next/assets/about-icon-BaVeClOr.svg"
+      },
+      {
+        "from": "next/assets/index-D8_X97fm.js",
+        "to": "next/assets/donation-qr-D7kdLLAm.png"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-CnnBDWQK.css"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-D8_X97fm.js"
+      }
+    ]
+  },
+  "logs": [
+    {
+      "path": ".test-artifacts/ui-020/companion-020-colors-final.log",
+      "bytes": 1230,
+      "sha256": "9fb7278ff4c93fb5ec5a35905aa25efb17b51457588de7d6d9d33f319ad3d591"
+    },
+    {
+      "path": ".test-artifacts/ui-020/companion-020-focused-2.log",
+      "bytes": 1860,
+      "sha256": "55c4d6dab1acf733acb94d8b1332f1c37baf6fadf54256167ad5c0a62816692c"
+    },
+    {
+      "path": ".test-artifacts/ui-020/companion-020-focused-3.log",
+      "bytes": 1421,
+      "sha256": "612f8c8194b6db1ed5166923bfd1f6e31ea5161f4c1a85b4cc56c4cc7174cea2"
+    },
+    {
+      "path": ".test-artifacts/ui-020/companion-020-focused-4.log",
+      "bytes": 696,
+      "sha256": "d671ab7dc048c7e957c35e0c3041a5a487681b2fe20ff875565f43d94aa0e4b9"
+    },
+    {
+      "path": ".test-artifacts/ui-020/companion-020-focused.log",
+      "bytes": 1753,
+      "sha256": "08ef84494c1505faac2186b5120de5c691c82442af8c1f4d9909f609ba11a841"
+    },
+    {
+      "path": ".test-artifacts/ui-020/companion-020-own-colors.log",
+      "bytes": 694,
+      "sha256": "8b99cb3897acfa76f306581cbb4e754727bd843653b006579809ed9fa2be70d5"
+    },
+    {
+      "path": ".test-artifacts/ui-020/final-build-companion-config-editor.log",
+      "bytes": 1366,
+      "sha256": "905f246400c0c1ea197abd46cfd854b668d5674bfdd058ed88d2a3f6f9cb996d"
+    },
+    {
+      "path": ".test-artifacts/ui-020/final-build-companion-knowledge-chat.log",
+      "bytes": 1357,
+      "sha256": "943f7c9d1762a5b9040cfc6b54c5a91ddd5bc36add8a75750f2d8e9f4ac298be"
+    },
+    {
+      "path": ".test-artifacts/ui-020/final-build-companion-readonly.log",
+      "bytes": 1309,
+      "sha256": "0b6e8d8eab848162b8c7400b136f840388592e6f7cc81e9d304d7d259dfd40be"
+    },
+    {
+      "path": ".test-artifacts/ui-020/final-build-companion-workspace.log",
+      "bytes": 1382,
+      "sha256": "0a0d45bf25834e64466bab694a518a3a24a9193a6763a45184c541427ce76b41"
+    },
+    {
+      "path": ".test-artifacts/ui-020/final-build.log",
+      "bytes": 1182,
+      "sha256": "27abf91fc1b7d1706bda7ce95661e937ae3cd8e0167d5d7d0b7a623f8cae0350"
+    },
+    {
+      "path": ".test-artifacts/ui-020/final-static.log",
+      "bytes": 3826,
+      "sha256": "0378edf16f0c7a73f00db91ad6179b764a4f303a32ea89c8ff52419d96b68347"
+    },
+    {
+      "path": ".test-artifacts/ui-020/final-tests.log",
+      "bytes": 640,
+      "sha256": "d4023d257268ddf9d947e7f865f8c8cfc4ba70ee26c95dc93adc0e4b639e14ac"
+    }
+  ]
+}

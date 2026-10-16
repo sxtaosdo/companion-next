@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "kind": "companion-static-additions",
+  "frontendVersion": "0.1.4",
+  "sourceCommit": "3a2ee1ff403f47ed73188f213f1158cc884068ac",
+  "sourceCommitAfter": "3a2ee1ff403f47ed73188f213f1158cc884068ac",
+  "sourceDirty": false,
+  "generatedAt": "2026-10-12T12:28:41.793Z",
+  "build": {
+    "mode": "companion-readonly",
+    "base": "./",
+    "entry": "/next/index.html#/projects"
+  },
+  "status": "offline-candidate-not-deployed",
+  "pathPolicy": {
+    "prefix": "next/",
+    "existingTarget": "must-be-absent",
+    "overwrite": false,
+    "symlinks": false,
+    "hardlinks": false,
+    "manifestDeployed": false
+  },
+  "requiredPreflight": [
+    "Explicit approval for the live webRoot next/ exception",
+    "Recheck current runtime identity and original deployment hashes; stop on drift",
+    "Verify target next/ is absent and every destination ancestor is not a link/reparse point",
+    "Verify all candidate bytes against this manifest before and after copying"
+  ],
+  "rollback": "Only remove or move files introduced by this candidate whose hashes still match; stop on later edits. Never alter original files, credentials, process or deployment manifest.",
+  "files": [
+    {
+      "path": "next/assets/about-icon-BaVeClOr.svg",
+      "size": 230,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "next/assets/donation-qr-D7kdLLAm.png",
+      "size": 106967,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "next/assets/index-CI4cv5kZ.js",
+      "size": 1291695,
+      "sha256": "6850a2a554fb4ccfbe00aa9573c33afd4e39f3d39d9f97b87f97aba3b85abd5c"
+    },
+    {
+      "path": "next/assets/index-DqdBZHXa.css",
+      "size": 395846,
+      "sha256": "fbf163fe44b1fe31de9a4858feefe069126de11d546810c25cc498d880f256fe"
+    },
+    {
+      "path": "next/favicon.svg",
+      "size": 245,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "next/index.html",
+      "size": 573,
+      "sha256": "bd06205363dd28ca0527c3b39ffce09a03554c3b80762892c9e7df13b6bd6f32"
+    }
+  ],
+  "references": [
+    {
+      "from": "next/assets/index-CI4cv5kZ.js",
+      "to": "next/assets/about-icon-BaVeClOr.svg"
+    },
+    {
+      "from": "next/assets/index-CI4cv5kZ.js",
+      "to": "next/assets/donation-qr-D7kdLLAm.png"
+    },
+    {
+      "from": "next/index.html",
+      "to": "next/assets/index-CI4cv5kZ.js"
+    },
+    {
+      "from": "next/index.html",
+      "to": "next/assets/index-DqdBZHXa.css"
+    }
+  ]
+}

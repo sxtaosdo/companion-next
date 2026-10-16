@@ -1,0 +1,112 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { createPinia } from 'pinia'
+import { createMemoryHistory, createRouter } from 'vue-router'
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
+import { nextTick } from 'vue'
+import ElementPlus from 'element-plus'
+import LocalServiceControls from '../src/components/LocalServiceControls.vue'
+import { localServiceOperationsProvider, registerLocalServiceOperationsProvider, isCompanionLocalServiceHost } from '../src/local-service-operations-integration'
+import { knowledgeReadProvider, registerKnowledgeReadProvider } from '../src/knowledge-read-integration'
+import { useLocalServiceOperationsStore } from '../src/stores/local-service-operations'
+import { useWorkspaceStore } from '../src/stores/workspace'
+import { LocalServiceOperationError, type LocalServiceOperationsProvider, type LocalServiceOperationReply } from '../src/domain/local-service-operations'
+import { knowledgeFixture, deferred } from './knowledge-read-fixture'
+let wrapper: VueWrapper | undefined
+function provider(): LocalServiceOperationsProvider { return { label: 'OFFLINE STOP UI', run: vi.fn(async (input): Promise<LocalServiceOperationReply> => input.service === 'knowledge' && input.action === 'start' ? { service: 'knowledge', action: 'start', state: { running: true, frameable: false } } : input.service === 'model' ? { service: 'model', action: 'stop', state: { running: false } } : { service: 'knowledge', action: 'stop', state: { running: false, frameable: false } }), waitForIdle: vi.fn(async () => {}) } }
+async function setup(options: { p?: LocalServiceOperationsProvider | null; modelsOnly?: boolean } = {}) {
+  const pinia = createPinia(), p = options.p === undefined ? provider() : options.p, r = knowledgeFixture()
+  registerKnowledgeReadProvider(r); if (p) registerLocalServiceOperationsProvider(p)
+  const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/:pathMatch(.*)*', component: { template: '<div />' } }] }); await router.push('/knowledge'); await router.isReady()
+  wrapper = mount(LocalServiceControls, { props: { modelsOnly: options.modelsOnly }, attachTo: document.body, global: { plugins: [pinia, ElementPlus, router] } }); await flushPromises()
+  return { p: p!, r, pinia, router, store: useLocalServiceOperationsStore(pinia), workspace: useWorkspaceStore(pinia) }
+}
+function button(text: string) { const found = wrapper!.findAll('button').find(value => value.text() === text); if (!found) throw Error(`missing ${text}`); return found }
+async function click(text: string) { await button(text).trigger('click'); await flushPromises() }
+async function check() { const checkbox = wrapper!.get('[aria-label="确认本次服务关闭"]'); await (checkbox.element.matches('input') ? checkbox : checkbox.get('input')).setValue(true) }
+async function prepare(service = '模型启动器') { await click('读取当前服务状态'); await click(`核对关闭${service}`) }
+async function stop(service = '模型启动器') { await prepare(service); await check(); await click('确认并关闭这一次') }
+afterEach(() => { wrapper?.unmount(); wrapper = undefined; localServiceOperationsProvider.value = null; knowledgeReadProvider.value = null; document.body.innerHTML = '' })
+describe('service controls build boundary', () => {
+  it.each(['production', 'development', 'test', 'companion-readonly', 'companion-config-editor', 'companion-knowledge-chat'])('denies operation registration in %s', mode => expect(isCompanionLocalServiceHost(mode, { protocol: 'http:', hostname: '127.0.0.1' })).toBe(false))
+  it.each([{ protocol: 'https:', hostname: '127.0.0.1' }, { protocol: 'http:', hostname: 'localhost' }, { protocol: 'http:', hostname: 'example.test' }, { protocol: 'file:', hostname: '' }])('denies nonexact transport %#', location => expect(isCompanionLocalServiceHost('companion-workspace', location)).toBe(false))
+  it('permits only the exact workspace host and registration is passive', () => { const p = provider(); registerLocalServiceOperationsProvider(p); expect(isCompanionLocalServiceHost('companion-workspace', { protocol: 'http:', hostname: '127.0.0.1' })).toBe(true); expect(p.run).not.toHaveBeenCalled() })
+})
+describe('explicit service-control UI and source protection', () => {
+  it('does not probe, use CLI, run operations or create iframe/links on mount', async () => {
+    const { p, r } = await setup(); expect(r.loadServiceStates).not.toHaveBeenCalled(); expect(r.status).not.toHaveBeenCalled(); expect(p.run).not.toHaveBeenCalled()
+    expect(button('核对关闭模型启动器').attributes('disabled')).toBeDefined(); expect(wrapper!.findAll('iframe,a,object,img')).toHaveLength(0)
+    expect(wrapper!.findAll('button').some(value => value.text().includes('启动') && !value.text().includes('关闭模型启动器'))).toBe(false)
+    expect(wrapper!.text()).toContain('没有接入启动操作'); expect(wrapper!.text()).toContain('不能保证只关闭本页')
+  })
+  it('explains absent capability and does not silently use read-only builds', async () => {
+    const { r } = await setup({ p: null }); expect(button('读取当前服务状态').attributes('disabled')).toBeDefined(); expect(wrapper!.text()).toContain('当前构建未接入服务启停能力'); expect(r.loadServiceStates).not.toHaveBeenCalled()
+  })
+  it('reads just the two service-status capability endpoints on explicit request', async () => {
+    const { p, r } = await setup(); await click('读取当前服务状态'); expect(r.loadServiceStates).toHaveBeenCalledOnce(); expect(r.status).not.toHaveBeenCalled(); expect(p.run).not.toHaveBeenCalled(); expect(wrapper!.text()).toContain('本次读取：服务可达')
+  })
+  it.each(['知识库服务', '模型启动器'])('needs separate confirmation for every %s close', async service => {
+    const { p } = await setup(); await prepare(service); expect(p.run).not.toHaveBeenCalled(); expect(button('确认并关闭这一次').attributes('disabled')).toBeDefined()
+    expect(wrapper!.text()).toContain('所有客户端'); await check(); await click('确认并关闭这一次'); expect(p.run).toHaveBeenCalledOnce()
+    expect(wrapper!.text()).toContain('已收到关闭回执'); expect(wrapper!.text()).toContain('不证明所有相关进程均已结束')
+    await prepare(service); expect(button('确认并关闭这一次').attributes('disabled')).toBeDefined(); await check(); await click('确认并关闭这一次'); expect(p.run).toHaveBeenCalledTimes(2)
+  })
+  it('shows only model controls on model tab and gives precise launcher warning', async () => {
+    await setup({ modelsOnly: true }); expect(wrapper!.text()).toContain('关闭启动器不等于终止已运行的模型'); expect(wrapper!.findAll('button').some(value => value.text() === '核对关闭知识库服务')).toBe(false)
+  })
+  it('invalidates a checked confirmation on route, project or provider changes', async () => {
+    const { p, store, workspace, router } = await setup()
+    for (const change of ['project', 'route', 'provider']) {
+      await prepare(); await check()
+      if (change === 'project') workspace.selectedProjectId = 'new-project'
+      else if (change === 'route') await router.push('/knowledge?tab=models')
+      else registerLocalServiceOperationsProvider(provider())
+      await nextTick(); expect(store.prepared).toBeNull(); expect(wrapper!.find('[aria-label="本次服务关闭确认"]').exists()).toBe(false)
+    }
+    expect(p.run).not.toHaveBeenCalled()
+  })
+  it('invalidates a checked confirmation on read source or modelsOnly changes', async () => {
+    const { p, store } = await setup(); await prepare(); await check(); registerKnowledgeReadProvider(knowledgeFixture()); await nextTick(); expect(store.prepared).toBeNull()
+    await prepare(); await check(); await wrapper!.setProps({ modelsOnly: true }); expect(store.prepared).toBeNull(); expect(p.run).not.toHaveBeenCalled()
+  })
+  it('blocks rapid double confirmation and another service while pending', async () => {
+    const p = provider(), result = deferred<LocalServiceOperationReply>(); vi.mocked(p.run).mockReturnValue(result.promise); await setup({ p }); await prepare(); await check()
+    const execute = button('确认并关闭这一次'); await execute.trigger('click'); await execute.trigger('click'); expect(p.run).toHaveBeenCalledOnce()
+    expect(button('核对关闭知识库服务').attributes('disabled')).toBeDefined(); expect(button('读取当前服务状态').attributes('disabled')).toBeDefined()
+    result.resolve({ service: 'model', action: 'stop', state: { running: false } }); await flushPromises()
+  })
+  it('keeps UNKNOWN after status refresh; no retry and no successful late receipt', async () => {
+    const p = provider(), result = deferred<LocalServiceOperationReply>(); vi.mocked(p.run).mockReturnValue(result.promise); const { store } = await setup({ p }); await stop(); await click('停止等待关闭回执')
+    expect(store.blockedUnknown).toBe(true); expect(wrapper!.text()).toContain('刷新状态不会解除此保护')
+    result.resolve({ service: 'model', action: 'stop', state: { running: false } }); await flushPromises(); await click('读取当前服务状态')
+    expect(store.records[0]!.status).toBe('unknown'); expect(button('核对关闭模型启动器').attributes('disabled')).toBeDefined(); expect(p.run).toHaveBeenCalledOnce()
+  })
+  it('does not echo backend errors or render URLs/HTML as actions', async () => {
+    const p = provider(); vi.mocked(p.run).mockRejectedValue(Error('PRIVATE <iframe src="https://invalid.test">')); await setup({ p }); await stop()
+    expect(wrapper!.text()).not.toContain('PRIVATE'); expect(wrapper!.findAll('iframe,a,object,img')).toHaveLength(0)
+  })
+  it('keeps backend reported failure distinct from unknown', async () => {
+    const p = provider(); vi.mocked(p.run).mockRejectedValue(new LocalServiceOperationError('backend-failure', 'reported-failure')); await setup({ p }); await stop('知识库服务')
+    expect(wrapper!.text()).toContain('后台报告未关闭'); expect(wrapper!.text()).toContain('可能已有进程或文件受到影响')
+  })
+  it('leaving cannot turn a late reply into current success', async () => {
+    const p = provider(), result = deferred<LocalServiceOperationReply>(); vi.mocked(p.run).mockReturnValue(result.promise); const { store } = await setup({ p }); await stop(); wrapper!.unmount(); wrapper = undefined
+    result.resolve({ service: 'model', action: 'stop', state: { running: false } }); await flushPromises()
+    expect(store.records[0]).toMatchObject({ status: 'unknown', detached: true, reply: null }); expect(store.states).toBeNull()
+  })
+})
+
+
+describe('knowledge start UI retains original flow with explicit side-effect review', () => {
+  it('shows a real start only after explicit unreachable status and confirms the original script', async () => {
+    const { p, r } = await setup(); vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: false, frameable: false }, model: { running: false }, warnings: [] })
+    await click('读取当前服务状态'); await click('核对启动知识库服务'); expect(p.run).not.toHaveBeenCalled(); expect(button('确认并启动这一次').attributes('disabled')).toBeDefined()
+    for (const text of ['ExecutionPolicy Bypass', '既有 JWT', '127.0.0.1:8081', '检查摘要、日志和 PID', 'disabled', '数据库']) expect(wrapper!.text()).toContain(text)
+    const checkbox = wrapper!.get('[aria-label="确认本次服务启动"]'); await (checkbox.element.matches('input') ? checkbox : checkbox.get('input')).setValue(true)
+    await click('确认并启动这一次'); expect(p.run).toHaveBeenCalledOnce(); expect(vi.mocked(p.run).mock.calls[0]![0]).toEqual({ service: 'knowledge', action: 'start' })
+    expect(wrapper!.text()).toContain('已收到启动回执'); expect(wrapper!.text()).toContain('不代表登录、检索或索引就绪'); expect(wrapper!.findAll('iframe,a,object')).toHaveLength(0)
+  })
+  it('never offers model start even when launcher is explicitly unreachable', async () => {
+    const { r } = await setup({ modelsOnly: true }); vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: false, frameable: false }, model: { running: false }, warnings: [] }); await click('读取当前服务状态')
+    expect(wrapper!.findAll('button').some(value => value.text().startsWith('核对启动') || value.text().startsWith('确认并启动'))).toBe(false); expect(wrapper!.text()).toContain('8092 局域网代理')
+  })
+})

@@ -1,0 +1,148 @@
+{
+  "version": "0.1.18",
+  "dateUtc": "2026-10-15",
+  "baseline": "00052ded324ec8a206829c9e62a58bcb7b8d3293",
+  "checkpoint": "7295ba0",
+  "scope": "dot source, fake provider, real Element Plus jsdom; no actual API, Windows, deployment, dependency install or credentials",
+  "final": {
+    "session": 1940,
+    "exitCode": 0,
+    "startedUtc": "2026-10-15T05:35:45Z",
+    "finishedUtc": "2026-10-15T05:38:02Z",
+    "files": 63,
+    "passed": 3097,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 67.81
+  },
+  "builds": [
+    "default",
+    "companion-readonly",
+    "companion-config-editor",
+    "companion-knowledge-chat",
+    "companion-workspace"
+  ],
+  "staticTests": 56,
+  "focused": {
+    "creatorStore": 274,
+    "creatorAndBrowserDom": 52,
+    "navigation": 21,
+    "setupDom": 22,
+    "setupState": 83,
+    "infoTip": 5
+  },
+  "review": "Independent source review passed. Early success toast, old-receipt toast replay, and locked setup diagnostic reachability findings closed. No new history entry or navigation reordering. Reviewer did not run tests/browser.",
+  "cancelledExecution": "A compound edit/test command returned cancelled without session or exit. Read-only checks confirmed changes present and no active tests; its test outcome remains unknown. Did not replay edits. Authorized fresh focused session44028 passed110; final session1940 is the only final all-suite evidence.",
+  "preFinal": {
+    "session": 45388,
+    "exitCode": 0,
+    "passed": 3096,
+    "files": 63,
+    "fiveBuilds": true,
+    "staticTests": 56,
+    "note": "Before last diagnostic tip reachability refinement; not final evidence."
+  },
+  "browser": "Not verified: no dot cloud browser tool exposed; user-computer CUA not used; prior denied exec Chromium route not retried.",
+  "dependencies": "Lock identical to baseline excluding own application version",
+  "protectedPackages": [
+    {
+      "path": "../../delivery-0.1.14/companion-next-0.1.14-normal-workspace-candidate.zip",
+      "bytes": 682939,
+      "sha256": "e1c24005d8c17678a465d5ef9cc47ce2b4b8bf47c67031a4aba906f4ea37c4e4"
+    },
+    {
+      "path": "../../delivery-0.1.17/companion-next-0.1.17-workspace-static.zip",
+      "bytes": 684392,
+      "sha256": "f574487c16203b08a6042b3c3320b1328b43f7c2498652aac1cf3a981714bb33"
+    }
+  ],
+  "logs": [
+    {
+      "path": ".test-artifacts/ui-018/final-build-companion-config-editor.log",
+      "bytes": 1366,
+      "sha256": "e76ba1dd9b291635516c2f458f1f59f715be84fd51effe81a374d0d66da2ea8c"
+    },
+    {
+      "path": ".test-artifacts/ui-018/final-build-companion-knowledge-chat.log",
+      "bytes": 1357,
+      "sha256": "a809f8c50bf12362c820e7b86795c713ccd39ce9db9cf52f1141fa74568741c8"
+    },
+    {
+      "path": ".test-artifacts/ui-018/final-build-companion-readonly.log",
+      "bytes": 1309,
+      "sha256": "c2d355bf94abadfbbe6bcf09ab49c0a00506638c404974a9ad3b8f4563e9ad02"
+    },
+    {
+      "path": ".test-artifacts/ui-018/final-build-companion-workspace.log",
+      "bytes": 1382,
+      "sha256": "3d9a0e8d30f6c131c7c38e3da95f835490601b190c1bc27a00c0c1123c1d3973"
+    },
+    {
+      "path": ".test-artifacts/ui-018/final-build.log",
+      "bytes": 1182,
+      "sha256": "a9a4b519b17d0c730b7e11558e7762faa551100b85b5ab9175a757419e1f6e59"
+    },
+    {
+      "path": ".test-artifacts/ui-018/final-full.log",
+      "bytes": 655,
+      "sha256": "a9918fdbdde06d004fcc5e7654babde9bd5da37c68476ce6e5c6c3f9d61bfd93"
+    },
+    {
+      "path": ".test-artifacts/ui-018/final-static.log",
+      "bytes": 3828,
+      "sha256": "8f603124ed405d765e3983dbd6593b88afd4bad846d4b46acf331ad40517bf83"
+    }
+  ],
+  "workspaceStatic": {
+    "files": [
+      {
+        "path": "next/assets/about-icon-BaVeClOr.svg",
+        "size": 230,
+        "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+      },
+      {
+        "path": "next/assets/donation-qr-D7kdLLAm.png",
+        "size": 106967,
+        "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+      },
+      {
+        "path": "next/assets/index-BMQZusTg.css",
+        "size": 406607,
+        "sha256": "787b45e43c761b98d88d1aa0ad516a22e2c88f245056336e7369cc61435f5bfd"
+      },
+      {
+        "path": "next/assets/index-CyBrkJ0_.js",
+        "size": 1554896,
+        "sha256": "b53618f2bb5b80d9b23f65a953c5e94994d9a52bb392c2efc5564afefdff9c2b"
+      },
+      {
+        "path": "next/favicon.svg",
+        "size": 245,
+        "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+      },
+      {
+        "path": "next/index.html",
+        "size": 573,
+        "sha256": "65f1f6faa3114f668a8e6d26146212637f2be3c91d5ffc642a4be49e89fe78ff"
+      }
+    ],
+    "references": [
+      {
+        "from": "next/assets/index-CyBrkJ0_.js",
+        "to": "next/assets/about-icon-BaVeClOr.svg"
+      },
+      {
+        "from": "next/assets/index-CyBrkJ0_.js",
+        "to": "next/assets/donation-qr-D7kdLLAm.png"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-BMQZusTg.css"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-CyBrkJ0_.js"
+      }
+    ]
+  }
+}

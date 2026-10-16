@@ -1,0 +1,148 @@
+{
+  "version": "1.3.172",
+  "versionProvenance": {
+    "hostBase": "0.3.150",
+    "nextRevision": 22,
+    "rule": "1.<host minor>.<host patch + nextRevision>",
+    "hostEvidenceSha256": "39e88c9045e5d8266b059ce2b1ceb48cf522c5d0afc5f4596658c4545ae6641e"
+  },
+  "dateUtc": "2026-10-15",
+  "baseline": "8dd699da615f8fdcca0cb60e7abf6367e3a0662b",
+  "checkpoint": "21b77f9",
+  "scope": "Original AI single-icon creation/action/review/import/CPU variant flow; normal workspace source and fake tests only",
+  "final": {
+    "runId": "AI-WORKFLOW-022-FINAL-V2",
+    "session": 42026,
+    "exitCode": 0,
+    "startedUtc": "2026-10-15T15:06:16Z",
+    "finishedUtc": "2026-10-15T15:08:03Z",
+    "files": 88,
+    "passed": 3737,
+    "failed": 0,
+    "skipped": 0
+  },
+  "builds": [
+    "default",
+    "companion-readonly",
+    "companion-config-editor",
+    "companion-knowledge-chat",
+    "companion-workspace"
+  ],
+  "staticTests": 56,
+  "typecheck": "Direct installed vue-tsc --noEmit passed",
+  "execution": "Direct preinstalled Node vitest/vue-tsc/Vite; no package-manager resolution, installation, new dependency or real service request",
+  "priorRun": {
+    "session": 16741,
+    "exitCode": 2,
+    "testsPassed": 3737,
+    "typecheck": "Failed on two test-wrapper props key annotations; assertions unchanged, test-only structural cast fixed; replaced by final-v2 full suite"
+  },
+  "review": "Independent read-only review passed. Closed adopted-source SHA, creation UNKNOWN read recovery, reader/writer drain retention, stage scope invalidation, current image DOM node gating, and matching nested import state. Reviewer did not execute tests/builds or real host operations.",
+  "browser": "Fake jsdom/ElementPlus interactions only. No supported dot browser used; denied Chromium/shared CSS paths not retried. Actual Windows rendering, CSP, image pixels and native dialogs not verified.",
+  "dependencies": "Unchanged dependency tree. Root package and lock version only changed to 1.3.172.",
+  "remaining": [
+    "Runtime-selected Studio/Python/CLI/importer/policy paths, SHA values and Pillow availability need actual host proof",
+    "Real GPU task, trusted local catalog, persisted queue/sealed references and same-origin auth not exercised",
+    "Real PNG visual quality, CPU resize pixels, Creator assets/meta/UUID/scene references/Preview/Build not exercised",
+    "Creation UNKNOWN after reload has only minimal evidence; cannot clear fence by guessed task identity. Unknown variant export cannot be cleared by task status",
+    "No generic Owner image bytes, reference crop, web Codex native generation API or general resource inventory contract",
+    "Existing model launcher start LAN/proxy risk and Comfy detailed-health projection remain outside this slice",
+    "Other legacy Preview/Profiler/scaffold/Agent/MCP and per-source KB synchronization gaps remain as feature-parity-current.md"
+  ],
+  "protectedPackages": [
+    {
+      "version": "0.1.14",
+      "path": "../../delivery-0.1.14/companion-next-0.1.14-normal-workspace-candidate.zip",
+      "bytes": 682939,
+      "sha256": "e1c24005d8c17678a465d5ef9cc47ce2b4b8bf47c67031a4aba906f4ea37c4e4",
+      "verified": true
+    },
+    {
+      "version": "0.1.17",
+      "path": "../../delivery-0.1.17/companion-next-0.1.17-workspace-static.zip",
+      "bytes": 684392,
+      "sha256": "f574487c16203b08a6042b3c3320b1328b43f7c2498652aac1cf3a981714bb33",
+      "verified": true
+    },
+    {
+      "version": "0.1.18",
+      "path": "../../delivery-0.1.18/companion-next-0.1.18-workspace-static.zip",
+      "bytes": 684427,
+      "sha256": "4161ccbf2930fa891c4849bbc976acec3ddf6f8ef71371c49b9e90675cfb52ad",
+      "verified": true
+    },
+    {
+      "version": "0.1.19",
+      "path": "../../delivery-0.1.19/companion-next-0.1.19-workspace-static.zip",
+      "bytes": 687672,
+      "sha256": "9c932eaf0a27ea7d134fe01fafaf086224409d90666d09729283bbbde3f5e414",
+      "verified": true
+    },
+    {
+      "version": "0.1.20",
+      "path": "../../delivery-0.1.20/companion-next-0.1.20-workspace-static.zip",
+      "bytes": 693167,
+      "sha256": "3d0e30a7cd1e148050998e4358abe7dbae769ecfa976672dfdd2505cca068c0a",
+      "verified": true
+    },
+    {
+      "version": "1.3.171",
+      "path": "../../delivery-1.3.171/companion-next-1.3.171-workspace-static.zip",
+      "bytes": 720906,
+      "sha256": "07aa45ead591224ddd1a7ed3f6001f7e60118f0b05b3aa8bd5b658c8b86668db",
+      "verified": true
+    }
+  ],
+  "staticAssets": {
+    "files": [
+      {
+        "path": "next/assets/about-icon-BaVeClOr.svg",
+        "size": 230,
+        "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+      },
+      {
+        "path": "next/assets/donation-qr-D7kdLLAm.png",
+        "size": 106967,
+        "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+      },
+      {
+        "path": "next/assets/index-_rnjKa5X.js",
+        "size": 1749245,
+        "sha256": "45edd331f84d806ce4d546f456afda75d34a15ed2359f17a2b5eb2e98cbb145a"
+      },
+      {
+        "path": "next/assets/index-Cs3qU8jX.css",
+        "size": 423855,
+        "sha256": "549df46df31fdb3bbf438f6f810c6ff62a236841da5f578122330fb4b655d4c8"
+      },
+      {
+        "path": "next/favicon.svg",
+        "size": 245,
+        "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+      },
+      {
+        "path": "next/index.html",
+        "size": 573,
+        "sha256": "34c9479682bea9aacca60b78adfec69b21f68e4090b8f0d79d4a4120749e56f0"
+      }
+    ],
+    "references": [
+      {
+        "from": "next/assets/index-_rnjKa5X.js",
+        "to": "next/assets/about-icon-BaVeClOr.svg"
+      },
+      {
+        "from": "next/assets/index-_rnjKa5X.js",
+        "to": "next/assets/donation-qr-D7kdLLAm.png"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-_rnjKa5X.js"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-Cs3qU8jX.css"
+      }
+    ]
+  }
+}

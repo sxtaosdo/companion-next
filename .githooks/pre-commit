@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+export PYTHONUTF8=1
+export PYTHONIOENCODING=utf-8
+exec "${COMPANION_NEXT_PYTHON:-python3}" scripts/git_version.py bump

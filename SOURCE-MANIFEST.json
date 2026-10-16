@@ -1,0 +1,1612 @@
+{
+  "schemaVersion": 1,
+  "version": "1.3.173",
+  "sourceCommit": "9db8b3af26982af7e9366ae03d865d8782f98a33",
+  "sourceFileCount": 319,
+  "sourceStatus": "clean",
+  "files": [
+    {
+      "path": "companion-next/.gitattributes",
+      "bytes": 182,
+      "sha256": "51b9c0b3d73174f8b3cdeab31fbc7c9b1581686923ef5904daa030db7e0db67b"
+    },
+    {
+      "path": "companion-next/.gitignore",
+      "bytes": 192,
+      "sha256": "315182979760e85ddcab7a68472316f5a1517626aa0d71faa91500cbb809d49d"
+    },
+    {
+      "path": "companion-next/README.md",
+      "bytes": 42521,
+      "sha256": "6cf5229225b3d679ee7b077c2699fda1cf0b3a395db0a6a5d54c594e18efb1c2"
+    },
+    {
+      "path": "companion-next/bridge/README.md",
+      "bytes": 7242,
+      "sha256": "515b1b707320067e1fb00d2ed17b6290d00ecbebd43a2800916c46f3e30c2084"
+    },
+    {
+      "path": "companion-next/bridge/__init__.py",
+      "bytes": 79,
+      "sha256": "0eec5fc87a1dd6c8b51eb2b336a72db47bc1ce7228c08858fb29bac96734cc30"
+    },
+    {
+      "path": "companion-next/bridge/launch_picker.py",
+      "bytes": 10572,
+      "sha256": "74f7d20245c637b784e7f402b1ad212e17fb45b4729ee0a97e933aeedf3bdbb3"
+    },
+    {
+      "path": "companion-next/bridge/picker_bridge.py",
+      "bytes": 23928,
+      "sha256": "4d48e718ccfc17cdaf2affe175fe7e0bb1e35c10f5eb39175d52f7b870eb2824"
+    },
+    {
+      "path": "companion-next/docs/ai-job-actions-022.md",
+      "bytes": 10215,
+      "sha256": "c78a2065de4f364ea2e1eb5e23179e89249b88d5c654bb1eefc559f4f629e26e"
+    },
+    {
+      "path": "companion-next/docs/ai-jobs-read-021.md",
+      "bytes": 5942,
+      "sha256": "ee7618665ef067b01068ea5112e5a92f22873826b01fb930e8a2ad7e19a6afc1"
+    },
+    {
+      "path": "companion-next/docs/ai-reference-upload.md",
+      "bytes": 5853,
+      "sha256": "982ead28bee1053536f631998d9a015582acf4c178327d74d3ac02bebfa2eddd"
+    },
+    {
+      "path": "companion-next/docs/ai-resource-config-editor.md",
+      "bytes": 6353,
+      "sha256": "48b99aa023687c90a5848e324698efcad45ca7a22e9a24c59fcaa92a8d3218cd"
+    },
+    {
+      "path": "companion-next/docs/ai-resource-read-contract.md",
+      "bytes": 6233,
+      "sha256": "3410d66241fdc20749d7841f1ea8b5f0aadf74dd9f00d979eedfa3dae3b05f84"
+    },
+    {
+      "path": "companion-next/docs/ai-task-creation-022.md",
+      "bytes": 9213,
+      "sha256": "ba64266777f62bf2836ba2375cef1839a08e18e2e0b88c63c97be96eddf46d18"
+    },
+    {
+      "path": "companion-next/docs/ai-workflow-022.md",
+      "bytes": 7932,
+      "sha256": "6a69507d409297b1efafb71060765491f2697cb33a222a4a13ec8619fb54c33e"
+    },
+    {
+      "path": "companion-next/docs/bridge-review-controls.md",
+      "bytes": 12345,
+      "sha256": "b61466acf8c9d001538cbf6dbc2389283a441b73d7393353c774294b893d71d3"
+    },
+    {
+      "path": "companion-next/docs/cli-use-copy.md",
+      "bytes": 5533,
+      "sha256": "99c301f81b16e2ec3a85c41eae0aec3d1bfe3fcc91effeb6c41534960aaca6d3"
+    },
+    {
+      "path": "companion-next/docs/compact-project-ui-018.md",
+      "bytes": 3191,
+      "sha256": "d7eae512eac1fe7b789263323aae2bc12d2750a26d966814d6a776aebf4351f5"
+    },
+    {
+      "path": "companion-next/docs/companion-browser-contract.md",
+      "bytes": 11685,
+      "sha256": "4cf1271ac18ae38330e185ad8e57c14ab07247a01fc93f8a6811ac4d1375e79d"
+    },
+    {
+      "path": "companion-next/docs/companion-host-assembly.md",
+      "bytes": 7894,
+      "sha256": "b74beb74d6097742613d6d32074ec9b348845d1a2601a5e664335b4e077b3e94"
+    },
+    {
+      "path": "companion-next/docs/companion-live-refresh.md",
+      "bytes": 3950,
+      "sha256": "d73c7f27263a6751bd53cc906866e35c606e5890a6a00708cb675370ae0109e4"
+    },
+    {
+      "path": "companion-next/docs/companion-read-workspace.md",
+      "bytes": 4764,
+      "sha256": "efe8b66df3cf119c7e3caff6ea8c1953c99fb0a2b3dd2c0b21f87f774acb02d3"
+    },
+    {
+      "path": "companion-next/docs/companion-runtime-binder.md",
+      "bytes": 13570,
+      "sha256": "a957a477a97008e9d0f660f1de4e9d9d515741cb9d3a564c54791d27abae0512"
+    },
+    {
+      "path": "companion-next/docs/companion-static-candidate.md",
+      "bytes": 7221,
+      "sha256": "97dae22852ef6d94d69d722c2d602343c126520b1dac92b170e25347167173b9"
+    },
+    {
+      "path": "companion-next/docs/creator-flow-review.md",
+      "bytes": 8101,
+      "sha256": "1a62f842ea7f5d4a292acf28fc7a65d1fd354c9d2c9559ff699559b2218c59e5"
+    },
+    {
+      "path": "companion-next/docs/creator-operations.md",
+      "bytes": 6638,
+      "sha256": "ae1c65f13c3d92f99edae881f659547adf968eaa2ffcce0578270f51126a13f4"
+    },
+    {
+      "path": "companion-next/docs/creator-stop-restart.md",
+      "bytes": 7078,
+      "sha256": "55e306af60703f3804007c9613ba2b9f9a62cdb530cbe4655597bb993fa25c7b"
+    },
+    {
+      "path": "companion-next/docs/dependencies.md",
+      "bytes": 2226,
+      "sha256": "76829575df37515b4ab29994ab5a798df45d95e06b86dcf6bf60dd9160a7ca44"
+    },
+    {
+      "path": "companion-next/docs/evidence/ai-workflow-022.json",
+      "bytes": 5990,
+      "sha256": "366230fe4a0b30276defa9a78ec12c86a72ff0dae964c4de6216f48d4e435b6a"
+    },
+    {
+      "path": "companion-next/docs/evidence/compact-ui-018.json",
+      "bytes": 5145,
+      "sha256": "a1597465d711c8f8f06b0a3d93546ceeacbfa746247c0d6ee4d4adb52b86872e"
+    },
+    {
+      "path": "companion-next/docs/evidence/companion-static-additions.json",
+      "bytes": 2594,
+      "sha256": "4b58f32f357d06f43435ce6efc1b0dfbe46dec112333c7ae2ea4bd06696586df"
+    },
+    {
+      "path": "companion-next/docs/evidence/companion-static-delivery.json",
+      "bytes": 1139,
+      "sha256": "9b0a296f37656ce489d02cd810af5b6239d302b417d6d87dfaf7f571cea84caf"
+    },
+    {
+      "path": "companion-next/docs/evidence/creator-stop-restart-015.json",
+      "bytes": 2531,
+      "sha256": "dd4f7f4e2bdd456b57edfd1e75b53a704b51b7be2b80ad2d89521f4d5f6c5644"
+    },
+    {
+      "path": "companion-next/docs/evidence/normal-project-014.json",
+      "bytes": 2535,
+      "sha256": "6e1d93649e782d0c1d7eaaaac07581ea4d6e3fbd01396f3d986ce8607787bb71"
+    },
+    {
+      "path": "companion-next/docs/evidence/production-pages-021.json",
+      "bytes": 7481,
+      "sha256": "95c5e3e2cd030023dd3df65721b008ec0408ce6eb2468032fb87770083badb04"
+    },
+    {
+      "path": "companion-next/docs/evidence/project-registration-016.json",
+      "bytes": 4220,
+      "sha256": "445e63684a7b383288bdabefed11b8687649ae8a1d35681ce78fee64a68880e3"
+    },
+    {
+      "path": "companion-next/docs/evidence/project-setup-017.json",
+      "bytes": 5853,
+      "sha256": "4937856a2e4354acc5ff990cc393199977bb56500074a0f55ea1d9959aecf167"
+    },
+    {
+      "path": "companion-next/docs/evidence/project-ui-019.json",
+      "bytes": 5909,
+      "sha256": "c3c3d03264de3a52966b3a3cf19db814001f1137ed0a99d6c60d4321542a4ee2"
+    },
+    {
+      "path": "companion-next/docs/evidence/project-ui-020.json",
+      "bytes": 6682,
+      "sha256": "1d7da12ac7c74d5af48978a214651ebd42fb90be341733b70cb06e8094f00378"
+    },
+    {
+      "path": "companion-next/docs/evidence/v148-http-validation.json",
+      "bytes": 1901,
+      "sha256": "c2d3c37125b0cd2d456aeede0cbe14473cdd683a21ddf613a6cb97f01de8da03"
+    },
+    {
+      "path": "companion-next/docs/evidence/v148-typecheck-approved.json",
+      "bytes": 11966,
+      "sha256": "7d76740f29d09d34c4197f3cf224b4883bf449466471329be25c46cea2abc4a9"
+    },
+    {
+      "path": "companion-next/docs/evidence/v148-typecheck-limit.json",
+      "bytes": 565,
+      "sha256": "2df0467e5f49fa0c9bef7de4e83ac5448e326c0e1f6fbc99c0f6af79d1ab0040"
+    },
+    {
+      "path": "companion-next/docs/feature-parity-current.md",
+      "bytes": 8199,
+      "sha256": "28a2a4e9cd5107a3a4a8d40e5e43b10c03341d46258d0fef68df496c15da4397"
+    },
+    {
+      "path": "companion-next/docs/generation-receipts.md",
+      "bytes": 4589,
+      "sha256": "6f21425f25c8f1c6bd37c05feb9c77aef6cd03f0dd35308d6970b1008d0f305f"
+    },
+    {
+      "path": "companion-next/docs/generation-sources.md",
+      "bytes": 4069,
+      "sha256": "709e7813fd07c3af0c0e3c1740bb59b63c6a292d078fbb02d415ca1a164992d4"
+    },
+    {
+      "path": "companion-next/docs/image-assets.md",
+      "bytes": 9184,
+      "sha256": "7d8da1cf5a0524a0f3132a25509b061594608928790a7779798fcfc46d0278cd"
+    },
+    {
+      "path": "companion-next/docs/knowledge-conversation.md",
+      "bytes": 6243,
+      "sha256": "c5b8736ed044c6473bebc7ef1f7e83104184135645b34e14e213974cb998d83e"
+    },
+    {
+      "path": "companion-next/docs/knowledge-read-contract.md",
+      "bytes": 12346,
+      "sha256": "07f4381e989ee177145fa3655b02c8fd77f03c592fc5b1ca579c3ed42e2c1119"
+    },
+    {
+      "path": "companion-next/docs/local-service-operations-021.md",
+      "bytes": 9025,
+      "sha256": "4911cdfb2529cb433d811e6305e11c0a8cc362634ec42949a26e43d3c706ff53"
+    },
+    {
+      "path": "companion-next/docs/migration-acceptance-current.md",
+      "bytes": 6372,
+      "sha256": "9885dd5cfa8598413a92cb32e1b4213d34ae529d7b04b640059971d01eecec6f"
+    },
+    {
+      "path": "companion-next/docs/migration-execution-order.md",
+      "bytes": 16465,
+      "sha256": "f2090286266eeb0d7a273e9f0d4c9467102ee38baa173369cc025f8b66eddede"
+    },
+    {
+      "path": "companion-next/docs/migration-parity-v133.md",
+      "bytes": 14864,
+      "sha256": "43decb23370cc2272b9017d0fa8012a6e50a7fa1136e74afa6b550843f8d9394"
+    },
+    {
+      "path": "companion-next/docs/migration-parity-v148.md",
+      "bytes": 31520,
+      "sha256": "103fb1fd29a3b4a32ad92c6e3e16f2d52b34b7f27c557499cb5ad4717a6cbb85"
+    },
+    {
+      "path": "companion-next/docs/npm-audit.json",
+      "bytes": 364,
+      "sha256": "010da6d705eeca5f2559a267eb9e1802f233aeeb66b134b9fad4edda4fd9c553"
+    },
+    {
+      "path": "companion-next/docs/page-acceptance-021.md",
+      "bytes": 4442,
+      "sha256": "7016285b2663e581d166dd86fb647bdfa2e888950f95b3df8a8694c74a23d42e"
+    },
+    {
+      "path": "companion-next/docs/passive-readonly-013.md",
+      "bytes": 5894,
+      "sha256": "9685bdc3c3931aabc1ea0c8313746f83ad0a812545955797739cff71b47ac17b"
+    },
+    {
+      "path": "companion-next/docs/production-pages-021.md",
+      "bytes": 4200,
+      "sha256": "71dd5737b4b49ed30b84ea4b6e5b86dafd529d036e31052b9a94ad3578fd22a2"
+    },
+    {
+      "path": "companion-next/docs/project-registration-actions.md",
+      "bytes": 5379,
+      "sha256": "36bad38056b897252d8edd69d236a80f757e23332bce5efbfc9992ede3e76676"
+    },
+    {
+      "path": "companion-next/docs/project-setup-wizard.md",
+      "bytes": 6701,
+      "sha256": "edc3adce14c078f98eeb903e3981f2098467d91f0be52b36e0ddf771537446cf"
+    },
+    {
+      "path": "companion-next/docs/project-status-tooltip-023.md",
+      "bytes": 2709,
+      "sha256": "2bd4191753b0aed10220b3f97ed2c704a51a6a2d06a38ccf4237d2a8b7ba81f8"
+    },
+    {
+      "path": "companion-next/docs/project-ui-019.md",
+      "bytes": 4926,
+      "sha256": "683feb2014b5de345b676ba5ee47c493dc0280d72d6441b3e7016544f8deca93"
+    },
+    {
+      "path": "companion-next/docs/project-ui-020.md",
+      "bytes": 4424,
+      "sha256": "a34f5a88429085174fdff7c71f19b7a7735176ff1e716949b89004616c6cc6dc"
+    },
+    {
+      "path": "companion-next/docs/public-image-review-parity.md",
+      "bytes": 6531,
+      "sha256": "afa3aab109854502454faf69241ff4264cc832173828a254b1ebb47abf753a91"
+    },
+    {
+      "path": "companion-next/docs/readonly-adapter.md",
+      "bytes": 9678,
+      "sha256": "9df3cf1b3dc30fb0171c1df5a6d5e5c66b18662f659a62d8e376d705870222d8"
+    },
+    {
+      "path": "companion-next/docs/remaining-api-inventory.md",
+      "bytes": 15084,
+      "sha256": "fa71abf94ea178022c0826e0009950f1be36ddf2dbf8e7dc4d04623a9a210675"
+    },
+    {
+      "path": "companion-next/docs/resource-config-production-021.md",
+      "bytes": 4336,
+      "sha256": "9561c3787b6dab53a8210005522095456dfa1c2961e9c570a068a072272b6f85"
+    },
+    {
+      "path": "companion-next/docs/resource-planning.md",
+      "bytes": 6888,
+      "sha256": "d8d9883330cd789d4cdf9ff6f6f3ebf75c0c36f9b06f0ad008a2b180d867b558"
+    },
+    {
+      "path": "companion-next/docs/route-production-audit-021.md",
+      "bytes": 5241,
+      "sha256": "f310d3d89638ee2e4a3543a91e962369db4794615ad7106a681f51350b924cfa"
+    },
+    {
+      "path": "companion-next/docs/service-status-021.md",
+      "bytes": 4359,
+      "sha256": "76814cec51b6edd172dd3754d8f3b440af8d11292c7ea2bde66e53696fe4acb6"
+    },
+    {
+      "path": "companion-next/docs/tool-preset-drafts.md",
+      "bytes": 4695,
+      "sha256": "a52907d7b5f26936b0fa371bb825d7c96500ebc4cde08ae2ecd2029fbde79f40"
+    },
+    {
+      "path": "companion-next/docs/tool-presets-read-contract.md",
+      "bytes": 8491,
+      "sha256": "6f33f7dbc386daa108240436a052dd88be805c725b459da8d3b838187647d055"
+    },
+    {
+      "path": "companion-next/docs/tool-presets-write-021.md",
+      "bytes": 7772,
+      "sha256": "103ba47070d6a6e28d37b3082500758123af9a8e5c0ba854f847df9730b4e5d7"
+    },
+    {
+      "path": "companion-next/docs/validation.md",
+      "bytes": 74491,
+      "sha256": "c8ca1d4089fda3c9d2d98531fee01b9d7e67a3800e203d4e95b7518f750e31ef"
+    },
+    {
+      "path": "companion-next/host/companion-read-assembly.ts",
+      "bytes": 6094,
+      "sha256": "86237bcd64a11865ee4cc9889c32c66f3fbfa709c13dc4a005d92e2123da1587"
+    },
+    {
+      "path": "companion-next/host/v148-runtime-binder.ts",
+      "bytes": 11104,
+      "sha256": "12e43db015bf109c94f852245506ebf10378f6f992f881ae9630dc2cfcfaa163"
+    },
+    {
+      "path": "companion-next/index.html",
+      "bytes": 471,
+      "sha256": "0337815cd0cd7e5ec76127b1363661ae012403ebc1381eb105498ff19b2333ae"
+    },
+    {
+      "path": "companion-next/package-lock.json",
+      "bytes": 125668,
+      "sha256": "c5cfda71019754a954c6acd9e570121d28a9975e6aceae65bab7ee375c98e23a"
+    },
+    {
+      "path": "companion-next/package.json",
+      "bytes": 1598,
+      "sha256": "853f7379d7e4ea38c114213947cbc4773de2ffd8b98a5a9fc8b14fc5d8098ab2"
+    },
+    {
+      "path": "companion-next/public/favicon.svg",
+      "bytes": 245,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "companion-next/scripts/build-v148-test-runtime.mjs",
+      "bytes": 2681,
+      "sha256": "5e34de3a1f2daaa5419d91d99a745c37a8e266e17b052e92d4bb2d0c362a4418"
+    },
+    {
+      "path": "companion-next/scripts/prepare-companion-static.mjs",
+      "bytes": 13464,
+      "sha256": "afadf90928d90bb39bcf12223bef08cd859b67a1268747a18c804c0b7ade1bac"
+    },
+    {
+      "path": "companion-next/scripts/typecheck-v148-runtime.mjs",
+      "bytes": 4942,
+      "sha256": "1b2879700d9756801d7ae87e010aea8e798a67aa5c803fcae7617df66c4cd9a9"
+    },
+    {
+      "path": "companion-next/scripts/validate-v148-http.mjs",
+      "bytes": 15704,
+      "sha256": "1a861f8ebdb2d1da2fddd59c9d14c78ec6b6d1ecd2cf5299df55c2c8f5f836d8"
+    },
+    {
+      "path": "companion-next/src/App.vue",
+      "bytes": 14563,
+      "sha256": "4b9cf2774ffa101d0ab6ef64350383fb047d473cb0ee25380893256f1336fc5a"
+    },
+    {
+      "path": "companion-next/src/adapters/ai-job-actions.ts",
+      "bytes": 8027,
+      "sha256": "5a62f1374d985bb083a03b4c4fea7741a436c2435945dcd2a41ff249a4312797"
+    },
+    {
+      "path": "companion-next/src/adapters/ai-jobs-read.ts",
+      "bytes": 9215,
+      "sha256": "3394a433db4d78803e3d46a78a3b0eaf0ed82468b1be9993a814c01e75115c8a"
+    },
+    {
+      "path": "companion-next/src/adapters/ai-reference-upload.ts",
+      "bytes": 9287,
+      "sha256": "587d8f776a8f899714de2b147aca7d1776534c3cca9dea848bf8c4edc8068dec"
+    },
+    {
+      "path": "companion-next/src/adapters/ai-resource-read.ts",
+      "bytes": 8312,
+      "sha256": "f2ac18591ea8a519e7cf26d8e0443816416619b8a71b823f1964c4493db255d4"
+    },
+    {
+      "path": "companion-next/src/adapters/ai-resource-save.ts",
+      "bytes": 8544,
+      "sha256": "88f6703f8aa00f2ae1a51b2449873c9bef85069167476c512e194a74ed167c55"
+    },
+    {
+      "path": "companion-next/src/adapters/ai-task-creation.ts",
+      "bytes": 7431,
+      "sha256": "2f37fe07d9c9ec608447b99ba0a28ade8924eb0d8ca4f1f868427fe39023ace2"
+    },
+    {
+      "path": "companion-next/src/adapters/companion-browser.ts",
+      "bytes": 23312,
+      "sha256": "74091090ae89f0193628ec90337821909dcc8ebd0a6fffc17c5a9ac85fefef4e"
+    },
+    {
+      "path": "companion-next/src/adapters/companion-events.ts",
+      "bytes": 6858,
+      "sha256": "6903aec6e6a5f1f2eea531bc3683b08c78b17a7ca12624475ae725e316a1194f"
+    },
+    {
+      "path": "companion-next/src/adapters/creator-operations.ts",
+      "bytes": 15378,
+      "sha256": "9455ee2432da6015e631dbbe6703d3d32c1cd391967a15f7126a078ab6602e9a"
+    },
+    {
+      "path": "companion-next/src/adapters/image-review-state.ts",
+      "bytes": 8320,
+      "sha256": "2e0f58869d4d38f0cfd3795d3e088a3039d1ca912eb88c1a885fea0aca8987fc"
+    },
+    {
+      "path": "companion-next/src/adapters/image-review.ts",
+      "bytes": 10636,
+      "sha256": "30325e0817c3d52e344192cb3e8f921cd79ba05a2f568cbdba0ef2d95222d9c6"
+    },
+    {
+      "path": "companion-next/src/adapters/knowledge-conversation.ts",
+      "bytes": 10047,
+      "sha256": "c97367113bf9e9794cec522f73e7ed14df877ea550726ac5c72623b2d269d9ee"
+    },
+    {
+      "path": "companion-next/src/adapters/knowledge-read.ts",
+      "bytes": 25649,
+      "sha256": "783fe6978933b1d286c26684d8d94f827021ca1d58458df56ef59fb249fa565c"
+    },
+    {
+      "path": "companion-next/src/adapters/local-service-operations.ts",
+      "bytes": 10069,
+      "sha256": "84d6ff1898107ce08e166fab0a0aa927c79e028e4803fcfc68e2d5f9aaf0e4d3"
+    },
+    {
+      "path": "companion-next/src/adapters/project-setup.ts",
+      "bytes": 14747,
+      "sha256": "e24fa4192eb83fce1daa66f3b65a3189d1b2bb991aebb0df76511b1408bff7ae"
+    },
+    {
+      "path": "companion-next/src/adapters/same-origin-readonly.ts",
+      "bytes": 16604,
+      "sha256": "62da2d08f2634f1990500ff62e18ba123138dcf961d46b007890b7b5b79ad5f4"
+    },
+    {
+      "path": "companion-next/src/adapters/tool-presets-read.ts",
+      "bytes": 6736,
+      "sha256": "ff218533fc294cabff0b5ad9bb8c3c4faacff1f215237a0c1da1cee9708af339"
+    },
+    {
+      "path": "companion-next/src/adapters/tool-presets-write.ts",
+      "bytes": 8383,
+      "sha256": "21bbad4fb322745ad2ecb4975aaaa4ba093cf52bbcc45b2cd8ca116d49d8dd7d"
+    },
+    {
+      "path": "companion-next/src/ai-job-actions-integration.ts",
+      "bytes": 378,
+      "sha256": "ceec37cf6ad04aa493c34144c27f75f797b233e46a2839cb91a2c691b0baf956"
+    },
+    {
+      "path": "companion-next/src/ai-jobs-read-integration.ts",
+      "bytes": 382,
+      "sha256": "087da9efadb457ceadf14c9b9ebfe910ddaa4cae77b60d962230f8cf7656b2ce"
+    },
+    {
+      "path": "companion-next/src/ai-reference-upload-integration.ts",
+      "bytes": 432,
+      "sha256": "8b536c35902face0f29ded71ae539873cde7eb24671fa6250cdfb82a49cba541"
+    },
+    {
+      "path": "companion-next/src/ai-resource-read-integration.ts",
+      "bytes": 409,
+      "sha256": "e5f6ffc5f026438c8e7fb974c53f3da8421d17c77efe5ea6a6e426cbfd99ba15"
+    },
+    {
+      "path": "companion-next/src/ai-resource-save-integration.ts",
+      "bytes": 642,
+      "sha256": "ce234f65414e05fe8b918ec19da9c8c764121a5f1c7e70adbcc761c0a169a8cd"
+    },
+    {
+      "path": "companion-next/src/ai-task-creation-integration.ts",
+      "bytes": 425,
+      "sha256": "4c4b3edcb6dba3f12e127efe36f566c3aee7f63e1b421550b682333c0c6c2a28"
+    },
+    {
+      "path": "companion-next/src/assets/legacy-v148/about-icon.svg",
+      "bytes": 230,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "companion-next/src/assets/legacy-v148/donation-qr.png",
+      "bytes": 106967,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "companion-next/src/companion-browser-integration.ts",
+      "bytes": 1366,
+      "sha256": "b075fd19ccda1df88fb0557636ab45a26a3208a180a1ea8694186bc21595d87e"
+    },
+    {
+      "path": "companion-next/src/components/AiJobActionsPanel.vue",
+      "bytes": 12742,
+      "sha256": "09651370658e56c7979b55dd425cbfbc03c2fc98b804daf91434fd4ed8a54edd"
+    },
+    {
+      "path": "companion-next/src/components/AiJobsReadPanel.vue",
+      "bytes": 13617,
+      "sha256": "883f8b21f5f65b706a90f0441c5c5b4a5d57d99bd0fef5c2dd4f86e6bbbfb0d8"
+    },
+    {
+      "path": "companion-next/src/components/AiReferenceUploadPanel.vue",
+      "bytes": 8600,
+      "sha256": "a4d8ddc9b90b8bcaf5c2d14925287b0b4707f300e412fc28b1e0b5b0f54afaf1"
+    },
+    {
+      "path": "companion-next/src/components/AiResourceConfigDialog.vue",
+      "bytes": 13845,
+      "sha256": "574b68368b67eef881e849b630c39a203fb8dd84c4f071bafa12d128847e3cdf"
+    },
+    {
+      "path": "companion-next/src/components/AiTaskCreationPanel.vue",
+      "bytes": 10940,
+      "sha256": "9e5aec11a0a580314e582ca001466aafb8fda30d10ea0415682256a019fae939"
+    },
+    {
+      "path": "companion-next/src/components/AssetArt.vue",
+      "bytes": 2575,
+      "sha256": "1e52607253f526eff815c2f005132931cea751ee3f11e8a435218e814661cf7c"
+    },
+    {
+      "path": "companion-next/src/components/CliUseDialog.vue",
+      "bytes": 5371,
+      "sha256": "17bd7883fd075e1efb65b1967d8a9f4ac2ac4405d9336a027d8176f2772df651"
+    },
+    {
+      "path": "companion-next/src/components/CreatorOperationDialog.vue",
+      "bytes": 5333,
+      "sha256": "55d90fd1e58ac176091172e5b5aad3a622dd0bf43a4a85243d698abc52839c7d"
+    },
+    {
+      "path": "companion-next/src/components/EmptyState.vue",
+      "bytes": 2138,
+      "sha256": "9ac7f772ed665b615ae5672aec948f37e49f5a23520e8ba5b6476f7d08f1a33b"
+    },
+    {
+      "path": "companion-next/src/components/GenerationReceiptPanel.vue",
+      "bytes": 7764,
+      "sha256": "a9ce342876b6aa350229ee4876c5ad937d0b4bbe08a67fd387be4486d84759f0"
+    },
+    {
+      "path": "companion-next/src/components/GenerationSourcePanel.vue",
+      "bytes": 4759,
+      "sha256": "eddb4e84941a8ee5105d7ac7559560a4f028f4d7992828fcda3e48e2170e4748"
+    },
+    {
+      "path": "companion-next/src/components/InfoTip.vue",
+      "bytes": 1431,
+      "sha256": "f58ca159f0e260db81fb406a9303b7d306feef3102135e025b75c1f6a5f9cc5e"
+    },
+    {
+      "path": "companion-next/src/components/KnowledgeConversationPanel.vue",
+      "bytes": 10246,
+      "sha256": "6110bf18aecfb3ea78bf75ccfe26b42115fdda7ddc040897d024cc37dd1a9a8b"
+    },
+    {
+      "path": "companion-next/src/components/LocalServiceControls.vue",
+      "bytes": 6604,
+      "sha256": "9635209983ed778e0b27b7e6bbe86e5e3bd4bb385f773ab902d8609fe8b12b89"
+    },
+    {
+      "path": "companion-next/src/components/ProjectSetupWizard.vue",
+      "bytes": 13618,
+      "sha256": "92679245adfde8546ed7a6724badd01035932950f58f98b391997c99ba5a4991"
+    },
+    {
+      "path": "companion-next/src/components/ProjectStatusTag.vue",
+      "bytes": 2178,
+      "sha256": "fd4f8d8f194da247459e81642ec7de7cbeb7e74cfe12500e1e567e010ffcd69e"
+    },
+    {
+      "path": "companion-next/src/components/RegisteredProjectOverview.vue",
+      "bytes": 4627,
+      "sha256": "fda6f815234ddea60de15e8ba4a905d14f484131e3316e3888f18e85ca6ed442"
+    },
+    {
+      "path": "companion-next/src/components/RegisteredProjectResources.vue",
+      "bytes": 4898,
+      "sha256": "060b0f9a0cdc77c37a0ca3754bf7d5d3fc3687f011ff702586a96dba20e034c4"
+    },
+    {
+      "path": "companion-next/src/components/ResourcePlanner.vue",
+      "bytes": 21780,
+      "sha256": "55bbad5cec3ec738e42d2a5bdcf62519705c830a056d7c0fea95bfb04b40b527"
+    },
+    {
+      "path": "companion-next/src/components/SpecDialog.vue",
+      "bytes": 8307,
+      "sha256": "89aec857e89f65591bac1778f3f7a07a763746d86d5f820b65df58c381a41f3f"
+    },
+    {
+      "path": "companion-next/src/components/SpecSummary.vue",
+      "bytes": 1309,
+      "sha256": "1723cbb5085a2b0d69d5e64224861a9284769ee55a6df15c12978353299003fe"
+    },
+    {
+      "path": "companion-next/src/components/ToolPresetDraftPanel.vue",
+      "bytes": 13825,
+      "sha256": "4e183eb1f535a1d68942ddc6485e8559ff491afa1e1f2b53f3e191213da21992"
+    },
+    {
+      "path": "companion-next/src/components/ToolPresetWritePanel.vue",
+      "bytes": 13075,
+      "sha256": "1819f887cebdb961322c84dcd8b8531674b473d632752d1b0ddc078b9421c738"
+    },
+    {
+      "path": "companion-next/src/components/ToolPresetsReadPanel.vue",
+      "bytes": 8167,
+      "sha256": "7a35db7d873637dd9ed636fad7d8b592393abb203dde09aefb71b007212d670c"
+    },
+    {
+      "path": "companion-next/src/composables/use-companion-project-entry.ts",
+      "bytes": 3552,
+      "sha256": "404fec7c03b5b0717cbe19fea98bf1ee90dbf596c60476dcaeb00ac8d9a33019"
+    },
+    {
+      "path": "companion-next/src/composables/use-registered-project-page.ts",
+      "bytes": 1144,
+      "sha256": "c37048365bddc15cc8ab9398cc9ef3ec1d4740c1b499a3253fc8e673bc74a0c0"
+    },
+    {
+      "path": "companion-next/src/creator-operations-integration.ts",
+      "bytes": 655,
+      "sha256": "26fdce59607ffd74001134aea21ef44e1369de84e9dcbc80d76e2645ba67ccd9"
+    },
+    {
+      "path": "companion-next/src/domain/ai-job-acceptance.ts",
+      "bytes": 2825,
+      "sha256": "363c3a5d25c79aad8f1f83f2aa7ebba497a4874c1229ad0d67f5cfa468416291"
+    },
+    {
+      "path": "companion-next/src/domain/ai-job-actions.ts",
+      "bytes": 12293,
+      "sha256": "ab10c166ccab336fb83c75b90bb350bc6617d1bb244f2613d7ece81e92dfdc37"
+    },
+    {
+      "path": "companion-next/src/domain/ai-jobs-read.ts",
+      "bytes": 16634,
+      "sha256": "a5b2608e64abdc801b50bad8fcd3675820bf6d474af9b5542dc949c7e4d00719"
+    },
+    {
+      "path": "companion-next/src/domain/ai-reference-upload.ts",
+      "bytes": 20595,
+      "sha256": "85fc1c30e3f4880e3c3cc5cdf7edf4d5cf77edd4c2d59212a3ec4491f59b4902"
+    },
+    {
+      "path": "companion-next/src/domain/ai-resource-read.ts",
+      "bytes": 23457,
+      "sha256": "7a1c49ad07d3389fd3d51e97125a414362d188f4b33273760946cfdc0ad30173"
+    },
+    {
+      "path": "companion-next/src/domain/ai-resource-save.ts",
+      "bytes": 6761,
+      "sha256": "c3639612bbbeea5bb63fbc4769a6da27aef7e28739c4f59b8d5d6678d269a955"
+    },
+    {
+      "path": "companion-next/src/domain/ai-resource-snapshot.ts",
+      "bytes": 2713,
+      "sha256": "797009fce1e382f53e3f8c4a55425a639ac6478487ac0bf2f5b08f9b2cd297c8"
+    },
+    {
+      "path": "companion-next/src/domain/ai-task-creation.ts",
+      "bytes": 15491,
+      "sha256": "7c01960d9b86ad2af374415090e0f107ee2ec5eabfb35df0d3c88236b23cf104"
+    },
+    {
+      "path": "companion-next/src/domain/ai-write-coordination.ts",
+      "bytes": 5468,
+      "sha256": "bc7c4d8054a9b105669587f24104bdae01f72e4211d784eeef0cb418ce3bb5f7"
+    },
+    {
+      "path": "companion-next/src/domain/cli-use-copy.ts",
+      "bytes": 3186,
+      "sha256": "85c2139fda1f37096d7a10991872e0c105f6ddf5a981e211d530d10ca2e3e462"
+    },
+    {
+      "path": "companion-next/src/domain/companion-browser.ts",
+      "bytes": 5420,
+      "sha256": "dc8c5801e9643e59bd842bb75d8ed789b38c231494ff50691bc3e1eadde20994"
+    },
+    {
+      "path": "companion-next/src/domain/companion-live.ts",
+      "bytes": 1405,
+      "sha256": "1625241a86c762abef3068d6d51da2b9c21bc0dd2b4d4bdc0dfc385a2b97ecd5"
+    },
+    {
+      "path": "companion-next/src/domain/companion-project-display.ts",
+      "bytes": 662,
+      "sha256": "077df13012a2a58bbb840a891b0f196514aef4172d1b10050bd9e204628c2db5"
+    },
+    {
+      "path": "companion-next/src/domain/contracts.ts",
+      "bytes": 2920,
+      "sha256": "2e0ead28d708331885119106e5665a9fda5d2f8774a25048b03f17d22cba57b9"
+    },
+    {
+      "path": "companion-next/src/domain/creator-operations.ts",
+      "bytes": 3976,
+      "sha256": "22c90f35c1e8e19db3c7d281f269b7d90702234ab18c61306deb395a576c9466"
+    },
+    {
+      "path": "companion-next/src/domain/drafts.ts",
+      "bytes": 2678,
+      "sha256": "0210b55f8f18d0bb96b367fc43d6196a47378a28a7e97731efee50b6fb584eda"
+    },
+    {
+      "path": "companion-next/src/domain/generation-handoff.ts",
+      "bytes": 2931,
+      "sha256": "e0bff8e493a50e5d25c88900969fa457c836887ec8db72566273dec7027f4a90"
+    },
+    {
+      "path": "companion-next/src/domain/generation-receipt.ts",
+      "bytes": 14287,
+      "sha256": "621c442f4408fc3e2f78d34e5154dd822e79df35d0cbfc8885163e594b71db1a"
+    },
+    {
+      "path": "companion-next/src/domain/generation-source.ts",
+      "bytes": 1728,
+      "sha256": "3f20a0261598e6b31675c20fefb1e7b6254bb2c2deea193ffb3b7777e5abcdac"
+    },
+    {
+      "path": "companion-next/src/domain/image-review-workflow.ts",
+      "bytes": 3757,
+      "sha256": "6e133a67df2e0e39d32b3a2a5bc6fb6c9aa31067b1ed7f658c31f8dd9505142e"
+    },
+    {
+      "path": "companion-next/src/domain/image-review.ts",
+      "bytes": 2838,
+      "sha256": "dd29c008f7a45ca7efcb049da75797cdf8e9bdae980a506142ee7f31a7d575df"
+    },
+    {
+      "path": "companion-next/src/domain/knowledge-conversation.ts",
+      "bytes": 6955,
+      "sha256": "1ac27c936b402feeff0c6d6bda026b5077348477c98dda4094f11f042ccc6fd6"
+    },
+    {
+      "path": "companion-next/src/domain/knowledge-read.ts",
+      "bytes": 4834,
+      "sha256": "a85b642ee9cc2d90ecc0d9543f6c79275720b130405a59d23ca6f43c7199f1e8"
+    },
+    {
+      "path": "companion-next/src/domain/legacy-v148-changelog.ts",
+      "bytes": 38355,
+      "sha256": "4c03b723850a3ceb47bf8d955752d993ed9f1064380b0386da11be288e34fc0b"
+    },
+    {
+      "path": "companion-next/src/domain/legacy-v148-cli-use-copy.ts",
+      "bytes": 9251,
+      "sha256": "a1dbbaa6e151f073b5a76318ada5606e5d378078d55415f6696f291645186899"
+    },
+    {
+      "path": "companion-next/src/domain/legacy-v148-help.json",
+      "bytes": 17810,
+      "sha256": "297c63a4915da97b36f5d0b3405c61175a23e9fff3db40f41a9a3b4c02d8a50a"
+    },
+    {
+      "path": "companion-next/src/domain/local-service-operations.ts",
+      "bytes": 6414,
+      "sha256": "f1810ac20d0da76d26eacf2311f07bd58bc0013f3e3d4a99b96cf1126d1600f4"
+    },
+    {
+      "path": "companion-next/src/domain/picker-import.ts",
+      "bytes": 4555,
+      "sha256": "135b328e692b8784c03f86b97bac1d6429d2e614b4a9cd60ac2a1c631b94eb4a"
+    },
+    {
+      "path": "companion-next/src/domain/product-information.ts",
+      "bytes": 27648,
+      "sha256": "d82cb59ed566fab3aad6a49ca08b9afaa12136a007a9377ff15c0f7e2e90eb9b"
+    },
+    {
+      "path": "companion-next/src/domain/project-setup.ts",
+      "bytes": 3755,
+      "sha256": "75e43b9da080f3516aa86ec25d550e5b2981e95bcaeedcf2a32b4b696ffd3306"
+    },
+    {
+      "path": "companion-next/src/domain/project-workspace.ts",
+      "bytes": 409,
+      "sha256": "199cdddcc0c4a77df5dc20ddda2914f335f9b52121b3a7d0fef103ad2b5dbefb"
+    },
+    {
+      "path": "companion-next/src/domain/resource-plan-import.ts",
+      "bytes": 7301,
+      "sha256": "9f5fdfebc7fdd0d6152b9d0f6a343757ebd64c794316ec3eec7e2a23ec8bca92"
+    },
+    {
+      "path": "companion-next/src/domain/resource-planning.ts",
+      "bytes": 15621,
+      "sha256": "cd6174e4c6b1cdbec59c82d16dd0c7b8b8decd54e6f3819249e0dd9ed4b08a1a"
+    },
+    {
+      "path": "companion-next/src/domain/resource-preflight.ts",
+      "bytes": 4424,
+      "sha256": "5bd96e2621c2ff56973a800b8044002b8cc3b2ff0aebf7a53c8ebcbf8bd21fc7"
+    },
+    {
+      "path": "companion-next/src/domain/spec.ts",
+      "bytes": 3009,
+      "sha256": "d13e91d2400b9ad8be9e0df21c972c7bc1702345b76574d0fd50b1ff64f9c9f7"
+    },
+    {
+      "path": "companion-next/src/domain/tool-preset-drafts.ts",
+      "bytes": 12752,
+      "sha256": "e0df83f7628512d50ca6d4b6ed937ac1f1296737e98077689c9b882108666e53"
+    },
+    {
+      "path": "companion-next/src/domain/tool-presets-read.ts",
+      "bytes": 10103,
+      "sha256": "fe011945dd5820221b4445d6e1146243d82301395800617f9e04b7fe511ea4f9"
+    },
+    {
+      "path": "companion-next/src/domain/tool-presets-write.ts",
+      "bytes": 9321,
+      "sha256": "96d1d7b3270e27ec68780e5f702fc76b3fc874ba6799032c49aa29300691749d"
+    },
+    {
+      "path": "companion-next/src/image-review-integration.ts",
+      "bytes": 728,
+      "sha256": "f18ed9292fa59129a1d48e1cb34fead96b12b76f73b75ea321db35ab886f8c2d"
+    },
+    {
+      "path": "companion-next/src/integration.ts",
+      "bytes": 707,
+      "sha256": "66f04cf10e64a4f0925e31c42a46476fc51d29167438522177a3e729e616be35"
+    },
+    {
+      "path": "companion-next/src/knowledge-conversation-integration.ts",
+      "bytes": 792,
+      "sha256": "655f38eb267b3677574c178a67c4d962f025289e3d3e1c8a9af963c2ab4d8f51"
+    },
+    {
+      "path": "companion-next/src/knowledge-read-integration.ts",
+      "bytes": 400,
+      "sha256": "de612122a56bbbd5622915a467a62c5043c6f5973a846dbde0c95d553d3d9a75"
+    },
+    {
+      "path": "companion-next/src/local-service-operations-integration.ts",
+      "bytes": 698,
+      "sha256": "61063191d846d632d8c4d1815b94286072ded8fba67061e025a778f2ecfaf58f"
+    },
+    {
+      "path": "companion-next/src/main.ts",
+      "bytes": 5955,
+      "sha256": "cd574d4d8f2b1c971bde7e3b76520bcb62744cef4749db3ac19d7cd521e86328"
+    },
+    {
+      "path": "companion-next/src/project-setup-integration.ts",
+      "bytes": 291,
+      "sha256": "3ee86c42c2356aa9e10f53e09ef671be9430ce14b9eebe45bfee04f53d0787bf"
+    },
+    {
+      "path": "companion-next/src/providers/demo.ts",
+      "bytes": 3356,
+      "sha256": "47d5c018b147e269607858f3362312fd388ce6e16d4796d72da2fa83fd3a901c"
+    },
+    {
+      "path": "companion-next/src/router.ts",
+      "bytes": 3086,
+      "sha256": "ada1da3c5f1a9f2533cdf15fe31a2216438eda601a47c6b80b117dd5ff7a9bde"
+    },
+    {
+      "path": "companion-next/src/stores/ai-job-actions.ts",
+      "bytes": 21530,
+      "sha256": "0beb8d9e8a5af8e41ef79496c6ceedccaacd6f412781ad33e9f828a22f9a6bbc"
+    },
+    {
+      "path": "companion-next/src/stores/ai-jobs-read.ts",
+      "bytes": 9220,
+      "sha256": "758b7f6d76a945946aae1026ef642b5f63e3cb01522a962ed7297f76d8887623"
+    },
+    {
+      "path": "companion-next/src/stores/ai-reference-upload.ts",
+      "bytes": 21687,
+      "sha256": "4fdd49e6d95308b1f2c4f247db9b6e926101ca552ad18ea15f4afb4cbfbcb0e2"
+    },
+    {
+      "path": "companion-next/src/stores/ai-resource-editor.ts",
+      "bytes": 27663,
+      "sha256": "d71789f465152c7ee18c04a69e9e6ce5b3a4a3cbc6cf6cb09ea72d1a99a891a9"
+    },
+    {
+      "path": "companion-next/src/stores/ai-resource-read.ts",
+      "bytes": 4550,
+      "sha256": "d07f42c3b18632a3b84181b07d4ac298f9e5a4741c5ae20aaa612040c3fcae42"
+    },
+    {
+      "path": "companion-next/src/stores/ai-task-creation.ts",
+      "bytes": 20160,
+      "sha256": "fb4cd12684023055402bdfcd815d4ce04bb0f1a125ed4363c54374fde1f0bf1d"
+    },
+    {
+      "path": "companion-next/src/stores/companion-browser.ts",
+      "bytes": 17353,
+      "sha256": "96178ae04c2c20e95399a7582e3215934dd2ddc9e5d35adad9078e6c73222283"
+    },
+    {
+      "path": "companion-next/src/stores/creator-operations.ts",
+      "bytes": 33028,
+      "sha256": "2d8fbca5afecf3888365bd0e3857c15693bdad8815d28086b55ecd4ae2985c7e"
+    },
+    {
+      "path": "companion-next/src/stores/generation-receipts.ts",
+      "bytes": 3214,
+      "sha256": "0c68ea2f6f189d9a424f7b39e923de1dbf0614e06d88484cf37dc71193f94ddc"
+    },
+    {
+      "path": "companion-next/src/stores/image-review.ts",
+      "bytes": 16869,
+      "sha256": "a6d837b685740237e02af9d2bbcc1761163f0b7b208ae697e0ef1e76385d47b4"
+    },
+    {
+      "path": "companion-next/src/stores/knowledge-conversation.ts",
+      "bytes": 14641,
+      "sha256": "e8ffd2807c73de9939a8890005883ef21886cb46465a1bdc584b76032f7bddb3"
+    },
+    {
+      "path": "companion-next/src/stores/knowledge-read.ts",
+      "bytes": 6376,
+      "sha256": "3343ee89fc8107a0660249b050f4e5517b5b517fef7f05abe9db731cf3ba03fb"
+    },
+    {
+      "path": "companion-next/src/stores/local-service-operations.ts",
+      "bytes": 12448,
+      "sha256": "d6f68eca85ee8e98f609402094e02254a4723ea16ab52935758099cb160825e6"
+    },
+    {
+      "path": "companion-next/src/stores/project-operation-lane.ts",
+      "bytes": 1310,
+      "sha256": "163f50a2f614d8298f3bb360af320862f3bbb66c80c4f7355a897d6fb80022b9"
+    },
+    {
+      "path": "companion-next/src/stores/project-setup.ts",
+      "bytes": 29052,
+      "sha256": "3607972a4b78244bbe7131bb179bf8875463d2af0031595ecb7d3cdfc665b7a0"
+    },
+    {
+      "path": "companion-next/src/stores/registered-project.ts",
+      "bytes": 2703,
+      "sha256": "efb71154695cf92c8a6a2fbed7b172a4864eb9d213533d6970cd815e716935b4"
+    },
+    {
+      "path": "companion-next/src/stores/resource-planning.ts",
+      "bytes": 5056,
+      "sha256": "5886e1b8c8fe8adf255fc6462a1bb43944e82078c2a1437ae80d973981dccb28"
+    },
+    {
+      "path": "companion-next/src/stores/service-status.ts",
+      "bytes": 6251,
+      "sha256": "d4325e24d13cb1d75317062fc7832c18c005b8af630958c0a8bbb8c8e991f2ab"
+    },
+    {
+      "path": "companion-next/src/stores/tool-preset-drafts.ts",
+      "bytes": 15349,
+      "sha256": "56b72fad21ac39a10da185d2730078941254f11c362ed01a29d6df4ca911054c"
+    },
+    {
+      "path": "companion-next/src/stores/tool-presets-read.ts",
+      "bytes": 7390,
+      "sha256": "bf4bf23674785a0e2d10f727111ff3782222671515c98f4f254bc35e472a4de5"
+    },
+    {
+      "path": "companion-next/src/stores/tool-presets-write.ts",
+      "bytes": 16626,
+      "sha256": "fbd1a6f22f95c6e06f1755963a8ac6e2b92f65d4be53775126e172c5a4b51bd0"
+    },
+    {
+      "path": "companion-next/src/stores/workspace.ts",
+      "bytes": 4431,
+      "sha256": "0a05ed89d8b946391992f9a16fe831d452e164aa00656a4e8705cb127454ca1c"
+    },
+    {
+      "path": "companion-next/src/style.css",
+      "bytes": 55473,
+      "sha256": "0705401555aa3851b5c1e7794a3c14958db1f07abed5ad30f759e08a41a8f842"
+    },
+    {
+      "path": "companion-next/src/styles/project-setup-theme.css",
+      "bytes": 4102,
+      "sha256": "5f72a2bd223ce1050b4acdfcef00ed47ad946d4772084171ac95076b602ad018"
+    },
+    {
+      "path": "companion-next/src/tool-presets-read-integration.ts",
+      "bytes": 401,
+      "sha256": "2b12301e4a0914aa1c146d860cda2e2e796c7d8b0f9ad68fdc072fd94fdc9e1a"
+    },
+    {
+      "path": "companion-next/src/tool-presets-write-integration.ts",
+      "bytes": 427,
+      "sha256": "71b74fbd7d981d0bb02109f7e1d2c6513d4ac3aba3b5a25d188265b6a4c491b5"
+    },
+    {
+      "path": "companion-next/src/views/AboutView.vue",
+      "bytes": 6247,
+      "sha256": "cb21362ac373b01fe42b550d06ac4db8ef82328daebf2bd4c81dea63bffef8be"
+    },
+    {
+      "path": "companion-next/src/views/AiResourceReadView.vue",
+      "bytes": 15314,
+      "sha256": "4931f2dae21a812afa11f3a7a5023845c699f5ae4edc6921e9f24588f7c22e2a"
+    },
+    {
+      "path": "companion-next/src/views/ChangelogView.vue",
+      "bytes": 1720,
+      "sha256": "cbe5e171fcb583616ac50a4fcd8d73799151fe36534de9d667d6048976f06fce"
+    },
+    {
+      "path": "companion-next/src/views/CompanionBrowserView.vue",
+      "bytes": 27861,
+      "sha256": "3b84ee4bdbb3f947584aa02583e5eeac42968c2af2059df7ce34fc5d88425008"
+    },
+    {
+      "path": "companion-next/src/views/HelpView.vue",
+      "bytes": 4175,
+      "sha256": "9cc4ee754171d31c07fa98193a543290af2aebabfd887f65923c3270e26c2b75"
+    },
+    {
+      "path": "companion-next/src/views/HistoryView.vue",
+      "bytes": 3434,
+      "sha256": "93757870c48849634c95eb81535c7e1631c0ef531ba75bb2b1942afdfaf2f86e"
+    },
+    {
+      "path": "companion-next/src/views/ImageAssetsView.vue",
+      "bytes": 22539,
+      "sha256": "b2dadb0be52f0d5f31f47099e26d800f7dd68f3f4f7d7588dc8a6abb67b842bf"
+    },
+    {
+      "path": "companion-next/src/views/KnowledgeReadView.vue",
+      "bytes": 12494,
+      "sha256": "b5369d714c56213c9145da13f7d03bc4fd9a043540efeed48ad56a2be6b65bd9"
+    },
+    {
+      "path": "companion-next/src/views/MigrationView.vue",
+      "bytes": 2372,
+      "sha256": "64a6046e1d749714823085de9a7f0622d883f1e7fda5becb9cf5ee4da2b072c7"
+    },
+    {
+      "path": "companion-next/src/views/OverviewView.vue",
+      "bytes": 4540,
+      "sha256": "56b8bc9f544b8fe7b67ca8b0ba7472597091ac6ee95275badf4c28dd40b21088"
+    },
+    {
+      "path": "companion-next/src/views/ResourcesView.vue",
+      "bytes": 14001,
+      "sha256": "096bed336e568b12b6125f30c45ad20fd018b919c5ccd55a5ca77a4a47cd539c"
+    },
+    {
+      "path": "companion-next/src/views/ServicesView.vue",
+      "bytes": 17312,
+      "sha256": "a02b52c7501620f5518d86b6f55a28f61d73d9d3c96a5d32e59fddab239a3339"
+    },
+    {
+      "path": "companion-next/tests/ai-job-acceptance.test.ts",
+      "bytes": 3940,
+      "sha256": "8a70d112e985e8d9bc05a241d9c8dbd29bf75f34f1c8214c22d1f67651ddc7b7"
+    },
+    {
+      "path": "companion-next/tests/ai-job-actions-adapter.test.ts",
+      "bytes": 13142,
+      "sha256": "aaf47b489afede26fb4bcde764f744b937ce5afa1a676ef133c821320d5fe9d5"
+    },
+    {
+      "path": "companion-next/tests/ai-job-actions-coordination.test.ts",
+      "bytes": 4849,
+      "sha256": "c85bd08b5c817790d692969d0c35663c1230e38e9ffcb09c23802756c5ea2890"
+    },
+    {
+      "path": "companion-next/tests/ai-job-actions-store.test.ts",
+      "bytes": 24912,
+      "sha256": "31b4415315e19d82fd1543391110061d84d90db8181ebca00c50320f254a20d5"
+    },
+    {
+      "path": "companion-next/tests/ai-job-actions-ui.test.ts",
+      "bytes": 9065,
+      "sha256": "b8f17d598f86159bdf28de91bf3bcbd8085938cacc66cf415265c8ae74c0cca9"
+    },
+    {
+      "path": "companion-next/tests/ai-jobs-read-adapter.test.ts",
+      "bytes": 17894,
+      "sha256": "1249c64029177dd6d573d9c22967564ba54705e3925c6e72663c3099b8fa6570"
+    },
+    {
+      "path": "companion-next/tests/ai-jobs-read-store.test.ts",
+      "bytes": 12485,
+      "sha256": "10006004c66d1780581de4c35d9cf9bbfb6c30f24fd9cde8142816f916a28a4c"
+    },
+    {
+      "path": "companion-next/tests/ai-jobs-read-ui.test.ts",
+      "bytes": 12555,
+      "sha256": "f3d7afadb7a0bd4cbf6017ad7a9427f9b095298ad6d2cc5c660c877d3e76c865"
+    },
+    {
+      "path": "companion-next/tests/ai-reference-upload-adapter.test.ts",
+      "bytes": 31723,
+      "sha256": "9e93407bf8432d6b4e7f5baa4471ed4cfbc9119ee7f4d7aac217460fe50414ce"
+    },
+    {
+      "path": "companion-next/tests/ai-reference-upload-store.test.ts",
+      "bytes": 24823,
+      "sha256": "892d178df3b2dc2cd8e4b5058286bd3030ceddb125cc8a28a475b5f207d87394"
+    },
+    {
+      "path": "companion-next/tests/ai-reference-upload-ui.test.ts",
+      "bytes": 14623,
+      "sha256": "dbcb0c84a7cf0d55b0734e2053e2f895ccbe9423734f3e49e928b7eded229d41"
+    },
+    {
+      "path": "companion-next/tests/ai-resource-editor-store.test.ts",
+      "bytes": 30159,
+      "sha256": "0a13a0416dd392c26f96f09ac074c2b3ea5a34d487e23f2df54e61d69e950ed3"
+    },
+    {
+      "path": "companion-next/tests/ai-resource-editor-ui.test.ts",
+      "bytes": 12681,
+      "sha256": "0acf31f9c4466a29ac91c9fe7e7d403569a2af05dcd73d637f204eedda1ac8e8"
+    },
+    {
+      "path": "companion-next/tests/ai-resource-read-adapter.test.ts",
+      "bytes": 31482,
+      "sha256": "94d6dd7d53d11aa85da74fefa96f6d5d1149afc44d9fd12aadcc6b6ba7b1b84f"
+    },
+    {
+      "path": "companion-next/tests/ai-resource-read-store.test.ts",
+      "bytes": 6903,
+      "sha256": "4048b9db9cd0eba9099bbb074315a1f75fd335bac48391e0f25684a0aac0f719"
+    },
+    {
+      "path": "companion-next/tests/ai-resource-read-ui.test.ts",
+      "bytes": 12616,
+      "sha256": "c622ffa53eadb4da90e1ce85b6c8afcd6bb1a12b6895c681c5fc311e1430a323"
+    },
+    {
+      "path": "companion-next/tests/ai-resource-save-adapter.test.ts",
+      "bytes": 23773,
+      "sha256": "85293f25bbec3dc51e64906b7b8a0048f6f0e98036e041f91e5667e19a5b5b01"
+    },
+    {
+      "path": "companion-next/tests/ai-resource-snapshot.test.ts",
+      "bytes": 4036,
+      "sha256": "7c4822fa3ced3cc1e0ea6bbfe6ef198525cccaa44504b5368a86dec1fe0f8efb"
+    },
+    {
+      "path": "companion-next/tests/ai-task-creation-adapter.test.ts",
+      "bytes": 7071,
+      "sha256": "812e0ca818360380db9b074df37a59e3c7fb0ee8be0e530bae7ca1b0bfcf11f9"
+    },
+    {
+      "path": "companion-next/tests/ai-task-creation-domain.test.ts",
+      "bytes": 6981,
+      "sha256": "7230e60ac4f69a6935fa27aa3b64d53d5d3ca5e43843d5057aecbe22c7b51326"
+    },
+    {
+      "path": "companion-next/tests/ai-task-creation-store.test.ts",
+      "bytes": 24127,
+      "sha256": "36c6a2934b17865736513154ea67158637fe0aec9e70cec6f1cb4aa8ac6e979d"
+    },
+    {
+      "path": "companion-next/tests/ai-task-creation-ui.test.ts",
+      "bytes": 8517,
+      "sha256": "46d18ba361dce1e1557a58f3ac666300756e99c79f477b0499d6b5b9dfebc04e"
+    },
+    {
+      "path": "companion-next/tests/browser-smoke.py",
+      "bytes": 8403,
+      "sha256": "6fce3c8a9d5f2be2d172b4980ef1c6cba802004ad2998c1331cc68957399474c"
+    },
+    {
+      "path": "companion-next/tests/cli-use-copy.test.ts",
+      "bytes": 9255,
+      "sha256": "80611d72d4ec2470935e83caafa70338ab1b3445e3febb0d31fae5a54ac8357e"
+    },
+    {
+      "path": "companion-next/tests/cli-use-ui.test.ts",
+      "bytes": 9862,
+      "sha256": "a6ded261a46abc353451e7052ba0caa364c682b76c33f85154b5f4ecf1814b58"
+    },
+    {
+      "path": "companion-next/tests/companion-browser-adapter.test.ts",
+      "bytes": 25967,
+      "sha256": "52823af91daf7db28706075f0ae78d0d6103a291b72598048adda916938347f3"
+    },
+    {
+      "path": "companion-next/tests/companion-browser-store.test.ts",
+      "bytes": 8667,
+      "sha256": "d8da4ac77b82d6d126e7ccf9d58cd24101f8f10d85014b57f9f8ae88448893f5"
+    },
+    {
+      "path": "companion-next/tests/companion-browser-ui.test.ts",
+      "bytes": 16043,
+      "sha256": "70e5ac67eeb054caf46b9a3315f6e660a4a844e26c93a4f3c7aeff057bcf248f"
+    },
+    {
+      "path": "companion-next/tests/companion-events.test.ts",
+      "bytes": 16324,
+      "sha256": "516db8886cfadb172fa083a760ff095c1519866e50357fad7c47187ed9df6e61"
+    },
+    {
+      "path": "companion-next/tests/companion-host-assembly.test.ts",
+      "bytes": 7774,
+      "sha256": "413a76d96abb9483f96958432fecbee519a7091531e7d1c39b98ee9c6453f78b"
+    },
+    {
+      "path": "companion-next/tests/companion-live-store.test.ts",
+      "bytes": 14724,
+      "sha256": "0d89cdc4171f2358a33e5b6ab4c6a8c8dc2fbd138a23139c2015d96e06434c14"
+    },
+    {
+      "path": "companion-next/tests/companion-normal-state.test.ts",
+      "bytes": 2798,
+      "sha256": "2e3ee907182c0d7677910c8b1a7eaed314b330f6520f18e53380baf9d11e6937"
+    },
+    {
+      "path": "companion-next/tests/companion-passive-read.test.ts",
+      "bytes": 5929,
+      "sha256": "e81ab2ff8457474c755a90f10fed77ca08867b069b3338e205985151631d7349"
+    },
+    {
+      "path": "companion-next/tests/companion-static.test.mjs",
+      "bytes": 10415,
+      "sha256": "737643a91fe5058c054a06efc2a8711bb191193d8b3d53afc1fb4883e5135a85"
+    },
+    {
+      "path": "companion-next/tests/creator-operations-adapter.test.ts",
+      "bytes": 39334,
+      "sha256": "e9613634ccb28841ec03187dd24474ef3a3cb78cfc4de209e0ebe6b7f23830b0"
+    },
+    {
+      "path": "companion-next/tests/creator-operations-store.test.ts",
+      "bytes": 88180,
+      "sha256": "c9b098945d0a4bc135201e3472251339005842571a5658f6050e0603e11635bc"
+    },
+    {
+      "path": "companion-next/tests/creator-operations-ui.test.ts",
+      "bytes": 29791,
+      "sha256": "68ea0b7acbb596b9acbd8d37cbbdf6904ee901c47290ce8112e42bf65c48a5a6"
+    },
+    {
+      "path": "companion-next/tests/creator-project-poll-pause.test.ts",
+      "bytes": 9918,
+      "sha256": "075ef6faf9f6e30a56e29d5e01e2f0c7b06daac121be610eedff0303e3d71221"
+    },
+    {
+      "path": "companion-next/tests/fixtures/ai-resource-read.ts",
+      "bytes": 1496,
+      "sha256": "3544459651fc6d5705d764fb419a3d0ff11d1402deeb2639cce2738025fbb07e"
+    },
+    {
+      "path": "companion-next/tests/fixtures/generation-png.ts",
+      "bytes": 962,
+      "sha256": "94949c876bf466ab84c94291c7e42553960dc083f3a5cc9898c1d5b59697ea83"
+    },
+    {
+      "path": "companion-next/tests/generation-receipt.test.ts",
+      "bytes": 20996,
+      "sha256": "68587cf2c0d49786d8904c84e41110b25a551e81786c5daa8a373c1cf4ba4f54"
+    },
+    {
+      "path": "companion-next/tests/generation-receipts-store.test.ts",
+      "bytes": 5461,
+      "sha256": "61cabfb5012e01adbaceda619bf3a02833170f832d561057fe87c329b0a4f952"
+    },
+    {
+      "path": "companion-next/tests/generation-receipts-ui.test.ts",
+      "bytes": 7824,
+      "sha256": "f465c371b8d1f82f2714e8382617a515f34a4df04e2799c309fbcd5870a0e54f"
+    },
+    {
+      "path": "companion-next/tests/generation-source-ui.test.ts",
+      "bytes": 4977,
+      "sha256": "06f926613f770f58ffae970595d11b8eabd7a7a13ca2e418a60face74f58888e"
+    },
+    {
+      "path": "companion-next/tests/generation-source.test.ts",
+      "bytes": 7337,
+      "sha256": "9470e5dfc54995613976aed62e9a8fe96d6ee3e30687b20c1fe2a832c6f17d43"
+    },
+    {
+      "path": "companion-next/tests/help-about-navigation.test.ts",
+      "bytes": 30309,
+      "sha256": "db417f4c3d8675dafe04cad4099041e7bbd8d85f8eced1b7166d2861a6fcf092"
+    },
+    {
+      "path": "companion-next/tests/image-review-adapter.test.ts",
+      "bytes": 7415,
+      "sha256": "8d6e25b347fd55df9ab2cbd732d0de6fd4e3f401f437fe0efb147b396eab230e"
+    },
+    {
+      "path": "companion-next/tests/image-review-readiness.test.ts",
+      "bytes": 19776,
+      "sha256": "21f169f41ad2f62bab5d5c59014172d0f3bb79d1805aafa567443a507883d693"
+    },
+    {
+      "path": "companion-next/tests/image-review-selection.test.ts",
+      "bytes": 7848,
+      "sha256": "997ceab3e256363147b9db2281f066c3d395a05d7bdd10e4c72a80e6cddff5f9"
+    },
+    {
+      "path": "companion-next/tests/image-review-store.test.ts",
+      "bytes": 7487,
+      "sha256": "e23591c444903c376fa56d873d612f3e7b01b948e1a2cdc870a742a28226fc53"
+    },
+    {
+      "path": "companion-next/tests/image-review-ui.test.ts",
+      "bytes": 6756,
+      "sha256": "245b9eb304c562fc7605b77d643dec8c32396a53829a54fc4adcdb3078547995"
+    },
+    {
+      "path": "companion-next/tests/image-review-workflow.test.ts",
+      "bytes": 17373,
+      "sha256": "6ea26f7cd7c1b65c6d4aaec374ca724271ce4a8edc77ca6ada43e887c3d1d8a4"
+    },
+    {
+      "path": "companion-next/tests/info-tip.test.ts",
+      "bytes": 2926,
+      "sha256": "e7cd817f660db96e256098202b13825a4d4526dcf8f7317d4fefe442dfbcdec6"
+    },
+    {
+      "path": "companion-next/tests/knowledge-conversation-adapter.test.ts",
+      "bytes": 24267,
+      "sha256": "01657efcf4b8627f24ed8e125af194b1168e8a6229362b1b3b5d935465ea5b13"
+    },
+    {
+      "path": "companion-next/tests/knowledge-conversation-bootstrap.test.ts",
+      "bytes": 9411,
+      "sha256": "0fcb229b6ce8d3e5545a405cb12177370d6931de0eea56878f9d6b93673b5349"
+    },
+    {
+      "path": "companion-next/tests/knowledge-conversation-store.test.ts",
+      "bytes": 18321,
+      "sha256": "efb82d0d10cbcd9be88cd4b3a1f72ffbc8cae0464d5c2f33396da924584d69f7"
+    },
+    {
+      "path": "companion-next/tests/knowledge-conversation-ui.test.ts",
+      "bytes": 16082,
+      "sha256": "b228c13fea328b131236365388be86f58e09f476985332b3eaefb3be5b9ed52d"
+    },
+    {
+      "path": "companion-next/tests/knowledge-read-adapter.test.ts",
+      "bytes": 23631,
+      "sha256": "5586fcdf9b9381a12b72eeca6e482e67b182c53c4690978ef3d5c2a85cecc84b"
+    },
+    {
+      "path": "companion-next/tests/knowledge-read-fixture.ts",
+      "bytes": 1554,
+      "sha256": "4d1b1e111011822d34a02a623383b4d5ae82f620f532d259c36cf8af322d3cd6"
+    },
+    {
+      "path": "companion-next/tests/knowledge-read-store.test.ts",
+      "bytes": 6750,
+      "sha256": "5dafbb912c85dc5ec94ba6ca4fd7d4bfcbbde2b6274a0f319433d6c5fd5f8906"
+    },
+    {
+      "path": "companion-next/tests/knowledge-read-ui.test.ts",
+      "bytes": 6909,
+      "sha256": "ba6cc7c9ee2fb769c40dda60be514bfd3ed81e07fd6658cd671693bd75da2594"
+    },
+    {
+      "path": "companion-next/tests/legacy-v148-content.test.ts",
+      "bytes": 12259,
+      "sha256": "536100c9522e9a3f7a45d4c291cf67d76eb414741e57dc2b7ad81b40d00f8f6b"
+    },
+    {
+      "path": "companion-next/tests/local-service-operations-adapter.test.ts",
+      "bytes": 14958,
+      "sha256": "6048f34851edd8288decb578ec81e7a889bf99f2f8f5bf9995411dca65a8259c"
+    },
+    {
+      "path": "companion-next/tests/local-service-operations-store.test.ts",
+      "bytes": 16440,
+      "sha256": "e4541ac4c47a32d5e5ac272187cb49f5cf3be2832053dba88d7e8fc1f23a0464"
+    },
+    {
+      "path": "companion-next/tests/local-service-operations-ui.test.ts",
+      "bytes": 12584,
+      "sha256": "84c1bfa360cbdfcdaf7f00f2a2514d52c653a6792ef92ca202197a991bf471ae"
+    },
+    {
+      "path": "companion-next/tests/picker-import.test.ts",
+      "bytes": 3694,
+      "sha256": "77b4ba37f186230eab6ef05d164f5c5ef3b86e395d5e54d561b0ab938c395475"
+    },
+    {
+      "path": "companion-next/tests/project-background-read.test.ts",
+      "bytes": 4467,
+      "sha256": "00784125d21d1dcdebd432c612530ba176ea4133c77c53e35b721e26893470b9"
+    },
+    {
+      "path": "companion-next/tests/project-entry.test.ts",
+      "bytes": 20054,
+      "sha256": "7480bf443b5ae4393db473a452ccb371b75deb4fcd4f4b3f6ca317bf75bdd4d6"
+    },
+    {
+      "path": "companion-next/tests/project-layout-019.test.ts",
+      "bytes": 31887,
+      "sha256": "059f16ecd70fb4eac48c1af51ac2d834b6fc9e70fc11fec042c6a867ca660ec2"
+    },
+    {
+      "path": "companion-next/tests/project-operation-lane.test.ts",
+      "bytes": 3531,
+      "sha256": "a66e7c8c8f5dffa680630f351a69b0984af5dc96bb57a4f8b5933aea29c56c7a"
+    },
+    {
+      "path": "companion-next/tests/project-setup-adapter.test.ts",
+      "bytes": 39695,
+      "sha256": "e12323c0dbbe2bb54279c6e92973b730c1579bf90943a7f3b09ce0e66e94b522"
+    },
+    {
+      "path": "companion-next/tests/project-setup-store.test.ts",
+      "bytes": 38418,
+      "sha256": "6ba26bd0bec61bc2a3f067e94208ab0c11ebfd92da9d11e4cd6b4867fd37ff18"
+    },
+    {
+      "path": "companion-next/tests/project-setup-ui.test.ts",
+      "bytes": 24163,
+      "sha256": "7b7469f95c02a9c3c7edd59baf0ef57da51fefe6b2628d72a2de3d1c1ad8ea3b"
+    },
+    {
+      "path": "companion-next/tests/project-status-tooltip.test.ts",
+      "bytes": 4833,
+      "sha256": "7cb9050242a006dfdd0269289c13a9410da2374c301fb5ace57e1f72e0a832bb"
+    },
+    {
+      "path": "companion-next/tests/readonly-adapter.test.ts",
+      "bytes": 15530,
+      "sha256": "719ca7a76c5a83dc039d9298b95a0474489c51bc834be1fc198511b3f177b5ad"
+    },
+    {
+      "path": "companion-next/tests/registered-project-views.test.ts",
+      "bytes": 22204,
+      "sha256": "48c3d01e10af19755b5ade3454f4bfda3d33e42ee1bb71bf11f75cb7f672e7a5"
+    },
+    {
+      "path": "companion-next/tests/resource-config-production.test.ts",
+      "bytes": 24357,
+      "sha256": "5e2e225017904b1d8a39fe1e7a66adcf92be3c191b2050080320244a1a768a02"
+    },
+    {
+      "path": "companion-next/tests/resource-plan-recovery.test.ts",
+      "bytes": 12132,
+      "sha256": "ec76826042784ebb94c6b68f39678f145c5fccc0ef19986feb230c93a2268f5c"
+    },
+    {
+      "path": "companion-next/tests/resource-planner-ui.test.ts",
+      "bytes": 12917,
+      "sha256": "819bd027892f83ba1175f5de9bb16b2a1e2fa168a96bd13ca951f1577794ebe4"
+    },
+    {
+      "path": "companion-next/tests/resource-planning.test.ts",
+      "bytes": 8917,
+      "sha256": "cb5635b1d8f74d4229f07a69dfd2102295229a1a28459d80ebcf2db88b5c6000"
+    },
+    {
+      "path": "companion-next/tests/resource-preflight.test.ts",
+      "bytes": 3499,
+      "sha256": "cf354f9eeeb3b28c02fb9ce60bffec4c04de0ac601aff8475c589a1bdd1c3dae"
+    },
+    {
+      "path": "companion-next/tests/service-status.test.ts",
+      "bytes": 24138,
+      "sha256": "c33815a6895e2562dbf20f457d5bbb3988bb6ccb25004386115224bee18f0eea"
+    },
+    {
+      "path": "companion-next/tests/spec-drafts.test.ts",
+      "bytes": 5981,
+      "sha256": "f49fa511a045817a140f2b59920bec66bfc587f3a44babca9133fb1946e4d7cd"
+    },
+    {
+      "path": "companion-next/tests/test_picker_bridge.py",
+      "bytes": 85641,
+      "sha256": "560f6dd76881f90ce35555559d4377466e12569e63cae550e3db9885c0ec9283"
+    },
+    {
+      "path": "companion-next/tests/tool-preset-drafts-store.test.ts",
+      "bytes": 19852,
+      "sha256": "78d77a965b9764ad58c4fcd7be68a0c368561ac74847007168b5749c0d12793b"
+    },
+    {
+      "path": "companion-next/tests/tool-preset-drafts-ui.test.ts",
+      "bytes": 13060,
+      "sha256": "ddcab47716a246c90720fc571e6e6a0cddc5479c56ce887a83f914330d9542a9"
+    },
+    {
+      "path": "companion-next/tests/tool-preset-drafts.test.ts",
+      "bytes": 21068,
+      "sha256": "f5803ee46bcfe198069018c52c24207e4283a341d55c4815a3286376a94524cd"
+    },
+    {
+      "path": "companion-next/tests/tool-presets-read-adapter.test.ts",
+      "bytes": 23956,
+      "sha256": "f6c8639812a1e1552d1650ca2c5844f9911d74ad79e66a8c865cdc132bd7c1c3"
+    },
+    {
+      "path": "companion-next/tests/tool-presets-read-store.test.ts",
+      "bytes": 11608,
+      "sha256": "992b37c65699dd049f9780bb2cc1c5b179dbcfdf5a8de266bc4daac7d736ff66"
+    },
+    {
+      "path": "companion-next/tests/tool-presets-read-ui.test.ts",
+      "bytes": 6606,
+      "sha256": "317a65185698713e7a2680e763ef986954c5f0d296c578dfb0ba384f6e936a3b"
+    },
+    {
+      "path": "companion-next/tests/tool-presets-write-adapter.test.ts",
+      "bytes": 13981,
+      "sha256": "4d35f5910cd597d16ba208bc42204f805cc08e96c0821d4959a74280bce6df29"
+    },
+    {
+      "path": "companion-next/tests/tool-presets-write-store.test.ts",
+      "bytes": 12778,
+      "sha256": "8fc7aca8a220752c95e90a5feae6640ad433071710cf92930c65a93aa58771c5"
+    },
+    {
+      "path": "companion-next/tests/tool-presets-write-ui.test.ts",
+      "bytes": 12888,
+      "sha256": "7ddfc0c6219d17cdad3a7d0114b3e457630c6015a85125f9cd2136062fe5ea2c"
+    },
+    {
+      "path": "companion-next/tests/ui.test.ts",
+      "bytes": 9847,
+      "sha256": "f6945e50f7d8a461b4f268b7798e665497684e048951d5a18abb37be98cbed2d"
+    },
+    {
+      "path": "companion-next/tests/workspace.test.ts",
+      "bytes": 8400,
+      "sha256": "85379b7cea47b4d62525ee307ec25f00442a16c782f837f7f4ce886622d91229"
+    },
+    {
+      "path": "companion-next/tsconfig.json",
+      "bytes": 577,
+      "sha256": "860b9f65aae09efa1d4059d3703f0c025bf4e871d603daddfaf9a4a0504bfe97"
+    },
+    {
+      "path": "companion-next/vite.config.ts",
+      "bytes": 455,
+      "sha256": "733fe746065932d6157e10cd012fc54f61bdd67c2e35797c0152793dba4f4a8a"
+    }
+  ],
+  "excluded": [
+    "Git internals/history",
+    "node_modules",
+    "dist outputs",
+    "test cache/logs",
+    "untracked/private files"
+  ],
+  "deployed": false
+}

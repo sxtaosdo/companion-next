@@ -1,0 +1,165 @@
+{
+  "dateUtc": "2026-10-15",
+  "version": "0.1.17",
+  "baseline": "858ed2884626500e35ff8334daadb8c02a94604f",
+  "checkpoint": "f9a9161",
+  "scope": "dot source / fake / jsdom only; no real registration/setup, Windows, install, account configuration, deployment or upload",
+  "contract": {
+    "source": "own v148 f6dcac804fb9ad806e8094594c7820a71cfab7b8",
+    "v150": "prior readonly setup broad-contract confirmation, not live execution verification",
+    "files": [
+      {
+        "path": "companion/http-server.ts",
+        "bytes": 49461,
+        "sha256": "d4cf830523dddb37217ccec980272037330060f7d4effc567b56d86366db5184"
+      },
+      {
+        "path": "companion/project-registry.ts",
+        "bytes": 3124,
+        "sha256": "1ffbb881498c754f5ec4a7dde690957af407b1268104d82d54dcf9d11b96e943"
+      },
+      {
+        "path": "companion/setup-service.ts",
+        "bytes": 4996,
+        "sha256": "ab52b3e1111f4ff9a1db55fdccaa9efbaf46779f045857f8f3ed7ab59a4e05ff"
+      },
+      {
+        "path": "companion/bridge-installer.ts",
+        "bytes": 6187,
+        "sha256": "a58a32e6d49f1d2af5c4752f8f21819fdc465b78de33b5c0851289f55b447b7e"
+      },
+      {
+        "path": "companion/codex-configurator.ts",
+        "bytes": 7178,
+        "sha256": "ca451af9431f0cda32fa762946fa4094289233b44bdd203b51a42a37859cf648"
+      },
+      {
+        "path": "companion-daemon.ts",
+        "bytes": 71878,
+        "sha256": "b97bfbe854794148516c875c740b5ee3f58fd7cc56cf64a778ea73ec79c1a8bc"
+      }
+    ]
+  },
+  "final": {
+    "session": 63744,
+    "exitCode": 0,
+    "files": 62,
+    "passed": 3024,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 63.35
+  },
+  "builds": [
+    "default",
+    "companion-readonly",
+    "companion-config-editor",
+    "companion-knowledge-chat",
+    "companion-workspace"
+  ],
+  "staticTests": 56,
+  "focused": {
+    "adapter": 281,
+    "setupState": 83,
+    "sharedLane": 5,
+    "creatorState": 227,
+    "setupDom": 17,
+    "creatorDom": 25,
+    "bootstrap": 11
+  },
+  "review": "independent source review passed after fixing unlock reentry and cached resume/raw label boundaries; reviewer did not execute tests",
+  "initialValidation": "Initial full3019pass/4fail: obsolete help status assertion plus final3 state hardening tests overlapping worker completion. Fresh full3023/five builds/static56 passed, then final readonly review added one resume regression/fix. Re-ran final3024 and all five builds/static on stable source; no dropped tests or relaxed timeouts.",
+  "dependenciesUnchanged": true,
+  "preserved014": {
+    "bytes": 682939,
+    "sha256": "e1c24005d8c17678a465d5ef9cc47ce2b4b8bf47c67031a4aba906f4ea37c4e4",
+    "uploaded": false,
+    "deployed": false
+  },
+  "normalBuild": {
+    "mode": "companion-workspace",
+    "base": "./",
+    "entry": "/next/index.html#/projects",
+    "inspection": "actual emitted asset graph/paths/bytes/no links validated offline; not deployed",
+    "files": [
+      {
+        "path": "next/assets/about-icon-BaVeClOr.svg",
+        "size": 230,
+        "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+      },
+      {
+        "path": "next/assets/donation-qr-D7kdLLAm.png",
+        "size": 106967,
+        "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+      },
+      {
+        "path": "next/assets/index-B8vb_Ym0.js",
+        "size": 1550171,
+        "sha256": "2cebe0810c80e2705094ce3880839374725095b4fd78fd5a3dbaa15fd0fa625d"
+      },
+      {
+        "path": "next/assets/index-npXemHV1.css",
+        "size": 404522,
+        "sha256": "763f8826ad8fad53df4de76d7d21b6ddb005569b4627c76c46819cca534fb1bd"
+      },
+      {
+        "path": "next/favicon.svg",
+        "size": 245,
+        "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+      },
+      {
+        "path": "next/index.html",
+        "size": 573,
+        "sha256": "6845221bea99cdf084db77c933415e5269b4803206a857a07cb44626c32a0a63"
+      }
+    ],
+    "references": [
+      {
+        "from": "next/assets/index-B8vb_Ym0.js",
+        "to": "next/assets/about-icon-BaVeClOr.svg"
+      },
+      {
+        "from": "next/assets/index-B8vb_Ym0.js",
+        "to": "next/assets/donation-qr-D7kdLLAm.png"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-B8vb_Ym0.js"
+      },
+      {
+        "from": "next/index.html",
+        "to": "next/assets/index-npXemHV1.css"
+      }
+    ],
+    "totalBytes": 2062708
+  },
+  "logs": {
+    "full-tests.log": {
+      "bytes": 655,
+      "sha256": "fd3caec0ffab8c7abf9b4590b66ce592a7a07c8c1d3dbda2d8c3fe1f16e2bdca"
+    },
+    "builds-static.log": {
+      "bytes": 10426,
+      "sha256": "96a0cc0d92be6f9ebecf7094eb51f137e0e52f97f81a55690733757c4a728c76"
+    },
+    "initial-tests.log": {
+      "bytes": 3501,
+      "sha256": "e382e8ece3a2be5ab13819921c6aeb55af39f916a94271ee9eb74f2fd22a5a17"
+    },
+    "pre-final-review-tests.log": {
+      "bytes": 655,
+      "sha256": "b2b41b3ffae750e29eaea596c2582cd58e4678fc45987a1312abcde7be83779c"
+    },
+    "pre-final-review-builds.log": {
+      "bytes": 10428,
+      "sha256": "58e0437f16d05e8c2d199c3f862df597d9a31b2f05ee0c66e2f8f2746e2b8be2"
+    }
+  },
+  "limitations": [
+    "Strict Bridge-only/no-Codex cannot be guaranteed by the original reused-operation contract",
+    "Setup202 is acceptance only; complete does not prove this request options executed",
+    "Shared lane is same page only; reload loses local fence; backend lacks atomic options/CAS/durable client idempotency",
+    "Directory picker/scaffold/tool assignment/other Agent configuration are not migrated in this slice",
+    "Normal setup build deployment and every real persistent-access action require explicit authorization",
+    "Real browser pixels, v150 host session, filesystem/Codex/Creator effects and cross-client behavior not tested"
+  ]
+}
