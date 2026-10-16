@@ -1,9 +1,9 @@
 import { RUNTIME_STATES } from '../domain/companion-browser'
 import type { ManagedProject } from '../domain/companion-browser'
-import { PROJECT_SETUP_LIMITS, ProjectSetupError, SETUP_STAGES, validateProjectPath, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
-import type { ProjectSetupErrorCode, ProjectSetupProvider, SetupSnapshot } from '../domain/project-setup'
+import { PROJECT_SETUP_LIMITS, ProjectSetupError, SETUP_STAGES, validateProjectPath, validateProjectScaffoldInput, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
+import type { ProjectScaffoldResult, ProjectSetupErrorCode, ProjectSetupProvider, SetupSnapshot } from '../domain/project-setup'
 export { PROJECT_SETUP_LIMITS, ProjectSetupError } from '../domain/project-setup'
-export type ProjectSetupPath = '/api/projects' | '/api/pick-directory' | '/api/setup' | `/api/setup/${string}`
+export type ProjectSetupPath = '/api/projects' | '/api/projects/scaffold' | '/api/pick-directory' | '/api/setup' | `/api/setup/${string}`
 export type ProjectSetupFetch = (input: ProjectSetupPath, init: RequestInit) => Promise<Response>
 
 const localFailures = new WeakSet<ProjectSetupError>()
@@ -106,6 +106,11 @@ function decodeDirectory(value: unknown): string | undefined {
   if (keys[0] === 'cancelled' && raw.cancelled === true) return undefined
   if (keys[0] === 'path') return safePath(raw.path)
   throw fail('invalid-shape')
+}
+function decodeScaffold(value:unknown):ProjectScaffoldResult {
+ const raw=object(value)
+ if(Object.keys(raw).sort().join(',')!=='creatorVersion,path'||raw.creatorVersion!=='3.8.8')throw fail('invalid-shape')
+ return {path:safePath(raw.path),creatorVersion:'3.8.8'}
 }
 function decodeStarted(value: unknown): { operationId: string } {
   const raw = object(value)
@@ -222,6 +227,15 @@ export function createProjectSetupProvider(options: { fetch: ProjectSetupFetch; 
     waitForIdle: () => idle,
     async pickDirectory(signal) {
       return request('/api/pick-directory', 'POST', 200, decodeDirectory, '{}', signal)
+    },
+    async scaffold(input,signal){
+      let target:ReturnType<typeof validateProjectScaffoldInput>
+      try{
+        target=validateProjectScaffoldInput(input)
+        if(target.mode==='initialize')safePath(target.path)
+        else if(safePath(target.parentPath)!==target.parentPath||displayText(target.projectName,128)!==target.projectName)throw fail('invalid-input','not-dispatched')
+      }catch{throw fail('invalid-input','not-dispatched')}
+      return request('/api/projects/scaffold','POST',201,decodeScaffold,JSON.stringify(target),signal)
     },
     async register(path, signal) {
       let target: string

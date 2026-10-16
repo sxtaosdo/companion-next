@@ -11,11 +11,34 @@ export interface ProjectSetupProvider {
  readonly label:string
  /** Explicit native folder dialog; undefined means user cancelled. Never registers the selection. */
  pickDirectory?(signal?:AbortSignal):Promise<string|undefined>
+ /** Original minimal Cocos scaffold only; never registers, installs or starts it. */
+ scaffold?(input:ProjectScaffoldInput,signal?:AbortSignal):Promise<ProjectScaffoldResult>
  register(path:string,signal?:AbortSignal):Promise<ManagedProject>
  /** Explicit full setup only. Provider sends true/true, never omitted defaults or codexPath. */
  start(projectId:string,signal?:AbortSignal):Promise<{operationId:string}>
  status(operationId:string,signal?:AbortSignal):Promise<SetupSnapshot>
  waitForIdle():Promise<void>
+}
+export type ProjectScaffoldInput=
+ | {mode:'create';parentPath:string;projectName:string;creatorVersion:'3.8.8'}
+ | {mode:'initialize';path:string;creatorVersion:'3.8.8'}
+export interface ProjectScaffoldResult {path:string;creatorVersion:'3.8.8'}
+export function validateProjectScaffoldInput(value:unknown):ProjectScaffoldInput {
+ const invalid=()=>new ProjectSetupError('invalid-input','not-dispatched')
+ if(!value||typeof value!=='object'||Array.isArray(value))throw invalid()
+ const raw=value as Record<string,unknown>,keys=Object.keys(raw).sort()
+ if(raw.creatorVersion!=='3.8.8')throw invalid()
+ if(raw.mode==='initialize'){
+  if(keys.join(',')!=='creatorVersion,mode,path')throw invalid()
+  return {mode:'initialize',path:validateProjectPath(raw.path),creatorVersion:'3.8.8'}
+ }
+ if(raw.mode!=='create'||keys.join(',')!=='creatorVersion,mode,parentPath,projectName')throw invalid()
+ const name=raw.projectName
+ if(typeof name!=='string'||!name||name!==name.trim()||name.length>128||/[\\/<>:"|?*\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/u.test(name)||name==='.'||name==='..'||name.endsWith('.')||/^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/i.test(name))throw invalid()
+ return {mode:'create',parentPath:validateProjectPath(raw.parentPath),projectName:name,creatorVersion:'3.8.8'}
+}
+export function projectScaffoldTarget(input:ProjectScaffoldInput):string {
+ return input.mode==='initialize'?input.path:input.parentPath.replace(/[\\/]+$/u,'')+(input.parentPath.startsWith('/')?'/':'\\')+input.projectName
 }
 export type ProjectSetupErrorCode='invalid-input'|'busy'|'aborted'|'timeout'|'forbidden'|'backend-failure'|'invalid-shape'|'response-too-large'|'network-error'
 export class ProjectSetupError extends Error {
