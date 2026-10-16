@@ -14,6 +14,7 @@ const scope = computed(() => JSON.stringify({ route: route.fullPath, tab: props.
 watch([localServiceOperationsProvider, knowledgeReadProvider, scope], () => store.syncContext({ provider: localServiceOperationsProvider.value, readProvider: knowledgeReadProvider.value, scopeKey: scope.value }), { immediate: true, flush: 'sync' })
 watch(() => store.revision, () => { confirmed.value = false }, { flush: 'sync' })
 const receipt = computed(() => store.records.at(-1) ?? null)
+const canOpenKnowledge = computed(() => !props.modelsOnly && !!localServiceOperationsProvider.value && store.canRead && store.states?.knowledge?.running === true && store.states.knowledge.frameable === false)
 const receiptLabel = computed(() => { const action = receipt.value?.action === 'start' ? '启动' : '关闭'; return { sending: `等待${action}回执`, acknowledged: `已收到${action}回执`, 'not-dispatched': '未发出', rejected: '明确拒绝', 'reported-failure': `后台报告未${action}`, unknown: '结果未知' } })
 function prepare(service: LocalService, action: LocalServiceAction = 'stop') { confirmed.value = false; store.prepare(service, action) }
 async function execute() { const prepared = store.prepared; if (prepared && confirmed.value) await store.execute(prepared, confirmed.value); confirmed.value = false }
@@ -31,6 +32,8 @@ onBeforeUnmount(() => store.leave())
         <p v-if="service==='model'">{{ LOCAL_SERVICE_START_GAPS.model }}</p>
         <p v-if="service==='model'">这里只表示启动器是否可达，不代表模型已加载、Comfy 已连接或 GPU 已就绪。关闭启动器不等于终止已运行的模型。</p>
         <p v-else>关闭可能中断所有客户端；原后台没有页面归属记录，不能保证只关闭本页启动的实例。</p>
+        <p v-if="service==='knowledge' && canOpenKnowledge">知识库服务已启动，但这个页面不能嵌进来。请在新页签打开。</p>
+        <a v-if="service==='knowledge' && canOpenKnowledge" class="service-external el-button el-button--primary" href="http://127.0.0.1:8081/" target="_blank" rel="noopener noreferrer">打开知识后台</a>
         <el-button v-if="service==='knowledge' && store.states?.knowledge?.running===false" type="primary" :disabled="!store.canPrepare(service,'start')" @click="prepare(service,'start')">核对启动知识库服务</el-button>
         <el-button v-else type="warning" :disabled="!store.canPrepare(service)" @click="prepare(service)">核对关闭{{ localServiceLabel(service) }}</el-button>
       </article>
@@ -48,7 +51,7 @@ onBeforeUnmount(() => store.leave())
     <div v-if="receipt" class="service-receipt" aria-live="polite">
       <strong>{{ localServiceLabel(receipt.service) }} · {{ receiptLabel[receipt.status] }}</strong><span v-if="receipt.detached"> · 原页面 / 来源回执</span><p>{{ receipt.message }}</p>
     </div>
-    <small>状态与回执仅保留在当前应用内存；不会嵌入后台管理页、打开外部地址或自动重试。</small>
+    <small>状态与回执仅保留在当前应用内存；知识服务不能内嵌时提供原固定地址的外开入口，不会自动打开后台或重试。</small>
   </section>
 </template>
 <style scoped>

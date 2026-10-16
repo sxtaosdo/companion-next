@@ -32,6 +32,46 @@ describe('service controls build boundary', () => {
   it('permits only the exact workspace host and registration is passive', () => { const p = provider(); registerLocalServiceOperationsProvider(p); expect(isCompanionLocalServiceHost('companion-workspace', { protocol: 'http:', hostname: '127.0.0.1' })).toBe(true); expect(p.run).not.toHaveBeenCalled() })
 })
 describe('explicit service-control UI and source protection', () => {
+  it('restores the original knowledge-only external link after explicit running/unframeable state', async () => {
+    const { p, r } = await setup()
+    vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
+    expect(wrapper!.find('a').exists()).toBe(false)
+    await click('读取当前服务状态')
+    const link = wrapper!.get('a')
+    expect(link.text()).toBe('打开知识后台')
+    expect(link.attributes()).toMatchObject({ href: 'http://127.0.0.1:8081/', target: '_blank', rel: 'noopener noreferrer' })
+    expect(wrapper!.text()).toContain('不能嵌进来')
+    expect(r.loadServiceStates).toHaveBeenCalledOnce();expect(r.status).not.toHaveBeenCalled();expect(p.run).not.toHaveBeenCalled()
+    expect(wrapper!.findAll('iframe,object,img')).toHaveLength(0)
+  })
+  it.each([
+    { knowledge: { running: false, frameable: false }, model: { running: true }, warnings: [] },
+    { knowledge: { running: true, frameable: true }, model: { running: true }, warnings: [] },
+    { model: { running: true }, warnings: [] },
+  ])('keeps the fallback link absent for stopped, frameable or unknown knowledge state %#', async states => {
+    const { r } = await setup();vi.mocked(r.loadServiceStates).mockResolvedValue(states)
+    await click('读取当前服务状态');expect(wrapper!.find('a').exists()).toBe(false)
+  })
+  it('does not turn the old model iframe into a new external-link capability', async () => {
+    const { r, p } = await setup({ modelsOnly: true })
+    vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
+    await click('读取当前服务状态');expect(wrapper!.findAll('a,iframe')).toHaveLength(0);expect(p.run).not.toHaveBeenCalled()
+  })
+  it('removes the old link during refresh and on failed reads, without retaining success', async () => {
+    const { r } = await setup();vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
+    await click('读取当前服务状态');expect(wrapper!.find('a').exists()).toBe(true)
+    const pending = deferred<Awaited<ReturnType<typeof r.loadServiceStates>>>()
+    vi.mocked(r.loadServiceStates).mockReturnValue(pending.promise)
+    await click('读取当前服务状态');expect(wrapper!.find('a').exists()).toBe(false)
+    pending.reject(Error('test status failure'));await flushPromises();expect(wrapper!.find('a').exists()).toBe(false)
+  })
+  it('invalidates the link on source and route changes without executing the link or operations', async () => {
+    const { r, p, router } = await setup();vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
+    await click('读取当前服务状态');expect(wrapper!.find('a').exists()).toBe(true)
+    await router.push('/knowledge?tab=models');await flushPromises();expect(wrapper!.find('a').exists()).toBe(false)
+    await click('读取当前服务状态');expect(wrapper!.find('a').exists()).toBe(true)
+    registerKnowledgeReadProvider(knowledgeFixture());await flushPromises();expect(wrapper!.find('a').exists()).toBe(false);expect(p.run).not.toHaveBeenCalled()
+  })
   it('does not probe, use CLI, run operations or create iframe/links on mount', async () => {
     const { p, r } = await setup(); expect(r.loadServiceStates).not.toHaveBeenCalled(); expect(r.status).not.toHaveBeenCalled(); expect(p.run).not.toHaveBeenCalled()
     expect(button('核对关闭模型启动器').attributes('disabled')).toBeDefined(); expect(wrapper!.findAll('iframe,a,object,img')).toHaveLength(0)
