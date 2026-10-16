@@ -2,7 +2,7 @@
 
 状态：Accepted（Owner/Parent已批准完整源码同步、本地开发/测试/构建/六静态文件部署及原锁官方npm依赖；Owner Sentinel_40a744e240288191a450453b37a4b488另明确批准第1项在Windows正常执行环境中保留原检查完成这些动作，不改网络/安全配置）。
 
-当前环境（2026-10-16 08:48 UTC）：获准宿主预检确认本项目无残留npm，官方DNS及正常HTTPS200；未改DNS/代理/安全设置或读取凭据。随后原锁`npm ci --ignore-scripts`退出0，214个适用依赖全部安装，逐项版本/来源与D盘缓存tarball完整性通过；package/lock字节不变。三份vue-demi默认已选Vue3，esbuild0.25.12原生包可用，所有生命周期脚本仍未执行。本机全量测试、workspace类型/构建和静态校验接续进行，尚未部署173。证据为仓外同目录`host-resume-preflight.json`、`host-install-result.json`与`host-dependency-verification.json`。
+当前交付（2026-10-16 08:57 UTC）：获准宿主确认无残留项目npm，正常DNS/HTTPS200；原锁214包安装与逐项版本/来源/SHA512通过，package/lock不变、D盘缓存、生命周期脚本未运行。本机89文件3751测试、vue-tsc及正常companion-workspace构建通过；静态55通过/0失败/1项Windows大小写fixture跳过，实际六产物引用/SHA独立通过。已仅部署本机173六静态并回读一致，172六备份/旧hash资源、1779保护项与22原修改保留，无共享服务重启。Owner认证页面与真实浏览器交互仍未验收。证据在仓外同目录host-dependency-verification.json、local-validation-result.json、local-workspace-manifest.json与local173-deployment-result.json。
 
 历史阻塞（05:15 UTC，已由本次明确批准的正常执行环境解决）：此前受限上下文安装因`ENOTFOUND`退出1，并报`Exit handler never called!`。当时没有改DNS、代理或安全设置、没有绕过拒绝；旧回执`locked-install-blocker-receipt.json`仅代表当时状态。
 
@@ -13,6 +13,8 @@
 来源完整包`companion-next-1.3.173-complete-source.zip`，1313261字节，SHA256=`b4dc893ddaab276ef8fd95c2eb35d82a4f1597affe8b6b6f03e1659d0ad2b477`；Library `libfile_bbf510fb90948191afc351ff85cfd1db`/version0，来源HEAD=`9db8b3af26982af7e9366ae03d865d8782f98a33`，产品版本1.3.173。正常浏览器会话下载，未读取认证材料。
 
 04:56 UTC导入时319份来源文件及3份迁移元信息全部逐文件校验字节/SHA256并回读；不含Git历史。原清单`SOURCE-MANIFEST.json`和`SOURCE-COMMIT.txt`原样保留。之后仅在README增加本地版本与状态入口，并增加本文件、VERSION、标准scripts/git_version.py及两项.githooks；package/lock/业务源码均保持来源字节。初始Git提交是本地导入检查点，不是来源提交本身，不能声称保留原Git历史。旧Downloads快照及既有后端未改。
+
+本次实际测试/构建/部署源为本地`31de6878239d20230657f85368e57601a51ba70b`（本地检查点1.3.173.2），原来源仍为9db8b3a。后续本README/交接与Hook VERSION的说明提交不重标这批构建；产品package/页面仍为1.3.173。
 
 ## 环境与锁定安装
 
@@ -26,8 +28,16 @@
 
 ## 验证、部署与下一步
 
-来源哈希与本机锁定安装核验已完成；全量测试、类型检查、正常companion-workspace构建与静态引用校验接续进行，本检查点尚不宣称通过。上游3751项等结果仍只按`BUILD-AND-MIGRATION.md`保留来源含义；迁移文档另列的其余构建模式不能在未执行时宣称通过。真实浏览器/GPU/Creator/业务API不包含在离线结果内。
+实际依次执行`npm test -- --maxWorkers=4`、`npm run build:companion-workspace`和`npm run test:companion-static`：Vitest89文件/3751项全过；workspace脚本先vue-tsc --noEmit再正常Vite构建、base ./，退出0；静态55通过/0失败/1跳过，跳过原因是Windows无法同时表示仅大小写不同的文件名。实际六产物另由现有inspectStaticCandidate检查普通文件/链接、路径、JS语法、HTML/JS/CSS引用及完整SHA，全部通过。验证期间源码commit、package/lock保持、工作树干净；未改断言、减少测试范围或重复另外四种构建模式。保留大chunk提示，不把离线结果等同真实浏览器/GPU/Creator或业务API验收。
 
-当前既有Next仍保持1.3.172；本检查点没有部署173，也没有启动/重启daemon、Creator或Dashboard。05:27核对1779保护项、22原修改快照、172六文件及六备份均不变。只有本机验证通过并再次核对保护基线/并行修改后，才继续六静态部署；以旧index与旧hash资源精确回滚，不能用预构建ZIP替代本地验证门。AI资源链独立只读合同审计已完成，详见仓外`readonly-diagnostics-20261016.md`；未修改旧后端或Studio、调用模型/GPU或导入资源，其合同扩展另协调。
+08:57 UTC仅部署到`D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/web/next`的manifest六路径，共2283176字节。实际新增`assets/index-W3W5uKIL.js`和`assets/index-BS4nt8-3.css`，最后原子切换index；另三资源同字节未重写。旧hash资源保留，172六备份仍位于`C:/Users/33272/AppData/Local/Temp/companion-next-1.3.173-deploy-20261016/backup-current-172`，全部回读通过。部署前后1779保护/22原修改匹配，其中junction只核元信息，原node_modules目录不遍历，不能扩成内部内容审计。没有启动/停止/重启daemon、Creator或Dashboard，没有使用预构建ZIP代替本机验证。
+
+- 本地构建manifest SHA256：`bbaafb75dbae58bd7e1fd03401c8f5689274f8b5fe0db3398a15020f017e072b`
+- 构建/部署相同六静态内容摘要：`04232eb3f19c7fe572c581a62c27ddba51c9faa87351c4211a205d3c67bc299d`
+- 已部署index SHA256：`74d548524c24040537ebe6b9918de1aa3ad352f3aa82ea50f66e2ecedd5079d8`
+
+回滚只恢复已核172 index，旧JS/CSS仍在，新hash资源可保持未引用；不恢复旧源码/父仓索引/用户数据或重启共享服务。若结果不明或有后续修改，先核当前SHA，不直接重跑apply/覆盖；脚本切换index后的失败不会自动回滚。本次已正常完成。完整六文件/前后保护/备份及写入记录在local173-deployment-result.json，元信息和manifest没有放入网页目录。
+
+原Hook/Agent/check-head用于本地检查点；部署脚本经独立reviewer审查无有证据P1/P2。普通角色prompt-emulated、硬只读隔离未核验；OCR仅作任务文档范围规则选择/宿主审读，不宣称managed PASS。认证页面、资源响应SHA及真实交互未验，没有读取/迁移Cookie/token。AI资源链独立只读合同已在仓外readonly-diagnostics-20261016.md记录；未修改旧后端/Studio、调用模型/GPU或导入业务资源，合同扩展另协调。
 
 可恢复性：同步到全新独立路径，未覆盖原工程；本地Git检查点保留来源及治理适配。若放弃本机准备，保留目录及证据供Owner处置，不自动递归删除；不回滚旧后端、父仓索引、用户数据或共享服务。没有远端、push/tag或父仓gitlink变化。
