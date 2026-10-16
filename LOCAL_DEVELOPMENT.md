@@ -1,5 +1,9 @@
 # Windows本地开发交接
 
+知识入口后续交付（2026-10-16 12:43 UTC）：源码 `d3792c10a6017830118ecb0878cacb44667ac819` / 本地1.3.173.7，只恢复旧知识服务不可内嵌分支的8081固定外链；模型原版无外开，不擅加新入口。最终90文件3775测试、types与正常构建通过，独立Edge受控5项通过（真实后台未打开）。固定8081只读实测ECONNREFUSED，未为测试启动服务/模型。详见[知识入口](docs/knowledge-service-entry-local.md)。
+
+第二片六静态回读一致，新增index-BLZP7lTS.js/index-BaZPIQDA.css，最后原子切换入口；旧12文件已备份，11份旧资源保留。1779保护项/22原脏项无变化；第二次部署前后43个node/python/Creator身份一致。该片构建源是d3792c1，后续纯说明提交不重标构建；package/页面继续1.3.173。第二片证据在原任务目录的knowledge-entry子目录，前Dashboard证据及备份完整保留。
+
 最新功能交付（2026-10-16）：已恢复独立手动Dashboard列表与原点选路径进入登记向导，代码 `6fe88585d942fe9862acc98b65664465734d1d10` / 本地版本1.3.173.5；package/页面版本继续1.3.173，没有擅改Owner前三位版本。90文件3768测试、vue-tsc及正常workspace构建通过，静态55通过/1项Windows大小写fixture跳过。真实机器API两次8项/6项登记匹配；既有Playwright+独立Edge以真实只读快照和受控故障验证5项流程，0业务写入/0页面异常；不等于认证生产页面验收。
 
 仅部署本片同一六静态路径，新增index-CXcfVXmi.css/index-DVyF6XSu.js并最后原子切换index，回读六项一致；原10项中的9项旧资源和index备份保留，1779保护/22原脏项无变。部署前后42个node/python/Creator进程PID、名称、创建时间一致，无共享服务重启/模型操作。源码、文档提交与可回滚部署分别记录，完整缺口见主矩阵；旧AI变体产物/UNKNOWN保持。完整证据位于 `C:/Users/33272/AppData/Local/Temp/companion-next-parity-20261016-1201`，本片合同与边界见 [Dashboard还原](docs/dashboard-discovery-local.md)。
