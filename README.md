@@ -1,6 +1,6 @@
 # Companion Next
 
-**当前版本：`v1.3.173.4`**
+**当前版本：`v1.3.173.5`**
 
 Windows本地源码基线：独立目录`D:/code/shidai3/P8000/companion-next`，来源提交`9db8b3af26982af7e9366ae03d865d8782f98a33`。四段版本仅表示本地Git检查点，产品package与页面版本仍为`1.3.173`；来源包没有Git历史。本机独立结果见[本地开发交接](LOCAL_DEVELOPMENT.md)，下方历史开发条目仍保留原上游验证来源。
 

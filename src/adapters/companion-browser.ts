@@ -287,6 +287,7 @@ export function createCompanionBrowserProvider(options: { fetch: CompanionFetch;
     label: runtimeProbesEnabled ? (dashboardDiscoveryEnabled ? 'Companion 同源查询接口（含运行与 Dashboard 发现）' : 'Companion 正常工程模式（真实状态，不自动发现 Dashboard）') : 'Companion 同源登记与记录（不探测运行状态）',
     runtimeProbesEnabled,
     dashboardDiscoveryEnabled,
+    ...(runtimeProbesEnabled ? { loadDashboardProjects(signal?: AbortSignal) { return read('/api/dashboard/projects', 'dashboard', decodeDashboard, signal) } } : {}),
     async loadProjects(signal?: AbortSignal) {
       if (!runtimeProbesEnabled) {
         const projects = await read('/api/projects', 'projects', decodeProjects, signal)

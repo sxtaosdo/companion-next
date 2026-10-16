@@ -6,6 +6,7 @@ import { mergeCalls } from '../domain/companion-browser'
 export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  const provider=shallowRef<CompanionBrowserProvider|null>(null),connected=ref(false)
  const projects=shallowRef<ManagedProject[]>([]),statuses=shallowRef<ManagedStatus[]>([]),dashboard=shallowRef<DashboardProject[]>([]),warnings=ref<string[]>([])
+ const dashboardLoading=ref(false),dashboardError=ref(''),dashboardRead=ref(false),dashboardObservedAt=ref('')
  const projectLoading=ref(false),backgroundProjectRead=ref(false),projectError=ref(''),observedAt=ref(''),projectSnapshotRevision=ref(0)
  const logs=shallowRef<LogRecord[]>([]),logsLoading=ref(false),logsError=ref(''),logsRead=ref(false)
  const logFilter=ref<LogFilter>({projectIds:[],sources:[],levels:[],search:'',limit:200})
@@ -18,12 +19,12 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  let eventProvider:CompanionEventProvider|null=null,boundReadProvider:CompanionBrowserProvider|null=null,eventAbort:AbortController|undefined,unsubscribe:(()=>void)|undefined
  let pollTimer:ReturnType<typeof setTimeout>|undefined,retryTimer:ReturnType<typeof setTimeout>|undefined,logTimer:ReturnType<typeof setTimeout>|undefined,openTimer:ReturnType<typeof setTimeout>|undefined
  let logDirty=false,eventStopped=false
- const versions={projects:0,logs:0,counts:0,calls:0},controllers:Partial<Record<keyof typeof versions,AbortController>>={}
+ const versions={projects:0,logs:0,counts:0,calls:0,dashboard:0},controllers:Partial<Record<keyof typeof versions,AbortController>>={}
  function cancel(key:keyof typeof versions){versions[key]++;controllers[key]?.abort();delete controllers[key]}
  function resetCalls(){records.value=[];total.value=null;retained.value=null;nextBefore.value=undefined;callRead.value=false}
- function cancelQueries(){for(const key of Object.keys(versions) as Array<keyof typeof versions>)cancel(key);projectLoading.value=false;backgroundProjectRead.value=false;logsLoading.value=false;countsLoading.value=false;callLoading.value=false}
+ function cancelQueries(){for(const key of Object.keys(versions) as Array<keyof typeof versions>)cancel(key);projectLoading.value=false;backgroundProjectRead.value=false;logsLoading.value=false;countsLoading.value=false;callLoading.value=false;dashboardLoading.value=false}
  function cancelReads(){stopLive()}
- function clearData(){connected.value=false;projects.value=[];statuses.value=[];dashboard.value=[];warnings.value=[];observedAt.value='';logs.value=[];logsRead.value=false;counts.value=null;sessionId.value='';sessionEpoch++;callProjectId.value='';resetCalls()}
+ function clearData(){connected.value=false;projects.value=[];statuses.value=[];dashboard.value=[];dashboardRead.value=false;dashboardError.value='';dashboardObservedAt.value='';warnings.value=[];observedAt.value='';logs.value=[];logsRead.value=false;counts.value=null;sessionId.value='';sessionEpoch++;callProjectId.value='';resetCalls()}
  function disconnect(){epoch++;cancelReads();provider.value=null;clearData();logsPaused.value=false;projectPollingPaused.value=false;projectError.value='';logsError.value='';countsError.value='';callError.value=''}
  async function connect(next:CompanionBrowserProvider){disconnect();const identity=epoch;provider.value=next;const pending=refreshProjects(),projectVersion=versions.projects;await pending;if(identity===epoch&&versions.projects===projectVersion&&provider.value===next&&connected.value)await refreshCounts()}
  /** A bounded page-entry read, separate from manual reconnect and live polling.
@@ -70,12 +71,22 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
    // Retain identical snapshots so live reads do not rebuild unchanged cards or filters.
    if(JSON.stringify(projects.value)!==JSON.stringify(result.projects))projects.value=result.projects
    if(JSON.stringify(statuses.value)!==JSON.stringify(result.statuses))statuses.value=result.statuses
-   if(JSON.stringify(dashboard.value)!==JSON.stringify(result.dashboard))dashboard.value=result.dashboard
+   // Normal workspace keeps explicit Dashboard observations across Bridge polling.
+   if(active.dashboardDiscoveryEnabled!==false&&JSON.stringify(dashboard.value)!==JSON.stringify(result.dashboard))dashboard.value=result.dashboard
    if(JSON.stringify(warnings.value)!==JSON.stringify(result.warnings))warnings.value=result.warnings
    connected.value=true;observedAt.value=new Date().toISOString()
    projectSnapshotRevision.value++
    if(callProjectId.value&&!projects.value.some(project=>project.id===callProjectId.value)){cancel('calls');callLoading.value=false;callProjectId.value='';resetCalls()}
   }catch(cause){if(!read.current())return;epoch++;cancelReads();clearData();projectError.value=message(cause)}finally{if(read.current()){projectLoading.value=false;backgroundProjectRead.value=false}}
+ }
+ function cancelDashboardRead(){cancel('dashboard');dashboardLoading.value=false}
+ async function refreshDashboard(){
+  const active=provider.value
+  if(!connected.value||!active?.loadDashboardProjects||dashboardLoading.value)return
+  const read=begin('dashboard');dashboardLoading.value=true;dashboardError.value='';dashboardRead.value=false;dashboard.value=[];dashboardObservedAt.value=''
+  try{const result=await active.loadDashboardProjects(read.signal);if(!read.current()||active!==provider.value)return
+   dashboard.value=result;dashboardRead.value=true;dashboardObservedAt.value=new Date().toISOString()
+  }catch(cause){if(read.current())dashboardError.value=message(cause)}finally{if(read.current())dashboardLoading.value=false}
  }
  async function refreshLogs(preserveSnapshot=false){
   const active=provider.value;if(!active||!connected.value)return
@@ -199,5 +210,5 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  function setLiveVisibility(visible:boolean){if(liveVisible.value===visible)return;liveVisible.value=visible;if(!liveEnabled.value)return;clearLiveWork();if(visible)resumeLive();else liveState.value='suspended'}
  watch(provider,next=>{if(liveEnabled.value&&next!==boundReadProvider)stopLive()},{flush:'sync'})
  watch(logFilter,()=>{cancel('logs');logsLoading.value=false;logsRead.value=false;logs.value=[];logsError.value='';if(liveEnabled.value)queueLiveLogs(liveEpoch)},{deep:true,flush:'sync'})
- return {provider,connected,projects,statuses,dashboard,warnings,projectLoading,backgroundProjectRead,projectError,observedAt,projectSnapshotRevision,logs,logsLoading,logsError,logsRead,logFilter,counts,countsLoading,countsError,callProjectId,failedOnly,records,callLoading,callError,callRead,total,retained,nextBefore,sessionId,liveEnabled,liveVisible,liveState,liveError,liveRetries,logsPaused,projectPollingPaused,startLive,stopLive,setLiveVisibility,pauseLogs,pauseProjectPolling,readProjectEntry,connect,disconnect,cancelReads,refreshProjects,refreshLogs,refreshCounts,setCallContext,loadCalls}
+ return {provider,connected,projects,statuses,dashboard,dashboardLoading,dashboardError,dashboardRead,dashboardObservedAt,refreshDashboard,cancelDashboardRead,warnings,projectLoading,backgroundProjectRead,projectError,observedAt,projectSnapshotRevision,logs,logsLoading,logsError,logsRead,logFilter,counts,countsLoading,countsError,callProjectId,failedOnly,records,callLoading,callError,callRead,total,retained,nextBefore,sessionId,liveEnabled,liveVisible,liveState,liveError,liveRetries,logsPaused,projectPollingPaused,startLive,stopLive,setLiveVisibility,pauseLogs,pauseProjectPolling,readProjectEntry,connect,disconnect,cancelReads,refreshProjects,refreshLogs,refreshCounts,setCallContext,loadCalls}
 })

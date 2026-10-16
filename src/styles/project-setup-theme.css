@@ -78,3 +78,14 @@
 .project-setup-select-popper .el-select-dropdown__item.is-hovering { background: #242933; }
 .project-setup-select-popper .el-select-dropdown__item.is-selected { color: #e7e9ed; background: #243056; }
 .project-setup-select-popper .el-popper__arrow::before { background: #202329; border-color: #383c45; }
+.project-setup-dialog .setup-dashboard { margin: 12px 0; }
+.project-setup-dialog .setup-dashboard h4 { margin: 0; color: #e7e9ed; }
+.project-setup-dialog .setup-dashboard-list { display: grid; gap: 8px; max-height: 280px; overflow: auto; }
+.project-setup-dialog .dashboard-item { display: grid; gap: 5px; width: 100%; padding: 10px 12px; border: 1px solid #383c45; border-radius: 6px; background: #191c21; color: #e7e9ed; text-align: left; cursor: pointer; }
+.project-setup-dialog .dashboard-item:hover:not(:disabled),
+.project-setup-dialog .dashboard-item:focus-visible { border-color: #537ef7; outline: 2px solid #537ef7; outline-offset: -2px; }
+.project-setup-dialog .dashboard-item.selected { border-color: #537ef7; background: #243056; }
+.project-setup-dialog .dashboard-item:disabled { opacity: .55; cursor: not-allowed; }
+.project-setup-dialog .dashboard-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.project-setup-dialog .dashboard-meta,
+.project-setup-dialog .dashboard-path { color: #9299a6; overflow-wrap: anywhere; }

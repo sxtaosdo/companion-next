@@ -62,7 +62,7 @@ watch(logPane,node=>{logResizeObserver?.disconnect();if(node&&typeof ResizeObser
 watch(()=>store.logs,async()=>{const node=logPane.value,stick=!!node&&node.scrollHeight>node.clientHeight+1&&nearLogBottom(node);await nextTick();if(!mounted)return;if(stick&&node===logPane.value)scrollLatest();else updateLatest()},{deep:true,flush:'pre'})
 window.addEventListener('resize',updateLatest)
 const passiveRead=computed(()=>(store.provider ?? companionBrowserProvider.value)?.runtimeProbesEnabled===false)
-const dashboardRead=computed(()=>!passiveRead.value&&(store.provider ?? companionBrowserProvider.value)?.dashboardDiscoveryEnabled!==false)
+const dashboardRead=computed(()=>!passiveRead.value&&(store.dashboardRead||(store.provider ?? companionBrowserProvider.value)?.dashboardDiscoveryEnabled!==false))
 const state=(id:string)=>store.statuses.find(status=>status.projectId===id)
 const matching=computed(()=>store.projects.filter(project=>{
  const status=state(project.id)?.state??'unknown',starting=['launching','bridge-wait'].includes(status)

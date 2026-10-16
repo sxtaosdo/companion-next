@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed,onBeforeUnmount,ref,watch } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus,Refresh } from '@element-plus/icons-vue'
 import InfoTip from './InfoTip.vue'
 import '../styles/project-setup-theme.css'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
@@ -9,11 +9,32 @@ import { useCreatorOperationsStore } from '../stores/creator-operations'
 import { useProjectOperationLaneStore } from '../stores/project-operation-lane'
 import { setupStageLabel } from '../domain/project-setup'
 import { projectSetupProvider } from '../project-setup-integration'
+import type { DashboardProject } from '../domain/companion-browser'
+import { projectDisplayPathKey,projectDisplayRank } from '../domain/companion-project-display'
 const emit=defineEmits<{(event:'dialog-visibility',open:boolean):void}>()
 const projects=useCompanionBrowserStore(),store=useProjectSetupStore(),lane=useProjectOperationLaneStore()
 const open=ref(false),path=ref(''),projectId=ref('')
 const consents=ref({installBridge:false,startCreator:false,configureCodex:false,acknowledgeReuse:false,acknowledgeToolScope:false})
 const selected=computed(()=>projects.projects.find(p=>p.id===projectId.value)??null)
+function registered(item:DashboardProject){return projects.projects.find(p=>projectDisplayPathKey(p.path)===projectDisplayPathKey(item.path))}
+function dashboardStatus(item:DashboardProject){
+ const target=registered(item),runtime=projects.statuses.find(s=>s.projectId===target?.id)
+ if(!item.exists)return '路径不存在'
+ if(item.running&&!target)return `Dashboard 已启动${item.pid?` · PID ${item.pid}`:''}`
+ if(!target)return '未添加'
+ if(runtime?.state==='ready')return '已接入 · ready'
+ if(runtime?.state)return `已添加 · ${runtime.state}`
+ return item.running?`Dashboard 已启动${item.pid?` · PID ${item.pid}`:''}`:'已添加'
+}
+const dashboardItems=computed(()=>[...projects.dashboard].sort((left,right)=>{
+ const rank=(item:DashboardProject)=>projectDisplayRank(item.running?'dashboard-running':projects.statuses.find(s=>s.projectId===registered(item)?.id)?.state,item.lastOpenedAt)
+ const a=rank(left),b=rank(right);return b[0]-a[0]||b[1]-a[1]
+}))
+function dashboardDate(value:number){const date=new Date(value);return Number.isFinite(date.getTime())?date.toLocaleString():'时间未知'}
+function selectDashboard(item:DashboardProject){
+ if(lane.locked||!projects.connected||!item.exists||!projects.dashboard.includes(item))return
+ path.value=item.path;projectId.value=registered(item)?.id??''
+}
 const allConsented=computed(()=>Object.values(consents.value).every(value=>value===true))
 const activeTask=computed(()=>!!store.setupReceipt&&['submitting','tracking','paused','unknown'].includes(store.setupReceipt.phase))
 const resumableTask=computed(()=>!!store.setupReceipt&&['paused','unknown'].includes(store.setupReceipt.phase))
@@ -48,7 +69,7 @@ watch([path,projectId,()=>JSON.stringify(consents.value)],()=>store.clearPrepare
 watch(open,value=>emit('dialog-visibility',value),{flush:'sync',immediate:true})
 function resetConsents(){consents.value={installBridge:false,startCreator:false,configureCodex:false,acknowledgeReuse:false,acknowledgeToolScope:false}}
 function show(id=''){if(lane.locked)return;dialogEpoch++;useCreatorOperationsStore().closeDialog();store.clearPrepared();resetConsents();projectId.value=id;open.value=true}
-function close(){dialogEpoch++;store.clearPrepared();store.stopWaiting();open.value=false}
+function close(){dialogEpoch++;store.clearPrepared();store.stopWaiting();projects.cancelDashboardRead();open.value=false}
 async function register(){
  const preview=store.preparedRegistration;if(!preview)return
  const source=projects.provider,epoch=contextEpoch,dialog=dialogEpoch
@@ -66,7 +87,7 @@ function prepareFull(){if(selected.value)store.prepareSetup(selected.value.id,{.
 async function submitFull(){const preview=store.preparedSetup;if(preview)await store.sendSetup(preview,true)}
 function visibility(){store.setVisible(document.visibilityState==='visible')}
 visibility();document.addEventListener('visibilitychange',visibility)
-onBeforeUnmount(()=>{mounted=false;store.leave();document.removeEventListener('visibilitychange',visibility);emit('dialog-visibility',false)})
+onBeforeUnmount(()=>{mounted=false;store.leave();projects.cancelDashboardRead();document.removeEventListener('visibilitychange',visibility);emit('dialog-visibility',false)})
 defineExpose({openForProject:show,close})
 </script>
 <template>
@@ -81,6 +102,14 @@ defineExpose({openForProject:show,close})
    <section class="setup-step"><h3>1. 仅登记已有工程</h3>
     <p>登记不会安装 Bridge、启动 Creator 或配置 Codex。后台校验工程并返回规范路径；已有登记返回原记录。请核对返回路径后，再单独确认安装接入。</p>
     <el-input v-model="path" :disabled="lane.locked" :maxlength="4096" aria-label="已有工程绝对路径" placeholder="例如 D:\Games\MyProject"/>
+     <section v-if="projects.provider?.loadDashboardProjects" class="setup-dashboard" aria-label="Dashboard 工程发现">
+      <div class="planner-import-actions"><h4>Dashboard 工程</h4><el-button size="small" :icon="Refresh" :loading="projects.dashboardLoading" :disabled="!projects.connected||lane.locked||projects.dashboardLoading" @click="projects.refreshDashboard()">刷新 Dashboard 工程</el-button><InfoTip label="Dashboard 工程发现说明" text="读取 Dashboard / Creator 本地工程列表、路径存在性和 Creator 进程信息。点选仅填入路径；登记与安装接入仍需分别确认。工程状态轮询不会刷新此列表。"/></div>
+      <el-alert v-if="projects.dashboardError" title="Dashboard 工程读取失败" :description="projects.dashboardError" type="error" :closable="false"/>
+      <p v-else-if="!projects.dashboardRead&&!projects.dashboardLoading">尚未读取 Dashboard 工程。</p>
+      <p v-else-if="projects.dashboardRead&&!dashboardItems.length">本次未读到 Dashboard / Creator 工程。</p>
+      <p v-if="projects.dashboardRead">读取时间：{{ new Date(projects.dashboardObservedAt).toLocaleString() }}</p>
+      <div class="setup-dashboard-list"><button v-for="item in dashboardItems" :key="item.path" type="button" class="dashboard-item" :class="{selected:path===item.path,registered:!!registered(item)}" :aria-pressed="path===item.path" :disabled="!item.exists||!projects.connected||lane.locked" @click="selectDashboard(item)"><span class="dashboard-heading"><strong>{{ item.name }}</strong><span>{{ dashboardStatus(item) }}</span></span><span class="dashboard-meta">{{ [item.version?`Creator ${item.version}`:'',item.source==='dashboard'?'Dashboard':item.source==='creator-editor'?'Creator':'来源未知',item.progress?`状态 ${item.progress}`:'',item.lastOpenedAt===undefined?'':`最近打开 ${dashboardDate(item.lastOpenedAt)}`].filter(Boolean).join(' · ') }}</span><span class="dashboard-path">{{ item.path }}</span></button></div>
+     </section>
     <p>缺少工具绑定时默认 full（全部工具）。重新登记不会恢复已移除的绑定，请另行核对工具清单。</p>
     <el-button :disabled="!projects.connected||lane.locked" @click="store.prepareRegistration(path)">核对仅登记</el-button>
     <div v-if="store.preparedRegistration" class="setup-confirm" data-testid="registration-confirm"><p>待发送路径：{{ store.preparedRegistration.path }}</p><p>来源：{{ store.preparedRegistration.sourceLabel }}</p><p>仅发送登记请求；成功后重读工程与状态，可能探测 Bridge 并更新诊断日志。</p><el-button type="primary" @click="register">确认仅登记此路径</el-button></div>

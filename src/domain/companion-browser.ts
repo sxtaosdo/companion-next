@@ -84,6 +84,8 @@ export interface CompanionBrowserProvider {
   /** False means only stored registration is read; no Bridge / Dashboard probes. */
   readonly runtimeProbesEnabled?: boolean
   readonly dashboardDiscoveryEnabled?: boolean
+  /** Explicit Dashboard refresh, independent of routine Bridge/status polling. */
+  loadDashboardProjects?(signal?: AbortSignal): Promise<DashboardProject[]>
   /** Registration is mandatory. Status and Dashboard failures are partial reads with explicit warnings. */
   loadProjects(signal?: AbortSignal): Promise<ProjectRead>
   loadLogs(filter: LogFilter, signal?: AbortSignal): Promise<LogRecord[]>

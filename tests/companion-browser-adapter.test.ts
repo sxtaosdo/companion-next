@@ -34,7 +34,7 @@ describe('v148 fixed same-origin read contract', () => {
     const fetch = fixture()
     const provider = createCompanionBrowserProvider({ fetch })
     expect(fetch).not.toHaveBeenCalled()
-    expect(Object.keys(provider).sort()).toEqual(['dashboardDiscoveryEnabled', 'label', 'loadCalls', 'loadCounts', 'loadLogs', 'loadProjects', 'runtimeProbesEnabled'])
+    expect(Object.keys(provider).sort()).toEqual(['dashboardDiscoveryEnabled', 'label', 'loadCalls', 'loadCounts', 'loadDashboardProjects', 'loadLogs', 'loadProjects', 'runtimeProbesEnabled'])
     expect(Object.isFrozen(provider)).toBe(true)
     await provider.loadProjects()
     await provider.loadLogs({})
