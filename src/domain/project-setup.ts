@@ -9,6 +9,8 @@ export interface SetupSnapshot {
 }
 export interface ProjectSetupProvider {
  readonly label:string
+ /** Explicit native folder dialog; undefined means user cancelled. Never registers the selection. */
+ pickDirectory?(signal?:AbortSignal):Promise<string|undefined>
  register(path:string,signal?:AbortSignal):Promise<ManagedProject>
  /** Explicit full setup only. Provider sends true/true, never omitted defaults or codexPath. */
  start(projectId:string,signal?:AbortSignal):Promise<{operationId:string}>

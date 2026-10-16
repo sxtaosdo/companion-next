@@ -3,7 +3,7 @@ import type { ManagedProject } from '../domain/companion-browser'
 import { PROJECT_SETUP_LIMITS, ProjectSetupError, SETUP_STAGES, validateProjectPath, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
 import type { ProjectSetupErrorCode, ProjectSetupProvider, SetupSnapshot } from '../domain/project-setup'
 export { PROJECT_SETUP_LIMITS, ProjectSetupError } from '../domain/project-setup'
-export type ProjectSetupPath = '/api/projects' | '/api/setup' | `/api/setup/${string}`
+export type ProjectSetupPath = '/api/projects' | '/api/pick-directory' | '/api/setup' | `/api/setup/${string}`
 export type ProjectSetupFetch = (input: ProjectSetupPath, init: RequestInit) => Promise<Response>
 
 const localFailures = new WeakSet<ProjectSetupError>()
@@ -100,6 +100,13 @@ function decodeProject(value: unknown): ManagedProject {
   // Registry canonicalization can legitimately change the submitted path. The store freezes this returned target.
   return result
 }
+function decodeDirectory(value: unknown): string | undefined {
+  const raw = object(value), keys = Object.keys(raw)
+  if (keys.length !== 1) throw fail('invalid-shape')
+  if (keys[0] === 'cancelled' && raw.cancelled === true) return undefined
+  if (keys[0] === 'path') return safePath(raw.path)
+  throw fail('invalid-shape')
+}
 function decodeStarted(value: unknown): { operationId: string } {
   const raw = object(value)
   required(raw, ['operationId'])
@@ -176,7 +183,8 @@ export function createProjectSetupProvider(options: { fetch: ProjectSetupFetch; 
     }
     const cancel = () => controller.abort()
     signal?.addEventListener('abort', cancel, { once: true })
-    const timer = setTimeout(() => { timedOut = true; controller.abort() }, timeoutMs)
+    // A native dialog waits for the user. Aborting fetch cannot close ShowDialog.
+    const timer = path === '/api/pick-directory' ? undefined : setTimeout(() => { timedOut = true; controller.abort() }, timeoutMs)
     const abortError = () => fail(signal?.aborted ? 'aborted' : timedOut ? 'timeout' : 'aborted', invoked ? 'unknown' : 'not-dispatched')
     try {
       if (signal?.aborted) controller.abort()
@@ -212,6 +220,9 @@ export function createProjectSetupProvider(options: { fetch: ProjectSetupFetch; 
   return Object.freeze({
     label: 'Companion 同源工程登记与完整配置（v148 源码合同，实机未验）',
     waitForIdle: () => idle,
+    async pickDirectory(signal) {
+      return request('/api/pick-directory', 'POST', 200, decodeDirectory, '{}', signal)
+    },
     async register(path, signal) {
       let target: string
       try { target = safePath(path) } catch { throw fail('invalid-input', 'not-dispatched') }

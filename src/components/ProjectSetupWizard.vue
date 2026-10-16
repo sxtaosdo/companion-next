@@ -7,13 +7,14 @@ import { useCompanionBrowserStore } from '../stores/companion-browser'
 import { useProjectSetupStore } from '../stores/project-setup'
 import { useCreatorOperationsStore } from '../stores/creator-operations'
 import { useProjectOperationLaneStore } from '../stores/project-operation-lane'
-import { setupStageLabel } from '../domain/project-setup'
+import { ProjectSetupError,setupStageLabel,validateProjectPath } from '../domain/project-setup'
 import { projectSetupProvider } from '../project-setup-integration'
 import type { DashboardProject } from '../domain/companion-browser'
 import { projectDisplayPathKey,projectDisplayRank } from '../domain/companion-project-display'
 const emit=defineEmits<{(event:'dialog-visibility',open:boolean):void}>()
 const projects=useCompanionBrowserStore(),store=useProjectSetupStore(),lane=useProjectOperationLaneStore()
 const open=ref(false),path=ref(''),projectId=ref('')
+const pickingDirectory=ref(false),directoryError=ref('')
 const consents=ref({installBridge:false,startCreator:false,configureCodex:false,acknowledgeReuse:false,acknowledgeToolScope:false})
 const selected=computed(()=>projects.projects.find(p=>p.id===projectId.value)??null)
 function registered(item:DashboardProject){return projects.projects.find(p=>projectDisplayPathKey(p.path)===projectDisplayPathKey(item.path))}
@@ -68,8 +69,35 @@ watch(()=>[projects.provider,projectSetupProvider.value,projects.connected,JSON.
 watch([path,projectId,()=>JSON.stringify(consents.value)],()=>store.clearPrepared(),{flush:'sync'})
 watch(open,value=>emit('dialog-visibility',value),{flush:'sync',immediate:true})
 function resetConsents(){consents.value={installBridge:false,startCreator:false,configureCodex:false,acknowledgeReuse:false,acknowledgeToolScope:false}}
-function show(id=''){if(lane.locked)return;dialogEpoch++;useCreatorOperationsStore().closeDialog();store.clearPrepared();resetConsents();projectId.value=id;open.value=true}
+function show(id=''){if(lane.locked)return;dialogEpoch++;useCreatorOperationsStore().closeDialog();store.clearPrepared();resetConsents();directoryError.value='';projectId.value=id;open.value=true}
 function close(){dialogEpoch++;store.clearPrepared();store.stopWaiting();projects.cancelDashboardRead();open.value=false}
+async function pickDirectory(){
+ const api=projectSetupProvider.value,source=projects.provider
+ if(!mounted||!open.value||!projects.connected||lane.locked||!api?.pickDirectory)return
+ const epoch=contextEpoch,dialog=dialogEpoch,originalPath=path.value,readLabel=source?.label,writeLabel=api.label
+ const lease=lane.acquire('选择工程目录');if(!lease)return
+ const current=()=>mounted&&open.value&&projects.connected&&dialog===dialogEpoch&&epoch===contextEpoch&&source===projects.provider&&api===projectSetupProvider.value&&source?.label===readLabel&&api.label===writeLabel&&path.value===originalPath
+ store.clearPrepared();directoryError.value='';pickingDirectory.value=true
+ let terminalReply=false
+ try{
+  // Leaving the page only discards the reply; it cannot cancel the native dialog.
+  const result=await api.pickDirectory()
+  if(result!==undefined)validateProjectPath(result)
+  terminalReply=true
+  if(!current()||result===undefined)return
+  path.value=validateProjectPath(result)
+  projectId.value=projects.projects.find(p=>projectDisplayPathKey(p.path)===projectDisplayPathKey(result))?.id??''
+ }catch(error){
+  terminalReply=error instanceof ProjectSetupError&&error.outcome==='rejected'
+  if(current())directoryError.value=error instanceof ProjectSetupError?`${new ProjectSetupError(error.code,error.outcome).message} 请先核对原系统窗口；页面取消不会关闭系统窗口。`:'无法读取目录选择结果；请先核对原系统窗口，不会自动重试。'
+ }finally{
+  let cleaned=false
+  try{await api.waitForIdle();cleaned=true}catch{if(mounted)directoryError.value='无法确认目录请求已结束，工程操作仍被锁定；请核对原宿主。'}
+  pickingDirectory.value=false
+  // Transport completion cannot prove an unknown native dialog has closed.
+  if(cleaned&&terminalReply)lane.release(lease)
+ }
+}
 async function register(){
  const preview=store.preparedRegistration;if(!preview)return
  const source=projects.provider,epoch=contextEpoch,dialog=dialogEpoch
@@ -101,7 +129,8 @@ defineExpose({openForProject:show,close})
  <el-dialog class="project-setup-dialog" modal-class="project-setup-overlay" :model-value="open" title="已有工程：登记与安装接入" width="760px" :close-on-click-modal="false" @update:model-value="(value:boolean)=>{if(!value)close()}">
    <section class="setup-step"><h3>1. 仅登记已有工程</h3>
     <p>登记不会安装 Bridge、启动 Creator 或配置 Codex。后台校验工程并返回规范路径；已有登记返回原记录。请核对返回路径后，再单独确认安装接入。</p>
-    <el-input v-model="path" :disabled="lane.locked" :maxlength="4096" aria-label="已有工程绝对路径" placeholder="例如 D:\Games\MyProject"/>
+    <div class="setup-path-row"><el-input v-model="path" :disabled="lane.locked" :maxlength="4096" aria-label="已有工程绝对路径" placeholder="例如 D:\Games\MyProject"/><el-button v-if="projectSetupProvider?.pickDirectory" :loading="pickingDirectory" :disabled="!projects.connected||lane.locked" @click="pickDirectory">选择目录…</el-button></div>
+    <el-alert v-if="directoryError" :title="directoryError" type="error" :closable="false"/>
      <section v-if="projects.provider?.loadDashboardProjects" class="setup-dashboard" aria-label="Dashboard 工程发现">
       <div class="planner-import-actions"><h4>Dashboard 工程</h4><el-button size="small" :icon="Refresh" :loading="projects.dashboardLoading" :disabled="!projects.connected||lane.locked||projects.dashboardLoading" @click="projects.refreshDashboard()">刷新 Dashboard 工程</el-button><InfoTip label="Dashboard 工程发现说明" text="读取 Dashboard / Creator 本地工程列表、路径存在性和 Creator 进程信息。点选仅填入路径；登记与安装接入仍需分别确认。工程状态轮询不会刷新此列表。"/></div>
       <el-alert v-if="projects.dashboardError" title="Dashboard 工程读取失败" :description="projects.dashboardError" type="error" :closable="false"/>
@@ -149,5 +178,6 @@ defineExpose({openForProject:show,close})
  </el-dialog>
 </template>
 <style scoped>
+.setup-path-row{display:flex;align-items:center;gap:8px}.setup-path-row :deep(.el-input){min-width:0;flex:1}
 .project-setup-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.project-setup-toolbar :deep(.el-button+.el-button){margin-left:0}.setup-status{font-size:12px;color:var(--text-secondary);overflow-wrap:anywhere}.setup-step+.setup-step{border-top:1px solid var(--border-color);margin-top:20px;padding-top:16px}.setup-step{display:grid;gap:10px}.setup-step p{margin:3px 0}.setup-step h3{margin:0 0 4px}.setup-consents{display:grid;gap:8px}.setup-consents :deep(.el-checkbox){height:auto;align-items:flex-start}.setup-consents :deep(.el-checkbox__label){white-space:normal;line-height:1.6}.setup-confirm{border:1px solid var(--border-color);border-radius:8px;padding:12px}.setup-result+.setup-result{border-top:1px solid var(--border-color);padding-top:12px}.setup-result dl{display:grid;grid-template-columns:130px minmax(0,1fr);gap:5px}.setup-result dd{margin:0}.setup-step,.setup-result{overflow-wrap:anywhere}.setup-record-note{color:var(--text-secondary);font-size:12px}
 </style>
