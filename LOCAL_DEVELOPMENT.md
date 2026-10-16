@@ -28,6 +28,10 @@
 
 ## 验证、部署与下一步
 
+2026-10-16只读验收补核：本轮工具目录没有用户浏览器控制、Playwright/CUA或工具检索入口，只有打开Codex面板；不重试历史失败初始化。173认证页面版本、资源响应SHA、真实hover/focus/Escape/失焦与截图仍未验，Owner会话状态未知。源码ProjectStatusTag.vue:8–11与旧app.ts:1364–1365的两条独立条件一致，既有3751本机测试不代替浏览器验收。旧7471草稿导出/重启答复仅对应已完成编辑器窗口，没有取消这两项核查；没有重复应用/重启。
+
+AI变体只读结论：通用asset_import接受绝对sourcePath与db://assets/... destinationUrl，目标存在拒绝、overwrite:false/rename:false；使用现有lease/stable operationId、operation_get和资产hash/UUID/SpriteFrame读回。裸工具不接预期SHA/variant身份；Python facade没有任意PNG/variant导入API，Studio importer固定1024×1024透明comfyui-local母图。正式nested companion-daemon.js（SHA39e88c9045e5d8266b059ce2b1ceb48cf522c5d0afc5f4596658c4545ae6641e）仍为v1变体收据、runtimeImported:false，没有源码新增的binding/readVariant；不能把旧jobId母图import或未打包源码当variant闭环。运行所选Python/Node/CLI/Studio/Pillow路径仍未读取/未验证。下一窄片先由旧后端/Studio Owner协调icon-adapter.ts、icon-image-assets.ts和local-icon-import.ts的可读回绑定收据/variant分支，保留Creator原语与UNKNOWN不重发；本轮不实施。完整参数、防覆盖、meta、UNKNOWN及执行器路径证据：仓外同目录[browser173-variant-import-contract-20261016.md](C:/Users/33272/AppData/Local/Temp/companion-next-1.3.173-source-sync-20261016/browser173-variant-import-contract-20261016.md)。
+
 实际依次执行`npm test -- --maxWorkers=4`、`npm run build:companion-workspace`和`npm run test:companion-static`：Vitest89文件/3751项全过；workspace脚本先vue-tsc --noEmit再正常Vite构建、base ./，退出0；静态55通过/0失败/1跳过，跳过原因是Windows无法同时表示仅大小写不同的文件名。实际六产物另由现有inspectStaticCandidate检查普通文件/链接、路径、JS语法、HTML/JS/CSS引用及完整SHA，全部通过。验证期间源码commit、package/lock保持、工作树干净；未改断言、减少测试范围或重复另外四种构建模式。保留大chunk提示，不把离线结果等同真实浏览器/GPU/Creator或业务API验收。
 
 08:57 UTC仅部署到`D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/web/next`的manifest六路径，共2283176字节。实际新增`assets/index-W3W5uKIL.js`和`assets/index-BS4nt8-3.css`，最后原子切换index；另三资源同字节未重写。旧hash资源保留，172六备份仍位于`C:/Users/33272/AppData/Local/Temp/companion-next-1.3.173-deploy-20261016/backup-current-172`，全部回读通过。部署前后1779保护/22原修改匹配，其中junction只核元信息，原node_modules目录不遍历，不能扩成内部内容审计。没有启动/停止/重启daemon、Creator或Dashboard，没有使用预构建ZIP代替本机验证。

@@ -1,12 +1,14 @@
 # Companion Next
 
-**当前版本：`v1.3.173.3`**
+**当前版本：`v1.3.173.4`**
 
 Windows本地源码基线：独立目录`D:/code/shidai3/P8000/companion-next`，来源提交`9db8b3af26982af7e9366ae03d865d8782f98a33`。四段版本仅表示本地Git检查点，产品package与页面版本仍为`1.3.173`；来源包没有Git历史。本机独立结果见[本地开发交接](LOCAL_DEVELOPMENT.md)，下方历史开发条目仍保留原上游验证来源。
 
 2026-10-16 08:57 UTC本机交付：214个原锁依赖来源/完整性通过，未运行安装脚本或更改package/lock。本地源31de687已实际通过89文件3751测试、vue-tsc与正常workspace构建；静态55通过/0失败/1项Windows大小写fixture跳过，实际六产物引用与SHA通过。已仅部署本地173六静态并回读一致，172六备份/旧资源、1779保护项及22原修改保留，无共享服务重启。后续本README/VERSION说明提交不重标该构建源；认证页面与真实交互仍未验。详见上述交接。
 
 ## 1.3.173 原工程状态 Dashboard 提示
+
+2026-10-16本机只读补核：当前没有用户浏览器控制工具，认证页面版本/资源响应SHA与真实hover/focus仍未验；两条旧显示条件源码已核一致。Creator通用asset_import可定向导入PNG并拒绝覆盖，但Studio仍限制1024母图；正式bundle没有源码新增的binding/readVariant合同，CPU变体到Creator尚未闭环。详见[本地交接](LOCAL_DEVELOPMENT.md)，本片未重启服务或改旧后端。
 
 恢复原状态标签的 Dashboard 接管版本和进度悬浮/键盘聚焦提示，两个字段按原独立条件显示。只使用已有工程状态，不增加常驻块、请求或权限；原状态文字与操作保持。全量89文件3751项离线回归通过，真实浏览器效果仍待验收。详见 [本片记录](docs/project-status-tooltip-023.md)。
 
