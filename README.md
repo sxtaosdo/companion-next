@@ -1,6 +1,8 @@
 # Companion Next
 
-**当前版本：`v1.3.173.12`**
+**当前版本：`v1.3.173.13`**
+
+2026-10-17资源验收增量：独立fixture单张96×96 CPU变体已真实导入Creator，asset/SpriteFrame与文件哈希回读通过、进程及端口正常关闭；7项离线检查通过。场景持久绑定、Preview/Build与Next完整资源UI仍未验，新增监听窗口待协调。详见[隔离资源记录](docs/isolated-variant-acceptance-20261017.md)，下方旧“未导入”段为其对应时间的历史结果；本片不改Next源码或部署。
 
 2026-10-17本轮恢复交付已完成：从5419ace恢复损坏README/索引，六静态已部署且实际HTTP回读一致，正常认证Edge在1440×1080核对创建/初始化表单。资源候选四产物未变，原CLI正常启动后仅127.0.0.1:32180、OPEN；历史UNKNOWN与原共享dirty保持。本轮不扩展UI；详见[恢复交付回执](docs/next-recovery-20261017.md)。
 

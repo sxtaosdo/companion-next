@@ -2,6 +2,8 @@
 
 状态：Accepted；本机已交付，未推送、打标签或更新父仓指针。
 
+后续02:00 UTC增量：独立fixture已完成单张96×96变体真实导入、UUID/元数据回读和正常关闭；原sourceId、旧UNKNOWN及Next产物均保持。7项离线检查与后续场景/Preview/Build清单见[隔离资源验收](isolated-variant-acceptance-20261017.md)。目标已获准，新监听窗口待协调；下文“未导入”仅描述00:37 UTC恢复切片的历史状态，不代表最新结果。
+
 本轮只完成此前已批准的创建/初始化切片部署与资源接口恢复验证，没有增加UI范围、安装依赖、修改旧Windows Companion源码或四后台产物，也没有执行关机。
 
 恢复只读核对确认昨晚静态部署派发及结果标记均不存在，旧入口SHA为`74ff66517075dc484dd73dfea2dcbab92487fafdee4684a02e1b01f15e83e922`；本轮没有把昨晚断连当成成功。daemon当时ECONNREFUSED。Next HEAD仍为`5419ace06f5f25f4a3f4300dcfab2a85255edc68`（`1.3.173.11`）。335份跟踪文件中仅README全零，33534字节Git索引也全零，其余334份及封存功能输入、构建六产物均匹配。
