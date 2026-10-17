@@ -9,3 +9,12 @@ Next已有GET /api/knowledge-service/status的running/frameable解码、显式�
 安全验收：离线mock覆盖条件/失败/迟到/来源/UNKNOWN与模型页无frame。现有32180独立认证Edge的状态GET及8081 frame导航均拦截隔离，不给真实8081发请求，不起监听/模型。若真实既有状态不可达，如实记录，不为验收启动服务；不验证知识登录/检索/问答/管理写操作。阶段完成按既有六静态备份、保留hash、原子入口流程部署并核SHA与独立Edge，不关闭用户窗口或重启服务。
 
 五步接入核对：现有四来源、登记及独立setup已在；原选工具范围、单独安装/启动、可跳过多Agent、完成示例分步与当前完整setup存在差异。Next provider.start固定完整安装/启动/Codex，旧后端复用任务不保证本次false选项，不能只加步骤外观便称完整迁移。真实安装/持久客户端配置按本轮限制不执行。MCP只读GET缺口继续保留，不调用注册POST探测。
+
+
+## 已完成交付
+
+源码8aace09/.38已实际部署，28旧文件备份/全部旧hash保留，最后原子切换入口。入口SHA 7ba08a03df6569039f77039b3d81251e07d82f9f494d34021e747b54d50f4088，六HTTP SHA一致。5文件211项定向、strict类型、正常workspace构建与静态55通过/1Windows平台跳过；独立reviewer无具体发现，OCR本地范围/规则及宿主审读完成，不宣称managed PASS。
+
+独立正式认证Edge七分支通过：未运行不嵌、运行可嵌固定地址、刷新移除旧frame、不可嵌恢复原外链、读取失败移除frame/link、模型导航不嵌、返回需重新显式读取；无pageerror。8081内容/两服务状态均拦截隔离，不请求真实页面/模型，截图已实际查看。另单独只读一次真实/api/knowledge-service/status为200/running=false/frameable=false，未为验收启动服务，因此真实知识后台登录/业务仍未验。
+
+仓外证据 C:/Users/33272/AppData/Local/Temp/companion-knowledge-frame-20261017，含browser-proof.json、frame-running-isolated.png、manifest、28份备份和部署保护回执。PID4092/epoch保持，22dirty及diff保持，用户浏览器未操作，自有Edge关闭；无安装、客户端配置、模型或Creator操作。
