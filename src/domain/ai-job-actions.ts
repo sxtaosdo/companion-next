@@ -2,21 +2,23 @@ import { decodeAiJobSnapshot, isAiCandidateId, isAiJobId } from './ai-jobs-read'
 import type { AiJobSnapshot } from './ai-jobs-read'
 import { isAiProjectId } from './ai-resource-read'
 
-/** Five already-deployed v148/v150 job actions. No enqueue, service start or generic operation route. */
-export const AI_JOB_ACTIONS = ['run-next', 'resume', 'select', 'import', 'export-variant'] as const
+/** Fixed original job routes, including the already-deployed independent variant importer. */
+export const AI_JOB_ACTIONS = ['run-next', 'resume', 'select', 'import', 'export-variant', 'import-variant'] as const
 export type AiJobAction = typeof AI_JOB_ACTIONS[number]
 export type AiJobActionInput = { jobId: string; revision: number; gpuUseApproved: true }
   | { jobId: string; revision: number }
   | { jobId: string; revision: number; selectedIds: string[]; approved: true }
   | { jobId: string; revision: number; approved: true }
   | { jobId: string; revision: number; candidateId: string; width: number; height: number; allowUpscale: boolean; expectedTargetSha256: null; approved: true }
+  | { jobId: string; revision: number; candidateId: string; width: number; height: number; destinationUrl: string; expectedVariantSha256: string; expectedReceiptSha256: string; approved: true }
 /** approved is local consent evidence. Only input is serialized, preserving the original strict wire schema. */
 export interface AiJobActionSubmission { operation: AiJobAction; input: AiJobActionInput; snapshot: AiJobSnapshot; approved: true }
 export interface AiJobVariantReceipt {
   jobId: string; revision: number; candidateId: string; relativePath: string; sha256: string; sourceSha256: string
   width: number; height: number; created: boolean; upscaled: boolean; qualityLimit: 'Upscaling adds no new detail.' | null
+  receiptSha256?: string
 }
-export type AiJobActionResult = { kind: 'dispatch'; dispatchAccepted: true; job: AiJobSnapshot }
+export type AiJobActionResult = { kind: 'dispatch'; dispatchAccepted: true; job: AiJobSnapshot; artifact?: 'variant' }
   | { kind: 'selection'; job: AiJobSnapshot } | { kind: 'variant'; receipt: AiJobVariantReceipt }
 export interface AiJobActionsProvider {
   readonly label: string
@@ -43,6 +45,15 @@ export const AI_JOB_ACTION_LIMITS = Object.freeze({ maxRequestBytes: 128 * 1024,
 const invalid = () => new AiJobActionError('invalid-input', 'not-sent')
 const shape = () => new AiJobActionError('invalid-shape', 'unknown')
 const sha = /^[a-f0-9]{64}$/
+/** Fixed sibling filename, from the sealed destination and the actual exported file identity. */
+export function aiVariantDestination(job: AiJobSnapshot, variant: { candidateId: string; width: number; height: number; sha256: string }): string {
+  const sealed = job.resourceSnapshot, candidate = job.candidates.find(row => row.candidateId === variant.candidateId)
+  if (sealed?.state !== 'sealed' || sealed.config.schemaVersion !== 'project-resource-config-v2' || !candidate || !sha.test(variant.sha256)) throw invalid()
+  if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(candidate.assetId)) throw invalid()
+  const destination = `db://${sealed.config.destination.directory}/${candidate.assetId}-${variant.width}x${variant.height}-${variant.sha256.slice(0, 12)}.png`
+  if (!/^db:\/\/assets\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+\.png$/.test(destination) || destination.split('/').some(part => part === '.' || part === '..')) throw invalid()
+  return destination
+}
 export function aiJobActionCanonical(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(aiJobActionCanonical).join(',')}]`
   if (value && typeof value === 'object') return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${aiJobActionCanonical((value as Record<string, unknown>)[key])}`).join(',')}}`
@@ -75,21 +86,26 @@ export function validateAiJobActionSubmission(projectId: string, value: unknown)
     const operation = raw.operation as AiJobAction, snapshot = decodeAiJobSnapshot(raw.snapshot, projectId)
     if (!aiJobActionAllowed(operation, snapshot)) throw invalid()
     const fields = operation === 'run-next' ? ['gpuUseApproved'] : operation === 'select' ? ['selectedIds', 'approved'] : operation === 'import' ? ['approved']
-      : operation === 'export-variant' ? ['candidateId', 'width', 'height', 'allowUpscale', 'expectedTargetSha256', 'approved'] : []
+      : operation === 'export-variant' ? ['candidateId', 'width', 'height', 'allowUpscale', 'expectedTargetSha256', 'approved']
+      : operation === 'import-variant' ? ['candidateId', 'width', 'height', 'destinationUrl', 'expectedVariantSha256', 'expectedReceiptSha256', 'approved'] : []
     const input = exact(raw.input, ['jobId', 'revision', ...fields])
     if (!isAiJobId(input.jobId) || input.jobId !== snapshot.jobId || input.revision !== snapshot.revision) throw invalid()
-    if (operation === 'run-next' && input.gpuUseApproved !== true || ['select', 'import', 'export-variant'].includes(operation) && input.approved !== true) throw invalid()
+    if (operation === 'run-next' && input.gpuUseApproved !== true || ['select', 'import', 'export-variant', 'import-variant'].includes(operation) && input.approved !== true) throw invalid()
     if (operation === 'select') {
       if (!Array.isArray(input.selectedIds) || input.selectedIds.length < 1 || input.selectedIds.length > 2 || new Set(input.selectedIds).size !== input.selectedIds.length) throw invalid()
       const candidates = input.selectedIds.map(id => { if (!isAiCandidateId(id)) throw invalid(); const candidate = snapshot.candidates.find(c => c.candidateId === id); if (!candidate) throw invalid(); return candidate })
       if (new Set(candidates.map(c => c.assetId)).size !== candidates.length) throw invalid()
     }
     if (operation === 'import' && snapshot.selectedIds.some(id => !isAiCandidateId(id))) throw invalid()
-    if (operation === 'export-variant') {
+    if (operation === 'export-variant' || operation === 'import-variant') {
       const candidate = snapshot.candidates.find(c => c.candidateId === input.candidateId)
       if (!candidate || !isAiCandidateId(input.candidateId) || snapshot.selectedIds[0] !== input.candidateId || typeof input.width !== 'number' || typeof input.height !== 'number'
         || !Number.isInteger(input.width) || !Number.isInteger(input.height) || input.width < 1 || input.height < 1 || input.width > 4096 || input.height > 4096 || input.width * input.height > 16_000_000
-        || typeof input.allowUpscale !== 'boolean' || input.expectedTargetSha256 !== null || input.width > 1024 && input.height > 1024 && !input.allowUpscale) throw invalid()
+        ) throw invalid()
+      if (operation === 'export-variant' && (typeof input.allowUpscale !== 'boolean' || input.expectedTargetSha256 !== null || input.width > 1024 && input.height > 1024 && !input.allowUpscale)) throw invalid()
+      if (operation === 'import-variant' && (typeof input.expectedVariantSha256 !== 'string' || !sha.test(input.expectedVariantSha256)
+        || typeof input.expectedReceiptSha256 !== 'string' || !sha.test(input.expectedReceiptSha256)
+        || input.destinationUrl !== aiVariantDestination(snapshot, { candidateId: input.candidateId, width: input.width, height: input.height, sha256: input.expectedVariantSha256 }))) throw invalid()
     }
     return { operation, input: JSON.parse(JSON.stringify(input)) as AiJobActionInput, snapshot, approved: true }
   } catch { throw invalid() }
@@ -111,7 +127,8 @@ export function decodeAiJobActionResponse(value: unknown, projectId: string, sub
         || typeof raw.sha256 !== 'string' || !sha.test(raw.sha256) || raw.sourceSha256 !== candidate.fileSha256 || raw.width !== input.width || raw.height !== input.height
         || typeof raw.created !== 'boolean' || raw.upscaled !== upscaled || raw.qualityLimit !== (upscaled ? 'Upscaling adds no new detail.' : null) || raw.dispatchAccepted !== undefined) throw shape()
       return { kind: 'variant', receipt: { jobId: expected.jobId, revision: expected.revision, candidateId: candidate.candidateId, relativePath: path, sha256: raw.sha256,
-        sourceSha256: candidate.fileSha256, width: input.width, height: input.height, created: raw.created, upscaled, qualityLimit: upscaled ? 'Upscaling adds no new detail.' : null } }
+        sourceSha256: candidate.fileSha256, width: input.width, height: input.height, created: raw.created, upscaled, qualityLimit: upscaled ? 'Upscaling adds no new detail.' : null,
+        ...(raw.receiptSha256 === undefined ? {} : { receiptSha256: typeof raw.receiptSha256 === 'string' && sha.test(raw.receiptSha256) ? raw.receiptSha256 : (() => { throw shape() })() }) } }
     }
     const job = decodeAiJobSnapshot(raw.job, projectId, expected.jobId)
     if (!aiJobActionIdentityMatches(expected, job) || aiJobActionCanonical(job.candidates) !== aiJobActionCanonical(expected.candidates)) throw shape()
@@ -120,15 +137,17 @@ export function decodeAiJobActionResponse(value: unknown, projectId: string, sub
         || aiJobActionCanonical([...job.selectedIds].sort()) !== aiJobActionCanonical([...(checked.input as { selectedIds: string[] }).selectedIds].sort())) throw shape()
       return { kind: 'selection', job }
     }
+    if (checked.operation === 'import-variant' && raw.artifact !== 'variant') throw shape()
     if (raw.dispatchAccepted !== true || raw.workerResident !== false || job.revision !== expected.revision || job.state !== expected.state
       || aiJobActionCanonical(job.selectedIds) !== aiJobActionCanonical(expected.selectedIds)) throw shape()
-    return { kind: 'dispatch', dispatchAccepted: true, job }
+    return { kind: 'dispatch', dispatchAccepted: true, job, ...(checked.operation === 'import-variant' ? { artifact: 'variant' as const } : {}) }
   } catch { throw shape() }
 }
 /** Revalidate even an injected provider result. A normalized dispatch is still a pre-execution acknowledgement. */
 export function validateAiJobActionResult(value: AiJobActionResult, projectId: string, submission: AiJobActionSubmission): AiJobActionResult {
   if (!value || typeof value !== 'object') throw shape()
-  if (value.kind === 'dispatch') return decodeAiJobActionResponse({ schemaVersion: 'companion-icons-v1', dispatchAccepted: value.dispatchAccepted, workerResident: false, job: value.job }, projectId, submission)
+  if (value.kind === 'dispatch') return decodeAiJobActionResponse({ schemaVersion: 'companion-icons-v1', dispatchAccepted: value.dispatchAccepted, workerResident: false, job: value.job,
+    ...(value.artifact === undefined ? {} : { artifact: value.artifact }) }, projectId, submission)
   if (value.kind === 'selection') return decodeAiJobActionResponse({ schemaVersion: 'companion-icons-v1', job: value.job }, projectId, submission)
   if (value.kind === 'variant') return decodeAiJobActionResponse({ schemaVersion: 'companion-icons-v1', ...value.receipt }, projectId, submission)
   throw shape()

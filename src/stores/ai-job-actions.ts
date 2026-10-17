@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { decodeAiJobSnapshot, verifyAiJobPreview } from '../domain/ai-jobs-read'
 import type { AiJobPreview, AiJobSnapshot, AiJobsReadProvider } from '../domain/ai-jobs-read'
 import { isAiProjectId } from '../domain/ai-resource-read'
-import { AiJobActionError, aiJobActionAllowed, aiJobActionCanonical, aiJobActionIdentityMatches, validateAiJobActionResult, validateAiJobActionSubmission } from '../domain/ai-job-actions'
+import { AiJobActionError, aiJobActionAllowed, aiJobActionCanonical, aiJobActionIdentityMatches, aiVariantDestination, validateAiJobActionResult, validateAiJobActionSubmission } from '../domain/ai-job-actions'
 import type { AiJobAction, AiJobActionSubmission, AiJobActionsProvider, AiJobVariantReceipt } from '../domain/ai-job-actions'
 import { AiWriteCoordinationError, aiWriteCoordinator, getAiWriteFenceStorage, hasPendingAiWrites, putAiWriteFence, readAiWriteFences, removeAiWriteFence } from '../domain/ai-write-coordination'
 import type { AiWriteCoordinator, AiWriteFence, AiWriteFenceStorage } from '../domain/ai-write-coordination'
@@ -86,7 +86,14 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
   function allowed(operation: AiJobAction): boolean {
     const target = binding.value
     return !!target?.provider && drainAvailable.value && !readDrainBlocked.value && (!observed.value || aiJobActionCanonical(observed.value) === aiJobActionCanonical(target.job)) && (operation !== 'import' || target.job.selectedIds.length === 1) && aiJobActionAllowed(operation, target.job, !generationEnabled.value)
+      && (operation !== 'import-variant' || variantMatchesCurrentJob())
       && !busy.value && !refreshing.value && !lane.locked && !storageBlocked.value && !hasPending.value
+  }
+  function variantMatchesCurrentJob(): boolean {
+    const receipt = variantReceipt.value, current = binding.value?.job
+    return !!receipt && !!current && /^[a-f0-9]{64}$/.test(receipt.receiptSha256 ?? '') && receipt.jobId === current.jobId && receipt.revision === current.revision
+      && current.selectedIds.length === 1 && current.selectedIds[0] === receipt.candidateId
+      && current.candidates.some(candidate => candidate.candidateId === receipt.candidateId && candidate.fileSha256 === receipt.sourceSha256)
   }
   function prepare(operation: AiJobAction, variantSize?: { width: number; height: number }): boolean {
     clearApproval(); updatePending()
@@ -106,6 +113,14 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
       const { width, height } = variantSize ?? sealed.config.iconSize
       needsUpscale = width > 1024 && height > 1024
       input = { ...base, candidateId: target.job.selectedIds[0]!, width, height, allowUpscale: needsUpscale, expectedTargetSha256: null, approved: true }
+    }
+    if (operation === 'import-variant') {
+      const receipt = variantReceipt.value
+      if (!receipt || !variantMatchesCurrentJob()) return false
+      try {
+        input = { ...base, candidateId: receipt.candidateId, width: receipt.width, height: receipt.height, destinationUrl: aiVariantDestination(target.job, receipt),
+          expectedVariantSha256: receipt.sha256, expectedReceiptSha256: receipt.receiptSha256!, approved: true }
+      } catch { message.value = new AiJobActionError('invalid-input', 'not-sent').message; return false }
     }
     try {
       const submission = validateAiJobActionSubmission(target.project.id, { operation, input, snapshot: target.job, approved: true })
@@ -129,6 +144,12 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
         || fence.requestHash !== snapshot.requestHash || fence.sourceRevision !== snapshot.sourceRevision || snapshot.revision <= fence.revision) continue
       // Revision advancement alone cannot prove an unresolved import finished or did not write.
       if (fence.operation === 'import' && !(snapshot.state === 'imported_pending_verification' && snapshot.import?.state === 'imported_pending_verification' && snapshot.import.effectApplied === true && snapshot.import.leaseState === 'RELEASED')) continue
+      if (fence.operation === 'import-variant') {
+        const imported = snapshot.variantImport, artifact = imported?.artifact
+        if (!fence.variant || !imported || imported.active || imported.state !== 'imported_pending_verification' || imported.effectApplied !== true || imported.leaseState !== 'RELEASED' || !artifact
+          || artifact.candidateId !== fence.variant.candidateId || artifact.width !== fence.variant.width || artifact.height !== fence.variant.height
+          || artifact.fileSha256 !== fence.variant.fileSha256 || artifact.receiptSha256 !== fence.variant.receiptSha256 || artifact.destinationUrl !== fence.variant.destinationUrl) continue
+      }
       if (fence.operation === 'select' && snapshot.state !== 'selected') continue
       if (['run-next', 'resume'].includes(fence.operation) && ['queued', 'waiting_service', 'import_unknown'].includes(snapshot.state)) continue
       removeAiWriteFence(getStorage(), fence.key)
@@ -191,9 +212,11 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
     dispatchStarted = false; busy.value = true; phase.value = 'sending'; message.value = ''; clearApproval()
     let sent = false, success = false, shouldRefresh = false, clearFenceAfterDrain = false
     const abort = new AbortController(); controller = abort
-    const base = approved.submission, variant = base.operation === 'export-variant' ? base.input as { candidateId: string; width: number; height: number } : null
+    const base = approved.submission, variant = ['export-variant', 'import-variant'].includes(base.operation) ? base.input as { candidateId: string; width: number; height: number } : null
     const fence: AiWriteFence = { key: `${target.project.id}/${target.job.jobId}/${base.operation}/${target.job.revision}${variant ? `/${variant.candidateId}/${variant.width}x${variant.height}` : ''}`,
       projectId: target.project.id, jobId: target.job.jobId, operation: base.operation, revision: target.job.revision, requestHash: target.job.requestHash, sourceRevision: target.job.sourceRevision }
+    if (base.operation === 'import-variant' && 'expectedVariantSha256' in base.input) fence.variant = { candidateId: base.input.candidateId, width: base.input.width, height: base.input.height,
+      fileSha256: base.input.expectedVariantSha256, receiptSha256: base.input.expectedReceiptSha256, destinationUrl: base.input.destinationUrl }
     const current = () => binding.value === target && epoch === token
     try {
       const locked = await coordinator.run(async () => {

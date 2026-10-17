@@ -7,8 +7,9 @@ export const AI_WRITE_FENCE_KEY = 'companion-next.ai-write-fences.v1'
 export interface AiWriteFenceStorage { getItem(key: string): string | null; setItem(key: string, value: string): void }
 export interface AiWriteFence {
   key: string; projectId: string; jobId: string
-  operation: 'run-next' | 'resume' | 'select' | 'import' | 'export-variant' | 'enqueue' | 'adopt'
+  operation: 'run-next' | 'resume' | 'select' | 'import' | 'export-variant' | 'import-variant' | 'enqueue' | 'adopt'
   revision: number; requestHash: string | null; sourceRevision: string
+  variant?: { candidateId: string; width: number; height: number; fileSha256: string; receiptSha256: string; destinationUrl: string }
 }
 export type AiWriteLockResult<T> = { acquired: false } | { acquired: true; value: T }
 export interface AiWriteCoordinator { run<T>(work: () => Promise<T>): Promise<AiWriteLockResult<T>> }
@@ -18,15 +19,28 @@ export class AiWriteCoordinationError extends Error {
 const limit = 64 * 1024, maxRecords = 100
 const fields = ['key', 'projectId', 'jobId', 'operation', 'revision', 'requestHash', 'sourceRevision']
 function check(value: unknown): AiWriteFence {
-  if (!value || typeof value !== 'object' || Array.isArray(value) || Reflect.ownKeys(value).length !== fields.length
-    || fields.some(field => !Object.hasOwn(value, field)) || Reflect.ownKeys(value).some(key => typeof key !== 'string' || !fields.includes(key))) throw new AiWriteCoordinationError()
+  if (!value || typeof value !== 'object' || Array.isArray(value)
+    || fields.some(field => !Object.hasOwn(value, field)) || Reflect.ownKeys(value).some(key => typeof key !== 'string' || ![...fields, 'variant'].includes(key))) throw new AiWriteCoordinationError()
   const raw = value as Record<string, unknown>, create = raw.operation === 'enqueue' || raw.operation === 'adopt'
   if (typeof raw.key !== 'string' || raw.key.length < 1 || raw.key.length > 300 || !/^[A-Za-z0-9:/._-]+$/.test(raw.key)
-    || !isAiProjectId(raw.projectId) || !isAiJobId(raw.jobId) || !['run-next', 'resume', 'select', 'import', 'export-variant', 'enqueue', 'adopt'].includes(raw.operation as string)
+    || !isAiProjectId(raw.projectId) || !isAiJobId(raw.jobId) || !['run-next', 'resume', 'select', 'import', 'export-variant', 'import-variant', 'enqueue', 'adopt'].includes(raw.operation as string)
     || typeof raw.revision !== 'number' || !Number.isSafeInteger(raw.revision) || (create ? raw.revision !== 0 : raw.revision < 1)
     || !(raw.requestHash === null && create || typeof raw.requestHash === 'string' && /^[a-f0-9]{64}$/.test(raw.requestHash))
     || typeof raw.sourceRevision !== 'string' || !/^[a-f0-9]{40}$/.test(raw.sourceRevision)) throw new AiWriteCoordinationError()
-  return { key: raw.key, projectId: raw.projectId, jobId: raw.jobId, operation: raw.operation as AiWriteFence['operation'], revision: raw.revision, requestHash: raw.requestHash as string | null, sourceRevision: raw.sourceRevision }
+  let variant: AiWriteFence['variant']
+  if (raw.operation === 'import-variant') {
+    const item = raw.variant as Record<string, unknown> | undefined
+    if (!item || typeof item !== 'object' || Array.isArray(item) || Reflect.ownKeys(item).length !== 6
+      || typeof item.candidateId !== 'string' || !/^CANDIDATE-[a-z0-9-]+-1$/.test(item.candidateId)
+      || typeof item.width !== 'number' || typeof item.height !== 'number' || !Number.isInteger(item.width) || !Number.isInteger(item.height)
+      || item.width < 1 || item.height < 1 || item.width > 4096 || item.height > 4096 || item.width * item.height > 16_000_000
+      || typeof item.fileSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(item.fileSha256) || typeof item.receiptSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(item.receiptSha256)
+      || typeof item.destinationUrl !== 'string' || !/^db:\/\/assets\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+\.png$/.test(item.destinationUrl)
+      || item.destinationUrl.split('/').some(part => part === '.' || part === '..')) throw new AiWriteCoordinationError()
+    variant = { candidateId: item.candidateId, width: item.width, height: item.height, fileSha256: item.fileSha256, receiptSha256: item.receiptSha256, destinationUrl: item.destinationUrl }
+  } else if (Object.hasOwn(raw, 'variant')) throw new AiWriteCoordinationError()
+  return { key: raw.key, projectId: raw.projectId, jobId: raw.jobId, operation: raw.operation as AiWriteFence['operation'], revision: raw.revision, requestHash: raw.requestHash as string | null, sourceRevision: raw.sourceRevision,
+    ...(variant ? { variant } : {}) }
 }
 export function readAiWriteFences(storage: AiWriteFenceStorage): AiWriteFence[] {
   try {

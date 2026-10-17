@@ -28,7 +28,7 @@ async function readCreatedTask(input: { snapshot: import('../domain/ai-jobs-read
   if (current() && store.history?.jobs.some(job => job.jobId === input.snapshot.jobId)) store.selectJob(input.snapshot.jobId)
 }
 defineExpose({ readCreatedTask })
-const actionsByStep: Record<number, readonly AiJobAction[]> = { 1: [], 2: [], 3: ['run-next', 'resume'], 4: ['select', 'export-variant'], 5: ['import', 'export-variant'], 6: [] }
+const actionsByStep: Record<number, readonly AiJobAction[]> = { 1: [], 2: [], 3: ['run-next', 'resume'], 4: ['select', 'export-variant', 'import-variant'], 5: ['import', 'export-variant', 'import-variant'], 6: [] }
 const allowedOperations = computed(() => props.workflowStep === undefined ? undefined : actionsByStep[props.workflowStep] ?? [])
 const uncertain = computed(() => store.status && ['unknown', 'import_unknown'].includes(store.status.state))
 onBeforeUnmount(() => store.disconnect())
@@ -70,6 +70,8 @@ onBeforeUnmount(() => store.disconnect())
       <h4>原任务目标</h4><ul><li v-for="asset in store.status.assets" :key="asset.assetId">{{ asset.assetId }} · {{ asset.relativePath }}</li></ul>
       <section v-if="store.status.variantImport" class="job-variant-import" data-testid="job-variant-import">
         <h4>变体导入回执摘要</h4>
+        <p v-if="store.status.variantImport.artifact && store.status.variantImport.state === 'imported_pending_verification' && store.status.variantImport.effectApplied === true && store.status.variantImport.leaseState === 'RELEASED' && !store.status.variantImport.active" role="status">尺寸变体文件已导入当前工程，租约已释放。场景与运行验收尚未据此确认。</p>
+        <p v-else role="status">尺寸变体导入尚未确认完成；只刷新同一原任务，不重复导入。</p>
         <p>母图任务状态与变体导入状态分别保留。此任务已有变体导入记录，页面写操作已暂停；请核对同一原操作。</p>
         <dl class="job-identity"><dt>原操作</dt><dd>{{ store.status.variantImport.operationId }}</dd><dt>变体状态</dt><dd>{{ store.status.variantImport.state }}</dd><dt>写入效果</dt><dd>{{ String(store.status.variantImport.effectApplied) }}</dd><dt>租约</dt><dd>{{ store.status.variantImport.leaseState }}</dd><dt>活动中</dt><dd>{{ String(store.status.variantImport.active) }}</dd><dt>错误码</dt><dd>{{ store.status.variantImport.errorCode ?? '无返回错误码' }}</dd></dl>
         <dl v-if="store.status.variantImport.artifact" class="job-identity"><dt>目标</dt><dd>{{ store.status.variantImport.artifact.destinationUrl }}</dd><dt>变体尺寸</dt><dd>{{ store.status.variantImport.artifact.width }} × {{ store.status.variantImport.artifact.height }}</dd><dt>文件 SHA-256</dt><dd>{{ store.status.variantImport.artifact.fileSha256 }}</dd><dt>收据 SHA-256</dt><dd>{{ store.status.variantImport.artifact.receiptSha256 }}</dd><dt>原候选</dt><dd>{{ store.status.variantImport.artifact.candidateId }}</dd></dl>

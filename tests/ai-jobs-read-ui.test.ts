@@ -50,7 +50,7 @@ describe('verified read-to-action DOM handoff', () => {
   })
   it('restricts original operations to their existing resource stage and does not write while switching', async () => {
     const p = provider(), w = writer(); aiJobActionsProvider.value = w; setup(p); await select()
-    for (const [step, operations] of [[3, ['run-next','resume']], [4, ['select','export-variant']], [5, ['import','export-variant']], [6, []]] as const) {
+    for (const [step, operations] of [[3, ['run-next','resume']], [4, ['select','export-variant','import-variant']], [5, ['import','export-variant','import-variant']], [6, []]] as const) {
       await wrapper!.setProps({ workflowStep: step })
       expect(wrapper!.getComponent({ name: 'AiJobActionsPanel' }).props('allowedOperations')).toEqual(operations)
     }

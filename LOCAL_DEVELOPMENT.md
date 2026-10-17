@@ -1,5 +1,7 @@
 # Windows本地开发交接
 
+2026-10-17 新增尺寸变体入口：按 Owner 07:28:12 UTC 批准，仅在新 Next 尺寸回执旁接入原 import-variant，不改旧 UI、生命周期或后端。文件/收据双 SHA、工程/版本、新目标确认及跨页未知保护已实现；本地部署与新隔离真实导入证据随后记录于[本次计划和交付](docs/variant-ui-import-20261017.md)。原服务保持 Node25，不上传文件。
+
 2026-10-17 05:40 UTC：原独立新任务已真实完成Next采用/选图/CPU96导出/1024母图导入，各写一次；r6、effectApplied=true、租约RELEASED，资产及meta回读一致，账本SUCCEEDED/TERMINAL/fence9。Creator/Edge/全部自有端口关闭，累计381.067/1800秒、active=null。任务原sourceRevision仍a2ff18a，资产检查点e182b6b/0.1.0.11后仅读历史，未改任务；原settings、旧成功资源与冻结记录保持。运行Next仍caf14fb/1.3.173.18，无业务源码/部署变化；不新增变体导入UI，productionVerified固定false。实际步骤、本地回执/截图及误上传撤回记录见[本轮交付](docs/variant-ui-followup-20261017.md)；下列旧记录保留各自时间。
 
 2026-10-17 变体摘要本地增量：代码 `c3b1fd1a8adf27c21018ff314e01eb666305d378` / `1.3.173.16`，936 项受影响测试、类型和 workspace 构建通过；未部署。真实 Next 资源页正确选中隔离工程，但原 jobs/status 因 Studio adopted exact-HEAD 合同返回409，完整 UI 尚未通过；变体 PNG 字节接口也待协调。既有 Preview/Profiler/Build 证据及 Library 截图 ID、GPU 待排 Smoke、精确 Owner 文件清单见[本轮交接](docs/variant-ui-followup-20261017.md)。
