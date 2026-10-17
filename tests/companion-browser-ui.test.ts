@@ -54,6 +54,13 @@ describe('Companion read UI and host identity',()=>{
   expect(router.currentRoute.value.query.tab).toBe('calls');expect(wrapper!.text()).toContain('本次查询没有匹配调用');expect(p.loadCalls).toHaveBeenCalledTimes(1);expect(p.loadCalls).toHaveBeenCalledWith('p1',{failed:false},expect.any(AbortSignal))
   expect(wrapper!.text()).not.toContain('不执行或重放');expect(await tip('调用记录说明')).toContain('不执行或重放工具调用')
  })
+ it('opens the exact project history from its recent-call summary without replaying',async()=>{
+  const p=fixture();vi.mocked(p.loadCounts).mockResolvedValue({sessionId:'s1',counts:{p1:0,p2:1},latest:{p2:{id:'r2',operationNameZh:'读取场景',startedAt:'2026-10-17T00:00:00Z',status:'success'}}})
+  registerCompanionBrowserProvider(p);const {store,router}=await setup();await store.connect(p);await flushPromises()
+  const summary=wrapper!.get('button.project-call-summary');expect(summary.attributes('type')).toBe('button');expect(summary.attributes('aria-label')).toBe('查看 未读状态 的调用记录');expect(summary.text()).toContain('读取场景')
+  expect(p.loadCalls).not.toHaveBeenCalled();expect(wrapper!.findAll('button.project-call-summary')).toHaveLength(1)
+  await summary.trigger('click');await flushPromises();expect(router.currentRoute.value.query.tab).toBe('calls');expect(store.callProjectId).toBe('p2');expect(p.loadCalls).toHaveBeenCalledExactlyOnceWith('p2',{failed:false},expect.any(AbortSignal))
+ })
  it('retains actual call pagination while moving capacity limits into an accessible tip',async()=>{
   const p=fixture();vi.mocked(p.loadCalls).mockResolvedValueOnce({sessionId:'s1',total:80,retained:80,nextBefore:31,records:[]}).mockResolvedValueOnce({sessionId:'s1',total:80,retained:80,records:[]})
   registerCompanionBrowserProvider(p);await setup();await button('连接 Companion').trigger('click');await flushPromises();await button('查看调用记录').trigger('click');await flushPromises()
