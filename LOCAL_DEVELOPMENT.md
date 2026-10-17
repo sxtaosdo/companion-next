@@ -1,5 +1,7 @@
 # Windows本地开发交接
 
+2026-10-17 a8813ac/.44工具范围入口已部署验收，证据C:/Users/33272/AppData/Local/Temp/companion-project-tool-scope-20261017/browser-proof.json及final-protection.json。无生产配置写入，Next检查点与部署源分别记录。
+
 2026-10-17 接入完成示例d982a34/.42已部署；本次接续工程工具范围入口，不启动Creator/模型或写客户端配置，使用现有32180/PID2100，保护共享22项修改。详见docs/project-tool-scope-entry-20261017.md。
 
 2026-10-17 日志切片最终部署9a6e952/.35：先备份26旧资源、保留hash、最后原子切换index，六HTTP SHA与独立认证Edge通过。清除只测隔离数据，生产DELETE0；真实诊断一次/583B仅存Temp本机。PID4092/epoch、22dirty及用户窗口保持，无新监听/Creator/模型/客户端配置。代码与文档HEAD分开，详见[本轮交付](docs/log-tools-20261017.md)。

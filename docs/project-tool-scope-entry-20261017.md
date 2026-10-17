@@ -16,3 +16,12 @@
 独立只读review发现并关闭两项竞态：移除project参数时先取消读取；手动范围读取/预览撤销自动后续读取。另补全局登记provider绑定，替换来源不继承旧登记。单worker定向回归及strict检查按最终结果记录，生产接口由后续部署回读与隔离Edge验证。外部OCR因可能联网传源码被自动审批拒绝，未执行，不声称通过。
 
 最终4文件70项单worker定向回归通过，strict类型检查通过；静态56项中55通过、1 Windows大小写碰撞fixture跳过。初始fixture缺少原内置中文预设名称导致验证失败，已修正；严格类型检查另补Promise泛型。增加注册来源绑定后按实际变更再构建一次，最终workspace构建通过（保留既有chunk体积提示），未进行并行压力构建。两轮独立只读复核未发现剩余具体问题。最终源提交后才执行部署，当前本记录不冒充已部署验收。
+
+
+## 部署与浏览器验收
+
+源a8813ac / 1.3.173.44已通过既定静态流程部署；先备份34旧文件，仅新增JS/CSS并原子切换index，旧hash资源保留。独立官方认证Edge验证六文件HTTP SHA全匹配。鼠标打开工程A与键盘Enter打开工程B分别精确带project参数，每次各1次目录GET和对应范围GET，总4次隔离读取；普通帮助/非法工程不读默认范围，页面错误0、意外接口0、生产业务写入0。初次浏览器脚本把ElSelect搜索input值当选中标签，误判失败；改查实际可见标签后通过，未重复发布。截图tool-scope.png已查看。
+
+证据根C:/Users/33272/AppData/Local/Temp/companion-project-tool-scope-20261017：deployment-result.json、browser-proof.json、final-protection.json。运行PID2100/startupEpoch/OPEN保持，无服务重启；共享22项head/status/binary diff/dirty文件SHA及daemon字节最终一致。用户窗口未操作，独立浏览器已关闭。
+
+业务页产品版本仍1.3.173；文档检查点不是新构建。下一目标仍为旧Companion全对齐：Preview/Profiler入口尚缺，真实运行验证受不启动Creator限制；严格部分安装需先核旧任务复用/选项合同；五客户端配置缺少可验证读取合同；Agent/同步、图片owner字节闭环未完成，模型工作继续暂停。
