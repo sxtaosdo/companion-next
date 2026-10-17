@@ -25,6 +25,7 @@ export interface AiJobSnapshot {
   resourceSnapshot?: AiJobResourceSnapshot
   productAcceptance?: AiJobProductAcceptance
   variantImport?: AiJobVariantImport
+  historyOnly?: { reason: 'SOURCE_REVISION_CHANGED'; currentSourceRevision: string }
 }
 export interface AiJobsView {
   schemaVersion: 'companion-icons-v1'; projectId: string; sourceRevision: string; jobs: AiJobSnapshot[]
@@ -32,6 +33,8 @@ export interface AiJobsView {
   schedulerEnabled: false; workerResident: false
 }
 export interface AiJobPreview { candidateId: string; mimeType: 'image/png'; base64: string; sha256: string; width: 1024; height: 1024 }
+export interface AiPngPreview { candidateId: string; mimeType: 'image/png'; base64: string; sha256: string; width: number; height: number }
+export interface AiVariantPreview extends AiPngPreview { operationId: string; receiptSha256: string }
 export interface AiJobsReadProvider {
   readonly label: string
   /** Optional for standalone reads; mutation pipelines require tracked I/O drainage. */
@@ -39,8 +42,9 @@ export interface AiJobsReadProvider {
   readJobs(projectId: string, signal?: AbortSignal): Promise<AiJobsView>
   readStatus(projectId: string, jobId: string, signal?: AbortSignal): Promise<AiJobSnapshot>
   previewCandidate(projectId: string, jobId: string, candidate: AiJobCandidate, signal?: AbortSignal): Promise<AiJobPreview>
+  previewVariant?(projectId: string, job: AiJobSnapshot, signal?: AbortSignal): Promise<AiVariantPreview>
 }
-export type AiJobsReadEndpoint = 'jobs' | 'status' | 'candidate'
+export type AiJobsReadEndpoint = 'jobs' | 'status' | 'candidate' | 'variant-preview'
 export type AiJobsReadCode = 'unauthorized' | 'forbidden' | 'timeout' | 'aborted' | 'invalid-shape' | 'response-too-large' | 'http-error' | 'network-error' | 'invalid-query' | 'busy' | 'verification-unavailable'
 const messages: Record<AiJobsReadCode, string> = {
   unauthorized: '需要已有的 Companion 会话（401）。', forbidden: 'Companion 拒绝任务读取（403），请核对已有会话与同源部署。',
@@ -51,6 +55,9 @@ const messages: Record<AiJobsReadCode, string> = {
   'verification-unavailable': '当前环境无法校验候选 SHA-256，未显示图片。',
 }
 export const AI_JOBS_BACKEND_ERRORS = {
+  HISTORY_READ_ONLY: { status: 409, message: '此任务绑定旧工程版本，仅可查看历史；没有重新执行或改写任务。' },
+  VARIANT_PROVENANCE_UNAVAILABLE: { status: 409, message: '变体文件或收据未通过来源校验，未显示图像。' },
+  VARIANT_BINDING_MISMATCH: { status: 409, message: '变体与原任务绑定不一致，未显示图像。' },
   REVISION_MISMATCH: { status: 409, message: '原后台因工程版本变化拒绝读取旧任务；需修复只读历史合同，未改写任务或重试导入。' },
   ICON_ADAPTER_DISABLED: { status: 503, message: '原图标任务后端未启用或可信配置不完整；未启动或补装任何服务。' },
   ICON_CONFIG_INVALID: { status: 503, message: '原图标任务后端配置无效，请核对原后台配置。' },
@@ -125,6 +132,12 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
   try { if (raw.resourceSnapshot !== undefined) resourceSnapshot = decodeAiJobResourceSnapshot(raw.resourceSnapshot, projectId) } catch { throw invalid() }
   const importReceipt = decodeImport(raw.import)
   const variantImport = raw.variantImport === undefined ? undefined : decodeVariantImport(raw.variantImport, candidates, selectedIds)
+  let historyOnly: AiJobSnapshot['historyOnly']
+  if (raw.historyOnly !== undefined) {
+    const history = record(raw.historyOnly), currentSourceRevision = pattern(history.currentSourceRevision, revision, 40)
+    if (history.reason !== 'SOURCE_REVISION_CHANGED' || currentSourceRevision === raw.sourceRevision) throw invalid()
+    historyOnly = { reason: 'SOURCE_REVISION_CHANGED', currentSourceRevision }
+  }
   let productAcceptance: AiJobProductAcceptance | undefined
   try {
     if (raw.productAcceptance !== undefined) productAcceptance = decodeAiJobProductAcceptance(raw.productAcceptance)
@@ -137,7 +150,7 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
     ...(raw.mode !== undefined ? { mode: member(raw.mode, ['generation', 'offline_import_only'] as const) } : {}),
     ...(raw.origin !== undefined ? { origin: member(raw.origin, ['generated', 'adopted'] as const) } : {}),
     ...(raw.errorCode !== undefined ? { errorCode: raw.errorCode === null ? null : pattern(raw.errorCode, errorCode, 80) } : {}),
-    ...(resourceSnapshot ? { resourceSnapshot } : {}), ...(productAcceptance ? { productAcceptance } : {}), ...(variantImport ? { variantImport } : {}) }
+    ...(resourceSnapshot ? { resourceSnapshot } : {}), ...(productAcceptance ? { productAcceptance } : {}), ...(variantImport ? { variantImport } : {}), ...(historyOnly ? { historyOnly } : {}) }
 }
 export function decodeAiJobsView(value: unknown, projectId: string): AiJobsView {
   const raw = record(value), profile = record(raw.profile)
@@ -158,14 +171,16 @@ export function decodeAiJobStatus(value: unknown, projectId: string, jobId: stri
 const crcTable = Array.from({ length: 256 }, (_, value) => { let crc = value; for (let bit = 0; bit < 8; bit++) crc = (crc >>> 1) ^ ((crc & 1) ? 0xedb88320 : 0); return crc >>> 0 })
 function crc32(bytes: Uint8Array, start: number, end: number) { let crc = 0xffffffff; for (let i = start; i < end; i++) crc = crcTable[(crc ^ bytes[i]!) & 255]! ^ (crc >>> 8); return (crc ^ 0xffffffff) >>> 0 }
 /** Fixed PNG content, never a URL or path. SHA and dimensions are pinned to the selected snapshot. */
-export async function verifyAiJobPreview(value: unknown, candidate: AiJobCandidate): Promise<AiJobPreview> {
-  const expected = decodeAiJobCandidate(candidate), raw = record(value)
+export async function verifyAiPngPreview(value: unknown, expected: { candidateId: string; fileSha256: string; width: number; height: number }, endpoint: AiJobsReadEndpoint = 'candidate'): Promise<AiPngPreview> {
+  const raw = record(value)
+  if (!sha.test(expected.fileSha256) || !Number.isInteger(expected.width) || !Number.isInteger(expected.height) || expected.width < 1 || expected.height < 1
+    || expected.width > 4096 || expected.height > 4096 || expected.width * expected.height > 16_000_000) throw invalid()
   if (!isAiCandidateId(expected.candidateId) || (raw.schemaVersion !== undefined && raw.schemaVersion !== 'companion-icons-v1') || raw.candidateId !== expected.candidateId || raw.mimeType !== 'image/png') throw invalid()
   const base64 = text(raw.base64, AI_JOBS_READ_LIMITS.maxBase64Length)
   if (base64.length < 76 || base64.length % 4 !== 0 || !/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) throw invalid()
   let binary: string
   try { binary = atob(base64); if (btoa(binary) !== base64) throw invalid() } catch { throw invalid() }
-  if (binary.length > AI_JOBS_READ_LIMITS.maxCandidateBytes) throw new AiJobsReadError('response-too-large', 'candidate')
+  if (binary.length > AI_JOBS_READ_LIMITS.maxCandidateBytes) throw new AiJobsReadError('response-too-large', endpoint)
   const bytes = Uint8Array.from(binary, char => char.charCodeAt(0)), view = new DataView(bytes.buffer)
   if (![137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => bytes[index] === byte)) throw invalid()
   let offset = 8, count = 0, idat = false, ended = false, afterIdat = false
@@ -174,7 +189,7 @@ export async function verifyAiJobPreview(value: unknown, candidate: AiJobCandida
     const size = view.getUint32(offset), end = offset + 12 + size, type = String.fromCharCode(...bytes.subarray(offset + 4, offset + 8))
     if (end > bytes.length || crc32(bytes, offset + 4, end - 4) !== view.getUint32(end - 4)) throw invalid()
     if (count === 1) {
-      if (type !== 'IHDR' || size !== 13 || view.getUint32(offset + 8) !== 1024 || view.getUint32(offset + 12) !== 1024
+      if (type !== 'IHDR' || size !== 13 || view.getUint32(offset + 8) !== expected.width || view.getUint32(offset + 12) !== expected.height
         || bytes[offset + 16] !== 8 || bytes[offset + 17] !== 6 || bytes[offset + 18] !== 0 || bytes[offset + 19] !== 0 || bytes[offset + 20] !== 0) throw invalid()
     } else if (type === 'IDAT') { if (afterIdat || size === 0) throw invalid(); idat = true }
     else if (type === 'IEND') { if (!idat || size !== 0 || end !== bytes.length) throw invalid(); ended = true }
@@ -184,12 +199,24 @@ export async function verifyAiJobPreview(value: unknown, candidate: AiJobCandida
     offset = end
   }
   if (!ended) throw invalid()
-  if (!globalThis.crypto?.subtle) throw new AiJobsReadError('verification-unavailable', 'candidate')
+  if (!globalThis.crypto?.subtle) throw new AiJobsReadError('verification-unavailable', endpoint)
   let digest: ArrayBuffer
-  try { digest = await globalThis.crypto.subtle.digest('SHA-256', bytes) } catch { throw new AiJobsReadError('verification-unavailable', 'candidate') }
+  try { digest = await globalThis.crypto.subtle.digest('SHA-256', bytes) } catch { throw new AiJobsReadError('verification-unavailable', endpoint) }
   const actual = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
   if (actual !== expected.fileSha256) throw invalid()
-  return { candidateId: expected.candidateId, mimeType: 'image/png', base64, sha256: actual, width: 1024, height: 1024 }
+  return { candidateId: expected.candidateId, mimeType: 'image/png', base64, sha256: actual, width: expected.width, height: expected.height }
+}
+export async function verifyAiJobPreview(value: unknown, candidate: AiJobCandidate): Promise<AiJobPreview> {
+  return { ...await verifyAiPngPreview(value, decodeAiJobCandidate(candidate)), width: 1024, height: 1024 }
+}
+export async function verifyAiVariantPreview(value: unknown, job: AiJobSnapshot): Promise<AiVariantPreview> {
+  const expected = job.variantImport, artifact = expected?.artifact, raw = record(value), preview = record(raw.preview)
+  const mother = job.candidates.find(row => row.candidateId === artifact?.candidateId)
+  if (!expected || !artifact || !mother || raw.schemaVersion !== 'companion-icons-v1' || raw.projectId !== job.projectId || raw.jobId !== job.jobId
+    || raw.operationId !== expected.operationId || preview.sha256 !== artifact.fileSha256 || preview.receiptSha256 !== artifact.receiptSha256 || preview.sourceSha256 !== mother.fileSha256
+    || preview.width !== artifact.width || preview.height !== artifact.height) throw invalid()
+  const checked = await verifyAiPngPreview(preview, { candidateId: artifact.candidateId, fileSha256: artifact.fileSha256, width: artifact.width, height: artifact.height }, 'variant-preview')
+  return { ...checked, operationId: expected.operationId, receiptSha256: artifact.receiptSha256 }
 }
 export const AI_JOB_STATE_LABELS: Record<AiJobState, string> = {
   queued: '已入队', waiting_service: '等待服务', running: '任务执行中', unknown: '生成结果未知', failed: '任务失败', reusable: '发现可复用内容',

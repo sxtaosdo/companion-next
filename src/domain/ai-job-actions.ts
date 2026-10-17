@@ -59,7 +59,7 @@ export function aiJobActionIdentityMatches(a: AiJobSnapshot, b: AiJobSnapshot): 
 }
 export function aiJobActionAllowed(operation: AiJobAction, job: AiJobSnapshot, offlineOnly = false): boolean {
   // The mother job can remain selected after a variant import. Preserve that separate binding.
-  if (job.variantImport !== undefined) return false
+  if (job.variantImport !== undefined || job.historyOnly !== undefined) return false
   if ((offlineOnly || job.mode === 'offline_import_only') && (operation === 'run-next' || operation === 'resume')) return false
   if (operation === 'run-next') return ['queued', 'waiting_service'].includes(job.state)
   if (operation === 'resume') return ['unknown', 'running'].includes(job.state)

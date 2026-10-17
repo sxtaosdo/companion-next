@@ -1,7 +1,7 @@
-import { AI_JOBS_BACKEND_ERRORS, AI_JOBS_READ_LIMITS, AiJobsReadError, decodeAiJobCandidate, decodeAiJobsView, decodeAiJobStatus, isAiJobId, isAiCandidateId, verifyAiJobPreview } from '../domain/ai-jobs-read'
+import { AI_JOBS_BACKEND_ERRORS, AI_JOBS_READ_LIMITS, AiJobsReadError, decodeAiJobCandidate, decodeAiJobsView, decodeAiJobStatus, decodeAiJobSnapshot, isAiJobId, isAiCandidateId, verifyAiJobPreview, verifyAiVariantPreview } from '../domain/ai-jobs-read'
 import { isAiProjectId } from '../domain/ai-resource-read'
 import type { AiJobsReadProvider, AiJobsReadEndpoint, AiJobsReadCode, AiJobsBackendCode } from '../domain/ai-jobs-read'
-export type AiJobsReadPath = `/api/icons/${string}/jobs` | `/api/icons/${string}/status` | `/api/icons/${string}/candidate`
+export type AiJobsReadPath = `/api/icons/${string}/jobs` | `/api/icons/${string}/status` | `/api/icons/${string}/candidate` | `/api/icons/${string}/variant-preview`
 export type AiJobsReadFetch = (input: AiJobsReadPath, init: RequestInit) => Promise<Response>
 function fail(code: AiJobsReadCode, endpoint: AiJobsReadEndpoint, status?: number) { return new AiJobsReadError(code, endpoint, status) }
 type Track = <T>(promise: Promise<T>) => Promise<T>
@@ -15,7 +15,7 @@ function abortable<T>(pending: Promise<T>, signal: AbortSignal, error: () => AiJ
   })
 }
 async function boundedJson(response: Response, endpoint: AiJobsReadEndpoint, signal: AbortSignal, abortError: () => AiJobsReadError, track: Track, maximum?: number) {
-  const limit = maximum ?? (endpoint === 'candidate' ? AI_JOBS_READ_LIMITS.maxCandidateJsonBytes : AI_JOBS_READ_LIMITS.maxJsonBytes)
+  const limit = maximum ?? (endpoint === 'candidate' || endpoint === 'variant-preview' ? AI_JOBS_READ_LIMITS.maxCandidateJsonBytes : AI_JOBS_READ_LIMITS.maxJsonBytes)
   const length = response.headers.get('content-length')
   if (length && /^\d+$/.test(length) && Number(length) > limit) { void track(discard(response)); throw fail('response-too-large', endpoint) }
   if (!response.body) throw fail('invalid-shape', endpoint)
@@ -116,6 +116,12 @@ export function createAiJobsReadProvider(options: { fetch: AiJobsReadFetch; time
         if (!value || typeof value !== 'object' || (value as Record<string, unknown>).schemaVersion !== 'companion-icons-v1') throw fail('invalid-shape', 'candidate')
         return verifyAiJobPreview(value, expected)
       }, signal)
+    },
+    async previewVariant(projectId, job, signal) {
+      let checked
+      try { checked = decodeAiJobSnapshot(job, projectId) } catch { throw fail('invalid-query', 'variant-preview') }
+      if (!checked.variantImport?.artifact) throw fail('invalid-query', 'variant-preview')
+      return read(projectId, 'variant-preview', { jobId: checked.jobId, operationId: checked.variantImport.operationId }, value => verifyAiVariantPreview(value, checked), signal)
     },
   } satisfies AiJobsReadProvider)
 }

@@ -25,7 +25,7 @@ describe('verified original jobs/status/candidate contract', () => {
   it('is passive and offers only three reads with fixed same-origin paths and exact methods/bodies', async () => {
     const image = await png(), value = job(); value.candidates[0]!.fileSha256 = image.sha256
     const fetch = vi.fn<AiJobsReadFetch>(async path => json(path.endsWith('/jobs') ? jobs() : path.endsWith('/status') ? { schemaVersion: 'companion-icons-v1', job: value } : { schemaVersion: 'companion-icons-v1', candidateId, mimeType: 'image/png', base64: image.base64 }))
-    const provider = createAiJobsReadProvider({ fetch }); expect(fetch).not.toHaveBeenCalled(); expect(Object.keys(provider).sort()).toEqual(['label', 'previewCandidate', 'readJobs', 'readStatus', 'waitForIdle'])
+    const provider = createAiJobsReadProvider({ fetch }); expect(fetch).not.toHaveBeenCalled(); expect(Object.keys(provider).sort()).toEqual(['label', 'previewCandidate', 'previewVariant', 'readJobs', 'readStatus', 'waitForIdle'])
     await provider.readJobs(id); await provider.waitForIdle!(); await provider.readStatus(id, jobId); expect((await provider.previewCandidate(id, jobId, value.candidates[0]!)).sha256).toBe(image.sha256)
     expect(fetch.mock.calls.map(([path]) => path)).toEqual([`/api/icons/${id}/jobs`, `/api/icons/${id}/status`, `/api/icons/${id}/candidate`])
     expect(fetch.mock.calls.map(([, init]) => [init.method, init.body])).toEqual([['GET', undefined], ['POST', JSON.stringify({ jobId })], ['POST', JSON.stringify({ jobId, candidateId })]])
