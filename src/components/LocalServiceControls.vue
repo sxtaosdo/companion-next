@@ -15,6 +15,7 @@ watch([localServiceOperationsProvider, knowledgeReadProvider, scope], () => stor
 watch(() => store.revision, () => { confirmed.value = false }, { flush: 'sync' })
 const receipt = computed(() => store.records.at(-1) ?? null)
 const canOpenKnowledge = computed(() => !props.modelsOnly && !!localServiceOperationsProvider.value && store.canRead && store.states?.knowledge?.running === true && store.states.knowledge.frameable === false)
+const canEmbedKnowledge = computed(() => !props.modelsOnly && route.query.tab !== 'models' && !!localServiceOperationsProvider.value && store.canRead && !store.blockedUnknown && store.states?.knowledge?.running === true && store.states.knowledge.frameable === true)
 const receiptLabel = computed(() => { const action = receipt.value?.action === 'start' ? '启动' : '关闭'; return { sending: `等待${action}回执`, acknowledged: `已收到${action}回执`, 'not-dispatched': '未发出', rejected: '明确拒绝', 'reported-failure': `后台报告未${action}`, unknown: '结果未知' } })
 function prepare(service: LocalService, action: LocalServiceAction = 'stop') { confirmed.value = false; store.prepare(service, action) }
 async function execute() { const prepared = store.prepared; if (prepared && confirmed.value) await store.execute(prepared, confirmed.value); confirmed.value = false }
@@ -42,6 +43,7 @@ onBeforeUnmount(() => store.leave())
     <el-alert v-if="store.error" type="warning" :closable="false" :title="store.error"/>
     <p v-if="store.transportPending" role="status">底层服务请求尚未结束，其他启停请求已阻止。停止等待或离开页面不会撤销后台操作。</p>
     <el-button v-if="store.busy" @click="store.cancel">{{ receipt?.action==='start'?'停止等待启动回执':'停止等待关闭回执' }}</el-button>
+    <iframe v-if="canEmbedKnowledge" class="knowledge-service-frame" src="http://127.0.0.1:8081/" title="本机知识库" referrerpolicy="no-referrer"></iframe>
     <section v-if="store.prepared" class="service-confirm" :aria-label="`本次服务${store.prepared.action==='start'?'启动':'关闭'}确认`">
       <h4>尚未发送：{{ store.prepared.action==='start'?'启动':'关闭' }}{{ localServiceLabel(store.prepared.service) }}</h4>
       <p>来源：{{ store.prepared.providerLabel }}</p><p>{{ store.prepared.impact }}</p>
@@ -51,9 +53,9 @@ onBeforeUnmount(() => store.leave())
     <div v-if="receipt" class="service-receipt" aria-live="polite">
       <strong>{{ localServiceLabel(receipt.service) }} · {{ receiptLabel[receipt.status] }}</strong><span v-if="receipt.detached"> · 原页面 / 来源回执</span><p>{{ receipt.message }}</p>
     </div>
-    <small>状态与回执仅保留在当前应用内存；知识服务不能内嵌时提供原固定地址的外开入口，不会自动打开后台或重试。</small>
+    <small>状态与回执仅保留在当前应用内存；知识服务已运行且允许内嵌时显示原固定地址的管理页；不能内嵌时保留外开入口。进入页面不自动读取状态、启停或重试。</small>
   </section>
 </template>
 <style scoped>
-.local-service-controls{margin:16px 0}.local-service-controls p{line-height:1.7;overflow-wrap:anywhere}.service-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}.service-card{border:1px solid #e2e7ef;border-radius:8px;padding:14px;margin:12px 0}.service-card h4{margin:0}.service-receipt{margin:14px 0}.service-confirm{padding:16px;border:1px solid #eac88e;background:#fff9ef;border-radius:8px;margin:16px 0}.service-confirm .el-button{display:block;margin-top:12px}.local-service-controls :deep(.el-checkbox){height:auto;align-items:flex-start;max-width:100%}.local-service-controls :deep(.el-checkbox__label){white-space:normal;line-height:1.6}
+.knowledge-service-frame{display:block;width:100%;height:min(820px,calc(100vh - 220px));min-height:480px;border:1px solid var(--el-border-color);border-radius:8px;background:#fff;margin:12px 0}.local-service-controls{margin:16px 0}.local-service-controls p{line-height:1.7;overflow-wrap:anywhere}.service-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}.service-card{border:1px solid #e2e7ef;border-radius:8px;padding:14px;margin:12px 0}.service-card h4{margin:0}.service-receipt{margin:14px 0}.service-confirm{padding:16px;border:1px solid #eac88e;background:#fff9ef;border-radius:8px;margin:16px 0}.service-confirm .el-button{display:block;margin-top:12px}.local-service-controls :deep(.el-checkbox){height:auto;align-items:flex-start;max-width:100%}.local-service-controls :deep(.el-checkbox__label){white-space:normal;line-height:1.6}
 </style>

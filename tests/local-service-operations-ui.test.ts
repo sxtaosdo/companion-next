@@ -52,6 +52,35 @@ describe('explicit service-control UI and source protection', () => {
     const { r } = await setup();vi.mocked(r.loadServiceStates).mockResolvedValue(states)
     await click('读取当前服务状态');expect(wrapper!.find('a').exists()).toBe(false)
   })
+  it('restores the fixed original knowledge iframe only after explicit running/frameable status', async () => {
+    const { r, p } = await setup()
+    vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: true }, model: { running: true }, warnings: [] })
+    expect(wrapper!.find('iframe').exists()).toBe(false)
+    await click('读取当前服务状态')
+    expect(wrapper!.get('iframe').attributes()).toMatchObject({ src: 'http://127.0.0.1:8081/', title: '本机知识库', referrerpolicy: 'no-referrer' })
+    expect(wrapper!.find('a').exists()).toBe(false);expect(p.run).not.toHaveBeenCalled();expect(r.status).not.toHaveBeenCalled()
+  })
+  it('detaches the knowledge iframe during refresh, failed reads and provider changes', async () => {
+    const { r } = await setup();const states={ knowledge: { running: true, frameable: true }, model: { running: true }, warnings: [] }
+    vi.mocked(r.loadServiceStates).mockResolvedValue(states);await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(true)
+    const pending=deferred<Awaited<ReturnType<typeof r.loadServiceStates>>>();vi.mocked(r.loadServiceStates).mockReturnValueOnce(pending.promise)
+    await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(false)
+    pending.reject(Error('isolated failed state'));await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false)
+    await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(true)
+    registerKnowledgeReadProvider(knowledgeFixture());await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false)
+  })
+  it('does not carry a running knowledge iframe into model navigation or service UNKNOWN', async () => {
+    const p=provider();vi.mocked(p.run).mockRejectedValue(new LocalServiceOperationError('network-error','unknown'))
+    const {r,router,store}=await setup({p});vi.mocked(r.loadServiceStates).mockResolvedValue({knowledge:{running:true,frameable:true},model:{running:true},warnings:[]})
+    await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(true)
+    await router.push('/knowledge?tab=models');await flushPromises();await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(false)
+    await router.push('/knowledge');await flushPromises();await stop('知识库服务');await click('读取当前服务状态')
+    expect(store.blockedUnknown).toBe(true);expect(wrapper!.find('iframe').exists()).toBe(false)
+  })
+  it.each([true, false])('never embeds model or missing write host when modelsOnly=%s', async modelsOnly => {
+    const {r}=await setup({modelsOnly,p:modelsOnly?undefined:null});vi.mocked(r.loadServiceStates).mockResolvedValue({knowledge:{running:true,frameable:true},model:{running:true},warnings:[]})
+    await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(false)
+  })
   it('does not turn the old model iframe into a new external-link capability', async () => {
     const { r, p } = await setup({ modelsOnly: true })
     vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
