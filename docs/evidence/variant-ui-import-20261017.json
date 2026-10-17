@@ -1,0 +1,1011 @@
+{
+  "schemaVersion": "next-variant-import-ui-acceptance-v1",
+  "recordedAtUtc": "2026-10-17T07:54:27.724466+00:00",
+  "authorization": {
+    "messageId": "Sentinel_a0ec1b9dbf9c8191ae555d737e8f2e12",
+    "confirmedAtUtc": "2026-10-17T07:28:12Z",
+    "scope": "new Companion size variant import current project button only"
+  },
+  "nextCodeAndDeployedSource": "3074d37e7b279b1c45c645d2ef7175549ef693ed",
+  "nextCodeCheckpoint": "1.3.173.25",
+  "nextProductVersion": "1.3.173",
+  "projectId": "a79f4915296f4091",
+  "jobId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+  "sourceRevisionAtImport": "796a233a424749ac0baecf5c7001a514ac8ef2d6",
+  "sourceRevisionMustNotRestampAfterEvidenceCommit": true,
+  "newTaskPostCounts": {
+    "adopt": 1,
+    "select": 1,
+    "export-variant": 1,
+    "import-variant": 1,
+    "import": 0
+  },
+  "oldTasksReplayed": false,
+  "realUi": {
+    "startedAt": "2026-10-17T07:50:50.279Z",
+    "projectId": "a79f4915296f4091",
+    "assetId": "coin-pouch-variant-ui-20261017",
+    "viewport": {
+      "width": 1440,
+      "height": 1080
+    },
+    "fakeApiResponses": false,
+    "browserGpuDisabled": true,
+    "productionVerified": false,
+    "jobId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+    "adoption": {
+      "schemaVersion": "companion-icons-v1",
+      "job": {
+        "projectId": "a79f4915296f4091",
+        "jobId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+        "revision": 2,
+        "state": "awaiting_selection",
+        "sourceRevision": "796a233a424749ac0baecf5c7001a514ac8ef2d6",
+        "requestHash": "34c7c632b41cddaf9a4b56c896e415c47a233292c66a2bee3e8c71dcc4917c2d",
+        "profile": "z-image-turbo-digital-asset-v1",
+        "budget": {
+          "maxAssets": 2,
+          "candidatesPerAsset": 1,
+          "submissionAttempts": 1
+        },
+        "createdAt": "2026-10-17T07:50:55.104Z",
+        "assets": [
+          {
+            "assetId": "coin-pouch-variant-ui-20261017",
+            "relativePath": "assets/art/coin-pouch-variant-ui-20261017.png"
+          }
+        ],
+        "candidates": [
+          {
+            "candidateId": "CANDIDATE-coin-pouch-variant-ui-20261017-adopt-1",
+            "assetId": "coin-pouch-variant-ui-20261017",
+            "fileSha256": "7100b11dd00bceb72147a606b1f048949a86f2ec3a9e253950fb3932ee83a756",
+            "width": 1024,
+            "height": 1024,
+            "hasAlpha": true
+          }
+        ],
+        "selectedIds": [],
+        "workerResident": false,
+        "productionVerified": false,
+        "mode": "offline_import_only",
+        "origin": "adopted",
+        "errorCode": null,
+        "import": null,
+        "resourceSnapshot": {
+          "state": "sealed",
+          "version": 1,
+          "hash": "785b88f4231076dc869957b865f9e615f6068fc4fc3f34c9519986a6d140b605",
+          "presetId": "default",
+          "config": {
+            "schemaVersion": "project-resource-config-v2",
+            "projectId": "a79f4915296f4091",
+            "version": 1,
+            "designResolution": {
+              "width": 750,
+              "height": 1334
+            },
+            "orientation": "portrait",
+            "iconSize": {
+              "width": 96,
+              "height": 96
+            },
+            "style": {
+              "description": "复用已批准coin-pouch母PNG，隔离单张96尺寸导入；不生成新内容",
+              "references": []
+            },
+            "background": {
+              "format": "png",
+              "transparent": true,
+              "color": "#ffffff"
+            },
+            "composition": {
+              "centered": true,
+              "paddingPercent": 0
+            },
+            "destination": {
+              "directory": "assets/art",
+              "exportDirectory": "art/final/companion",
+              "naming": "kebab-case"
+            }
+          }
+        }
+      }
+    },
+    "export": {
+      "schemaVersion": "companion-icons-v1",
+      "jobId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+      "revision": 3,
+      "candidateId": "CANDIDATE-coin-pouch-variant-ui-20261017-adopt-1",
+      "relativePath": "art/final/companion/coin-pouch-variant-ui-20261017-96x96-7100b11dd00b.png",
+      "sha256": "fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654",
+      "sourceSha256": "7100b11dd00bceb72147a606b1f048949a86f2ec3a9e253950fb3932ee83a756",
+      "width": 96,
+      "height": 96,
+      "created": true,
+      "upscaled": false,
+      "qualityLimit": null,
+      "receiptSha256": "88be3fd8f4234bb151a929a562c2901242aa1f1d81477258fa942814768821ca",
+      "bytes": 7391
+    },
+    "confirmationText": "确认：导入当前工程\n\n单独批准将下方尺寸变体导入当前工程的新目标。使用实际导出文件和收据的 SHA-256，不导入 1024 母图、不覆盖已有资源。结果未知时只读取同一原操作，不重复提交。\n\n工程\ncreator-ai-variant-import-acceptance-20261017 · a79f4915296f4091\n工程路径\nD:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\n原任务\nSTUDIO-RUN-icon-mvc3kj0s-b2d4ee94 · r3\n源提交\n796a233a424749ac0baecf5c7001a514ac8ef2d6\n请求 SHA-256\n34c7c632b41cddaf9a4b56c896e415c47a233292c66a2bee3e8c71dcc4917c2d\ncoin-pouch-variant-ui-20261017 → assets/art/coin-pouch-variant-ui-20261017.png\nCANDIDATE-coin-pouch-variant-ui-20261017-adopt-1 · SHA-256 7100b11dd00bceb72147a606b1f048949a86f2ec3a9e253950fb3932ee83a756\n变体尺寸\n96 × 96\n导入新目标\ndb://assets/art/coin-pouch-variant-ui-20261017-96x96-fe10e97c530d.png\n变体文件 SHA-256\nfe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654\n导出收据 SHA-256\n88be3fd8f4234bb151a929a562c2901242aa1f1d81477258fa942814768821ca\n我已核对上述冻结范围，并单独批准本次导入当前工程\n确认并导入当前工程\n取消确认",
+    "creator": {
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "instanceId": "9cf07f16-e918-47f3-abfe-2578883f61c3",
+      "pid": 19860,
+      "launchSource": "dashboard",
+      "dashboardVersion": "2.2.2",
+      "dashboardProgress": "open",
+      "creatorVersion": "3.8.8",
+      "sessionId": "ce4fb35a-606e-4095-bb5c-6b4dcc07406c"
+    },
+    "repeatDispatchBlocked": true,
+    "import": {
+      "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996",
+      "state": "imported_pending_verification",
+      "revision": 6,
+      "motherState": "selected",
+      "motherImport": null,
+      "effectApplied": true,
+      "leaseState": "RELEASED",
+      "destinationUrl": "db://assets/art/coin-pouch-variant-ui-20261017-96x96-fe10e97c530d.png",
+      "pngPath": "D:/code/shidai3/P8000/local-tests/creator-ai-variant-import-acceptance-20261017/assets/art/coin-pouch-variant-ui-20261017-96x96-fe10e97c530d.png",
+      "width": 96,
+      "height": 96,
+      "pngSha256": "fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654",
+      "pngBytes": 7391,
+      "metaSha256": "e68136948572b2962ae2bdc85c8a5e52cabfee778037a9c9d9cdc6a3fd16ee8e",
+      "assetUuid": "40ee0bc7-f379-4384-85c6-08cd40b59f82",
+      "spriteFrameUuid": "40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941"
+    },
+    "resultText": "变体导入回执摘要\n\n尺寸变体文件已导入当前工程，租约已释放。场景与运行验收尚未据此确认。\n\n母图任务状态与变体导入状态分别保留。此任务已有变体导入记录，页面写操作已暂停；请核对同一原操作。\n\n原操作\nicon-import-710dd9df6d2038390b667d9b76af5996\n变体状态\nimported_pending_verification\n写入效果\ntrue\n租约\nRELEASED\n活动中\nfalse\n错误码\n无返回错误码\n目标\ndb://assets/art/coin-pouch-variant-ui-20261017-96x96-fe10e97c530d.png\n变体尺寸\n96 × 96\n文件 SHA-256\nfe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654\n收据 SHA-256\n88be3fd8f4234bb151a929a562c2901242aa1f1d81477258fa942814768821ca\n原候选\nCANDIDATE-coin-pouch-variant-ui-20261017-adopt-1\n\n变体预览按原操作与文件/收据 SHA 校验，只读已保存文件。摘要和图像不代表当前资产回读、场景、Preview、Build 或生产验收通过。\n\n预览此变体\n\n96 × 96 · SHA-256 fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654\n\n关闭变体预览\ncreator_get_project_info · icon-import-710dd9df6d2038390b667d9b76af5996-identity · PASSED\nproject_get_status · icon-import-710dd9df6d2038390b667d9b76af5996-status · PASSED\nproject_write_lease · icon-import-710dd9df6d2038390b667d9b76af5996-lease · PASSED\noperation_get · icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017 · PASSED\nasset_get_info · icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017-existing · PASSED\nasset_import · icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017 · PASSED\nasset_get_info · icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017-readback · PASSED\nasset_resolve_reference · icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017-spriteframe · PASSED\nproject_write_lease · icon-import-710dd9df6d2038390b667d9b76af5996-release · PASSED",
+    "fences": [],
+    "ok": true,
+    "ownedBrowserClosed": true,
+    "stop": {
+      "atUtc": "2026-10-17T07:51:38.695Z",
+      "projectId": "a79f4915296f4091",
+      "authorizationId": "Sentinel_6bbc98226a6c819185d4dab69eafa737",
+      "reason": "new-variant-ui-completed",
+      "errorCode": null,
+      "cleanupErrors": [],
+      "firstListener": {
+        "atUtc": "2026-10-17T07:51:18.376Z",
+        "listener": {
+          "address": "0.0.0.0",
+          "port": 7458,
+          "pid": 19860
+        },
+        "authorizationId": "Sentinel_6bbc98226a6c819185d4dab69eafa737"
+      },
+      "cumulativeChargedMs": 412673,
+      "cumulativeCapMs": 1800000,
+      "conservativeWholeWindowCharge": true,
+      "observedOwnedListeners": [
+        {
+          "firstObservedAt": "2026-10-17T07:51:18.376Z",
+          "listener": {
+            "address": "0.0.0.0",
+            "port": 7458,
+            "pid": 19860
+          },
+          "identityMatchedMain": true
+        },
+        {
+          "firstObservedAt": "2026-10-17T07:51:22.550Z",
+          "listener": {
+            "address": "127.0.0.1",
+            "port": 10161,
+            "pid": 19860
+          },
+          "identityMatchedMain": true
+        },
+        {
+          "firstObservedAt": "2026-10-17T07:51:22.550Z",
+          "listener": {
+            "address": "127.0.0.1",
+            "port": 10169,
+            "pid": 19860
+          },
+          "identityMatchedMain": true
+        }
+      ],
+      "port7458Closed": true,
+      "ownListenersClosed": true,
+      "ownProcessTreeClosed": true,
+      "remainingProcesses": [],
+      "remainingMains": [],
+      "remainingListeners": [],
+      "withinAuthorizedWindow": true,
+      "officialStopResponse": {
+        "projectId": "a79f4915296f4091",
+        "state": "stopped",
+        "launchSource": "dashboard"
+      }
+    },
+    "cleanupErrors": [],
+    "finishedAt": "2026-10-17T07:51:38.982Z",
+    "network": [
+      {
+        "method": "GET",
+        "path": "/api/projects",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/calls/counts",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/tools",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/events",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/calls/counts",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/projects",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/status",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/calls/counts",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/resource-config",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/icons/a79f4915296f4091/jobs",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/inspect",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/resource-config",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/icons/a79f4915296f4091/jobs",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/adopt",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/icons/a79f4915296f4091/jobs",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/icons/a79f4915296f4091/jobs",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/candidate",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/select",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/export-variant",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/import-variant",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/variant-preview",
+        "status": 200
+      }
+    ],
+    "blocked": [],
+    "errors": [],
+    "writes": [
+      {
+        "atUtc": "2026-10-17T07:50:54.201Z",
+        "action": "adopt",
+        "body": {
+          "request": {
+            "schemaVersion": "local-icon-requests-v1",
+            "projectId": "a79f4915296f4091",
+            "runId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+            "sourceRevision": "796a233a424749ac0baecf5c7001a514ac8ef2d6",
+            "visualSpec": "复用已批准coin-pouch母PNG，隔离单张96尺寸导入；不生成新内容",
+            "assets": [
+              {
+                "assetId": "coin-pouch-variant-ui-20261017",
+                "relativePath": "assets/art/coin-pouch-variant-ui-20261017.png",
+                "prompt": "Reuse the approved trusted coin pouch PNG. No generation. Export one96x96 variant and import it once into a new missing target.",
+                "purpose": "新隔离任务：验收尺寸变体导入当前工程按钮，一次96像素变体导入",
+                "required": true
+              }
+            ]
+          },
+          "resourceBinding": {
+            "version": 1,
+            "hash": "785b88f4231076dc869957b865f9e615f6068fc4fc3f34c9519986a6d140b605",
+            "presetId": "default"
+          },
+          "approved": true,
+          "sourceId": "coin-pouch-existing-20261010"
+        }
+      },
+      {
+        "atUtc": "2026-10-17T07:51:00.909Z",
+        "action": "select",
+        "body": {
+          "jobId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+          "revision": 2,
+          "selectedIds": [
+            "CANDIDATE-coin-pouch-variant-ui-20261017-adopt-1"
+          ],
+          "approved": true
+        }
+      },
+      {
+        "atUtc": "2026-10-17T07:51:03.625Z",
+        "action": "export-variant",
+        "body": {
+          "jobId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+          "revision": 3,
+          "candidateId": "CANDIDATE-coin-pouch-variant-ui-20261017-adopt-1",
+          "width": 96,
+          "height": 96,
+          "allowUpscale": false,
+          "expectedTargetSha256": null,
+          "approved": true
+        }
+      },
+      {
+        "atUtc": "2026-10-17T07:51:26.243Z",
+        "action": "import-variant",
+        "body": {
+          "jobId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+          "revision": 3,
+          "candidateId": "CANDIDATE-coin-pouch-variant-ui-20261017-adopt-1",
+          "width": 96,
+          "height": 96,
+          "destinationUrl": "db://assets/art/coin-pouch-variant-ui-20261017-96x96-fe10e97c530d.png",
+          "expectedVariantSha256": "fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654",
+          "expectedReceiptSha256": "88be3fd8f4234bb151a929a562c2901242aa1f1d81477258fa942814768821ca",
+          "approved": true
+        }
+      }
+    ],
+    "importPostCount": 1
+  },
+  "closure": {
+    "atUtc": "2026-10-17T07:52:11.593Z",
+    "uiOk": true,
+    "projectId": "a79f4915296f4091",
+    "jobId": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+    "sourceRevision": "796a233a424749ac0baecf5c7001a514ac8ef2d6",
+    "revision": 6,
+    "motherState": "selected",
+    "motherImport": null,
+    "variant": {
+      "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996",
+      "state": "imported_pending_verification",
+      "effectApplied": true,
+      "leaseState": "RELEASED",
+      "errorCode": null,
+      "artifact": {
+        "kind": "variant",
+        "candidateId": "CANDIDATE-coin-pouch-variant-ui-20261017-adopt-1",
+        "width": 96,
+        "height": 96,
+        "fileSha256": "fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654",
+        "receiptSha256": "88be3fd8f4234bb151a929a562c2901242aa1f1d81477258fa942814768821ca",
+        "destinationUrl": "db://assets/art/coin-pouch-variant-ui-20261017-96x96-fe10e97c530d.png"
+      },
+      "tools": [
+        {
+          "tool": "creator_get_project_info",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-identity",
+          "status": "PASSED"
+        },
+        {
+          "tool": "project_get_status",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-status",
+          "status": "PASSED"
+        },
+        {
+          "tool": "project_write_lease",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-lease",
+          "status": "PASSED"
+        },
+        {
+          "tool": "operation_get",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017",
+          "status": "PASSED"
+        },
+        {
+          "tool": "asset_get_info",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017-existing",
+          "status": "PASSED"
+        },
+        {
+          "tool": "asset_import",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017",
+          "status": "PASSED"
+        },
+        {
+          "tool": "asset_get_info",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017-readback",
+          "status": "PASSED"
+        },
+        {
+          "tool": "asset_resolve_reference",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017-spriteframe",
+          "status": "PASSED"
+        },
+        {
+          "tool": "project_write_lease",
+          "operationId": "icon-import-710dd9df6d2038390b667d9b76af5996-release",
+          "status": "PASSED"
+        }
+      ],
+      "active": false
+    },
+    "creatorTotal": 0,
+    "remainingOwned": [],
+    "observedOwnedListeners": [
+      {
+        "address": "0.0.0.0",
+        "port": 7458,
+        "pid": 19860
+      },
+      {
+        "address": "127.0.0.1",
+        "port": 10161,
+        "pid": 19860
+      },
+      {
+        "address": "127.0.0.1",
+        "port": 10169,
+        "pid": 19860
+      }
+    ],
+    "remainingListeners": [],
+    "budgetUsedMs": 412673,
+    "budgetActive": null,
+    "budgetLockAbsent": true,
+    "sharedHeadUnchanged": true,
+    "sharedStatusUnchanged": true,
+    "sharedDiffUnchanged": true,
+    "sharedDirtyDrift": [],
+    "trackedDrift": [],
+    "settingsDrift": [],
+    "oldTaskDrift": [],
+    "daemonIdentity": {
+      "pid": 4092,
+      "startupEpoch": "38d457be-b726-433a-bcec-077b6d2a6245",
+      "startedAt": "2026-10-17T04:37:32.853Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "f3323c72165a2d2f28f3faf89b3c5811e5df1dafee384303db0bf84811970e70",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0
+    },
+    "unknown": [],
+    "originalDaemonUnchanged": true,
+    "productionVerified": false,
+    "cloudUploads": 0,
+    "ok": true
+  },
+  "operationLedger": {
+    "atUtc": "2026-10-17T07:52:08.818196+00:00",
+    "readOnly": true,
+    "payloadOrCredentialsRead": false,
+    "operations": [
+      {
+        "project_id": "a79f4915296f4091",
+        "operation_id": "icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017",
+        "tool": "asset_import",
+        "status": "SUCCEEDED",
+        "lease_id": "03800e08-5835-414d-9a1f-3b74cced057a",
+        "fencing_token": 10,
+        "started_ms": 1792223490527,
+        "completed_ms": 1792223491111
+      }
+    ],
+    "dispatches": [
+      {
+        "project_id": "a79f4915296f4091",
+        "operation_id": "icon-import-710dd9df6d2038390b667d9b76af5996-coin-pouch-variant-ui-20261017",
+        "state": "TERMINAL",
+        "terminal_status": "SUCCEEDED",
+        "recoverable": 0,
+        "lease_id": "03800e08-5835-414d-9a1f-3b74cced057a",
+        "fencing_token": 10
+      }
+    ],
+    "leases": [
+      {
+        "project_id": "a79f4915296f4091",
+        "lease_id": "03800e08-5835-414d-9a1f-3b74cced057a",
+        "run_id": "STUDIO-RUN-icon-mvc3kj0s-b2d4ee94",
+        "status": "RELEASED",
+        "fencing_token": 10,
+        "acquired_ms": 1792223489613,
+        "heartbeat_ms": 1792223491931,
+        "expires_ms": 1792223491931
+      }
+    ]
+  },
+  "protected": {
+    "atUtc": "2026-10-17T07:52:08.724675+00:00",
+    "oldProjectId": "87224a1a9dbb5736",
+    "readOnly": true,
+    "payloadOrCredentialsRead": false,
+    "records": {
+      "project_write_leases": [
+        {
+          "project_id": "87224a1a9dbb5736",
+          "run_id": "icons-product-acceptance-20261011",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "status": "ACTIVE",
+          "acquired_ms": 1791683032338,
+          "heartbeat_ms": 1791683334367,
+          "expires_ms": 1791683634367
+        }
+      ],
+      "operations": [
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icon-import-05ef8a9a9d2115d6976b5038402f8943-coin-pouch",
+          "tool": "asset_import",
+          "lease_id": "675db94f-446c-4f9d-9a5d-cd48b51c1863",
+          "fencing_token": 1,
+          "status": "SUCCEEDED",
+          "started_ms": 1791680281484,
+          "completed_ms": 1791680282100
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-compile",
+          "tool": "script_wait_compile",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "status": "SUCCEEDED",
+          "started_ms": 1791683208415,
+          "completed_ms": 1791683208465
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-create-canvas",
+          "tool": "ui_create_canvas",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "status": "SUCCEEDED",
+          "started_ms": 1791683208684,
+          "completed_ms": 1791683208776
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-create-scene",
+          "tool": "scene_create",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "status": "SUCCEEDED",
+          "started_ms": 1791683111130,
+          "completed_ms": 1791683111773
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-create-sprite",
+          "tool": "ui_create_sprite",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "status": "STARTED",
+          "started_ms": 1791683261443,
+          "completed_ms": null
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-write-test-script",
+          "tool": "script_write",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "status": "SUCCEEDED",
+          "started_ms": 1791683112047,
+          "completed_ms": 1791683112595
+        }
+      ],
+      "operation_dispatches": [
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icon-import-05ef8a9a9d2115d6976b5038402f8943-coin-pouch",
+          "dispatch_id": "463870ae-d555-4d2e-8f40-cb0294bdba3a",
+          "lease_id": "675db94f-446c-4f9d-9a5d-cd48b51c1863",
+          "fencing_token": 1,
+          "state": "TERMINAL",
+          "terminal_status": "SUCCEEDED",
+          "recoverable": 0
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-compile",
+          "dispatch_id": "59f393cc-8538-4463-a4ec-31d14286bed4",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "state": "TERMINAL",
+          "terminal_status": "SUCCEEDED",
+          "recoverable": 0
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-create-canvas",
+          "dispatch_id": "5d90f593-f207-430f-a6e3-bc78192ed361",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "state": "TERMINAL",
+          "terminal_status": "SUCCEEDED",
+          "recoverable": 0
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-create-scene",
+          "dispatch_id": "11ca801b-b01b-4dfb-bb25-6927bb5a119e",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "state": "TERMINAL",
+          "terminal_status": "SUCCEEDED",
+          "recoverable": 0
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-create-sprite",
+          "dispatch_id": "e97c504b-8de0-4405-b157-de588817d50d",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "state": "UNKNOWN",
+          "terminal_status": null,
+          "recoverable": 0
+        },
+        {
+          "project_id": "87224a1a9dbb5736",
+          "operation_id": "icons-product-20261011-write-test-script",
+          "dispatch_id": "b0b955c1-1bc3-46cf-8e0e-e0a392ad7170",
+          "lease_id": "8bdba56f-16f3-486e-9002-758ef6068573",
+          "fencing_token": 2,
+          "state": "TERMINAL",
+          "terminal_status": "SUCCEEDED",
+          "recoverable": 0
+        }
+      ],
+      "operation_resolutions": []
+    },
+    "newProjectCounts": {
+      "project_write_leases": 1,
+      "operations": 18,
+      "operation_dispatches": 12,
+      "operation_resolutions": 0
+    },
+    "oldMetadataSha256": "9eab90dcc56b34bf217e55dea3f73ab163a91908f948f8a7001e258c3f1a6828",
+    "adoptionManifestSha256": "65f660e7fd048147a700142b59f4ec352a6a7f162a2cba237ff54e5597b3191c",
+    "nextIndexSha256": "6347f254cdb6ae0b0afa9e0f8e2d5c6dcf405ddeba516c7a5a5ace186b267632",
+    "oldProjectUnchanged": true,
+    "manifestUnchanged": true,
+    "nextIndexUnchanged": true
+  },
+  "deployment": {
+    "atUtc": "2026-10-17T07:48:37.318Z",
+    "source": "3074d37e7b279b1c45c645d2ef7175549ef693ed",
+    "localCheckpoint": "1.3.173.25",
+    "productVersion": "1.3.173",
+    "httpReads": [
+      {
+        "path": "assets/about-icon-BaVeClOr.svg",
+        "status": 200,
+        "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+        "bytes": 230
+      },
+      {
+        "path": "assets/donation-qr-D7kdLLAm.png",
+        "status": 200,
+        "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+        "bytes": 106967
+      },
+      {
+        "path": "assets/index-CHDl0L-_.css",
+        "status": 200,
+        "sha256": "7c1f12fd9d7f7d9de9ddfdab3582b7b2819996f918622861d03e4046fac50bef",
+        "bytes": 425336
+      },
+      {
+        "path": "assets/index-q5kVf4uj.js",
+        "status": 200,
+        "sha256": "577456b7e00b33714f8d157448170d2f1f014cdf83b0e5afe62309ea234bb4af",
+        "bytes": 1781103
+      },
+      {
+        "path": "favicon.svg",
+        "status": 200,
+        "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+        "bytes": 245
+      },
+      {
+        "path": "index.html",
+        "status": 200,
+        "sha256": "6347f254cdb6ae0b0afa9e0f8e2d5c6dcf405ddeba516c7a5a5ace186b267632",
+        "bytes": 573
+      }
+    ],
+    "normalAuthenticatedEdgeSession": true,
+    "cookiesOrAuthCodesExported": false,
+    "ownedBrowserClosed": true,
+    "readDrainage": [
+      {
+        "atUtc": "2026-10-17T07:48:36.800Z",
+        "counts": {
+          "http": 1,
+          "mcp": 0,
+          "nativeAwaiting": 0,
+          "nativeUncertain": 0,
+          "maintenanceObservations": 0,
+          "projectActions": 0,
+          "globalActions": 0,
+          "recovery": 0,
+          "setup": 0,
+          "builds": 0,
+          "observedBuilds": 0,
+          "sidecars": 0,
+          "setupPolls": 0,
+          "setupTimers": 0,
+          "icons": 0
+        }
+      },
+      {
+        "atUtc": "2026-10-17T07:48:37.318Z",
+        "counts": {
+          "http": 0,
+          "mcp": 0,
+          "nativeAwaiting": 0,
+          "nativeUncertain": 0,
+          "maintenanceObservations": 0,
+          "projectActions": 0,
+          "globalActions": 0,
+          "recovery": 0,
+          "setup": 0,
+          "builds": 0,
+          "observedBuilds": 0,
+          "sidecars": 0,
+          "setupPolls": 0,
+          "setupTimers": 0,
+          "icons": 0
+        }
+      }
+    ],
+    "daemonIdentity": {
+      "pid": 4092,
+      "startupEpoch": "38d457be-b726-433a-bcec-077b6d2a6245",
+      "startedAt": "2026-10-17T04:37:32.853Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "f3323c72165a2d2f28f3faf89b3c5811e5df1dafee384303db0bf84811970e70",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0
+    },
+    "unknown": [],
+    "daemonRestarted": false,
+    "ok": true
+  },
+  "offlineValidation": {
+    "codeMapper": "/root/variant_ui_mapper",
+    "reviewer": "/root/variant_ui_reviewer",
+    "roles": "prompt-emulated; hard read-only isolation not verified",
+    "findingsResolved": [
+      {
+        "severity": "P2",
+        "path": "src/components/AiJobsReadPanel.vue",
+        "finding": "Missing artifact must not claim confirmed import",
+        "resolution": "artifact gate plus two full panel regression cases"
+      }
+    ],
+    "remainingP1P2": 0,
+    "targetedTests": 146,
+    "fullTests": 3883,
+    "fullFiles": 94,
+    "typecheck": "passed",
+    "workspaceBuild": "passed",
+    "static": {
+      "pass": 55,
+      "fail": 0,
+      "skip": 1,
+      "skipReason": "Windows case-sensitive fixture"
+    },
+    "ocr": "Delegation rule selection plus host review; no managed PASS"
+  },
+  "screenshots": {
+    "confirmation": {
+      "filename": "variant-confirmation-1440x1080.png",
+      "sha256": "dff84eee89b2256b0635d01d4ca86598f296f47f654f80e751939f42cb199ca8",
+      "bytes": 131961,
+      "viewport": {
+        "width": 1440,
+        "height": 1080
+      },
+      "visuallyInspected": true
+    },
+    "imported": {
+      "filename": "variant-imported-1440x1080.png",
+      "sha256": "56253ca3af44d7a553e9c3460f53a9ee7c0ff9fe7204d8ee94f503770614631c",
+      "bytes": 140671,
+      "viewport": {
+        "width": 1440,
+        "height": 1080
+      },
+      "visuallyInspected": true
+    }
+  },
+  "firstAutomationFailure": {
+    "result": {
+      "phase": "new-task-preparation",
+      "name": "TimeoutError",
+      "message": "locator.check: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('ai-task-creation-panel').getByRole('checkbox', { name: '批准本次单图任务', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <input type=\"checkbox\" class=\"el-checkbox__original\"/>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    58 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+    },
+    "jobIdNotPersisted": "STUDIO-RUN-icon-mvc3ilp1-0797c255",
+    "businessWrites": 0,
+    "creatorStarted": false,
+    "proof": {
+      "firstAttemptJobIdNotPersisted": "STUDIO-RUN-icon-mvc3ilp1-0797c255",
+      "firstAttemptWrites": 0,
+      "firstImportPosts": 0,
+      "creatorNeverStarted": true,
+      "budgetUnchanged": true,
+      "fix": "visible label.el-checkbox user click, checked state asserted",
+      "originalFailurePreserved": true,
+      "newRetryGate": "ui-retry-once.json"
+    }
+  },
+  "validationCorrections": [
+    "Initial unauthenticated HTTP probe did not match static content; supported authenticated Edge HTTP readback passed all six files.",
+    "After authenticated browser close, transient in-flight reads were given bounded read-only drainage; original daemon identity stayed unchanged.",
+    "Element Plus hidden input locator failed before any business write; visible label fixed, original failure retained, no adoption/import replay."
+  ],
+  "acceptanceBoundary": {
+    "real": [
+      "normal authenticated1440x1080 Edge",
+      "new isolated task preparation",
+      "one original import-variant dispatch",
+      "96x96 PNG/meta plus asset/SpriteFrame UUID readback",
+      "real saved variant PNG preview",
+      "released lease and owned process/listener closure"
+    ],
+    "automatedOnly": [
+      "request in-flight duplicate-click prevention",
+      "wrong project/size/hash and stale approval rejection",
+      "timeout/network/UNKNOWN persistent fence",
+      "mismatched artifact cannot clear fence"
+    ],
+    "notExecuted": [
+      "new scene",
+      "Preview",
+      "Build",
+      "GPU generation",
+      "old successful task replay"
+    ]
+  },
+  "productionVerified": false,
+  "cloudUploadsThisTask": 0,
+  "rawEvidenceDirectory": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-variant-import-20261016\\interface-load-20261016-phase2\\recovery-20261017\\isolated-import-20261017\\e2e-30min\\attempt-06-variant-ui"
+}

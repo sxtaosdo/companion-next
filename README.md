@@ -1,8 +1,8 @@
 # Companion Next
 
-**当前版本：`v1.3.173.25`**
+**当前版本：`v1.3.173.26`**
 
-2026-10-17 尺寸变体导入本地候选：尺寸回执旁新增“导入当前工程”，核对当前工程、原任务版本、变体尺寸、文件/收据 SHA 与新目标；复用原接口、写锁和持久未知保护，结果独立展示。此段为源码候选，部署和新隔离真实验收待本轮完成；范围、验证与回滚以[唯一计划](docs/variant-ui-import-20261017.md)为准。下列 05:40 旧验收记录保留原时间与范围。
+2026-10-17 新尺寸变体入口本机交付：尺寸回执旁“导入当前工程”已实现并部署3074d37/1.3.173.25（页面产品仍1.3.173），新隔离任务一次96×96导入、PNG/meta与UUID/SpriteFrame及真实预览通过，母图未导入。3883项完整回归、类型/构建和六HTTP SHA通过；自有进程/端口关闭，累计412.673/1800秒，无云上传。新资源未做场景/Preview/Build，productionVerified固定false。[唯一计划与证据](docs/variant-ui-import-20261017.md)。下列05:40记录保留原时间。
 
 2026-10-17当前资源范围：可信PNG采用、选图、CPU96导出及1024母图导入四个已有按钮已真实逐项确认，各写一次；原任务imported_pending_verification/r6、asset_import SUCCEEDED/TERMINAL、fence9释放，PNG/meta/Asset/SpriteFrame回读一致。Creator/Edge/自有端口全关，累计381.067/1800秒、active=null。资产已精确归档隔离仓e182b6b/0.1.0.11；原sourceRevision不重标。新增变体UI未实现，真实GPU生成及新母图场景/Preview/Build未验，productionVerified固定false。旧96变体运行证据继续有效。[操作步骤、回执及截图](docs/variant-ui-followup-20261017.md)为本轮范围说明。功能代码与部署仍caf14fb/1.3.173.18。
 

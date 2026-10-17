@@ -1,6 +1,6 @@
 # Windows本地开发交接
 
-2026-10-17 新增尺寸变体入口：按 Owner 07:28:12 UTC 批准，仅在新 Next 尺寸回执旁接入原 import-variant，不改旧 UI、生命周期或后端。文件/收据双 SHA、工程/版本、新目标确认及跨页未知保护已实现；本地部署与新隔离真实导入证据随后记录于[本次计划和交付](docs/variant-ui-import-20261017.md)。原服务保持 Node25，不上传文件。
+2026-10-17 新尺寸变体入口已完成：代码及实际部署3074d37/1.3.173.25，产品页面版本1.3.173；新任务一次96×96 import-variant、资源UUID/SpriteFrame和真实PNG预览通过，原母图按钮未执行。3883测试/类型/构建通过，六静态HTTP SHA一致，原Node25服务未重启，Owner dirty与旧任务保持。累计412.673/1800秒，自有进程关闭，零云上传。[完整计划、回执与本地截图](docs/variant-ui-import-20261017.md)。
 
 2026-10-17 05:40 UTC：原独立新任务已真实完成Next采用/选图/CPU96导出/1024母图导入，各写一次；r6、effectApplied=true、租约RELEASED，资产及meta回读一致，账本SUCCEEDED/TERMINAL/fence9。Creator/Edge/全部自有端口关闭，累计381.067/1800秒、active=null。任务原sourceRevision仍a2ff18a，资产检查点e182b6b/0.1.0.11后仅读历史，未改任务；原settings、旧成功资源与冻结记录保持。运行Next仍caf14fb/1.3.173.18，无业务源码/部署变化；不新增变体导入UI，productionVerified固定false。实际步骤、本地回执/截图及误上传撤回记录见[本轮交付](docs/variant-ui-followup-20261017.md)；下列旧记录保留各自时间。
 
