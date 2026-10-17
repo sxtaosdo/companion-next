@@ -1,8 +1,8 @@
 # Companion Next
 
-**当前版本：`v1.3.173.22`**
+**当前版本：`v1.3.173.23`**
 
-2026-10-17当前资源范围：旧变体场景/Preview/Build/Smoke及Next读图已验；新任务真实Next采用、选图、CPU96导出各写一次，母图导入POST为0。只读归因确认11097属于本工程Creator主进程TCP回环监听，不是已证局域网暴露；具体模块/协议/认证仍未核明，11105另有原Bridge日志。没有再启动或新增授权申请，累计预算346.778/1800秒、active=null。新增变体UI不实现，productionVerified固定false。[操作步骤、证据和归因限制](docs/variant-ui-followup-20261017.md)为本轮范围说明。功能代码及部署仍caf14fb/1.3.173.18。
+2026-10-17当前资源范围：可信PNG采用、选图、CPU96导出及1024母图导入四个已有按钮已真实逐项确认，各写一次；原任务imported_pending_verification/r6、asset_import SUCCEEDED/TERMINAL、fence9释放，PNG/meta/Asset/SpriteFrame回读一致。Creator/Edge/自有端口全关，累计381.067/1800秒、active=null。资产已精确归档隔离仓e182b6b/0.1.0.11；原sourceRevision不重标。新增变体UI未实现，真实GPU生成及新母图场景/Preview/Build未验，productionVerified固定false。旧96变体运行证据继续有效。[操作步骤、回执及截图](docs/variant-ui-followup-20261017.md)为本轮范围说明。功能代码与部署仍caf14fb/1.3.173.18。
 
 2026-10-17本轮恢复交付已完成：从5419ace恢复损坏README/索引，六静态已部署且实际HTTP回读一致，正常认证Edge在1440×1080核对创建/初始化表单。资源候选四产物未变，原CLI正常启动后仅127.0.0.1:32180、OPEN；历史UNKNOWN与原共享dirty保持。本轮不扩展UI；详见[恢复交付回执](docs/next-recovery-20261017.md)。
 

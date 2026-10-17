@@ -2,6 +2,24 @@
 
 状态：Accepted（本机事实及交接记录，不代表完整产品验收）
 
+## 05:40 UTC 四个已有写按钮闭环完成
+
+按明确的既有授权边界，官方同一Creator主进程自行建立的回环通信不视为新增局域网开放；7458仍是唯一获准全接口监听，其他非回环监听立即停止。不调用未知11097接口，不改绑定、认证、防火墙或系统权限。先核对原新任务仍selected/r3、import为null、目标不存在、原1024母PNG及96导出SHA一致，再继续同一任务，没有重新采用或换任务。
+
+任务`STUDIO-RUN-icon-mvby1nsy-a46a962c`已从真实Next完成采用、候选显示/选图、CPU96×96导出、1024母图导入，四个写POST各一次、全部200。母图导入POST于05:40:17.892 UTC发出，原操作`icon-import-cc3f8d6093fd310e63864eb8e39b799e`经STARTED和VERIFICATION_PENDING只读推进至`imported_pending_verification/r6`，effectApplied=true、leaseState=RELEASED；没有因中间状态重发。账本独立核对asset_import=SUCCEEDED、dispatch=TERMINAL、fence9租约RELEASED。真实设计视口仍1440×1080，正常原会话、禁浏览器GPU、无mock，页面错误/被拦请求均为零。
+
+实际母图为`assets/art/coin-pouch-next-ui-20261017.png`，1024×1024、522068字节，SHA `7100b11dd00bceb72147a606b1f048949a86f2ec3a9e253950fb3932ee83a756`；meta SHA `8b37c2b53e5b5a39a9b6362de5090d2fb693488cb5240bd86c96c1b1d5b3d499`。asset UUID `95806242-61c9-4057-8be4-a233724226ce`，SpriteFrame为该UUID加`@f9941`，文件、meta及两个原资产读取工具回读一致。96派生PNG仍是另一份文件，不是母图按钮导入的内容。
+
+Creator3.8.8本次PID23512/session `489a8a9c-311a-423c-9408-61a302080565`，AssetDB经既有只读查询3次就绪才发送导入。观测到0.0.0.0:7458及同一已核主进程的127.0.0.1:2938/2950（2950有Bridge日志），没有额外非回环监听。完成即官方停止并核对全部自有进程/端口关闭，Edge关闭。窗口保守计34.289秒，跨尝试累计381067/1800000ms，剩余1418933ms、active=null；原daemon PID4092保持OPEN、零在途、unknown=[]。旧task/冻结元数据/manifest/部署入口及Owner共享dirty保持；记录前46个原跟踪文件和7个原settings一致，之后只归档任务资产与文档。
+
+物理资产及回执已精确提交隔离仓`e182b6b2bd72d42f72fbbcf128e18319ee94a016` / `0.1.0.11`，仅原settings保持未跟踪。后续交付更正检查点为`796a233a424749ac0baecf5c7001a514ac8ef2d6` / `0.1.0.12`，只追加审计事实，不改物理PNG/meta。写入原sourceRevision仍为`a2ff18a013608dadf47b624eb58fba587b754fc7`，不重标为证据HEAD。提交后实际只读status仍返回r6和原导入收据，显式historyOnly指向e182b6b；新旧task字节都未因读取改写。历史任务写保护是预期结果，不能再导入来测试按钮。
+
+- [四按钮原始回执、账本与收尾汇总](evidence/next-buttons-mother-20261017.json)
+- [已查看的真实导入页面截图](evidence/next-buttons-mother-20261017.png)
+- 截图仅作上述本地交付。曾误沿用更早Library交付要求上传一张截图，随后按本轮“无云外发”限制将该新建文件移入Library回收站，撤回操作成功，停止后续上传；不声称传输未发生或底层物理清除。汇总JSON保留原上传事实并追加撤回状态，完整回执存外置目录。
+
+这是可信PNG离线采用分支的四个已有按钮及母图文件/资产闭环；真实GPU生成/enqueue未执行，新母图未新增场景、Preview或Build验收，既有96变体的运行证据继续按原sourceRevision保留。新增尺寸变体UI仍未实现，productionVerified固定false不变。本轮没有业务源码缺陷需要修改，修正仅在验收脚本；不重建部署、不改未知并行停服脚本、不操作冻结UNKNOWN、push/tag/父pin或关机。以下旧阻断及预算记录保留各自时间事实，已由本节推进。
+
 ## 05:35 UTC 11097监听只读归因
 
 本轮仅查询既存进程/端口记录、项目日志、已安装Creator源码及文件版本；没有再启动Creator、连接端口、调用API或申请新增授权。以下结论替代把所有非7458端口视为新增局域网暴露的粗粒度判断；不会因此直接放行未归因的服务。此前提问不作为本轮启动依据。
@@ -58,7 +76,7 @@
 | GPU运行/恢复原任务 | Next已有run-next/resume，逐次批准，UNKNOWN只查原操作 | 本轮未从Next执行真实GPU生成，不新增启动模型权限 |
 | 候选审阅、保存唯一选择 | Next已有入口，先显示并核候选SHA | 05:25已从真实页面显示1024候选并保存唯一选择一次 |
 | 导出默认或自定义96×96 PNG | Next已有export-variant；封存v2规范、唯一已选母图、CPU缩放、禁止覆盖 | 05:25自定义96×96真实确认一次，PNG/收据SHA及尺寸已实读 |
-| 导入已选母图（1024） | Next已有import，按钮和确认均明确母图 | 不能用它导入96×96变体；05:25确认页已核，启动被严格端口门收尾，导入POST仍0 |
+| 导入已选母图（1024） | Next已有import，按钮和确认均明确母图 | 05:40真实按钮一次导入，原操作SUCCEEDED/TERMINAL、租约释放，PNG/meta/Asset/SpriteFrame回读一致；不导入96×96变体 |
 | 导入96×96变体 | 后端import-variant及原操作查询已实现、单张真实导入已验 | Next缺少对应写操作合同/确认/接线；这是具体功能缺口，不只是缺一项测试 |
 | 查看已有变体摘要和PNG | Next已有受限只读variant-preview | 04:38真实同源页面已通过，零业务写入 |
 

@@ -1,0 +1,418 @@
+{
+  "schemaVersion": "next-existing-buttons-real-acceptance-v1",
+  "recordedAtUtc": "2026-10-17T05:45:06.989931+00:00",
+  "scope": "actual existing Next adoption, selection,96CPU export and1024mother import; no new variant UI, no new scene/preview/build acceptance",
+  "projectId": "a79f4915296f4091",
+  "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+  "sourceRevisionAtWrites": "a2ff18a013608dadf47b624eb58fba587b754fc7",
+  "nextDeployedSource": "caf14fbf997ef1b2cc18aa5e4d0a980885df9882",
+  "nextProductVersion": "1.3.173",
+  "sourceRevisionMustNotRestampAfterEvidenceCommit": true,
+  "businessPostCounts": {
+    "adopt": 1,
+    "select": 1,
+    "export-variant": 1,
+    "import": 1
+  },
+  "initialAdoption": {
+    "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+    "revision": 2,
+    "state": "awaiting_selection",
+    "sourceRevision": "a2ff18a013608dadf47b624eb58fba587b754fc7"
+  },
+  "selection": {
+    "revision": 3,
+    "candidateId": "CANDIDATE-coin-pouch-next-ui-20261017-adopt-1",
+    "state": "selected"
+  },
+  "cpuExport": {
+    "schemaVersion": "companion-icons-v1",
+    "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+    "revision": 3,
+    "candidateId": "CANDIDATE-coin-pouch-next-ui-20261017-adopt-1",
+    "relativePath": "art/final/companion/coin-pouch-next-ui-20261017-96x96-7100b11dd00b.png",
+    "sha256": "fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654",
+    "sourceSha256": "7100b11dd00bceb72147a606b1f048949a86f2ec3a9e253950fb3932ee83a756",
+    "width": 96,
+    "height": 96,
+    "created": true,
+    "upscaled": false,
+    "qualityLimit": null,
+    "receiptSha256": "32e9bc205742cb9a4c4039b2c6287afbf89a29c6ab95893d1985277ba0f663aa",
+    "pngPath": "D:/code/shidai3/P8000/local-tests/creator-ai-variant-import-acceptance-20261017/art/final/companion/coin-pouch-next-ui-20261017-96x96-7100b11dd00b.png",
+    "bytes": 7391
+  },
+  "motherImportUi": {
+    "startedAt": "2026-10-17T05:39:52.685Z",
+    "projectId": "a79f4915296f4091",
+    "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+    "assetId": "coin-pouch-next-ui-20261017",
+    "viewport": {
+      "width": 1440,
+      "height": 1080
+    },
+    "fakeApiResponses": false,
+    "browserGpuDisabled": true,
+    "productionVerified": false,
+    "creator": {
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "instanceId": "b97da65c-2653-4125-bfb8-462567d88e21",
+      "pid": 23512,
+      "launchSource": "dashboard",
+      "dashboardVersion": "2.2.2",
+      "dashboardProgress": "open",
+      "creatorVersion": "3.8.8",
+      "sessionId": "489a8a9c-311a-423c-9408-61a302080565"
+    },
+    "import": {
+      "state": "imported_pending_verification",
+      "revision": 6,
+      "operationId": "icon-import-cc3f8d6093fd310e63864eb8e39b799e",
+      "leaseState": "RELEASED",
+      "effectApplied": true,
+      "pngPath": "D:/code/shidai3/P8000/local-tests/creator-ai-variant-import-acceptance-20261017/assets/art/coin-pouch-next-ui-20261017.png",
+      "pngBytes": 522068,
+      "pngSha256": "7100b11dd00bceb72147a606b1f048949a86f2ec3a9e253950fb3932ee83a756",
+      "width": 1024,
+      "height": 1024,
+      "metaSha256": "8b37c2b53e5b5a39a9b6362de5090d2fb693488cb5240bd86c96c1b1d5b3d499",
+      "assetUuid": "95806242-61c9-4057-8be4-a233724226ce",
+      "spriteFrameUuid": "95806242-61c9-4057-8be4-a233724226ce@f9941"
+    },
+    "panelText": "原图标任务与候选\n\n查看当前登记工程已有任务，再按需刷新单个任务或预览候选。不会自动查询或轮询。\n\n工程\ncreator-ai-variant-import-acceptance-20261017 · a79f4915296f4091\n工程路径\nD:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\n读取 / 刷新任务历史\n清空本页结果\n\n这些读取会由原后台执行 Python、读取文件与 Git，并可能用 Pillow 检查候选。取消页面读取不能证明后台进程已结束。任务操作在下方逐次确认，接收回执不等于执行完成。\n\n已读取 2 个任务 · 历史读取时间 2026-10-17T05:39:55.368Z\n\n本次列表工程 HEAD：a2ff18a013608dadf47b624eb58fba587b754fc7。任务自身的源版本单独显示，不能据状态查询断言它仍匹配当前工程 HEAD。\n\n选择已有任务（仅切换本地查看）\nSTUDIO-RUN-icon-mvby1nsy-a46a962c · 已保存候选选择 · r3\n刷新所选原任务状态\n已导入，待运行验收 · imported_pending_verification\n任务 ID\nSTUDIO-RUN-icon-mvby1nsy-a46a962c\n任务版本\n6\n状态读取时间\n2026-10-17T05:40:26.653Z\n创建时间（原值）\n2026-10-17T05:16:16.715Z\n任务源版本\na2ff18a013608dadf47b624eb58fba587b754fc7\n请求 SHA-256\ndc3cbbc21e424fceb8e7c571fd5ed80e9bec847f87b5eff2f05ce2b92e64bea3\n运行模式 / 来源\noffline_import_only / adopted\n\n原任务已进入导入后待验证状态；这不等于场景绑定、Preview、Build 或生产验收完成。\n\n原协议 productionVerified：false；这不表示独立人工验收通过。\n\n任务封存规范\n\n此任务未附关联工程验收证据；不能把导入状态当作运行验收。\n\n原导入回执\n操作 ID\nicon-import-cc3f8d6093fd310e63864eb8e39b799e\n导入状态\nimported_pending_verification\n写入效果\ntrue\n租约状态\nRELEASED\n原错误码\n无返回错误码\n\n写入效果与租约状态相互独立；租约未知不表示资产未导入。\n\ncreator_get_project_info · icon-import-cc3f8d6093fd310e63864eb8e39b799e-identity · PASSED\nproject_get_status · icon-import-cc3f8d6093fd310e63864eb8e39b799e-status · PASSED\nproject_write_lease · icon-import-cc3f8d6093fd310e63864eb8e39b799e-lease · PASSED\noperation_get · icon-import-cc3f8d6093fd310e63864eb8e39b799e-coin-pouch-next-ui-20261017 · PASSED\nasset_get_info · icon-import-cc3f8d6093fd310e63864eb8e39b799e-coin-pouch-next-ui-20261017-existing · PASSED\nasset_import · icon-import-cc3f8d6093fd310e63864eb8e39b799e-coin-pouch-next-ui-20261017 · PASSED\nasset_get_info · icon-import-cc3f8d6093fd310e63864eb8e39b799e-coin-pouch-next-ui-20261017-readback · PASSED\nasset_resolve_reference · icon-import-cc3f8d6093fd310e63864eb8e39b799e-coin-pouch-next-ui-20261017-spriteframe · PASSED\nproject_write_lease · icon-import-cc3f8d6093fd310e63864eb8e39b799e-release · PASSED\n原任务目标\ncoin-pouch-next-ui-20261017 · assets/art/coin-pouch-next-ui-20261017.png\n已记录候选\nCANDIDATE-coin-pouch-next-ui-20261017-adopt-1\n\n资产 coin-pouch-next-ui-20261017 · 1024 × 1024 · PNG / Alpha\n\nSHA-256 7100b11dd00bceb72147a606b1f048949a86f2ec3a9e253950fb3932ee83a756\n\n原任务已保存此选择\n\n预览此候选\n原任务操作\n\n每项操作单独核对并批准；确认绑定当前工程、来源、原任务版本和候选 SHA-256。跨标签页保护只协调当前站点，后台仍按原版本与状态拒绝冲突。\n\n导出默认尺寸 PNG\n导出其他尺寸\n刷新原任务并核对保护记录\n\n工程、来源、任务版本或提供者已变化，本次确认已撤销。",
+    "ok": true,
+    "ownedBrowserClosed": true,
+    "stop": {
+      "atUtc": "2026-10-17T05:40:31.606Z",
+      "projectId": "a79f4915296f4091",
+      "authorizationId": "Sentinel_6bbc98226a6c819185d4dab69eafa737",
+      "reason": "real-next-existing-buttons-completed",
+      "errorCode": null,
+      "cleanupErrors": [],
+      "firstListener": {
+        "atUtc": "2026-10-17T05:40:08.592Z",
+        "listener": {
+          "address": "0.0.0.0",
+          "port": 7458,
+          "pid": 23512
+        },
+        "authorizationId": "Sentinel_6bbc98226a6c819185d4dab69eafa737"
+      },
+      "cumulativeChargedMs": 381067,
+      "cumulativeCapMs": 1800000,
+      "conservativeWholeWindowCharge": true,
+      "observedOwnedListeners": [
+        {
+          "firstObservedAt": "2026-10-17T05:40:08.592Z",
+          "listener": {
+            "address": "0.0.0.0",
+            "port": 7458,
+            "pid": 23512
+          },
+          "identityMatchedMain": true
+        },
+        {
+          "firstObservedAt": "2026-10-17T05:40:12.717Z",
+          "listener": {
+            "address": "127.0.0.1",
+            "port": 2938,
+            "pid": 23512
+          },
+          "identityMatchedMain": true
+        },
+        {
+          "firstObservedAt": "2026-10-17T05:40:14.087Z",
+          "listener": {
+            "address": "127.0.0.1",
+            "port": 2950,
+            "pid": 23512
+          },
+          "identityMatchedMain": true
+        }
+      ],
+      "port7458Closed": true,
+      "ownListenersClosed": true,
+      "ownProcessTreeClosed": true,
+      "remainingProcesses": [],
+      "remainingMains": [],
+      "remainingListeners": [],
+      "withinAuthorizedWindow": true,
+      "officialStopResponse": {
+        "projectId": "a79f4915296f4091",
+        "state": "stopped",
+        "launchSource": "dashboard"
+      }
+    },
+    "cleanupErrors": [],
+    "finishedAt": "2026-10-17T05:40:31.703Z",
+    "network": [
+      {
+        "method": "GET",
+        "path": "/api/projects",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/calls/counts",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/status",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/tools",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/events",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/calls/counts",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/projects",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/status",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/calls/counts",
+        "status": 200
+      },
+      {
+        "method": "GET",
+        "path": "/api/icons/a79f4915296f4091/jobs",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/import",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/icons/a79f4915296f4091/status",
+        "status": 200
+      }
+    ],
+    "blocked": [],
+    "errors": [],
+    "writes": [
+      {
+        "atUtc": "2026-10-17T05:40:17.892Z",
+        "action": "import",
+        "body": {
+          "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+          "revision": 3,
+          "approved": true
+        }
+      }
+    ],
+    "importPostCount": 1
+  },
+  "closure": {
+    "atUtc": "2026-10-17T05:42:42.977Z",
+    "projectId": "a79f4915296f4091",
+    "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+    "taskState": "imported_pending_verification",
+    "revision": 6,
+    "importOperationId": "icon-import-cc3f8d6093fd310e63864eb8e39b799e",
+    "importEffect": true,
+    "importLease": "RELEASED",
+    "sourceRevision": "a2ff18a013608dadf47b624eb58fba587b754fc7",
+    "creatorTotal": 0,
+    "remainingOwned": [],
+    "observedOwnedListeners": [
+      {
+        "address": "0.0.0.0",
+        "port": 7458,
+        "pid": 23512
+      },
+      {
+        "address": "127.0.0.1",
+        "port": 2938,
+        "pid": 23512
+      },
+      {
+        "address": "127.0.0.1",
+        "port": 2950,
+        "pid": 23512
+      }
+    ],
+    "sensitiveOrObservedListeners": [],
+    "budgetUsedMs": 381067,
+    "budgetActive": null,
+    "sharedDirtyUnchanged": true,
+    "sharedHeadUnchanged": true,
+    "trackedDrift": [],
+    "settingsDrift": [],
+    "oldTaskUnchanged": true,
+    "daemonIdentity": {
+      "pid": 4092,
+      "startupEpoch": "38d457be-b726-433a-bcec-077b6d2a6245",
+      "startedAt": "2026-10-17T04:37:32.853Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "f3323c72165a2d2f28f3faf89b3c5811e5df1dafee384303db0bf84811970e70",
+      "nodeVersion": "v25.2.1"
+    },
+    "inflightCounts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0
+    },
+    "unknown": [],
+    "ok": true
+  },
+  "operationLedger": {
+    "atUtc": "2026-10-17T05:42:43.787653+00:00",
+    "readOnly": true,
+    "payloadOrCredentialsRead": false,
+    "operations": [
+      {
+        "project_id": "a79f4915296f4091",
+        "operation_id": "icon-import-cc3f8d6093fd310e63864eb8e39b799e-coin-pouch-next-ui-20261017",
+        "tool": "asset_import",
+        "lease_id": "d13a1df2-34e5-4ebc-8465-0040dfb8499e",
+        "fencing_token": 9,
+        "status": "SUCCEEDED",
+        "started_ms": 1792215622012,
+        "completed_ms": 1792215622636
+      }
+    ],
+    "dispatches": [
+      {
+        "project_id": "a79f4915296f4091",
+        "operation_id": "icon-import-cc3f8d6093fd310e63864eb8e39b799e-coin-pouch-next-ui-20261017",
+        "dispatch_id": "c4649a2b-f622-4c31-9b6f-abd0c2dab47a",
+        "lease_id": "d13a1df2-34e5-4ebc-8465-0040dfb8499e",
+        "fencing_token": 9,
+        "state": "TERMINAL",
+        "terminal_status": "SUCCEEDED",
+        "recoverable": 0
+      }
+    ],
+    "leases": [
+      {
+        "project_id": "a79f4915296f4091",
+        "run_id": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+        "lease_id": "d13a1df2-34e5-4ebc-8465-0040dfb8499e",
+        "fencing_token": 9,
+        "status": "RELEASED"
+      }
+    ]
+  },
+  "protected": {
+    "atUtc": "2026-10-17T05:40:44.032495+00:00",
+    "oldProjectId": "87224a1a9dbb5736",
+    "readOnly": true,
+    "payloadOrCredentialsRead": false,
+    "newProjectCounts": {
+      "project_write_leases": 1,
+      "operations": 17,
+      "operation_dispatches": 11,
+      "operation_resolutions": 0
+    },
+    "oldMetadataSha256": "9eab90dcc56b34bf217e55dea3f73ab163a91908f948f8a7001e258c3f1a6828",
+    "adoptionManifestSha256": "65f660e7fd048147a700142b59f4ec352a6a7f162a2cba237ff54e5597b3191c",
+    "nextIndexSha256": "8ac97a787d9a8bf19c79b48e1bde144eeef74118098e2ae82e6c8bc2251a2eac",
+    "oldProjectUnchanged": true,
+    "manifestUnchanged": true,
+    "nextIndexUnchanged": true
+  },
+  "productionVerified": false,
+  "libraryScreenshot": {
+    "status": "succeeded",
+    "file_name": "mother-imported-1440x1080.png",
+    "file_id": "file_0000000058c882309b50f71ca229a141",
+    "library_file_id": "libfile_4f7fb776b6cc819192eec3c45c7a9435",
+    "current_version_number": 0,
+    "file_size_bytes": 137537,
+    "localIdentityXattrsApplied": false,
+    "localIdentityFailure": "Windows Python has no os.setxattr; upload succeeded, sidecar retained; no duplicate upload"
+  },
+  "screenshot": {
+    "filename": "next-buttons-mother-20261017.png",
+    "sourceFilename": "mother-imported-1440x1080.png",
+    "sha256": "1d136e16376efc1f2ae6905ff6817056b2d703e0a50a048848ce9b31ab79ea6e",
+    "width": 1440,
+    "height": 1080,
+    "visuallyInspected": true
+  },
+  "readOnlyReview": {
+    "task": "/root/window_budget_reviewer",
+    "role": "prompt-emulated reviewer",
+    "result": "no remaining proven P1/P2; readonly isolation not verified"
+  },
+  "rawEvidenceDirectory": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-variant-import-20261016\\interface-load-20261016-phase2\\recovery-20261017\\isolated-import-20261017\\e2e-30min\\attempt-05-ui-mother",
+  "libraryUploadCorrection": {
+    "recordedAtUtc": "2026-10-17T05:50:51.941247+00:00",
+    "reason": "Earlier Library screenshot delivery instruction was mistakenly carried into this slice despite its no-cloud-outbound restriction.",
+    "uploadedFileCount": 1,
+    "currentStatus": "moved_to_library_trash",
+    "deleteOperationStatus": "succeeded",
+    "physicalPurgeNotClaimed": true,
+    "subsequentDelivery": "local artifacts only",
+    "receiptFile": "library-withdrawal-receipt.json",
+    "noFurtherUploads": true
+  }
+}
