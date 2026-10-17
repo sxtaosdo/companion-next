@@ -2,6 +2,8 @@
 
 状态：Accepted。本记录补充真实资源导入证据，不改变Next界面、已部署六静态、共享cocos-mcp源码或旧UNKNOWN。完整迁移差距仍以[主清单](feature-parity-current.md)为准。
 
+后续实际窗口（02:43 UTC）：同一fixture通过Dashboard启动3.8.8，首次7458监听02:43:54.937Z、固定截止02:53:54.937Z。02:44:00.686Z首次只读解析返回NOT_FOUND；资产日志到本机UTC+8 10:44:02才ready，查询早于就绪约2秒。没有派发场景/Preview/Build，没有重导或重放；官方stop后两项已核自有子进程另以同一SIGTERM收尾，02:46:03.487Z确认全树和7456/7458关闭，新fence2于02:46:44释放。原资产7项复查通过；只读就绪门候选8项离线检查通过，尚未实测。细节及原始FALSE关闭回执/最终补充证明见fixture根WINDOW-20261017.md。不能把Bridge ready当AssetDB ready；已用窗口不因重连重置。
+
 2026-10-17在Owner批准的独立fixture `D:/code/shidai3/P8000/local-tests/creator-ai-variant-import-acceptance-20261017`（projectId `a79f4915296f4091`，Creator3.8.8、Bridge0.3.138）已完成现有母图的单张CPU96×96 PNG真实导入。使用新job/绑定/收据，不重用旧失败操作；原sourceId与adoption manifest只读复用。两次启动期间合计只有一次导入POST，首次7456意外端口尝试提交0次，失败与Owner批准的profile修正/残留清理记录保留。
 
 PNG7391字节，SHA256 `fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654`，meta SHA256 `e57c2fd7977930cd99f5a5239bbb0947b7d3db6d154448af43dbbf0e27faaa7b`；asset UUID `8caed0d9-2eec-48ff-a7ea-9788842986b0`，SpriteFrame UUID同UUID加`@f9941`。原PNG96×96与SpriteFrame raw96×96一致，有效auto-trim53×68不代表尺寸错误。导出和导入字节相同，Creator实际引用回读与7项只读CPU检查均通过。
