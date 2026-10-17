@@ -1,6 +1,6 @@
 # Companion Next
 
-**当前版本：`v1.3.173.23`**
+**当前版本：`v1.3.173.24`**
 
 2026-10-17当前资源范围：可信PNG采用、选图、CPU96导出及1024母图导入四个已有按钮已真实逐项确认，各写一次；原任务imported_pending_verification/r6、asset_import SUCCEEDED/TERMINAL、fence9释放，PNG/meta/Asset/SpriteFrame回读一致。Creator/Edge/自有端口全关，累计381.067/1800秒、active=null。资产已精确归档隔离仓e182b6b/0.1.0.11；原sourceRevision不重标。新增变体UI未实现，真实GPU生成及新母图场景/Preview/Build未验，productionVerified固定false。旧96变体运行证据继续有效。[操作步骤、回执及截图](docs/variant-ui-followup-20261017.md)为本轮范围说明。功能代码与部署仍caf14fb/1.3.173.18。
 
