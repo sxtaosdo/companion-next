@@ -322,3 +322,5 @@ export function createCompanionBrowserProvider(options: { fetch: CompanionFetch;
     },
   })
 }
+
+export { displayText as sanitizeCompanionDisplayText }

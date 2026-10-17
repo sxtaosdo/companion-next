@@ -1,3 +1,5 @@
+import { createLogToolsProvider } from './adapters/log-tools'
+import { registerLogToolsProvider } from './log-tools-integration'
 import { createAiJobActionsProvider } from './adapters/ai-job-actions'
 import { registerAiJobActionsProvider } from './ai-job-actions-integration'
 import { createAiTaskCreationProvider } from './adapters/ai-task-creation'
@@ -46,6 +48,7 @@ if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatH
   // Normal workspace exposes the approved existing capabilities; readonly keeps
   // its passive boundary. Loopback never replaces session or per-action consent.
   if (normalWorkspaceHost) {
+    registerLogToolsProvider(createLogToolsProvider({fetch:window.fetch.bind(window)}))
     registerAiJobsReadProvider(createAiJobsReadProvider({fetch:window.fetch.bind(window)}))
     registerAiJobActionsProvider(createAiJobActionsProvider({fetch:window.fetch.bind(window)}))
     registerAiTaskCreationProvider(createAiTaskCreationProvider({fetch:window.fetch.bind(window)}))
