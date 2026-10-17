@@ -65,6 +65,29 @@ describe('Companion read UI and host identity',()=>{
   await button('查询 / 刷新日志').trigger('click');await flushPromises();expect(wrapper!.text()).toContain('本次条件返回空日志');store.logFilter.search='new';await flushPromises();expect(wrapper!.text()).toContain('筛选已变');expect(p.loadLogs).toHaveBeenCalledTimes(1)
   expect(await tip('日志范围说明')).toContain('最多最新200条');expect(await tip('日志范围说明')).toContain('无历史分页')
  })
+ it.each([true,false])('keeps manual-refresh logs mounted and preserves bottom following=%s',async following=>{
+  const p=fixture();registerCompanionBrowserProvider(p);const {store}=await setup('/projects?tab=logs');await store.connect(p)
+  const log={id:'l1',projectId:'p1',source:'bridge' as const,level:'info' as const,time:'2026-10-17T00:00:00Z',message:'existing log'}
+  vi.mocked(p.loadLogs).mockResolvedValueOnce([log]);await button('查询 / 刷新日志').trigger('click');await flushPromises()
+  const pane=wrapper!.get('.companion-log-pane').element as HTMLElement
+  const height=1000
+  Object.defineProperties(pane,{scrollHeight:{configurable:true,get:()=>height},clientHeight:{configurable:true,get:()=>200}})
+  pane.scrollTop=following?800:200;await wrapper!.get('.companion-log-pane').trigger('scroll')
+  let resolve!:(logs:typeof log[])=>void
+  vi.mocked(p.loadLogs).mockImplementationOnce(()=>new Promise(r=>{resolve=r}))
+  await button('查询 / 刷新日志').trigger('click');await flushPromises()
+  expect(store.logsLoading).toBe(true)
+  expect(wrapper!.get('.companion-log-pane article').text()).toContain('existing log')
+  expect(pane.scrollTop).toBe(following?800:200)
+  // Keep layout fixed: jsdom has no layout engine; real scroll geometry needs browser QA.
+  resolve([log,{...log,id:'l2',message:'new log'}])
+  await flushPromises()
+  await wrapper!.get('.companion-log-pane').trigger('scroll')
+  expect(wrapper!.get('.companion-log-pane').element).toBe(pane)
+  expect(wrapper!.findAll('.companion-log-pane article')).toHaveLength(2)
+  expect(pane.scrollTop).toBe(following?1000:200)
+  expect(wrapper!.find('.companion-scroll-latest').exists()).toBe(!following)
+ })
  it('checks provider identity immediately after returning from another route',async()=>{
   const old=fixture();registerCompanionBrowserProvider(old);const pinia=createPinia(),store=useCompanionBrowserStore(pinia);await store.connect(old);registerCompanionBrowserProvider(fixture());const router=createRouter({history:createMemoryHistory(),routes:[{path:'/projects',component:CompanionBrowserView}]});await router.push('/projects');await router.isReady();wrapper=mount(CompanionBrowserView,{global:{plugins:[pinia,router,ElementPlus]}});await flushPromises();expect(store.connected).toBe(false);expect(store.provider).toBeNull();expect(store.projects).toEqual([])
  })

@@ -1,5 +1,8 @@
 # 当前功能差距与恢复顺序（2026-10-16）
 
+2026-10-17 独立接续核对：**尚未全部对齐**。现存旧UI真实路由/动作与Next逐项矩阵见 [本轮审计](parity-audit-20261017.md)。具体缺口包含Next Preview/Profiler栏、日志清除/诊断、独立MCP配置、Agent问答/同步及旧管理iframe；仅源码已接而无真实回执的动作继续列未验证。本片已复现并修复手动日志刷新先清空导致滚动/跟随丢失，82项定向、strict类型、构建和55静态检查通过（1平台跳过），独立reviewer无发现；源码未部署，现有3074d37/.25和96资源已完成证据保持。
+
+
 2026-10-17 10:43 UTC当前补核：新增尺寸入口的40ee0bc7…资源已在独立fixture完成新场景保存/跨会话重开、真实Preview/Profiler/WebMobile/Smoke，证据521fcf8、说明c80b890；不同于旧8caed0d9资源或1024母图。原scene_validate弃用warn误判false单列，不把productionVerified固定false计未通过。原历史读取在c80b890后仍200且保留导入源796a233，新Next适配记录回归3例加原测试共82项与strict类型通过，未发现确切逻辑缺陷，不制造代码改动。页面实际1.3.173、部署3074d37/.25，用户已要求并打开正确Next入口，独立认证页面与六文件可达验证通过；不等于Owner逐项功能操作验收。剩余Preview控制/日志清空等新界面流程继续先确认；本地模型任务已停止推进，不启动模型。详见[接续范围与证据](history-read-regression-20261017.md)。下方旧段各按其原时间理解。
 
 2026-10-17 04:38 UTC 更新：隔离工程的持久场景、Preview、Profiler、WebMobile Build 与固定产物 Smoke 已通过；Next 原资源面板真实历史/状态/原96×96变体PNG读取均200、图片SHA与原收据一致，明确历史只读，productionVerified=false。Next caf14fb/1.3.173.18已部署；实际 Studio 工作树6cb7c09（合同7e117fe），Node25 daemon PID4092。下述旧失败/待办作为当时记录保留，当前状态、源码整合边界和证据以[本轮交付](variant-ui-followup-20261017.md)为准。

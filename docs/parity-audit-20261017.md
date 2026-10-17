@@ -42,3 +42,15 @@ Next 起点 `fab6ebf` / 本地 `1.3.173.29`，工作树干净；产品 `1.3.173`
 先以本文件提交任务检查点，再修日志手动刷新保留快照。仅改 Next 对应日志按钮、定向UI回归、用户更新记录和本文件；不新增交互，不发送DELETE，不改旧宿主或生命周期，不部署共享目录。源码修复完成与运行网页仍为旧部署分别交付。
 
 其余缺失仍应逐项恢复，不能宣称“功能已对齐”。Preview/Profiler、日志清除/诊断、MCP/Agent/同步需按旧合同分别推进；模型工作暂停。既有96验收、82历史回归不重复执行。
+
+
+## 本片完成结果
+
+- 审计检查点：`1339e9e` / `1.3.173.30`，之后只修复已批准日志刷新交互；表中修复前的日志缺陷现已在源码修复，其余缺失仍成立。
+- 最小业务改动：`src/views/CompanionBrowserView.vue:128` 的手动按钮调用既有 `refreshLogs(true)`。等待响应时保留日志DOM；已有 watcher 继续区分底部跟随与向上阅读。筛选、失败、断开/来源切换仍沿原 store 清理及版本取消逻辑，不改接口或后台日志。
+- 新增两例 UI 回归：先在原代码运行，两例都因等待时 article 被清空而失败；修复后通过。五个受影响测试文件共 **82项通过**（companion-browser-ui/store、companion-live-store、companion-normal-state、companion-passive-read），strict类型与正常workspace构建通过；静态56项中55通过、1项Windows大小写碰撞fixture跳过，0失败。保留原大chunk提示。
+- 构建输出 `dist-companion-workspace/assets/index-DRqkgBYx.js`、`index-BmCNTDuV.css`；只为离线验证，未复制到旧宿主、未切换网页入口。**当前用户页面仍为3074d37/.25部署**，不能说已看到本片修复。
+- 适用根AGENTS要求的独立 reviewer 已只读审查本次三文件，未发现具体回归；核实失败清理、筛选取消、provider/epoch拒绝迟到回复及更新说明边界。OCR本地delegate preview/rule已执行，默认排除测试，本宿主另审测试；未调用托管模型，不宣称权威PASS。
+- jsdom使用固定模拟高度，只证明DOM和代码分支。真实浏览器滚动、200条截断/变高、换行和缩放仍未验证；本轮没有启动新监听、Creator、模型或向真实后台发送写请求。未推送、未发布、未上传。
+
+下一目标继续保持：恢复旧 Companion 能力，优先 Preview/Profiler、日志清除/诊断，再处理 MCP/Agent/同步；模型工作仍暂停。下一片应先核真实旧动作合同和副作用，不能把本片一行修复扩大为全迁移完成。
