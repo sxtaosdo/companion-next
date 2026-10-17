@@ -20,3 +20,8 @@
 3文件126项单worker串行测试通过，strict类型和一次必要workspace构建通过，保留原大chunk提示。首轮125项断言通过但Navigator替身引发未处理错误，不算成功；已改为保留真实Navigator仅注入clipboard并复跑通过，追加迟到复制不串来源。独立只读reviewer未发现具体缺陷，未运行额外高负载测试。
 
 本轮ocr delegate被自动审批拒绝：外部审查程序可能更新检查或传输私有源码，未获授权且不必要。未执行该命令、不重试、不绕过，改用本地类型/测试和独立源码审查；不宣称OCR完成或managed PASS。后续静态备份/部署/Edge隔离回执另记，不以源码完成代替已部署。
+
+
+## 已部署验收
+
+源 d982a34 / 1.3.173.42 已通过原静态发布流程部署到现有32180，六文件HTTP SHA一致，保留旧静态文件和共享22项修改。Edge顺序验证有名称、缺省、失败三分支；复制/换行有效，断开重连不复活旧完成示例。三个setup均为拦截fixture，生产setup/安装/客户端配置写入/用户剪贴板写入均0。PID2100和startupEpoch保持，独立浏览器已关闭。证据：C:/Users/33272/AppData/Local/Temp/companion-next-resume-usage/delivery/browser-proof.json；截图completion-usage.png已查看。
