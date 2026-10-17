@@ -1,5 +1,7 @@
 # Companion 1.3.171：原图标任务历史、状态与候选只读接线
 
+2026-10-17 04:38 UTC 更新：隔离工程的持久场景、Preview、Profiler、WebMobile Build 与固定产物 Smoke 已通过；Next 原资源面板真实历史/状态/原96×96变体PNG读取均200、图片SHA与原收据一致，明确历史只读，productionVerified=false。Next caf14fb/1.3.173.18已部署；实际 Studio 工作树6cb7c09（合同7e117fe），Node25 daemon PID4092。下述旧失败/待办作为当时记录保留，当前状态、源码整合边界和证据以[本轮交付](variant-ui-followup-20261017.md)为准。
+
 ## 2026-10-17 变体导入摘要增量（本地开发，未部署）
 
 以实际运行的 `cocos-mcp/mcp/dist/companion/companion-daemon.js` 合同为准：`jobs/status` 可带独立 `variantImport`，包含原操作、写入效果、租约、工具摘要、active 和可选 artifact。Next 将严格校验并单独展示这份摘要；它不改变母图 `state/import`，不将 `productionVerified` 晋级。存在变体导入记录的任务暂停全部页面写操作，防止母图仍为 selected 时误触重复导入或变更既有绑定。

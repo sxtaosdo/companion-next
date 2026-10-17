@@ -1,5 +1,7 @@
 # 隔离96×96变体导入与后续验收
 
+2026-10-17 04:38 UTC 更新：隔离工程的持久场景、Preview、Profiler、WebMobile Build 与固定产物 Smoke 已通过；Next 原资源面板真实历史/状态/原96×96变体PNG读取均200、图片SHA与原收据一致，明确历史只读，productionVerified=false。Next caf14fb/1.3.173.18已部署；实际 Studio 工作树6cb7c09（合同7e117fe），Node25 daemon PID4092。下述旧失败/待办作为当时记录保留，当前状态、源码整合边界和证据以[本轮交付](variant-ui-followup-20261017.md)为准。
+
 后续事实更新（03:59 UTC）：该独立 fixture 已完成持久场景跨会话重开、实际 Preview 可见、Profiler 和 WebMobile Build，权威记录在 fixture `WINDOW-20261017.md` / HEAD `aae735afc76793186c9e100179f75425caffad28`。Build Smoke 尚待 GPU 窗口；真实 Next 资源 UI 已复现旧任务读取409，未通过完整验收。以下保留当时窗口记录，不作为后续 Runtime 未执行的结论；详见[后续交接](variant-ui-followup-20261017.md)。
 
 状态：Accepted。本记录补充真实资源导入证据，不改变Next界面、已部署六静态、共享cocos-mcp源码或旧UNKNOWN。完整迁移差距仍以[主清单](feature-parity-current.md)为准。

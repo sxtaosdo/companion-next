@@ -1,5 +1,7 @@
 # 当前功能差距与恢复顺序（2026-10-16）
 
+2026-10-17 04:38 UTC 更新：隔离工程的持久场景、Preview、Profiler、WebMobile Build 与固定产物 Smoke 已通过；Next 原资源面板真实历史/状态/原96×96变体PNG读取均200、图片SHA与原收据一致，明确历史只读，productionVerified=false。Next caf14fb/1.3.173.18已部署；实际 Studio 工作树6cb7c09（合同7e117fe），Node25 daemon PID4092。下述旧失败/待办作为当时记录保留，当前状态、源码整合边界和证据以[本轮交付](variant-ui-followup-20261017.md)为准。
+
 2026-10-17当前增量：隔离fixture已完成单张96×96变体真实导入、Creator引用回读、7项离线检查及官方停止；未扩大Next UI。场景/Preview/Build目标已获准，新监听窗口待协调，这些运行验收仍未完成，见[真实导入记录](isolated-variant-acceptance-20261017.md)。此前创建/初始化六静态已部署、认证Edge表单验收通过；恢复与损坏保护见[恢复回执](next-recovery-20261017.md)。下方旧“未导入”描述均为对应时间的历史结果。
 
 当前切片：已恢复原创建项目/初始化空目录scaffold与四来源选择；92文件3840项回归、类型/正常构建通过，真实旧接口只在本任务Temp合成目录验证两次201并核实最小文件，未登记或启动Creator。静态交付与浏览器边界见[本片记录](project-scaffold-local.md)。下一片为日志清空，诊断旧响应含原始日志，先核清脱敏边界；随后Preview/Profiler与五客户端MCP/Agent。真实Creator、GPU、持久账号配置与通配监听仍分别受原批准边界约束。

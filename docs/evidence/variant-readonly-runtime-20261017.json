@@ -1,0 +1,70 @@
+{
+  "atUtc": "2026-10-17T04:37:33.116Z",
+  "ok": true,
+  "beforeIdentity": {
+    "pid": 16140,
+    "startupEpoch": "4e1af6ae-0131-4c17-9998-2a68d2c7ea41",
+    "startedAt": "2026-10-17T00:37:06.015Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "ac1f2f5f0958f091935d905793d6fe8db9747e5a9cc04b3a000c86f72e8ac141",
+    "nodeVersion": "v25.2.1"
+  },
+  "afterIdentity": {
+    "pid": 4092,
+    "startupEpoch": "38d457be-b726-433a-bcec-077b6d2a6245",
+    "startedAt": "2026-10-17T04:37:32.853Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "f3323c72165a2d2f28f3faf89b3c5811e5df1dafee384303db0bf84811970e70",
+    "nodeVersion": "v25.2.1"
+  },
+  "phase": "OPEN",
+  "origin": "http://127.0.0.1:32180",
+  "counts": {
+    "http": 0,
+    "mcp": 0,
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "maintenanceObservations": 0,
+    "projectActions": 0,
+    "globalActions": 0,
+    "recovery": 0,
+    "setup": 0,
+    "builds": 0,
+    "observedBuilds": 0,
+    "sidecars": 0,
+    "setupPolls": 0,
+    "setupTimers": 0,
+    "icons": 0
+  },
+  "oldTaskUnchanged": true,
+  "taskSha256": "181095392e02d8b08a368ef725fc34629bb804f29710a18d991f724a4da69126",
+  "bundles": [
+    {
+      "name": "creator-ai.js",
+      "bytes": 1407127,
+      "sha256": "6085072c7c9c7901b1a77d9392785209f9b80c00334a509afd9947f72cde87b8"
+    },
+    {
+      "name": "creator-ai.js.map",
+      "bytes": 2651817,
+      "sha256": "1d3fa9e2c00629a7775df27b24a777c32c2ea850718101388843d55b599c4681"
+    },
+    {
+      "name": "companion-daemon.js",
+      "bytes": 1699446,
+      "sha256": "f3323c72165a2d2f28f3faf89b3c5811e5df1dafee384303db0bf84811970e70"
+    },
+    {
+      "name": "companion-daemon.js.map",
+      "bytes": 2941529,
+      "sha256": "bb763665e87bdce07824d52e0d5f2e254e8d11d05b1443f94e2e295b0f4ff06f"
+    }
+  ],
+  "staticSourceRevision": "caf14fbf997ef1b2cc18aa5e4d0a980885df9882",
+  "indexSha256": "8ac97a787d9a8bf19c79b48e1bde144eeef74118098e2ae82e6c8bc2251a2eac",
+  "oldAssetsRetained": true,
+  "creatorStarted": false,
+  "credentialsLogged": false,
+  "firstStartFailed": true,
+  "recoveredUsingOriginalRuntime": true
+}
