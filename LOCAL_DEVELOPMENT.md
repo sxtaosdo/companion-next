@@ -1,6 +1,6 @@
 # Windows本地开发交接
 
-2026-10-17 05:10 UTC：变体历史/状态/原PNG真实Next读取及隔离场景/Preview/Profiler/Build/Smoke已验；资源API已精确整合共享main（代码8f169c7、合同4fcfe82），22项并行dirty保持。运行Next仍caf14fb/1.3.173.18、Studio功能6cb7c09（合同7e117fe）、Node25 daemon PID4092。本轮真实Next零业务写入；新任务写操作尚未实际点击，Next缺少尺寸变体导入入口。productionVerified是固定false协议策略，没有置true接口。可用入口、短步骤、缺口和并行TS7016归属见[本轮交付](docs/variant-ui-followup-20261017.md)；下列旧记录保留各自时间，不替代最新范围。
+2026-10-17 05:25 UTC：独立新任务已真实Next采用/选图/CPU96导出，各写一次；母图导入确认页已核，导入前因7458之外的原Creator本机监听被守卫收尾，等待范围澄清，导入POST为0。累计346.778/1800秒、active=null，Creator/端口/Edge关闭，旧任务、原46跟踪文件和7个settings保持。此前场景/Preview/Build/Smoke与Next历史读图及共享资源API整合继续有效；新任务HEAD保持a2ff18a便于原ID核对，不重建重发。运行Next仍caf14fb/1.3.173.18，新增变体导入UI不实现，productionVerified固定false。精确证据及限制见[本轮交付](docs/variant-ui-followup-20261017.md)；下列旧记录保留各自时间。
 
 2026-10-17 变体摘要本地增量：代码 `c3b1fd1a8adf27c21018ff314e01eb666305d378` / `1.3.173.16`，936 项受影响测试、类型和 workspace 构建通过；未部署。真实 Next 资源页正确选中隔离工程，但原 jobs/status 因 Studio adopted exact-HEAD 合同返回409，完整 UI 尚未通过；变体 PNG 字节接口也待协调。既有 Preview/Profiler/Build 证据及 Library 截图 ID、GPU 待排 Smoke、精确 Owner 文件清单见[本轮交接](docs/variant-ui-followup-20261017.md)。
 

@@ -1,0 +1,121 @@
+{
+  "atUtc": "2026-10-17T05:24:58.093762+00:00",
+  "projectId": "a79f4915296f4091",
+  "sourceRevision": "a2ff18a013608dadf47b624eb58fba587b754fc7",
+  "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+  "completedActualUi": [
+    "adopt",
+    "select",
+    "export-variant"
+  ],
+  "businessPostCounts": {
+    "adopt": 1,
+    "select": 1,
+    "export-variant": 1,
+    "import": 0
+  },
+  "selectedRevision": 3,
+  "export": {
+    "schemaVersion": "companion-icons-v1",
+    "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+    "revision": 3,
+    "candidateId": "CANDIDATE-coin-pouch-next-ui-20261017-adopt-1",
+    "relativePath": "art/final/companion/coin-pouch-next-ui-20261017-96x96-7100b11dd00b.png",
+    "sha256": "fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654",
+    "sourceSha256": "7100b11dd00bceb72147a606b1f048949a86f2ec3a9e253950fb3932ee83a756",
+    "width": 96,
+    "height": 96,
+    "created": true,
+    "upscaled": false,
+    "qualityLimit": null,
+    "receiptSha256": "32e9bc205742cb9a4c4039b2c6287afbf89a29c6ab95893d1985277ba0f663aa",
+    "pngPath": "D:/code/shidai3/P8000/local-tests/creator-ai-variant-import-acceptance-20261017/art/final/companion/coin-pouch-next-ui-20261017-96x96-7100b11dd00b.png",
+    "bytes": 7391
+  },
+  "motherImport": {
+    "implemented": true,
+    "notDispatched": true,
+    "blocker": "Literal only7458 guard observed other own loopback listeners; awaiting precise permission clarification",
+    "observedOtherListeners": [
+      {
+        "host": "127.0.0.1",
+        "port": 11097,
+        "pid": 3356,
+        "purpose": "unconfirmed"
+      },
+      {
+        "host": "127.0.0.1",
+        "port": 11105,
+        "pid": 3356,
+        "purpose": "creator-ai-bridge (project.log exact line)"
+      }
+    ]
+  },
+  "creatorStop": {
+    "atUtc": "2026-10-17T05:21:59.818Z",
+    "projectId": "a79f4915296f4091",
+    "authorizationId": "Sentinel_6bbc98226a6c819185d4dab69eafa737",
+    "reason": "safety-stop",
+    "errorCode": "Unexpected wildcard listener",
+    "cleanupErrors": [],
+    "firstListener": {
+      "atUtc": "2026-10-17T05:21:50.787Z",
+      "listener": {
+        "address": "0.0.0.0",
+        "port": 7458,
+        "pid": 3356
+      },
+      "authorizationId": "Sentinel_6bbc98226a6c819185d4dab69eafa737"
+    },
+    "cumulativeChargedMs": 346778,
+    "cumulativeCapMs": 1800000,
+    "conservativeWholeWindowCharge": true,
+    "port7458Closed": true,
+    "ownListenersClosed": true,
+    "ownProcessTreeClosed": true,
+    "remainingProcesses": [],
+    "remainingMains": [],
+    "remainingListeners": [],
+    "withinAuthorizedWindow": true,
+    "officialStopResponse": {
+      "projectId": "a79f4915296f4091",
+      "state": "stopped",
+      "launchSource": "dashboard"
+    }
+  },
+  "budget": {
+    "usedMs": 346778,
+    "remainingMs": 1453222,
+    "active": null
+  },
+  "protectedOriginalTrackedFileCount": 46,
+  "trackedDrift": [],
+  "untrackedSettingsDrift": [],
+  "oldTaskUnchanged": true,
+  "frozenMetadataUnchanged": true,
+  "manifestUnchanged": true,
+  "deployedNextUnchanged": true,
+  "productionVerified": false,
+  "newVariantUiImplemented": false,
+  "failedHarnessAttemptsPreserved": [
+    "ui-prepare-result.json",
+    "ui-prepare-retry-result.json",
+    "ui-import-result.json"
+  ],
+  "screenshots": [
+    {
+      "file": "continued-selected-1440x1080.png",
+      "sha256": "a5bc7da72a29a317c893945b6b6ace270aa2b6a38198948d471057ded2f68ed6"
+    },
+    {
+      "file": "continued-export-1440x1080.png",
+      "sha256": "984929d9024b43249c2ab1e5492d6749300e7a061c79fb751ff766638e8c1fcf"
+    },
+    {
+      "file": "mother-confirmation-1440x1080.png",
+      "sha256": "d22b4e8c6355fd0b0fe419f28d90b3647c75a9333878dffc11806c0c4c848c9f"
+    }
+  ],
+  "nextCode": "caf14fbf997ef1b2cc18aa5e4d0a980885df9882",
+  "taskRetainedForSameIdReadOnlyRecovery": true
+}
