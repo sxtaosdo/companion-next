@@ -2,6 +2,26 @@
 
 状态：Accepted（本机事实及交接记录，不代表完整产品验收）
 
+## 05:35 UTC 11097监听只读归因
+
+本轮仅查询既存进程/端口记录、项目日志、已安装Creator源码及文件版本；没有再启动Creator、连接端口、调用API或申请新增授权。以下结论替代把所有非7458端口视为新增局域网暴露的粗粒度判断；不会因此直接放行未归因的服务。此前提问不作为本轮启动依据。
+
+| 项目 | 可证事实及限制 |
+| --- | --- |
+| 进程归属 | 05:21:54.911 UTC的TCP监听快照记录PID3356、127.0.0.1:11097。原启动回执和创建时间05:21:40.7950540Z将其绑定到本工程Creator3.8.8主进程；不是据端口号猜Owner。 |
+| 具体用途 | 尚未确证。可读launch源码初始化了内部ProcessMainManager，但没有把11097关联到它；不能据此认定为正常IPC、持续服务或异常服务。只有一次正样本，也不能排除启动期临时端口探测。 |
+| 协议 | 已证TCP/IPv4；HTTP、WebSocket、消息格式及具体监听调用均未核明。 |
+| 认证 | 未核明，不能声称有token/会话鉴权，也不能断言匿名访问。没有读取connection/token、账户或凭据文件。 |
+| 外部直接可达 | 观察到的socket只绑定127.0.0.1，没有绑定LAN接口；不能称为新增LAN或公网监听。未证明有外部直接可达路径，本轮也没有做主动探测；不据此保证主机所有潜在代理/转发路径不存在。 |
+| 与7458的区别 | 7458为原批准的0.0.0.0监听，累计窗口仍有1453.222秒；工程未变、预算未耗尽。11097是同进程的另一项回环监听，不等同于扩展7458的全网卡授权。 |
+| 与Bridge的区别 | project.log第4行明确原Bridge为127.0.0.1:11105。该Bridge是既有安装目标；没有证据把11097也认作Bridge。 |
+
+安装包`C:/ProgramData/cocos/editors/Creator/3.8.8/resources/app.asar`的package及EXE文件版本均为3.8.8。只读ASAR索引确认`launch/dist/launch.js`加载`@editor/process-message`并注册`ProcessMainManager(process)`；该入口SHA为`33bc605c2d7b5ed23fbea2aa5b29f79bd91d8e71fa862c467b7435eac51b219e`。实际process-message管理器及creator的network/message/startup关键实现为不可读`.ccc`文件，未解码或执行；unpacked目录也没有对应可读实现。可读`v-electron-channel`使用Electron ipcMain，仍没有11097关联。项目日志仅387字节，只有引擎初始化和11105 Bridge监听，没有11097协议/认证记录。
+
+因此本轮已核清“本工程Creator主进程、TCP回环绑定、与已知Bridge不同、不是已证LAN扩权”，但具体服务模块及认证仍缺少可读实现或既有明确日志，不能虚称用途已确认。最小进一步证据应直接关联模块、监听调用及认证处理；不靠再次启动、猜测端口号或泛化白名单代替。05:30:55 UTC再次只读核对Creator为0、旧身份无残留、7458/11097/11105无监听。预算仍346778/1800000ms、active=null；新任务selected/r3和母图POST0保持。
+
+[机器证据、ASAR偏移/文件SHA及只读边界](evidence/creator-loopback-attribution-20261017.json)。code-mapper与reviewer任务分别为`/root/resource_source_git_mapper`、`/root/window_budget_reviewer`，普通子代理prompt-emulated，硬只读隔离未核验；两者均未运行进程、连接端口或修改文件。主会话保存证据和文档。
+
 ## 05:25 UTC 已有按钮真实写验收
 
 本轮获准在既有隔离工程中使用独立新任务，实际点击已有采用、选图、尺寸导出和母图导入按钮；不实现新增尺寸变体导入UI。新任务`STUDIO-RUN-icon-mvby1nsy-a46a962c`绑定工程`a79f4915296f4091`、HEAD `a2ff18a013608dadf47b624eb58fba587b754fc7`，新目标`assets/art/coin-pouch-next-ui-20261017.png`。原保存v2配置版本1及SHA复用，不改配置；仅采用原manifest的`coin-pouch-existing-20261010`，无生成、云调用、费用或新凭据。

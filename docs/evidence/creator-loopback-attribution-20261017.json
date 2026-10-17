@@ -1,0 +1,172 @@
+{
+  "recordedAtUtc": "2026-10-17T05:33:22.744252+00:00",
+  "mode": "readonly existing evidence and installed-source inspection; no process start, network connection, API, credential access or permission request",
+  "listener": {
+    "atUtc": "2026-10-17T05:21:54.911Z",
+    "listeners": [
+      {
+        "address": "127.0.0.1",
+        "port": 11097,
+        "pid": 3356
+      }
+    ]
+  },
+  "creatorIdentity": {
+    "projectId": "a79f4915296f4091",
+    "state": "ready",
+    "instanceId": "89ab9cae-1c81-478a-8eab-5f1fdc9c9485",
+    "pid": 3356,
+    "launchSource": "dashboard",
+    "dashboardVersion": "2.2.2",
+    "dashboardProgress": "open",
+    "creatorVersion": "3.8.8",
+    "sessionId": "4cad55e0-c5ce-44c7-bcb5-4880d690d54a"
+  },
+  "creatorMainEvidence": {
+    "name": "CocosCreator.exe",
+    "executableMatches": true,
+    "pid": 3356,
+    "parentPid": 10660,
+    "createdAt": "2026-10-17T05:21:40.7950540Z",
+    "projectMatched": true
+  },
+  "bridgeEvidence": {
+    "projectLog": "D:/code/shidai3/P8000/local-tests/creator-ai-variant-import-acceptance-20261017/temp/logs/project.log",
+    "exactLine": "2026-10-17 13:21:55 - info: [creator-ai-bridge] listening on 127.0.0.1:11105",
+    "lineTimezone": "Original local timestamp; other evidence uses UTC",
+    "notEquivalentTo11097": true
+  },
+  "asarEvidence": {
+    "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\resources\\app.asar",
+    "size": 764700326,
+    "mtimeUtc": "2026-10-02T13:21:08.360216+00:00",
+    "packageVersion": "3.8.8",
+    "headerJsonSha256": "1fd9f84a7e2df1c83572e1345ae50ede2c36485937232d4cf220d0b5022c9ca4",
+    "dataBaseOffset": 19156504,
+    "sourceRecords": [
+      {
+        "asarPath": "package.json",
+        "relativeOffset": 745448114,
+        "size": 5966,
+        "sha256": "7c6fc6ba8301ee90530c143e7bfe0f5b97d54ba0909c3a31b44a5daab4241b5f",
+        "readableText": true
+      },
+      {
+        "asarPath": "launch/dist/index.js",
+        "relativeOffset": 43281651,
+        "size": 1220,
+        "sha256": "ca3082dcf80c68baf1de3ffbabf2813293437db7ebe10d74125c0931ec646d5f",
+        "readableText": true
+      },
+      {
+        "asarPath": "launch/dist/launch.js",
+        "relativeOffset": 43283278,
+        "size": 4810,
+        "sha256": "33bc605c2d7b5ed23fbea2aa5b29f79bd91d8e71fa862c467b7435eac51b219e",
+        "readableText": true,
+        "relevantExcerpt": {
+          "line": 1,
+          "characterOffset": 415,
+          "text": "var{editorProcessManager:e,ProcessMainManager:t}=require(\"@editor/process-message\");if(e(\"DASHBOARD_STORE_EXTENSION_INSTALL\",new t(process)),n.PATH.PROJECT&&(e=join(n.PATH.PROJECT,\"temp/crash\"),app.setPath(\"crashDumps\",e),crashReporter.star",
+          "scope": "startup loads process-message and registers ProcessMainManager; no11097 association"
+        }
+      },
+      {
+        "asarPath": "node_modules/@editor/process-message/package.json",
+        "relativeOffset": 398153925,
+        "size": 1000,
+        "sha256": "1c96a0c51cf5452f8a1ba70220d81404186636dda21666f06691c54120ce7f8e",
+        "readableText": true
+      },
+      {
+        "asarPath": "node_modules/@editor/process-message/dist/index.js",
+        "relativeOffset": 398146612,
+        "size": 829,
+        "sha256": "aec6d91cdd4933aef6f200b097ca3f51acb6af942fc5027ad2b0e72903ce2bcc",
+        "readableText": true
+      },
+      {
+        "asarPath": "node_modules/@editor/process-message/dist/lib/ProcessMainManager.ccc",
+        "relativeOffset": 398150713,
+        "size": 2792,
+        "sha256": "df478b3ba0f93867450d7d0bc662b46c4827589f7949c7a9f258144e906f7f21",
+        "readableText": false
+      },
+      {
+        "asarPath": "node_modules/@editor/process-message/dist/lib/ProcessChildManager.ccc",
+        "relativeOffset": 398147925,
+        "size": 2788,
+        "sha256": "b2485e40c43f58662ee67867b79a5549bfa339e814e1a32be13678294c9615b4",
+        "readableText": false
+      },
+      {
+        "asarPath": "node_modules/@editor/process-message/dist/lib/EditorMessageManager.ccc",
+        "relativeOffset": 398147441,
+        "size": 484,
+        "sha256": "68be0fd1c8ab67e0e85923fd8a5eb984ca0e4a171d7f67acb03e0c232d6ba23c",
+        "readableText": false
+      },
+      {
+        "asarPath": "node_modules/@editor/creator/dist/init.ccc",
+        "relativeOffset": 376650106,
+        "size": 1556,
+        "sha256": "0157cf98edbcab08d4b62b4a1ec0af9396c8aa96d7152de6fd8a774dce2d955d",
+        "readableText": false
+      },
+      {
+        "asarPath": "node_modules/@editor/creator/dist/network/protected/browser/util.ccc",
+        "relativeOffset": 376708862,
+        "size": 3140,
+        "sha256": "c1f9b028535348802f98ac9dded89c042bb107740ee3e233a318147433c073ad",
+        "readableText": false
+      },
+      {
+        "asarPath": "node_modules/@editor/creator/@types/editor.d.ts",
+        "relativeOffset": 375862794,
+        "size": 52925,
+        "sha256": "1ae915baea6c60544a5ace2354e11948221f3080298d1c329cf3d28eb7c1239a",
+        "readableText": true
+      },
+      {
+        "asarPath": "node_modules/v-electron-channel/dist/browser.js",
+        "relativeOffset": 724012098,
+        "size": 4298,
+        "sha256": "7908342fbeb0cbd2983a8d23c6caac3b5547a7b32f52115c91c63a137a90e12a",
+        "readableText": true
+      }
+    ]
+  },
+  "conclusions": {
+    "processOwner": "same isolated-project CocosCreator.exe main PID3356; executable/project/creation-time identity captured",
+    "transportConfirmed": "TCP (netstat -p tcp) IPv4 loopback listener",
+    "protocol": "unconfirmed beyond TCP; no HTTP/WebSocket/IPC service proof",
+    "authentication": "unconfirmed; no basis to claim authenticated or anonymous",
+    "externalDirectReachability": "Observed bind is127.0.0.1 only, not wildcard or LAN bind; this listener is not directly offered on other-host interface. No active network probe was performed.",
+    "normalInternalIpcAttribution": "plausible but unproven; readable launch code initializes internal process messaging, implementation is opaque .ccc and no log connects11097 to that module",
+    "lifetime": "one positive listener sample; persistence and temporary port-probe alternatives not determined",
+    "policy": "do not classify every Creator loopback port as new LAN exposure; do not silently whitelist unidentified service;11105 is separately confirmed existing Bridge",
+    "currentState": "all own processes and ports closed per closure; only readonly attribution in this slice"
+  },
+  "job": {
+    "projectId": "a79f4915296f4091",
+    "jobId": "STUDIO-RUN-icon-mvby1nsy-a46a962c",
+    "state": "selected",
+    "revision": 3,
+    "importPostCount": 0,
+    "sourceRevisionUnchanged": "a2ff18a013608dadf47b624eb58fba587b754fc7"
+  },
+  "budget": {
+    "chargedMs": 346778,
+    "capMs": 1800000,
+    "active": null
+  },
+  "existingProcessRecheck": {
+    "atUtc": "2026-10-17T05:30:55.0304724Z",
+    "creatorTotal": 0,
+    "mains": [],
+    "remainingTracked": [],
+    "ports7458_11097_11105Absent": true,
+    "installedExeFileVersion": "3.8.8",
+    "method": "Get-CimInstance through existing identity checker; netstat readonly; file version metadata, no connection probe"
+  }
+}
