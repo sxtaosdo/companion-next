@@ -14,7 +14,7 @@ PNG7391字节，SHA256 `fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05
 
 后续场景绑定、Preview与Build目标已由Owner“继续推荐。直到完成。可用”授权。当前仅完成离线清单与恢复点；新的TCP7458全IPv4限时监听/GPU窗口仍需Parent协调。严格通过原Dashboard/Bridge、fresh revision/new operation/lease建立最小Canvas+Sprite场景，保存重开并核持久引用，再Preview/Profiler及web-mobile Build。禁止重导入或手写scene/prefab/meta，UNKNOWN只读查同一操作，不重放；实际URL或端口超范围立即停止。步骤、边界与恢复见fixture根ACCEPTANCE.md。
 
-官方3.8.8安装版builder声明证实scenes是`{url,uuid}`对象数组、startScene是string；其值语义尚未证实，运行前仍须核准确配置。现有helper默认scenes空，构建无内置超时；不猜场景或承诺10分钟内构建完成。Preview不提供端口控制，独立build_smoke还会启用loopback动态端口，未纳入当前7458请求。
+官方3.8.8安装版builder声明证实scenes是`{url,uuid}`对象数组；[官方命令行手册](https://docs.cocos.com/creator/3.8/manual/en/editor/publish/publish-in-command-line.html)进一步证实startScene值为主场景UUID。运行前在configPath指定文件填实际回读的场景URL/UUID，不给build_start捏造场景参数。现有helper默认scenes空，构建无内置超时；不承诺10分钟内构建完成。Preview不提供端口控制，独立build_smoke还会启用loopback动态端口，未纳入当前7458请求。
 
 原始证据目录：`C:/Users/33272/AppData/Local/Temp/companion-variant-import-20261016/interface-load-20261016-phase2/recovery-20261017/isolated-import-20261017/approved-7458-run`。核心文件delivery-result.json、new-import-ledger.json、final-job-status.json、final-closure-proof.json、offline-consistency.json。fixture已保存PNG、Creator原样meta、来源/UUID/哈希基线和只读检查，临时目录不承诺永久保留。
 
