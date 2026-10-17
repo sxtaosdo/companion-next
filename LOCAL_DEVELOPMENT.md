@@ -1,5 +1,7 @@
 # Windows本地开发交接
 
+2026-10-17 10:43 UTC接续：独立fixture c80b890/.18已归档本轮新96资源的场景/跨会话重开、Preview/846采样Profiler/WebMobile/Smoke；原scene_validate的两种弃用warn误判false不改写，真实运行四类诊断为空、两图已查看。累计554154/1800000ms、active=null，全体自有测试进程/7458/Smoke12180关闭，旧32构建文件恢复、7settings保持。随后原/v1只读status+variant-preview均200，原任务r6/source796a233/currentHistoryHead=c80b890，PNG/收据和三task字节保持；Next原适配离线82项与strict类型通过，仅增加测试/证据，不改src/依赖/部署。页面实际仍1.3.173，部署源3074d37/.25；正式creator-ai ui与同源Next地址已在用户浏览器打开，独立正常认证Edge核页面200、六文件SHA相同、0页面/Console错误且已关闭，用户窗口保留。不启动模型/Creator，不因3595无监听重复起daemon；原32180/PID4092继续。详见[接续回归记录](docs/history-read-regression-20261017.md)，早期记录保持原时间。
+
 2026-10-17 新尺寸变体入口已完成：代码及实际部署3074d37/1.3.173.25，产品页面版本1.3.173；新任务一次96×96 import-variant、资源UUID/SpriteFrame和真实PNG预览通过，原母图按钮未执行。3883测试/类型/构建通过，六静态HTTP SHA一致，原Node25服务未重启，Owner dirty与旧任务保持。累计412.673/1800秒，自有进程关闭，零云上传。[完整计划、回执与本地截图](docs/variant-ui-import-20261017.md)。
 
 2026-10-17 05:40 UTC：原独立新任务已真实完成Next采用/选图/CPU96导出/1024母图导入，各写一次；r6、effectApplied=true、租约RELEASED，资产及meta回读一致，账本SUCCEEDED/TERMINAL/fence9。Creator/Edge/全部自有端口关闭，累计381.067/1800秒、active=null。任务原sourceRevision仍a2ff18a，资产检查点e182b6b/0.1.0.11后仅读历史，未改任务；原settings、旧成功资源与冻结记录保持。运行Next仍caf14fb/1.3.173.18，无业务源码/部署变化；不新增变体导入UI，productionVerified固定false。实际步骤、本地回执/截图及误上传撤回记录见[本轮交付](docs/variant-ui-followup-20261017.md)；下列旧记录保留各自时间。

@@ -2,6 +2,8 @@
 
 状态：Accepted（本次唯一范围计划；执行状态随证据更新）
 
+2026-10-17 10:43 UTC后续：本入口已导入的新96资源UUID40ee0bc7…在独立工程完成scene15d1180d…持久保存/跨会话重开、真实750×1334 Preview、846采样Profiler、WebMobile构建和精确包Smoke；两张实图钱袋已查看、完整运行诊断为空。场景/运行源码与导入源796a233分开，证据521fcf8、说明c80b890/.18，旧构建32文件恢复，所有本轮测试进程/7458/12180关闭，预算554154/1800000ms、active=null。原scene_validate弃用warn误判false、optional wait_ready跳过与中途停止原回执保留；不重导、不改本入口、不调用模型。随后原/v1历史读取和PNG仍200，currentSourceRevision=c80b890而原sourceRevision保持796a233；Next适配真实响应离线3例及原覆盖共82项、strict类型通过。详见[接续回归](history-read-regression-20261017.md)和[独立工程运行回执](../../local-tests/creator-ai-variant-import-acceptance-20261017/tests/fixtures/variant-ui96-runtime-20261017.json)；下文07:51“本轮没有新场景”等仅为当时范围。
+
 Owner 于 2026-10-17 07:28:12 UTC 确认新增入口，消息 `Sentinel_a0ec1b9dbf9c8191ae555d737e8f2e12`。仅在新 Companion 的尺寸变体区域接入已验证的 `import-variant`；不改变旧 Windows UI、生命周期、冻结 UNKNOWN、已有成功任务或后台接口。
 
 ## 基线与文件边界
