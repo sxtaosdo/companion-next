@@ -12,6 +12,10 @@ export interface AiJobImport {
   operationId: string; state: string; effectApplied: boolean | 'UNKNOWN'; leaseState: 'RELEASED' | 'UNKNOWN' | 'RETAINED'; errorCode: string | null
   tools: Array<{ tool: string; operationId: string; status: string }>
 }
+export interface AiJobVariantImport extends AiJobImport {
+  active: boolean
+  artifact?: { kind: 'variant'; candidateId: string; width: number; height: number; fileSha256: string; receiptSha256: string; destinationUrl: string }
+}
 export interface AiJobBudget { maxAssets: 2; candidatesPerAsset: 1; submissionAttempts: 1 }
 export interface AiJobSnapshot {
   projectId: string; jobId: string; revision: number; state: AiJobState; sourceRevision: string; requestHash: string
@@ -20,6 +24,7 @@ export interface AiJobSnapshot {
   mode?: AiJobMode; origin?: 'generated' | 'adopted'; errorCode?: string | null
   resourceSnapshot?: AiJobResourceSnapshot
   productAcceptance?: AiJobProductAcceptance
+  variantImport?: AiJobVariantImport
 }
 export interface AiJobsView {
   schemaVersion: 'companion-icons-v1'; projectId: string; sourceRevision: string; jobs: AiJobSnapshot[]
@@ -46,6 +51,7 @@ const messages: Record<AiJobsReadCode, string> = {
   'verification-unavailable': '当前环境无法校验候选 SHA-256，未显示图片。',
 }
 export const AI_JOBS_BACKEND_ERRORS = {
+  REVISION_MISMATCH: { status: 409, message: '原后台因工程版本变化拒绝读取旧任务；需修复只读历史合同，未改写任务或重试导入。' },
   ICON_ADAPTER_DISABLED: { status: 503, message: '原图标任务后端未启用或可信配置不完整；未启动或补装任何服务。' },
   ICON_CONFIG_INVALID: { status: 503, message: '原图标任务后端配置无效，请核对原后台配置。' },
   IMAGE_PROCESSING_UNAVAILABLE: { status: 503, message: '原后台图片处理能力不可用，候选读取尚未完成。' },
@@ -87,6 +93,24 @@ function decodeImport(value: unknown): AiJobImport | null {
     leaseState: member(raw.leaseState, ['RELEASED', 'UNKNOWN', 'RETAINED']), errorCode: raw.errorCode === null ? null : pattern(raw.errorCode, errorCode, 80),
     tools: rows(raw.tools, 20).map(value => { const tool = record(value); return { tool: pattern(tool.tool, /^[a-z_]{1,80}$/), operationId: text(tool.operationId, 200), status: text(tool.status, 30) } }) }
 }
+function decodeVariantImport(value: unknown, candidates: AiJobCandidate[], selectedIds: string[]): AiJobVariantImport {
+  const raw = record(value), summary = decodeImport(raw)
+  if (!summary || typeof raw.active !== 'boolean') throw invalid()
+  let artifact: AiJobVariantImport['artifact']
+  if (raw.artifact !== undefined) {
+    const item = record(raw.artifact)
+    if (item.kind !== 'variant' || !isAiCandidateId(item.candidateId) || !selectedIds.includes(item.candidateId)
+      || !candidates.some(candidate => candidate.candidateId === item.candidateId)
+      || typeof item.width !== 'number' || typeof item.height !== 'number' || !Number.isInteger(item.width) || !Number.isInteger(item.height)
+      || item.width < 1 || item.height < 1 || item.width > 4096 || item.height > 4096 || item.width * item.height > 16_000_000) throw invalid()
+    const destinationUrl = text(item.destinationUrl, 512)
+    if (!/^db:\/\/assets\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+\.png$/.test(destinationUrl)
+      || destinationUrl.slice('db://assets/'.length).split('/').some(segment => segment === '.' || segment === '..')) throw invalid()
+    artifact = { kind: 'variant', candidateId: item.candidateId, width: item.width, height: item.height,
+      fileSha256: pattern(item.fileSha256, sha, 64), receiptSha256: pattern(item.receiptSha256, sha, 64), destinationUrl }
+  }
+  return { ...summary, active: raw.active, ...(artifact ? { artifact } : {}) }
+}
 /** Sealed config is validated metadata; it is never production acceptance. */
 export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: string): AiJobSnapshot {
   const raw = record(value)
@@ -100,6 +124,7 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
   let resourceSnapshot: AiJobResourceSnapshot | undefined
   try { if (raw.resourceSnapshot !== undefined) resourceSnapshot = decodeAiJobResourceSnapshot(raw.resourceSnapshot, projectId) } catch { throw invalid() }
   const importReceipt = decodeImport(raw.import)
+  const variantImport = raw.variantImport === undefined ? undefined : decodeVariantImport(raw.variantImport, candidates, selectedIds)
   let productAcceptance: AiJobProductAcceptance | undefined
   try {
     if (raw.productAcceptance !== undefined) productAcceptance = decodeAiJobProductAcceptance(raw.productAcceptance)
@@ -112,7 +137,7 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
     ...(raw.mode !== undefined ? { mode: member(raw.mode, ['generation', 'offline_import_only'] as const) } : {}),
     ...(raw.origin !== undefined ? { origin: member(raw.origin, ['generated', 'adopted'] as const) } : {}),
     ...(raw.errorCode !== undefined ? { errorCode: raw.errorCode === null ? null : pattern(raw.errorCode, errorCode, 80) } : {}),
-    ...(resourceSnapshot ? { resourceSnapshot } : {}), ...(productAcceptance ? { productAcceptance } : {}) }
+    ...(resourceSnapshot ? { resourceSnapshot } : {}), ...(productAcceptance ? { productAcceptance } : {}), ...(variantImport ? { variantImport } : {}) }
 }
 export function decodeAiJobsView(value: unknown, projectId: string): AiJobsView {
   const raw = record(value), profile = record(raw.profile)

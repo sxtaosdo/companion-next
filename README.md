@@ -1,6 +1,6 @@
 # Companion Next
 
-**当前版本：`v1.3.173.15`**
+**当前版本：`v1.3.173.16`**
 
 2026-10-17资源验收增量：独立fixture单张96×96 CPU变体已真实导入Creator，asset/SpriteFrame与文件哈希回读通过、进程及端口正常关闭；7项离线检查通过。场景持久绑定、Preview/Build与Next完整资源UI仍未验，新增监听窗口待协调。详见[隔离资源记录](docs/isolated-variant-acceptance-20261017.md)，下方旧“未导入”段为其对应时间的历史结果；本片不改Next源码或部署。
 
