@@ -1,8 +1,8 @@
 # Companion Next
 
-**当前版本：`v1.3.173.19`**
+**当前版本：`v1.3.173.20`**
 
-2026-10-17资源验收增量：独立fixture单张96×96 CPU变体已真实导入Creator，asset/SpriteFrame与文件哈希回读通过、进程及端口正常关闭；7项离线检查通过。场景持久绑定、Preview/Build与Next完整资源UI仍未验，新增监听窗口待协调。详见[隔离资源记录](docs/isolated-variant-acceptance-20261017.md)，下方旧“未导入”段为其对应时间的历史结果；本片不改Next源码或部署。
+2026-10-17当前资源范围：单张96×96变体已真实导入，场景持久化/Preview/Profiler/Build/固定产物Smoke及Next历史/状态/变体PNG读取通过；共享资源API源码已整合。Next仍缺少变体导入写入口，已有创建/选图/导出/母图导入尚未在本轮真实页面提交；productionVerified是固定false协议值，不是无限验收待办。[可用入口、操作步骤和精确限制](docs/variant-ui-followup-20261017.md)为本轮范围说明，下方旧记录保留各自时间边界。本次仅文档澄清，部署功能代码仍caf14fb/1.3.173.18。
 
 2026-10-17本轮恢复交付已完成：从5419ace恢复损坏README/索引，六静态已部署且实际HTTP回读一致，正常认证Edge在1440×1080核对创建/初始化表单。资源候选四产物未变，原CLI正常启动后仅127.0.0.1:32180、OPEN；历史UNKNOWN与原共享dirty保持。本轮不扩展UI；详见[恢复交付回执](docs/next-recovery-20261017.md)。
 

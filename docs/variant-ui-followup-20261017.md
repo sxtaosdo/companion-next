@@ -2,6 +2,44 @@
 
 状态：Accepted（本机事实及交接记录，不代表完整产品验收）
 
+## 05:10 UTC 可使用范围与明确剩余项
+
+当前可用的是已有隔离任务的真实历史、状态和96×96变体PNG查看。单张变体的API导入、场景保存/重开、Preview、Profiler、WebMobile Build与固定产物Smoke均有真实证据，但变体导入不是从Next页面发起。Next尚无`import-variant`写入口，因此“在Next完成96×96导出并导入Creator”仍缺少这一项接线；不能把读图通过描述为完整页面写流程通过。
+
+### 现在查看已验资源
+
+1. 使用原Companion的`creator-ai ui`正常会话入口；已登录的同源浏览器可直接进入[隔离工程资源第六步](http://127.0.0.1:32180/next/index.html#/resources?project=a79f4915296f4091&step=6)。如会话无效，回到原入口重新打开，不复制认证码或Cookie。当前服务仅监听127.0.0.1。
+2. 核对工程ID`a79f4915296f4091`，点击“读取 / 刷新任务历史”，选择`STUDIO-RUN-variant-isolated-20261017-27c2be4f`并读取原任务。
+3. 查看独立变体导入摘要，再点击“预览此变体”。应显示96×96钱袋、文件SHA `fe10e97c530d9cd03908e77dddaa9413a8284baab8c22bb461e7bb05b4638654`；母任务仍为selected/r6，变体为imported_pending_verification。历史只读提示和禁写是预期行为，不应重新导入。
+
+真实页面截图见下节两张已验截图；[Library中的实际Preview截图](https://chatgpt.com/api/library/files/libfile_49e9aeb37f28819186fd6d3ee34cf950/download)已交付，不重复上传。这份历史读取不启动Creator，也不证明当前Creator仍在线。
+
+### 新任务流程：实现、实测和缺口分别记录
+
+| 操作 | 当前实现 | 本轮真实验收边界 |
+| --- | --- | --- |
+| 单图准备、inspect、enqueue或采用可信PNG | Next已有入口；需当前工程HEAD、已保存v2规范；采用来源限登记manifest | 本轮未通过真实浏览器提交这些写操作；采用不接受任意本地PNG路径 |
+| GPU运行/恢复原任务 | Next已有run-next/resume，逐次批准，UNKNOWN只查原操作 | 本轮未从Next执行真实GPU生成，不新增启动模型权限 |
+| 候选审阅、保存唯一选择 | Next已有入口，先显示并核候选SHA | 有离线/DOM回归；本轮未在真实Next页面提交选择 |
+| 导出默认或自定义96×96 PNG | Next已有export-variant；封存v2规范、唯一已选母图、CPU缩放、禁止覆盖 | API/文件链有既有证据；本轮未点击真实Next导出确认 |
+| 导入已选母图（1024） | Next已有import，按钮和确认均明确母图 | 不能用它导入96×96变体；本轮未从真实Next提交母图导入 |
+| 导入96×96变体 | 后端import-variant及原操作查询已实现、单张真实导入已验 | Next缺少对应写操作合同/确认/接线；这是具体功能缺口，不只是缺一项测试 |
+| 查看已有变体摘要和PNG | Next已有受限只读variant-preview | 04:38真实同源页面已通过，零业务写入 |
+
+普通新任务在当前HEAD、已保存规范、合法会话和原服务可用的前提下，可按资源步骤准备/采用→生成（仅需要时）→显示并审阅候选→保存选择→导出其他尺寸（96×96）操作。这描述已有实现，不替代尚未执行的真实页面写验收。当前隔离历史任务禁止写入，不能用来测试上述新任务动作。要实现页面内尺寸变体导入，最小后续切片是原步骤5的domain输入/回执、adapter、store确认与UNKNOWN保护、面板和定向测试，并复用现有后端；本轮未新建导航、导入向导或另一套执行器。
+
+### productionVerified不是无限待办
+
+实际Studio `companion_api.py`任务快照与变体结果固定写`productionVerified:false`；Next `src/domain/ai-jobs-read.ts`要求收到false并返回false，后端schema同样只接受false。当前没有已实现的置true接口。独立`productAcceptance`投影也不会修改该字段。它是现行协议禁止自动宣称生产验收的固定策略，不能据此重复导入、重跑Creator或无限延长验收；已通过的场景、Preview、Build及Smoke按各自来源/产物SHA记录。真实Next写流程和缺失的变体导入入口仍按上表处理，不把固定false当作这些缺口的代称。
+
+### 源码整合和类型检查归属
+
+此前共享main整合待办已经完成：资源代码`8f169c709d7b731b2753fbd4ea9390c7b0c5ce86`，合同`4fcfe82717da3f4a84f4e3117217366bffb93b4b`。独立索引树165/165图标测试及TypeScript通过，两份实际资源源码与运行sourcemap一致；22项并行dirty仍保持。权威边界见[共享源码整合记录](../../cocos-mcp/mcp/docs/resource-api-source-integration-20261017.md)。本次纯文档澄清不重建部署，运行Next代码仍为caf14fb/1.3.173.18。
+
+混合工作区的`mcp/tests/stop-previous-daemon.test.ts:2`以静态TypeScript导入`../scripts/stop-previous-daemon.mjs`，而NodeNext/strict及tests包含规则下没有同名声明，产生TS7016。整合前检查点已记录脚本和测试为未跟踪；`build-companion.mjs:62–63`直接调用该脚本，归属并行构建/停服生命周期候选，具体执行者/Owner尚未核明。最小type-only修复是由该候选维护者新增`mcp/scripts/stop-previous-daemon.d.mts`，精确声明`companionDaemonBundlePath(root?: string): string`、`commandRunsDaemon(commandLine: string, daemonPath: string): boolean`、`locatorPath(): string`和`stopPreviousDaemon(): Promise<void>`。无需改JS/test/tsconfig或运行构建/停服。本轮依要求只读定位，不吸收该并行文件，也不以放宽类型检查掩盖错误。
+
+本轮只读审查真实任务为`/root/resource_source_git_mapper`（Next流程/固定策略）和`/root/window_budget_reviewer`（TS7016归因/最小修复），均为普通子代理的prompt-emulated职责，硬只读运行隔离未核验。未发现本任务自身新增接口/测试缺陷；仅修正旧文档中已过期的“源码待整合”和验收范围描述。未操作Creator、UNKNOWN、真实写任务、旧Windows UI/生命周期、服务启停、push/tag/父pin或关机。
+
 ## 04:38 UTC 本机交付：已解决 409 与变体 PNG 缺口
 
 Next 功能检查点 `caf14fbf997ef1b2cc18aa5e4d0a980885df9882` / `1.3.173.18` 已构建并精确部署六静态路径，产品版本仍为 1.3.173；index SHA `8ac97a787d9a8bf19c79b48e1bde144eeef74118098e2ae82e6c8bc2251a2eac`。以下旧阶段的失败证据保留，后端协调项已由本节实现替代。
@@ -10,7 +48,7 @@ Next 功能检查点 `caf14fbf997ef1b2cc18aa5e4d0a980885df9882` / `1.3.173.18` �
 
 Node 从此前已审查的实际运行源码快照增量构建，新 daemon bundle SHA `f3323c72165a2d2f28f3faf89b3c5811e5df1dafee384303db0bf84811970e70`。`variant-preview` 只接受原 jobId/operationId，读取持久绑定并核 PNG、尺寸、母图和文件/收据 SHA，不调用 Creator、不重导出或导入。Next 在原资源面板读取，另核身份、尺寸、CRC、SHA；历史或已有变体任务均暂停写入，换工程/任务取消并隔离迟到结果。
 
-共享 cocos-mcp main 较旧且有 22 项并行 dirty，未覆盖、暂存或提交这些源码。运行增量补丁、完整测试快照和受限接口合同已保存在隔离验收仓 `tests/fixtures/mcp-readonly-patch/`，manifest 记录原运行 sourcemap 基线和 SHA，供后续由源码 Owner 精确整合；不可盲贴到较旧 main。两份候选 bundle、输入 SHA 清单和旧四文件备份另存于外置证据目录。
+04:38时共享cocos-mcp main较旧且有22项并行dirty，当时只将运行增量补丁、完整测试快照和受限接口合同保存到隔离验收仓`tests/fixtures/mcp-readonly-patch/`。05:03已精确整合本任务资源源码，详见上节及共享源码整合记录；没有覆盖并行差异。两份候选bundle、输入SHA清单和旧四文件备份继续保留。
 
 完整受影响校验：Python 三份模块 80 测试通过（1 项原有跳过），MCP 八份图标模块 140 测试通过，Next 23 份 AI 模块 948 测试通过，TypeScript/Vue 类型检查和 workspace 构建通过。prompt-emulated reviewer `/root/window_budget_reviewer` 发现并复核修复三项 P2：变体完成后的直连写入、generated 历史 candidate、两次 status 间 HEAD 变化时导出。OCR Delegation 清单与共享规则由宿主审读，未称为 managed PASS。
 
@@ -28,7 +66,7 @@ Node 从此前已审查的实际运行源码快照增量构建，新 daemon bund
 
 WebMobile Smoke 也已通过：04:11:49–04:12:20 UTC，使用既有固定构建、fresh lease/fence8 和新 render-ready 操作，750×1334 实图已查看，四类完整原始诊断数组均为空；独立浏览器、12189 服务及租约关闭。首个未派发 schema 错误、第二次过早空白截图均保留，不冒充可见成功。构建 sourceRevision 仍为 `f19564bda642374b7780a00b19d9c86cf72185d7`，无 Creator/重建/重新导入，预算仍 326254/1800000ms。核心 Smoke 回执、原报告及截图已进入隔离验收仓 `tests/fixtures/build-smoke-*`，新增六项只读证据检查通过。
 
-当前切片无待协调的实现或真实读取阻断；剩余仅为共享较旧 main 的源码整合，以及任何新平台/生产用途另行授权。未 push/tag/父 pin，未关机。
+本次已有变体的真实读取切片无阻断，共享main资源源码整合也已完成。新任务写流程实测及Next缺失的变体导入入口按05:10范围表分别列明；不能将本次读取切片扩大为完整页面写流程通过。未push/tag/父pin，未关机。
 
 ## 03:55 UTC 旧阶段记录（已由上述交付推进）
 
