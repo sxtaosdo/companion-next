@@ -1,7 +1,7 @@
 import { computed, ref, shallowRef, toRaw, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type { CompanionBrowserProvider, ManagedProject } from '../domain/companion-browser'
-import { PROJECT_SETUP_LIMITS, ProjectSetupError, SETUP_STAGES, validateProjectPath, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
+import { PROJECT_SETUP_LIMITS, ProjectSetupError, buildSetupCompletionPrompt, SETUP_STAGES, validateProjectPath, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
 import type { ProjectSetupProvider, SetupSnapshot } from '../domain/project-setup'
 import { projectSetupProvider } from '../project-setup-integration'
 import { useCompanionBrowserStore } from './companion-browser'
@@ -103,6 +103,7 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
   const registrationApprovals = new WeakMap<PreparedRegistration, Binding>(), setupApprovals = new WeakMap<PreparedSetup, Binding>()
   const barriers: RegistrationBarrier[] = []
   const generation = ref(0), transportBusy = ref(false)
+  const completionBinding = shallowRef<Binding | null>(null)
   let registration: RegistrationOperation | null = null, setup: SetupOperation | null = null
   let readGeneration = browser.projectLoading ? 1 : 0, activeRead: ReadStart | null = null
   let pollTimer: ReturnType<typeof setTimeout> | undefined, deadlineTimer: ReturnType<typeof setTimeout> | undefined
@@ -231,6 +232,7 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
     return acknowledged
   }
   function setupResult(op: SetupOperation, phase: SetupReceipt['phase'], message: string, snapshot?: Readonly<SetupSnapshot>) {
+    completionBinding.value = phase === 'complete' ? op.binding : null
     error.value = phase === 'tracking' || phase === 'complete' ? '' : message
     setupReceipt.value = freeze({ phase, project: op.preview.project, ...(op.operationId ? { operationId: op.operationId } : {}),
       ...(snapshot ? { snapshot } : setupReceipt.value?.snapshot ? { snapshot: setupReceipt.value.snapshot } : {}), message })
@@ -377,7 +379,14 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
   }
   function leave() { visible.value = false; stopWaiting() }
   function setVisible(next: boolean) { visible.value = next === true; if (!visible.value) stopWaiting() }
+  const completedUsage = computed(() => {
+    const receipt=setupReceipt.value,binding=completionBinding.value
+    if(!receipt||receipt.phase!=='complete'||receipt.snapshot?.stage!=='complete'||receipt.snapshot.failureReported===true||!binding||!sameContext(binding,receipt.project))return null
+    const prompt=buildSetupCompletionPrompt(receipt.snapshot.mcpName)
+    return prompt?freeze({project:receipt.project,prompt}):null
+  })
   function contextChanged() {
+    if(completionBinding.value&&(!setupReceipt.value||!sameContext(completionBinding.value,setupReceipt.value.project)))completionBinding.value=null
     const hadPreview = !!preparedRegistration.value || !!preparedSetup.value
     clearPrepared()
     if (hadPreview) error.value = contextMessage
@@ -408,7 +417,7 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
     }
   }, { flush: 'sync' })
   return { preparedRegistration: computed(() => preparedRegistration.value), preparedSetup: computed(() => preparedSetup.value),
-    registrationReceipt: computed(() => registrationReceipt.value), setupReceipt: computed(() => setupReceipt.value),
+    completedUsage, registrationReceipt: computed(() => registrationReceipt.value), setupReceipt: computed(() => setupReceipt.value),
     pending: computed(() => pending.value), tracking: computed(() => tracking.value), error: computed(() => error.value), canResume,
     prepareRegistration, sendRegistration, prepareSetup, sendSetup, resume, stopWaiting, clearPrepared, leave, setVisible, blocksAutomaticProjectRead }
 })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed,onBeforeUnmount,ref,watch } from 'vue'
 import { Plus,Refresh } from '@element-plus/icons-vue'
+import SetupCompletionUsage from './SetupCompletionUsage.vue'
 import InfoTip from './InfoTip.vue'
 import '../styles/project-setup-theme.css'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
@@ -39,6 +40,7 @@ function selectDashboard(item:DashboardProject){
  if(lane.locked||!projects.connected||!item.exists||!projects.dashboard.includes(item))return
  sourceMode.value='dashboard';path.value=item.path;projectId.value=registered(item)?.id??''
 }
+const completionUsage=computed(()=>open.value&&store.completedUsage?.project.id===selected.value?.id?store.completedUsage:null)
 const allConsented=computed(()=>Object.values(consents.value).every(value=>value===true))
 const activeTask=computed(()=>!!store.setupReceipt&&['submitting','tracking','paused','unknown'].includes(store.setupReceipt.phase))
 const resumableTask=computed(()=>!!store.setupReceipt&&['paused','unknown'].includes(store.setupReceipt.phase))
@@ -196,6 +198,7 @@ defineExpose({openForProject:show,close})
     <strong>安装接入 · {{ store.setupReceipt.project.name }}</strong><p>{{ store.setupReceipt.project.id }} · {{ store.setupReceipt.project.path }}</p>
     <p>{{ store.setupReceipt.message }}</p><p v-if="store.setupReceipt.operationId">任务 ID：{{ store.setupReceipt.operationId }}</p>
     <template v-if="store.setupReceipt.snapshot"><p>后台阶段：{{ setupStageLabel(store.setupReceipt.snapshot.stage) }} · {{ store.setupReceipt.snapshot.updatedAt }}</p><p v-if="store.setupReceipt.snapshot.bridge">Bridge 回执：{{ store.setupReceipt.snapshot.bridge.status }} · {{ store.setupReceipt.snapshot.bridge.version }}<br>{{ store.setupReceipt.snapshot.bridge.targetPath }}</p><p v-if="store.setupReceipt.snapshot.runtime">当时运行回执：{{ store.setupReceipt.snapshot.runtime.state }}，不是当前状态验证。</p><p v-if="store.setupReceipt.snapshot.mcpName">后台返回的 MCP 名称：{{ store.setupReceipt.snapshot.mcpName }}；不证明当前配置或工具范围。</p></template>
+    <SetupCompletionUsage v-if="completionUsage" :usage="completionUsage"/>
     <p>可能复用同路径任务，但接口不返回原始选项或复用标记，无法核验实际执行范围。complete 不证明本次全部步骤已执行，也不证明 Creator 当前就绪。</p>
     <el-button v-if="activeTask" :disabled="!store.canResume" @click="store.resume()">继续读取接入进度</el-button>
    </article>

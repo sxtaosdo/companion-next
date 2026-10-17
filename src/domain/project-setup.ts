@@ -59,3 +59,11 @@ export function validateProjectPath(value:unknown):string {
 export function validateSetupProjectId(value:unknown):string {if(typeof value!=='string'||!/^[a-f0-9]{16}$/.test(value))throw new ProjectSetupError('invalid-input','not-dispatched');return value}
 export function validateSetupOperationId(value:unknown):string {if(typeof value!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value))throw new ProjectSetupError('invalid-input','not-dispatched');return value}
 export function setupStageLabel(stage:SetupStage):string{return ({registering:'登记工程', 'installing-bridge':'安装 / 更新 Bridge','opening-dashboard':'打开 Dashboard','waiting-bridge':'等待 Bridge','configuring-codex':'Codex 配置阶段','verifying':'验证阶段',complete:'后台任务完成',failed:'后台任务失败'} satisfies Record<SetupStage,string>)[stage]}
+
+/** Original v148 completion-page prompt; this text never executes a tool. */
+export interface SetupCompletionUsage { readonly project: Readonly<ManagedProject>; readonly prompt: string }
+export function buildSetupCompletionPrompt(mcpName: unknown): string | null {
+ const name=mcpName===undefined||mcpName===''?'当前工程的 Cocos Creator MCP':mcpName
+ if(typeof name!=='string'||(name!=='当前工程的 Cocos Creator MCP'&&!/^[A-Za-z0-9][A-Za-z0-9._-]{0,255}$/.test(name)))return null
+ return `使用 ${name} MCP 检查连接，确认工程身份后等待我的修改要求。禁止操作其他 Creator 工程。`
+}
