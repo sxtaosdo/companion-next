@@ -1,0 +1,85 @@
+{
+  "projectId": "a79f4915296f4091",
+  "atUtc": "2026-10-17T03:54:59.311Z",
+  "viewport": {
+    "width": 1440,
+    "height": 1080
+  },
+  "browserGpuDisabled": true,
+  "fakeApiResponses": false,
+  "creatorStarted": false,
+  "importPostCount": 0,
+  "completeResourceUiAcceptance": false,
+  "deployedStaticIndexSha256": "4717a68ace5df9c95fe65ca67783b85d1069d95e83de053d7e618fccfc9808ab",
+  "registeredProjectVisible": true,
+  "initialWriteControls": [
+    "读取 / 刷新任务历史"
+  ],
+  "panelText": "原图标任务与候选\n\n查看当前登记工程已有任务，再按需刷新单个任务或预览候选。不会自动查询或轮询。\n\n工程\ncreator-ai-variant-import-acceptance-20261017 · a79f4915296f4091\n工程路径\nD:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\n读取 / 刷新任务历史\n清空本页结果\n\n这些读取会由原后台执行 Python、读取文件与 Git，并可能用 Pillow 检查候选。取消页面读取不能证明后台进程已结束。任务操作在下方逐次确认，接收回执不等于执行完成。\n\n原任务接口返回失败；未把失败转换为空历史或任务完成。",
+  "originalJobsHttpStatus": 409,
+  "currentUiReadBlocked": true,
+  "errorVisible": true,
+  "screenshot": {
+    "file": "next-real-resource-1440x1080.png",
+    "sha256": "ab2bb1bf29f14f973df79ed41d1fa293d4068368255ec717256d33637d655a81",
+    "width": 1440,
+    "height": 1080
+  },
+  "result": "actual-resource-ui-fails-closed-on-original-revision-mismatch",
+  "ownedBrowserClosed": true,
+  "finishedAt": "2026-10-17T03:55:01.306Z",
+  "network": [
+    {
+      "path": "/api/projects",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/calls/counts",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/tools",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/events",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/calls/counts",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/projects",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/status",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/calls/counts",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "path": "/api/icons/a79f4915296f4091/jobs",
+      "status": 409,
+      "method": "GET"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": []
+}

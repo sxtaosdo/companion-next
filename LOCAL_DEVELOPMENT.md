@@ -1,5 +1,7 @@
 # Windows本地开发交接
 
+2026-10-17 变体摘要本地增量：代码 `c3b1fd1a8adf27c21018ff314e01eb666305d378` / `1.3.173.16`，936 项受影响测试、类型和 workspace 构建通过；未部署。真实 Next 资源页正确选中隔离工程，但原 jobs/status 因 Studio adopted exact-HEAD 合同返回409，完整 UI 尚未通过；变体 PNG 字节接口也待协调。既有 Preview/Profiler/Build 证据及 Library 截图 ID、GPU 待排 Smoke、精确 Owner 文件清单见[本轮交接](docs/variant-ui-followup-20261017.md)。
+
 原创建/初始化已恢复（本机源码切片）：四来源选择、Creator3.8.8原scaffold接口，显式确认成功只回填路径。92文件3840项、类型/正常构建通过；真实接口仅在两个本任务Temp合成工程验证201与最小文件，登记列表未变，未启动Creator。静态/浏览器交付与剩余缺口见[本片记录](docs/project-scaffold-local.md)和[主差距清单](docs/feature-parity-current.md)。
 
 

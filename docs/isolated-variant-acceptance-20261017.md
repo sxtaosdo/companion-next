@@ -1,5 +1,7 @@
 # 隔离96×96变体导入与后续验收
 
+后续事实更新（03:59 UTC）：该独立 fixture 已完成持久场景跨会话重开、实际 Preview 可见、Profiler 和 WebMobile Build，权威记录在 fixture `WINDOW-20261017.md` / HEAD `aae735afc76793186c9e100179f75425caffad28`。Build Smoke 尚待 GPU 窗口；真实 Next 资源 UI 已复现旧任务读取409，未通过完整验收。以下保留当时窗口记录，不作为后续 Runtime 未执行的结论；详见[后续交接](variant-ui-followup-20261017.md)。
+
 状态：Accepted。本记录补充真实资源导入证据，不改变Next界面、已部署六静态、共享cocos-mcp源码或旧UNKNOWN。完整迁移差距仍以[主清单](feature-parity-current.md)为准。
 
 后续实际窗口（02:43 UTC）：同一fixture通过Dashboard启动3.8.8，首次7458监听02:43:54.937Z、固定截止02:53:54.937Z。02:44:00.686Z首次只读解析返回NOT_FOUND；资产日志到本机UTC+8 10:44:02才ready，查询早于就绪约2秒。没有派发场景/Preview/Build，没有重导或重放；官方stop后两项已核自有子进程另以同一SIGTERM收尾，02:46:03.487Z确认全树和7456/7458关闭，新fence2于02:46:44释放。原资产7项复查通过；只读就绪门候选8项离线检查通过，尚未实测。细节及原始FALSE关闭回执/最终补充证明见fixture根WINDOW-20261017.md。不能把Bridge ready当AssetDB ready；已用窗口不因重连重置。

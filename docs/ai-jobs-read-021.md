@@ -1,5 +1,13 @@
 # Companion 1.3.171：原图标任务历史、状态与候选只读接线
 
+## 2026-10-17 变体导入摘要增量（本地开发，未部署）
+
+以实际运行的 `cocos-mcp/mcp/dist/companion/companion-daemon.js` 合同为准：`jobs/status` 可带独立 `variantImport`，包含原操作、写入效果、租约、工具摘要、active 和可选 artifact。Next 将严格校验并单独展示这份摘要；它不改变母图 `state/import`，不将 `productionVerified` 晋级。存在变体导入记录的任务暂停全部页面写操作，防止母图仍为 selected 时误触重复导入或变更既有绑定。
+
+artifact 仅展示受限 `db://assets/` 路径、候选、尺寸和文件/收据 SHA，不据此读取任意路径。现有 candidate 预览仍是 1024 母图，不能冒充变体。变体 PNG 字节接口尚未接通；本增量不新增后端路由、不读取凭据、不重放导入。
+
+实际隔离项目当前 `jobs/status` 返回 `409 REVISION_MISMATCH`，另有只读 `variant-import-status` 可查询历史回执；Creator 关闭时实时资产回读仍可能为 UNKNOWN。不得使用离线快照替代真实 UI 响应，也不得将历史写入成功当作当前运行时查询成功。该后端读历史缺口须独立协调，完整 UI 验收尚未通过。
+
 已核构建基线：daemon 0.3.150 + Next 21；不是实时宿主版本探测。仅本轮独立 Next 源码与 fake 测试；未对实际工程、Python、GPU 或 Windows 服务发送请求，也未部署。
 
 ## 已核合同与接线
