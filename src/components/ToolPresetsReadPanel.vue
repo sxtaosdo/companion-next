@@ -3,10 +3,14 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import ToolPresetDraftPanel from './ToolPresetDraftPanel.vue'
 import ToolPresetWritePanel from './ToolPresetWritePanel.vue'
 import { toolPresetWriteProvider } from '../tool-presets-write-integration'
+import { companionBrowserProvider } from '../companion-browser-integration'
 import { toolPresetReadProvider } from '../tool-presets-read-integration'
 import { useToolPresetsReadStore } from '../stores/tool-presets-read'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
+const props = defineProps<{ requestedProjectId?: string }>()
 const store = useToolPresetsReadStore(), projects = useCompanionBrowserStore()
+const entryError = ref('')
+let entryGeneration = 0
 const query = ref(''), profile = ref('all'), collapsed = ref<Record<string, boolean>>(Object.create(null)), downloadNotice = ref('')
 const registered = computed(() => projects.connected ? projects.projects : [])
 const previewLabel = computed(() => store.preview?.name ?? '尚未读取')
@@ -15,7 +19,36 @@ const groups = computed(() => {
   const visible = store.tools.filter(tool => (profile.value === 'all' || tool.profile === profile.value) && [tool.name, tool.displayNameZh, tool.description, tool.scope].join('\n').toLocaleLowerCase().includes(search))
   return [...new Set(visible.map(tool => tool.scope))].sort().map(scope => ({ scope, tools: visible.filter(tool => tool.scope === scope) }))
 })
-function changeProject(id: string) { store.setProjectContext(id, registered.value.map(project => project.id)) }
+function changeProject(id: string) { entryGeneration++; store.cancelReads(); entryError.value = ''; store.setProjectContext(id, registered.value.map(project => project.id)) }
+function readRange() { entryGeneration++; return store.loadPresets() }
+function selectPreview(id: string) { entryGeneration++; store.selectPreview(id) }
+// A project shortcut is an explicit read intent. Ordinary help stays passive.
+watch(() => props.requestedProjectId, async id => {
+  const generation = ++entryGeneration
+  entryError.value = ''
+  store.cancelReads()
+  if (id === undefined) return
+  const api = toolPresetReadProvider.value, source = projects.provider
+  const target = registered.value.find(project => project.id === id)
+  if (!api || !source || source !== companionBrowserProvider.value || !/^[a-f0-9]{16}$/.test(id) || !target) {
+    store.setProjectContext('', [])
+    entryError.value = '该工程不在当前已读取登记中；请返回工程页核对后重新打开工具范围。'
+    return
+  }
+  const identity = JSON.stringify(target)
+  const pending = store.loadTools(api) // provider binding can reset the project context
+  store.setProjectContext(id, registered.value.map(project => project.id))
+  const current = () => generation === entryGeneration && toolPresetReadProvider.value === api && store.provider === api && projects.provider === source && companionBrowserProvider.value === source && projects.connected && store.projectId === id && JSON.stringify(registered.value.find(project => project.id === id)) === identity
+  await pending
+  if (current()) await store.loadPresets()
+}, { immediate: true })
+watch(() => [projects.provider, companionBrowserProvider.value, projects.connected, toolPresetReadProvider.value, JSON.stringify(registered.value.find(project => project.id === props.requestedProjectId))], () => {
+  entryGeneration++
+  if (props.requestedProjectId !== undefined) {
+    store.cancelReads(); store.setProjectContext('', [])
+    entryError.value = '工程或读取来源已变化；请返回工程页核对后重新打开工具范围。'
+  }
+}, { flush: 'sync' })
 watch(registered, list => { if (store.projectId && !list.some(project => project.id === store.projectId)) changeProject('') }, { flush: 'sync', immediate: true })
 watch(toolPresetReadProvider, next => { if (store.provider && store.provider !== next) store.disconnect() }, { flush: 'sync', immediate: true })
 watch(() => [store.projectId, store.previewPresetId, store.provider], () => { downloadNotice.value = '' }, { flush: 'sync' })
@@ -31,20 +64,21 @@ async function download() {
   } catch { downloadNotice.value = '浏览器下载未完成，可重新导出；没有改写工程范围。' }
   finally { if (url) URL.revokeObjectURL(url) }
 }
-onBeforeUnmount(() => store.cancelReads())
+onBeforeUnmount(() => { entryGeneration++; store.cancelReads() })
 </script>
 <template>
  <section class="tool-presets-read-panel" data-testid="tool-presets-read-panel">
+  <el-alert v-if="entryError" :title="entryError" type="error" :closable="false"/>
   <h3>真实工具目录与预设查看</h3>
   <p v-if="!toolPresetWriteProvider" class="form-help">与宿主交互仅读取目录与范围，可导出单个预设 JSON。选择下拉仅改变本地预览，没有分配、保存、导入、删除或注册请求。工具范围不会提升 Creator 权限，也不证明已连接 MCP 客户端的即时工具集合。目录与预设分别读取，都是当次快照，变更后需刷新。</p>
   <p v-else class="form-help">目录和范围按需读取，选择下拉仅改变预览。克隆、编辑、导入准备后可在下方逐次确认正式保存与工程分配；工具范围不会提升 Creator 权限。目录和预设分别读取，都是当次快照，变更后需刷新。</p>
   <div class="planner-import-actions"><el-button :disabled="!toolPresetReadProvider" :loading="store.toolsLoading" @click="store.loadTools(toolPresetReadProvider!)">读取 / 刷新工具目录</el-button><el-button :disabled="!store.provider" @click="store.disconnect()">断开工具读取</el-button><span>{{ store.toolsRead?`${store.tools.length} 项已读取`:'工具数量未读取' }}</span></div>
   <p v-if="!toolPresetReadProvider" class="form-help">此构建未注册 Companion 工具读取；需原 Cookie 会话同源宿主。图片审阅连接不提供工具权限。</p>
   <el-alert v-if="store.toolsError" :title="store.toolsError" type="error" :closable="false"/>
-  <div class="companion-filters"><el-select :model-value="store.projectId" aria-label="工具范围工程" @change="changeProject"><el-option label="无工程：原默认范围" value=""/><el-option v-for="project in registered" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-button :disabled="!store.provider" :loading="store.presetsLoading" @click="store.loadPresets()">读取登记范围</el-button><RouterLink to="/projects">先读取真实工程列表</RouterLink></div>
+  <div class="companion-filters"><el-select :model-value="store.projectId" aria-label="工具范围工程" @change="changeProject"><el-option label="无工程：原默认范围" value=""/><el-option v-for="project in registered" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-button :disabled="!store.provider" :loading="store.presetsLoading" @click="readRange()">读取登记范围</el-button><RouterLink to="/projects">先读取真实工程列表</RouterLink></div>
   <p class="form-help">{{ store.projectId?'查询此工程返回的范围（可能为默认全部）；不证明已显式保存或运行生效。':'无工程上下文返回的是后端默认范围，不是任何工程的登记或运行证据。' }}</p>
   <el-alert v-if="store.presetsError" :title="store.presetsError" type="error" :closable="false"/>
-  <div v-if="store.presetsRead" class="tool-preset-preview"><p>服务返回的当前范围：{{ store.presets.find(preset=>preset.id===store.selectedPresetId)?.name }}（ID：{{ store.selectedPresetId }}）。本地预览：{{ previewLabel }}。</p><div class="planner-import-actions"><el-select :model-value="store.previewPresetId" aria-label="只读预览预设" @change="store.selectPreview"><el-option v-for="preset in store.presets" :key="preset.id" :label="`${preset.name}（${preset.builtIn?'内置':'自定义'} / 基于${preset.baseProfile}）`" :value="preset.id"/></el-select><el-button :loading="store.exportLoading" :disabled="!store.preview||!!store.scope.error||store.toolsLoading" @click="download">导出当前预览 JSON</el-button></div><p class="form-help">内置范围导出为新的自定义副本，不会保存到服务器。{{ store.scope.names?`预览启用 ${store.scope.names.size} / ${store.tools.length} 项`:'有效工具范围未核验，需成功读取匹配目录。' }}</p><p v-if="store.preview" class="form-help">预设 ID：{{ store.preview.id }}；更新时间：{{ store.preview.updatedAt }}；显式启用 {{ store.preview.enabled.length }}，显式禁用 {{ store.preview.disabled.length }}。</p></div>
+  <div v-if="store.presetsRead" class="tool-preset-preview"><p>服务返回的当前范围：{{ store.presets.find(preset=>preset.id===store.selectedPresetId)?.name }}（ID：{{ store.selectedPresetId }}）。本地预览：{{ previewLabel }}。</p><div class="planner-import-actions"><el-select :model-value="store.previewPresetId" aria-label="只读预览预设" @change="selectPreview"><el-option v-for="preset in store.presets" :key="preset.id" :label="`${preset.name}（${preset.builtIn?'内置':'自定义'} / 基于${preset.baseProfile}）`" :value="preset.id"/></el-select><el-button :loading="store.exportLoading" :disabled="!store.preview||!!store.scope.error||store.toolsLoading" @click="download">导出当前预览 JSON</el-button></div><p class="form-help">内置范围导出为新的自定义副本，不会保存到服务器。{{ store.scope.names?`预览启用 ${store.scope.names.size} / ${store.tools.length} 项`:'有效工具范围未核验，需成功读取匹配目录。' }}</p><p v-if="store.preview" class="form-help">预设 ID：{{ store.preview.id }}；更新时间：{{ store.preview.updatedAt }}；显式启用 {{ store.preview.enabled.length }}，显式禁用 {{ store.preview.disabled.length }}。</p></div>
   <el-alert v-if="store.scope.error" :title="store.scope.error" type="warning" :closable="false"/><el-alert v-if="store.exportError" :title="store.exportError" type="error" :closable="false"/><p v-if="downloadNotice" role="status">{{ downloadNotice }}</p>
   <ToolPresetDraftPanel/>
   <ToolPresetWritePanel v-if="toolPresetWriteProvider"/>

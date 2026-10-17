@@ -49,6 +49,7 @@ describe('Companion read UI and host identity',()=>{
   expect(missing.text()).toContain('未知');expect(missing.text()).toContain('调用总数未记录');expect(missing.text()).toContain('当前 Creator未读取工程要求版本3.8.8');expect(p.loadLogs).not.toHaveBeenCalled();expect(p.loadCalls).not.toHaveBeenCalled()
   expect(await tip('调用统计说明')).toContain('没有记录不推断为零')
  })
+ it('opens tools help for the exact project without extra project or call reads',async()=>{const p=fixture();registerCompanionBrowserProvider(p);const {store,router}=await setup();await store.connect(p);await flushPromises();const reads=vi.mocked(p.loadProjects).mock.calls.length;await button('工具范围').trigger('click');await flushPromises();expect(router.currentRoute.value.path).toBe('/help');expect(router.currentRoute.value.query).toEqual({topic:'tools',project:'p1'});expect(p.loadProjects).toHaveBeenCalledTimes(reads);expect(p.loadCalls).not.toHaveBeenCalled()})
  it('opens calls for the explicit project, shows empty only after actual response and never replays',async()=>{
   const p=fixture();registerCompanionBrowserProvider(p);const {router}=await setup();await button('连接 Companion').trigger('click');await flushPromises();await button('查看调用记录').trigger('click');await flushPromises()
   expect(router.currentRoute.value.query.tab).toBe('calls');expect(wrapper!.text()).toContain('本次查询没有匹配调用');expect(p.loadCalls).toHaveBeenCalledTimes(1);expect(p.loadCalls).toHaveBeenCalledWith('p1',{failed:false},expect.any(AbortSignal))
