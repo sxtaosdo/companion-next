@@ -40,3 +40,15 @@ domain/adapter/store扩展原model start；不改变字段/体积/来源和lease
 按根AGENTS调用真实code-mapper `/root/code_mapper_model` 只读核对旧路径、Owner、接口和Next缺口，未操作网络/进程或修改文件。真实reviewer `/root/reviewer` 首审发现P2自动探测换源时被旧reading lane吞掉，已修成最新上下文串行补读；复审确认P2关闭、无新P1/P2。二者有效只读隔离未证实，自行遵守只读边界；没有冒称外部OCR通过。
 
 证据目录：`C:/Users/33272/AppData/Local/Temp/companion-model-parity-20261018/`。后续静态与只读页面交付基于已运行的原服务，不做真实启停或GPU实验。以上运行PID只代表这次观察，不作永久默认。
+
+## 最终交付与只读实机（通过）
+
+实现源9af58137f761ac330320e55476d23464b7a35685 / 内部.94，产品1.3.173。最终类型与正式workspace构建通过，206个不同定向隔离用例通过；静态六文件已备份/追加哈希资产/原子index切换，认证HTTP六SHA一致，旧资产保留。后续文档提交不重标静态源。
+
+正式/knowledge?tab=models已真实读取原状态并加载原8090页面，9张原服务卡可见；ComfyUI启动/停止/日志入口与Heretic运行/PID3260匹配原服务；没有知识CLI连接入口。离页iframe移除。整个脚本仅GET，实际启停/生成/同步POST为0，blocked=0，pageErrors=[]。这证明原入口/管理页可用，不将其写成真实模型切换或一致性效果通过。
+
+原daemon20116的PID/epoch/入口SHA不变，原launcher7292和Heretic3260保持；没有启动ComfyUI或8092代理，没有新监听、模型下载、软件安装、凭据或权限变化。用户窗口未触碰，自建无GPU浏览器已关闭，旧cocos-mcp并行修改与runtime/CLI受静态交付保护；原图片缓存决定不变，不重复其它已完成验收。
+
+证据：deployment-prepared.json、deployment-result.json、real-model-readonly-proof.json、real-model-panel.png、launcher-readonly-before.json、launcher-readonly-after.json、listeners-before.json、listeners-after.json、backup-static/。原始模型提示词/日志未归档，只记录服务ID/状态/PID等安全投影。
+
+最小后续仍是明确既有一致性工作流/输入输出及可切换现有Heretic的GPU窗口，随后只验指定旧功能；不默认重启任何旧批量生成。若仅继续使用已运行原面板，无需另启服务或新增权限。真实启动器启停和GPU/工作流执行仍在未验收栏，迁移范围已包含它们，不再一概排除。
