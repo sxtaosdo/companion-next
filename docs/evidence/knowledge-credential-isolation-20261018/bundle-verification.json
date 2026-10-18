@@ -1,0 +1,22 @@
+{
+  "artifacts": [
+    {
+      "name": "creator-ai",
+      "bytes": 1407643,
+      "sha256": "37edd3363c13b6d55c6720715aaf655ee3c037ffc5e451a12c4a3311a52f8d54"
+    },
+    {
+      "name": "companion-daemon",
+      "bytes": 1731902,
+      "sha256": "bf353a2d89046cc868e8503d18965b2e14b51973e3294ec61e804fa3ad84cc20"
+    },
+    {
+      "name": "knowledge-worker",
+      "bytes": 582828,
+      "sha256": "f043bc323d9eb0650b5914277652549622b6ed8e71cef5bae6b2eeee5bbb76ef"
+    }
+  ],
+  "bundledWorkerRejectsUnapprovedMethod": true,
+  "realCredentialLoaded": false,
+  "sharedServicesRestarted": false
+}

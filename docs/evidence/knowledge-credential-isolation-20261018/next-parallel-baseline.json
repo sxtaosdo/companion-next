@@ -1,0 +1,25 @@
+{
+  "head": "867f7e0215cf91705170aad52fbf5b832ba97d67",
+  "status": "",
+  "workingDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "indexDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "owners": {
+    "root": [
+      "docs/",
+      "src/domain/legacy-v148-changelog.ts",
+      "Git index/version/commit"
+    ],
+    "logs": [
+      "src/adapters/companion-events.ts",
+      "src/domain/companion-live.ts",
+      "tests/companion-events.test.ts",
+      "tests/companion-live-store.test.ts"
+    ],
+    "presets": [
+      "src/stores/tool-presets-write.ts",
+      "src/components/ToolPresetWritePanel.vue",
+      "tests/tool-presets-write-store.test.ts",
+      "tests/tool-presets-write-ui.test.ts"
+    ]
+  }
+}

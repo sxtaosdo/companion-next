@@ -1,0 +1,7 @@
+{
+  "baseline": "3b0c24a",
+  "candidate": "3f4ca701460fde68c8475c823b9232bbbb4086c9",
+  "branch": "codex/credential-isolation-20261018",
+  "sharedRuntimeDeployed": false,
+  "pushed": false
+}
