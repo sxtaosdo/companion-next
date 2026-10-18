@@ -1,0 +1,43 @@
+{
+  "source": "908d68c97de9729fcb9cf9b450ff2950b1e8babc",
+  "at": "2026-10-18T10:44:39.278Z",
+  "hashes": [
+    {
+      "path": "favicon.svg",
+      "status": 200,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "index.html",
+      "status": 200,
+      "sha256": "4e532fe31dae5e6ff3988a29a7c72f5e9a9c28d67b52aa91ad798d7353745426"
+    },
+    {
+      "path": "assets/about-icon-BaVeClOr.svg",
+      "status": 200,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "assets/donation-qr-D7kdLLAm.png",
+      "status": 200,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "assets/index-BPPpb5d1.css",
+      "status": 200,
+      "sha256": "2dfbac8c4f2617b62162e0560095ff3fb6a03651464b9c6c0ad584e732295628"
+    },
+    {
+      "path": "assets/index-C01UBbvS.js",
+      "status": 200,
+      "sha256": "f28a06015bd947b80cf101112377d12175f253c3dfc8d809a42d9a30f478ce67"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "strictCopyVisible": true,
+  "checkboxCount": 5,
+  "checkedCount": 0,
+  "daemonIdentityUnchanged": true,
+  "ok": true
+}

@@ -1,0 +1,24 @@
+{
+  "checkedAtUtc": "2026-10-18T10:42:08.2985715Z",
+  "classDefault": "URL:codex",
+  "commandDefault": null,
+  "delegateExecute": null,
+  "applications": [
+    {
+      "applicationId": "App",
+      "executable": "app/ChatGPT.exe",
+      "executableExists": true,
+      "protocols": [
+        "codex"
+      ]
+    },
+    {
+      "applicationId": "CodexCoreCommandRunner",
+      "executable": "app/resources/codex-command-runner.exe",
+      "executableExists": true,
+      "protocols": []
+    }
+  ],
+  "launchedApps": 0,
+  "clipboardWrites": 0
+}

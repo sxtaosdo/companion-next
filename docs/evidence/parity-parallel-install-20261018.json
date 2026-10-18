@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-18T10:42:08.059Z",
+  "run": "C:/Users/33272/AppData/Local/Temp/companion-parallel-install-20261018/run-NjDFpT",
+  "sources": {
+    "bridge-installer": "b622cef8f35041ab75f07d254384c1b354a0e0cb96841aa5b79bc1b5d0a62333",
+    "setup-service": "20710dfaed6d66f4650d1091d7a654bfd401a6e625189d1f4e775d47d1e99e20",
+    "dashboard-errors": "398b7217ca3eeb07ebf91bd145f54e2cf2428148e39ca5ad19dff28780f0d345"
+  },
+  "sourceExecution": "Read existing TS sources; TypeScript transpileModule to task-owned Temp; execute original class behavior without source edits.",
+  "bundle": "Synthetic two-file bundle; not a real Creator load or production package installation.",
+  "cases": {
+    "strictBridgeOnlyRealFilesystem": true,
+    "sameOptionsActiveReuse": true,
+    "differentOptionsActive409BeforeSecondDependency": true,
+    "secondInstallCurrent": true,
+    "managedManualModificationRejectedWithoutFileOrRegistryChange": true,
+    "unmanagedReservedDirectoryTakenOverAndExtraFilePreserved": true
+  },
+  "calls": {
+    "addProject": 1,
+    "install": 1,
+    "creator": 0,
+    "codex": 0,
+    "verify": 0
+  },
+  "receipt": {
+    "stage": "complete",
+    "effectiveOptions": {
+      "startCreator": false,
+      "configureCodex": false
+    },
+    "bridge": {
+      "status": "installed",
+      "version": "0.0.0-isolated",
+      "targetPath": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-parallel-install-20261018\\run-NjDFpT\\project\\extensions\\creator-ai-bridge"
+    }
+  },
+  "productionHttpCalls": 0,
+  "creatorLaunches": 0,
+  "clientConfigurationWrites": 0,
+  "newListeners": 0,
+  "repositoryWrites": 0
+}

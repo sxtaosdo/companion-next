@@ -1,0 +1,32 @@
+{
+  "checkedAtUtc": "2026-10-18T10:41:52.8204516Z",
+  "mode": "registry-and-file-existence-only",
+  "launchedApps": 0,
+  "clipboardWrites": 0,
+  "protocols": [
+    {
+      "scheme": "cursor",
+      "classExists": true,
+      "hasUrlProtocol": true,
+      "executable": "C:\\Users\\33272\\AppData\\Local\\Programs\\cursor\\Cursor.exe",
+      "executableExists": true,
+      "userChoiceProgId": null
+    },
+    {
+      "scheme": "codex",
+      "classExists": true,
+      "hasUrlProtocol": true,
+      "executable": null,
+      "executableExists": false,
+      "userChoiceProgId": null
+    }
+  ],
+  "matchingPackages": [
+    {
+      "name": "OpenAI.Codex",
+      "protocols": [
+        "codex"
+      ]
+    }
+  ]
+}

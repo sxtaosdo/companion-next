@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "source": "908d68c97de9729fcb9cf9b450ff2950b1e8babc",
+  "localVersion": "1.3.173.104",
+  "productVersion": "1.3.173",
+  "files": {
+    "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+    "index.html": "4e532fe31dae5e6ff3988a29a7c72f5e9a9c28d67b52aa91ad798d7353745426",
+    "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+    "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+    "assets/index-BPPpb5d1.css": "2dfbac8c4f2617b62162e0560095ff3fb6a03651464b9c6c0ad584e732295628",
+    "assets/index-C01UBbvS.js": "f28a06015bd947b80cf101112377d12175f253c3dfc8d809a42d9a30f478ce67"
+  },
+  "writes": [
+    "assets/index-BPPpb5d1.css",
+    "assets/index-C01UBbvS.js",
+    "index.html"
+  ],
+  "originalDirtyPathsAndHashesUnchanged": true,
+  "runtimeAndCliUnchanged": true,
+  "oldStaticAssetsPreserved": true,
+  "daemonRestarted": false,
+  "originalLibraryAccessed": false,
+  "rollback": "Verify current index hash then atomically restore backup-static/index.html; retain all hash assets."
+}

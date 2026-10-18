@@ -1,0 +1,171 @@
+{
+  "checkedAtUtc": "2026-10-18T10:42:36.227Z",
+  "mode": "pure-source-import-offline",
+  "cases": [
+    {
+      "agent": "cursor",
+      "index": 0,
+      "inputCodeUnits": 19,
+      "encodedUrlLength": 84,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "cursor",
+      "index": 1,
+      "inputCodeUnits": 1000,
+      "encodedUrlLength": 6047,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "cursor",
+      "index": 2,
+      "inputCodeUnits": 890,
+      "encodedUrlLength": 299,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    },
+    {
+      "agent": "cursor",
+      "index": 3,
+      "inputCodeUnits": 7955,
+      "encodedUrlLength": 299,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    },
+    {
+      "agent": "cursor",
+      "index": 4,
+      "inputCodeUnits": 7956,
+      "encodedUrlLength": 299,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    },
+    {
+      "agent": "cursor",
+      "index": 5,
+      "inputCodeUnits": 7981,
+      "encodedUrlLength": 299,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    },
+    {
+      "agent": "cursor",
+      "index": 6,
+      "inputCodeUnits": 7982,
+      "encodedUrlLength": 299,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    },
+    {
+      "agent": "cursor",
+      "index": 7,
+      "inputCodeUnits": 3,
+      "encodedUrlLength": 52,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "cursor",
+      "index": 8,
+      "inputCodeUnits": 1600,
+      "encodedUrlLength": 299,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    },
+    {
+      "agent": "codex",
+      "index": 0,
+      "inputCodeUnits": 19,
+      "encodedUrlLength": 56,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "codex",
+      "index": 1,
+      "inputCodeUnits": 1000,
+      "encodedUrlLength": 6019,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "codex",
+      "index": 2,
+      "inputCodeUnits": 890,
+      "encodedUrlLength": 271,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    },
+    {
+      "agent": "codex",
+      "index": 3,
+      "inputCodeUnits": 7955,
+      "encodedUrlLength": 7974,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "codex",
+      "index": 4,
+      "inputCodeUnits": 7956,
+      "encodedUrlLength": 7975,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "codex",
+      "index": 5,
+      "inputCodeUnits": 7981,
+      "encodedUrlLength": 8000,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "codex",
+      "index": 6,
+      "inputCodeUnits": 7982,
+      "encodedUrlLength": 271,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    },
+    {
+      "agent": "codex",
+      "index": 7,
+      "inputCodeUnits": 3,
+      "encodedUrlLength": 24,
+      "clipboardOnly": false,
+      "exactOldParity": true,
+      "fullRoundTrip": true
+    },
+    {
+      "agent": "codex",
+      "index": 8,
+      "inputCodeUnits": 1600,
+      "encodedUrlLength": 271,
+      "clipboardOnly": true,
+      "exactOldParity": true,
+      "fullRoundTrip": false
+    }
+  ],
+  "launchedApps": 0,
+  "clipboardWrites": 0,
+  "networkCalls": 0
+}

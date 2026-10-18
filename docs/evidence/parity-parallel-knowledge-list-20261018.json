@@ -1,0 +1,25 @@
+{
+  "capturedAt": "2026-10-18T10:42:04.409Z",
+  "baseUrl": "http://127.0.0.1:32180",
+  "kind": "actual authenticated Companion logical-read denial; not positive data acceptance",
+  "results": [
+    {
+      "path": "/api/knowledge/kb/list",
+      "method": "POST",
+      "body": {},
+      "httpStatus": 401,
+      "code": "AUTH_MISSING",
+      "error": "知识库只读身份尚未在本机配置"
+    },
+    {
+      "path": "/api/knowledge/agent/list",
+      "method": "POST",
+      "body": {},
+      "httpStatus": 401,
+      "code": "AUTH_MISSING",
+      "error": "知识库只读身份尚未在本机配置"
+    }
+  ],
+  "prohibitedOperationsPerformed": [],
+  "conclusion": "Both true readonly list paths reject at original ready() before CLI/data invocation; positive data reads remain unverified."
+}

@@ -1,0 +1,34 @@
+{
+  "parity-parallel-client-offline-20261018.json": {
+    "bytes": 3841,
+    "sha256": "b2698f135bf626828ea6ef486217221d25fd5189d984917f64f0bd3dece35cd6"
+  },
+  "parity-parallel-client-package-20261018.json": {
+    "bytes": 565,
+    "sha256": "e400d12be054d67f231d1c5cd5b30eec7a97967e2f2e5b532fd8a8af8655d9a7"
+  },
+  "parity-parallel-client-protocol-20261018.json": {
+    "bytes": 741,
+    "sha256": "b707e40f528f80b26a81e6e444dd7c31fe326c9e0b707de6d909777e405a5a81"
+  },
+  "parity-parallel-install-20261018.json": {
+    "bytes": 1625,
+    "sha256": "5d3011c6964477ce3764d0d8eb1c55558ba1b5bf96f66442c7c6b77299a09dbc"
+  },
+  "parity-parallel-knowledge-list-20261018.json": {
+    "bytes": 803,
+    "sha256": "8d4c914305bc2f9f5f95e3b991ec915db1138f45f4767f951f31c84f481a7d7b"
+  },
+  "parity-setup-copy-deployment-20261018.json": {
+    "bytes": 1164,
+    "sha256": "75434de3eb45a2c2df08ffd2fad15c1c1ac73edf7d984a66532b4158c3638dcf"
+  },
+  "parity-setup-copy-real-20261018.json": {
+    "bytes": 1212,
+    "sha256": "5f87e46b99137dfdebf06952bd8a5626e4baa9bc45667f29e0151c56c36e1a0d"
+  },
+  "parity-setup-copy-real-20261018.png": {
+    "bytes": 77147,
+    "sha256": "b3febde4d326b1b14f5881f94c8a8d447992c7dabc5d763f1317d41ff871b630"
+  }
+}
