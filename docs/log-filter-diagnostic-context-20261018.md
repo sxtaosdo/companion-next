@@ -13,3 +13,11 @@
 已恢复正常 workspace 可见日志页在停止实时更新或暂停日志时，用户修改筛选立即查询；实时运行时复用原队列，无重复请求。只读构建、其它页、未连接时保持原边界。有效 Preview 回执目标独立于结果显示保存，仅限当前来源及同一工程路径；Profiler/失败/迟到回执不写入，工程移除、换路径、断连清除。诊断选择优先级保持原逻辑，准备弹窗不自动发送。
 
 3文件63项单 worker 回归通过；首次新增测试写反按钮文案后修正通过。strict 首次发现测试夹具修改 readonly 属性，改为构造时指定后通过。独立只读 reviewer 无具体发现。无真实 Creator/Preview/诊断写入；外部 OCR 沿用既有自动审批拒绝状态，未重试、不记为通过。
+
+## 已部署及页面验证
+
+7bc072d/.56已部署，先备份44旧文件，再仅新增hash资源并原子替换index；旧资源保留，未重启。独立Edge核验6文件HTTP SHA，3场景通过：关闭实时后修改关键字只发1次匹配GET；最近Preview回执工程用于诊断；日志显式选项覆盖Preview默认工程。所有/api业务请求由独立上下文拦截，只有1次mock Preview probe、0次诊断发送，真实业务写入0。截图log-diagnostic-context.png已目视核对；PID2100/OPEN/epoch不变，未操作用户普通Edge窗口或Cookie。
+
+证据：C:/Users/33272/AppData/Local/Temp/companion-log-context-20261018/{browser-proof.json,deployment-result.json,final-protection.json}。共享cocos-mcp的22项dirty、HEAD、binary diff、所有dirty文件SHA及daemon bundle均与部署前一致。
+
+有界只读最终查漏未确认其它适合当前Next限定范围的小项；仍不可宣称全部迁移。五客户端只读配置合同、安装范围回显、外部编辑器唤起、图片owner字节、本地模型/Agent/同步暂停及真实Creator验收已在当前矩阵列明，不将既有96变体验收冒充本轮真实执行。
