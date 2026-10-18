@@ -1,0 +1,39 @@
+{
+  "capturedAt": "2026-10-18T11:15:48.070485+00:00",
+  "mode": "ro/query_only aggregate metadata only",
+  "groups": [
+    {
+      "parse_status": "completed",
+      "row_count": 154,
+      "oldest_update": "2026-09-20 03:05:12.086712+00:00",
+      "newest_update": "2026-09-20 11:30:42.221691+08:00",
+      "rows_with_pending_subtasks": 0,
+      "pending_subtask_slots": 0
+    },
+    {
+      "parse_status": "finalizing",
+      "row_count": 356,
+      "oldest_update": "2026-09-20 03:25:47.979917+00:00",
+      "newest_update": "2026-09-20 03:31:06.78027+00:00",
+      "rows_with_pending_subtasks": 356,
+      "pending_subtask_slots": 356
+    },
+    {
+      "parse_status": "processing",
+      "row_count": 1137,
+      "oldest_update": "2026-09-20 11:25:13.535003+08:00",
+      "newest_update": "2026-09-20 11:25:34.427959+08:00",
+      "rows_with_pending_subtasks": 0,
+      "pending_subtask_slots": 0
+    }
+  ],
+  "trigger_counts": {
+    "task_pending_ops": 0,
+    "data_sources": 0,
+    "sync_logs": 0,
+    "temporary_documents": 0,
+    "fork_snapshot_leases": 0,
+    "tenant_skills": 0
+  },
+  "caveat": "DB row status and pending slots do not establish currently running workers, failure cause or model readiness."
+}

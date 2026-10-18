@@ -1,0 +1,53 @@
+{
+  "before": {
+    "calls": 2,
+    "detached": 2,
+    "attached": 2,
+    "failed": false,
+    "receipt": {
+      "targetPid": 3820,
+      "foregroundPid": 3820,
+      "verified": true,
+      "detached": true
+    }
+  },
+  "after": {
+    "calls": 1,
+    "detached": 0,
+    "attached": 0,
+    "failed": false,
+    "receipt": {
+      "targetPid": 3820,
+      "foregroundPid": 3821,
+      "verified": false,
+      "detached": true
+    }
+  },
+  "restoreRace": {
+    "attached": 0,
+    "detached": 0,
+    "reason": "MethodInvocationException",
+    "failed": true,
+    "calls": 0
+  },
+  "fallback": {
+    "calls": 2,
+    "detached": 2,
+    "attached": 2,
+    "failed": false,
+    "receipt": {
+      "targetPid": 3820,
+      "foregroundPid": 3820,
+      "verified": true,
+      "detached": true
+    }
+  },
+  "attachRace": {
+    "attached": 2,
+    "detached": 2,
+    "reason": "MethodInvocationException",
+    "failed": true,
+    "calls": 1
+  },
+  "coverage": "Actual C# control flow compiled with every Win32 import stubbed; no desktop activation. Actual desktop helper acceptance separate."
+}

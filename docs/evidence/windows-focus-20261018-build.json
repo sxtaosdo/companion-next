@@ -1,0 +1,16 @@
+{
+  "baselineByteIdentical": true,
+  "baselineSha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+  "baselineMapSha256": "44aa846d59264ba2a98a5634c0da297bddd0aef99a8dec7b116e1f025c7416d4",
+  "candidateSha256": "148f28ad4989a038de1825beae197c4db9947f3209a8f22cf07ec330047df526",
+  "changedSources": [
+    "mcp/src/companion/platform.ts"
+  ],
+  "addedSources": [
+    "mcp/src/companion/windows-focus.ts"
+  ],
+  "removedSources": [],
+  "helperSha256": "6709a0562899f058dbd779023389eaaf6ab09d60fe0cde10cf3fb593c5ba1456",
+  "deployed": false,
+  "daemonRestarted": false
+}

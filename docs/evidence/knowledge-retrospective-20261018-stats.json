@@ -1,0 +1,39 @@
+{
+  "capturedAt": "2026-10-18T11:13:49.305565+00:00",
+  "mode": "SQLite mode=ro, query_only=ON, transaction snapshot; aggregate only",
+  "rowCounts": {
+    "knowledge_bases": 2,
+    "knowledges": 1647,
+    "chunks": 59428,
+    "lite_embeddings": 2269,
+    "sessions": 3,
+    "custom_agents": 1,
+    "models": 2,
+    "data_sources": 0,
+    "sync_logs": 0,
+    "task_pending_ops": 0,
+    "schema_migrations": 1
+  },
+  "knowledgeParseStatuses": {
+    "completed": 154,
+    "finalizing": 356,
+    "processing": 1137
+  },
+  "migration": [
+    [
+      30,
+      0
+    ]
+  ],
+  "activeRowCounts": {
+    "knowledge_bases": 2,
+    "knowledges": 1647,
+    "chunks": 20160
+  },
+  "scopeCounts": [
+    [
+      "da1051a5-3fff-4198-ba55-017ea79df9c3",
+      1647
+    ]
+  ]
+}

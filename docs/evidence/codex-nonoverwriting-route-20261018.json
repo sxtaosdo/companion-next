@@ -1,0 +1,114 @@
+[
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "function gD(",
+    "totalCount": 1,
+    "charOffset": 476161,
+    "snippet": "e.port!==``||e.hash!==``||t.includes(`#`)||e.searchParams.size!==1||n==null)return null;let r=ED(n);return r==null?null:{kind:`browser`,browserUrl:r}}function gD(e){let t=_D(e),n=e.searchParams.getAll(`mode`),r=Q(e,`originUrl`),a=Q(e,`path`),o=Q(e,`projectId`),s;if(n.length>1)return null;if(n.length===1){let e=i.to.safeParse(n[0]);if(!e.success)return null;s=e.data}return t==null||a!=null&&!i.mi(a)||t.prompt==null&&t.browserUrl==null&&s==null&&r==null&&a==null&&o==null?null:{codexAppMode:s,kind:`newThread`,originUrl:r,path:a,projectId:o==null?void 0:i.an(o),...t}}function _D(e){let t=Q(e,`prompt`),n=e.searchParams.get(`browserTabId`),r=n==null?null:eD.safeParse(n),i=e.searchParams.get(`browserActive`),a=i==null?null:tD.safeParse(i),o=e.searchParams.get(`browserUrl`),s=o==null?null:$E.safeParse(o);if(s!=null&&!s.success||r!=null&&!r.success||a!=null&&!a.success||s==null&&(r!=null||a!=null)||a!=null&&r==null)return null;if(a?.data===!1){if(s==null||!s.success||r==null||!r.success||!nD.test(r.data))return null;let e=new URL(s.data);if(e.protocol!==`https:`||e.username!==``||e.password!==``||e.port!==``||e.hash!==``||!rD.test(e.hostname)||e.pathname!==`/backfill`||e.searchParams.size!==2||e.searchParams.get(`backfillUi`)!==`sage`||!e.searchParams.get(`sageBackfillId`))return null}let c={browserUrl:s?.data,prompt:t??void 0};return r!=null&&(c.browserTabId=r.data),a!=null&&(c.browserActive=a.data),c}function vD(e){let[t,n,r]=Z(e);if(t!==`install`||r!=null)return null;let a=wD(n);if(a==null||!xD(e,KE))return null;let o=Q(e,`marketplace`)?.trim();return i.co(o)?{kind:`pluginInstall`,marketplaceName:o,pluginName:a}:null}function yD(e){let[t,n]=Z(e);if(n!=null||!xD(e,qE))return null;let r=wD(t),a=Q(e,`marketplacePath`)?.trim(),o=Q(e,`mode`)?.trim();return r==null||a==null||o!=null&&o!==`share`||!i.pi(a)||!i.mi(a)?null:{kind:`localPluginDetail`,hostId:null,marketplacePath:a,pluginName:r,openShareDialog:o===`share`}}function bD("
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "function OD(",
+    "totalCount": 1,
+    "charOffset": 479267,
+    "snippet": "ostname===``||t.username!==``||t.password!==``?null:t.toString()}function DD({isMacOS:e,isPackaged:t,hasExplicitUserDataPath:n=!1}){return t?!e||n:!1}function OD({app:e,isMacOS:t,platform:n=process.platform,ensurePrimaryWindowVisible:r,getPrimaryWindow:a,navigateToRoute:o,initialArgv:s,errorReporter:c,onDeepLinkReceived:d,openHttpUrl:f,wakeQueuedThread:p,isReadyToWake:m=()=>!0}){let h=[],g=new Set,_=new Set,v=!1,y=l.r();async function b(e){if(_.has(e))return;_.add(e);let t=0;try{for(;g.delete(e);)try{await p?.(e),t=0}catch(n){if(g.add(e),y.warning(`Failed to wake queued thread`,{safe:{},sensitive:{error:n}}),++t>=3)return;await(0,D.setTimeout)(1e3)}}finally{_.delete(e)}}async function x(){if(e.isReady()&&m())for(let e of g)b(e);let t=h.at(-1);if(t==null||!e.isReady())return;let n=t.kind===`codexDeepLink`&&t.route.kind===`localConversation"
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "--new-window",
+    "totalCount": 0
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "onlyIfEmpty",
+    "totalCount": 0
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "prefillPromptOnlyIfEmpty",
+    "totalCount": 0
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "windowId",
+    "totalCount": 4,
+    "charOffset": 404983,
+    "snippet": ";function jx(){return(0,p.join)(y.app.getPath(`userData`),`sentry`)}function Mx(){return Ox.major>=25}function Nx(e,t,n){Mx()?e.handle(t,async e=>(n({windowId:e.headers.get(`sentry-electron-renderer-id`)||void 0,url:e.url,body:Buffer.from(await e.arrayBuffer())}),new Response(``))):e.registerStringProtocol(t,(e,t)=>{n({windowId:e.headers[Cx],url:e.url,body:e.uploadData?.[0]?.bytes}),t(``)})}function Px(e,t){if(e.registerPreloadScript)e.registerPreloadScript({type:`frame`,filePath:t});else{let n=e.getPreloads();e.setPreloads([t,...n])}}var Fx=class{constructor(){this._entries=[],this._waiters=[],this._value=1}async runExclusive(e){let t=await this._acquire();try{return await e()}finally{t()}}_acquire(){return new Promise((e,t)=>{this._entries.push({resolve:e,reject:t}),this._dispatch()})}_release(){this._value+=1,this._dispatch()}_dispatch"
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "windowId",
+    "totalCount": 4,
+    "charOffset": 405154,
+    "snippet": "t(`sentry-electron-renderer-id`)||void 0,url:e.url,body:Buffer.from(await e.arrayBuffer())}),new Response(``))):e.registerStringProtocol(t,(e,t)=>{n({windowId:e.headers[Cx],url:e.url,body:e.uploadData?.[0]?.bytes}),t(``)})}function Px(e,t){if(e.registerPreloadScript)e.registerPreloadScript({type:`frame`,filePath:t});else{let n=e.getPreloads();e.setPreloads([t,...n])}}var Fx=class{constructor(){this._entries=[],this._waiters=[],this._value=1}async runExclusive(e){let t=await this._acquire();try{return await e()}finally{t()}}_acquire(){return new Promise((e,t)=>{this._entries.push({resolve:e,reject:t}),this._dispatch()})}_release(){this._value+=1,this._dispatch()}_dispatch(){for(let e=this._value;e>0;e--){let t=this._entries?.shift();t&&(this._value-=e,e=this._value+1,t.resolve(this._newReleaser()))}this._drainUnlockWaiters()}_newReleaser()"
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "windowId",
+    "totalCount": 4,
+    "charOffset": 436883,
+    "snippet": "ply:(e,t,n)=>{e([...n[0],r])}});let i=EC(e);y.app.whenReady().then(()=>{for(let r of n.getSessions())Nx(r.protocol,t.namespace,r=>{let a=()=>{let e=r.windowId?UC?.get(r.windowId):void 0;return e?y.webContents.fromId(e):void 0},o=r.body;if(t.urlMatches(r.url,`start`))WC();else if(t.urlMatches(r.url,`scope`)&&o)YC(n,o.toString());else if(t.urlMatches(r.url,`envelope`)&&o)qC(e,n,o,a());else if(t.urlMatches(r.url,`structured-log`)&&o)ZC(e,n,JSON.parse(o.toString()),a());else if(t.urlMatches(r.url,`metric`)&&o)QC(e,n,JSON.parse(o.toString()),a());else if(i&&t.urlMatches(r.url,`status`)&&o){let e=a();if(e){let t=JSON.parse(o.toString()).status;i(t,e)}}})}).catch(e=>H.error(e))}function ew(e,t,n){y.ipcMain.on(t.createKey(`start`),({sender:e})=>{let t=e.id;HC||=new Set,!HC.has(t)&&(e.isDestroyed()||(HC.add(t),e.once(`destroyed`,()=>{HC?.delete(t)"
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "windowId",
+    "totalCount": 4,
+    "charOffset": 436902,
+    "snippet": ".n[0],r])}});let i=EC(e);y.app.whenReady().then(()=>{for(let r of n.getSessions())Nx(r.protocol,t.namespace,r=>{let a=()=>{let e=r.windowId?UC?.get(r.windowId):void 0;return e?y.webContents.fromId(e):void 0},o=r.body;if(t.urlMatches(r.url,`start`))WC();else if(t.urlMatches(r.url,`scope`)&&o)YC(n,o.toString());else if(t.urlMatches(r.url,`envelope`)&&o)qC(e,n,o,a());else if(t.urlMatches(r.url,`structured-log`)&&o)ZC(e,n,JSON.parse(o.toString()),a());else if(t.urlMatches(r.url,`metric`)&&o)QC(e,n,JSON.parse(o.toString()),a());else if(i&&t.urlMatches(r.url,`status`)&&o){let e=a();if(e){let t=JSON.parse(o.toString()).status;i(t,e)}}})}).catch(e=>H.error(e))}function ew(e,t,n){y.ipcMain.on(t.createKey(`start`),({sender:e})=>{let t=e.id;HC||=new Set,!HC.has(t)&&(e.isDestroyed()||(HC.add(t),e.once(`destroyed`,()=>{HC?.delete(t)})))}),y.ipcMain.on"
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "newWindow",
+    "totalCount": 0
+  },
+  {
+    "source": "/.vite/build/bootstrap-cdWF4rWM.js",
+    "sha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "term": "openNewThread",
+    "totalCount": 0
+  },
+  {
+    "source": "/.vite/build/main-C4DYk222.js",
+    "sha256": "c8a2af504b21314fa6a64ad1b4ec83dbad80033ede902caf9978fd9c74a2c175",
+    "term": "function R0e(",
+    "totalCount": 1,
+    "charOffset": 3680083,
+    "snippet": "MessageToAllWindows({type:`global-state-updated`,keys:[i.vs.LOCAL_PROJECTS,i.vs.PROJECT_ORDER,i.vs.SELECTED_PROJECT]}),{type:`local`,projectId:s.id})}function R0e({settingsStore:e,buildFlavor:t,globalState:r,errorReporter:o,appUpdates:s,requestGitWorker:c,getLocalAppServerClient:l,threadCatalog:u,hasAppServerConnection:d,projectsManager:f,applyCodexAppConfig:p,getLocalAppServerConnection:m,windowServices:h,createFreshWindow:_,ensureWindow:v,getElectronMessageHandlerForWindow:y,allowDevtools:b,allowDebugMenu:x,enableUpdater:S,isMacOS:C,appVersion:w,onDeepLinkReceived:T,isReadyToWake:E}){let O=(e,t,n)=>{h.sendMessageToWindow(e,{type:`navigate-to-route`,path:t,state:n})},k=async()=>v({forNavigation:!0}),A=g.F({app:D.app,isMacOS:C,ensurePrimaryWindowVisible:k,isReadyToWake:E,wakeQueuedThread:async e=>{let t=m();await t.connect(),i.Ei(t.appServerVersion,`threadQueue`)&&(await t.sendAppServerRequest(`thread/queue/list`,{threadId:e,limit:1})).data.length!==0&&await t.resumeThread(e)},getPrimaryWindow:async()=>{let e=h.getPrimaryWindow();if(e==null)return null;let t=await h.windowManager.getOrCreateNavigationWindow(e);return t.isDestroyed()||t.webContents.isDestroyed()?null:t},navigateToRoute:async(e,t)=>{if(t.kind===`applyCodexAppConfig`){await p(e);return}let n=t.kind===`localConversation`?z0e({threadId:t.conversationId,originHostId:t.hostId,threadAccess:t.threadAccess,catalog:u,hasAppServerConnection:d}):void 0;return A0e({window:e,route:t.kind===`localConversation`?{...t,hostId:n}:t,globalState:r,requestGitWorker:c,appServerClient:l(),listPlugins:t.kind===`pluginInstall`?e=>m().listPlugins(e):void 0,projectsManager:f,windowManager:h.windowManager,navigateToRoute:O})},initialArgv:process.argv,errorReporter:o,onDeepLinkReceived:T,openHttpUrl:(e,t)=>{h.windowManager.sendMessageToWebContents(e.webContents,{type:`toggle-browser-panel`,open:!0,url:t,source:`manual`,initiator:`os_open`})}}),j=new O0e(()=>{D0e({commandKeymapStat"
+  },
+  {
+    "source": "/.vite/build/main-C4DYk222.js",
+    "sha256": "c8a2af504b21314fa6a64ad1b4ec83dbad80033ede902caf9978fd9c74a2c175",
+    "term": "case`newThread`",
+    "totalCount": 1,
+    "charOffset": 3676731,
+    "snippet": "o.size===0?a:`${a}?${o}`,r),j7({browserTabId:t.browserTabId,browserUrl:t.browserUrl,conversationId:t.conversationId,window:e,windowManager:c});return}case`newThread`:{let o=t.projectId==null?null:s?.getLocalProjects()[t.projectId]??vr(n)[t.projectId],u=null;u=o==null?await M0e({route:t,globalState:n,requestGitWorker:r,appServerClient:a,projectsManager:s}):i.tn(o.rootPaths);let d=u==null?void 0:await L0e({globalState:n,projectsManager:s,projectId:o?.id,workspaceRoot:u,windowManager:c});if(u!=null&&d==null)return;l(e,`/`,{codexAppMode:t.codexAppMode,focusComposerNonce:Date.now(),prefillPrompt:t.prompt,project:d}),j7({browserUrl:t.browserUrl,window:e,windowManager:c});return}case`settings`:l(e,`${t.section==null?`/settings`:`/settings/${t.section}`}${t.search??``}${t.hash??``}`);return;case`skills`:l(e,`/skills${t.search??``}`);return}}function j7({browserActive:e,browserTabId:t,browserUrl:n,conversationId:r,initiator:i=`open_in_browser_bridge`,window:a,windowManager:o}){if(n!=null){if(e===!1&&t!=null){o.sendMessageToWindow(a,{type:`open-browser-tab`,active:!1,browserTabId:t,conversationId:r,initialUrl:n,source:`manual`,initiator:i});return}o.sendMessageToWindow(a,{type:`toggle-browser-panel`,...t==null?{}:{browserTabId:t},conversationId:r,open:!0,url:n,source:`manual`,initiator:i})}}async function j0e({listPlugins:e,route:t}){if(e==null)return null;let{marketplaces:n}=await e({marketplaceKinds:[`local`]});return n.find(e=>e.path==null||e.name!==t.marketplaceName?!1:e.plugins.some(e=>e.name===t.pluginName))?.path??null}async function M0e({route:e,globalState:t,requestGitWorker:n,appServerClient:r,projectsManager:i}){if(e.path!=null){let t=await N0e(e.path);if(t!=null)return t}return e.originUrl==null?null:P0e({targetOriginUrl:e.originUrl,globalState:t,requestGitWorker:n,appServerClient:r,projectsManager:i})}async function N0e(e){let t=(0,S.resolve)(e);try{return(await(0,k.stat)(t)).isDirectory()?t:null}catch{return null"
+  },
+  {
+    "source": "/.vite/build/main-C4DYk222.js",
+    "sha256": "c8a2af504b21314fa6a64ad1b4ec83dbad80033ede902caf9978fd9c74a2c175",
+    "term": "--new-window",
+    "totalCount": 0
+  },
+  {
+    "source": "/.vite/build/main-C4DYk222.js",
+    "sha256": "c8a2af504b21314fa6a64ad1b4ec83dbad80033ede902caf9978fd9c74a2c175",
+    "term": "prefillPromptOnlyIfEmpty",
+    "totalCount": 0
+  },
+  {
+    "source": "/.vite/build/main-C4DYk222.js",
+    "sha256": "c8a2af504b21314fa6a64ad1b4ec83dbad80033ede902caf9978fd9c74a2c175",
+    "term": "openNewThread",
+    "totalCount": 0
+  }
+]

@@ -1,0 +1,310 @@
+{
+  "at": "2026-10-18T11:19:39.256Z",
+  "before": {
+    "foreground": 525512,
+    "foregroundPid": 19688,
+    "windows": [
+      {
+        "handle": 4064554,
+        "class": "ThumbnailDeviceHelperWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 65766,
+        "class": "Shell_TrayWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 525512,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 19688
+      },
+      {
+        "handle": 459944,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 18252
+      },
+      {
+        "handle": 591250,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 2992
+      },
+      {
+        "handle": 196814,
+        "class": "Windows.UI.Core.CoreWindow",
+        "pid": 11240
+      },
+      {
+        "handle": 66462,
+        "class": "EdgeUiInputTopWndClass",
+        "pid": 7604
+      },
+      {
+        "handle": 196632,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65872,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65870,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65868,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65866,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 984798,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19792
+      },
+      {
+        "handle": 1574252,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 23836
+      },
+      {
+        "handle": 1836414,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 24332
+      },
+      {
+        "handle": 1181328,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19356
+      },
+      {
+        "handle": 3737408,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19708
+      },
+      {
+        "handle": 2819882,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 20700
+      },
+      {
+        "handle": 65806,
+        "class": "Progman",
+        "pid": 7604
+      }
+    ]
+  },
+  "after": {
+    "foreground": 459944,
+    "foregroundPid": 18252,
+    "windows": [
+      {
+        "handle": 4064554,
+        "class": "ThumbnailDeviceHelperWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 65766,
+        "class": "Shell_TrayWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 459944,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 18252
+      },
+      {
+        "handle": 525512,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 19688
+      },
+      {
+        "handle": 591250,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 2992
+      },
+      {
+        "handle": 196814,
+        "class": "Windows.UI.Core.CoreWindow",
+        "pid": 11240
+      },
+      {
+        "handle": 66462,
+        "class": "EdgeUiInputTopWndClass",
+        "pid": 7604
+      },
+      {
+        "handle": 196632,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65872,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65870,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65868,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65866,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 984798,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19792
+      },
+      {
+        "handle": 1574252,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 23836
+      },
+      {
+        "handle": 1836414,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 24332
+      },
+      {
+        "handle": 1181328,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19356
+      },
+      {
+        "handle": 3737408,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19708
+      },
+      {
+        "handle": 2819882,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 20700
+      },
+      {
+        "handle": 65806,
+        "class": "Progman",
+        "pid": 7604
+      }
+    ]
+  },
+  "actualTargetForeground": true,
+  "noWindowRejected": true,
+  "stalePidRejected": true,
+  "restored": {
+    "foreground": 525512,
+    "foregroundPid": 19688,
+    "windows": [
+      {
+        "handle": 4064554,
+        "class": "ThumbnailDeviceHelperWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 65766,
+        "class": "Shell_TrayWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 525512,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 19688
+      },
+      {
+        "handle": 459944,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 18252
+      },
+      {
+        "handle": 591250,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 2992
+      },
+      {
+        "handle": 196814,
+        "class": "Windows.UI.Core.CoreWindow",
+        "pid": 11240
+      },
+      {
+        "handle": 66462,
+        "class": "EdgeUiInputTopWndClass",
+        "pid": 7604
+      },
+      {
+        "handle": 196632,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65872,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65870,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65868,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65866,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 984798,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19792
+      },
+      {
+        "handle": 1574252,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 23836
+      },
+      {
+        "handle": 1836414,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 24332
+      },
+      {
+        "handle": 1181328,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19356
+      },
+      {
+        "handle": 3737408,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19708
+      },
+      {
+        "handle": 2819882,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 20700
+      },
+      {
+        "handle": 65806,
+        "class": "Progman",
+        "pid": 7604
+      }
+    ]
+  },
+  "originalForegroundRestored": true
+}

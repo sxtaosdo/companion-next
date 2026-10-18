@@ -1,0 +1,146 @@
+{
+  "at": "2026-10-18T11:20:20.101Z",
+  "repos": {
+    "D:/code/shidai3/P8000/cocos-mcp": {
+      "head": "07c2a990c23e5899e81d132a7d6343e0caba57499caa987af2bb1d17c7db2f30",
+      "status": "288ff957e1cfce9131c216a06b2cf2c9dc5dbd0d0cdc9d2061504867371cf36b",
+      "work": "ec4c01b56d5433c3941bfae94277fbcc5f9bd98db2f09b74a683ecfea138eebf",
+      "index": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:/code/shidai3/P4000/colony-flow-food-hunt": {
+      "head": "38307b41cd7c43ad3db177a81a8ba59c234320aa563c8b87e48c493958b0a08e",
+      "status": "439182832419426306b57b1647ba8c977ecbabc7aebfa89a3b6204a115a99850",
+      "work": "2c835b735eef2ef5f6a65d6389655f29b9d406516dbb51d0107bdbba848aa87a",
+      "index": "db1e4259b4cbb94fe32a3d38ca6c2c1dc3cce70473603b50e08a26cbb7cc6e63"
+    },
+    "D:/code/shidai3/P8000/local-tests/creator-ai-variant-import-acceptance-20261017": {
+      "head": "b3de3e11050f1390a228057ea47bf6723c726ac6edb4c496473f9c0b97aa1ec3",
+      "status": "5958133fb25202e91637547d25be1c2ec16b3d1dd3d5cfc62027e50bff898adc",
+      "work": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "index": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "repoSnapshotsUnchanged": true,
+  "registryBytesRestored": true,
+  "presetBytesUnchanged": true,
+  "daemon": {
+    "pid": 20116,
+    "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+    "startedAt": "2026-10-18T04:48:30.247Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+    "nodeVersion": "v25.2.1"
+  },
+  "original": {
+    "state": "ready",
+    "pid": 18252,
+    "sessionId": "e04e7299-680f-4109-a829-8cac07a51bd4"
+  },
+  "desktop": {
+    "foreground": 525512,
+    "foregroundPid": 19688,
+    "windows": [
+      {
+        "handle": 4064554,
+        "class": "ThumbnailDeviceHelperWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 65766,
+        "class": "Shell_TrayWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 525512,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 19688
+      },
+      {
+        "handle": 459944,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 18252
+      },
+      {
+        "handle": 591250,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 2992
+      },
+      {
+        "handle": 196814,
+        "class": "Windows.UI.Core.CoreWindow",
+        "pid": 11240
+      },
+      {
+        "handle": 66462,
+        "class": "EdgeUiInputTopWndClass",
+        "pid": 7604
+      },
+      {
+        "handle": 196632,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65872,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65870,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65868,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65866,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 984798,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19792
+      },
+      {
+        "handle": 1574252,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 23836
+      },
+      {
+        "handle": 1836414,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 24332
+      },
+      {
+        "handle": 1181328,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19356
+      },
+      {
+        "handle": 3737408,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 19708
+      },
+      {
+        "handle": 2819882,
+        "class": "Open With Dummy Window Class For Interim Dialog",
+        "pid": 20700
+      },
+      {
+        "handle": 65806,
+        "class": "Progman",
+        "pid": 7604
+      }
+    ]
+  },
+  "cursor": {
+    "handles": [],
+    "pids": []
+  },
+  "originalForegroundRestored": true,
+  "originalWindowsPresent": true
+}
