@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-18T13:40:15.964744+00:00",
+  "originalKB": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+  "documents": 1647,
+  "originalMetadataSha256": "400e49c75b77cc45e16cb96cd6d21ecc47bc0b5df144886fce698d400b68efcd",
+  "chunks": 59428,
+  "indexRows": 2269,
+  "vectorMappings": 2264,
+  "testDocuments": [],
+  "migration": [
+    {
+      "version": 30,
+      "dirty": 0
+    }
+  ]
+}

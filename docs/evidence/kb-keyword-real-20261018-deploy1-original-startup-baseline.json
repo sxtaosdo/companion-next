@@ -1,0 +1,41 @@
+{
+  "migration": [
+    [
+      30,
+      0
+    ]
+  ],
+  "quick_check": "ok",
+  "empty_trigger_counts": {
+    "task_pending_ops": 0,
+    "data_sources": 0,
+    "im_channels": 0,
+    "mcp_endpoints": 0,
+    "mcp_services": 0,
+    "sync_logs": 0
+  },
+  "knowledge_statuses": [
+    [
+      "completed",
+      154
+    ],
+    [
+      "finalizing",
+      356
+    ],
+    [
+      "processing",
+      1137
+    ]
+  ],
+  "knowledge_state_sha256": "d761b079368fedeb58fbda195982876a6c1e577621266f4a10560bca2cc41daf",
+  "counts": {
+    "knowledges": 1647,
+    "chunks": 59428,
+    "lite_embeddings": 2269,
+    "auth_tokens": 22,
+    "users": 2,
+    "tenants": 2
+  },
+  "temporary_kbs": 0
+}

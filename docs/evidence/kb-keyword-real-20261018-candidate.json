@@ -1,0 +1,95 @@
+{
+  "preparedAt": "2026-10-18T13:53:15.111372+00:00",
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "local_extension": "reader-recovery-v1 + kb-keyword-routing-v1",
+  "checkpoint": "a866b0cc51b65f34517c28e14a6603e9605122c0",
+  "fix_commit": "277acc4fac665a73298373688dd2513e3e8eb93c",
+  "files": {
+    "weknora.exe": {
+      "sha256": "11abf6df9abe6503f3da8bd542cf3cf907ce90f311ad6dd6ad0d97b7d870cbe3",
+      "bytes": 219049472
+    },
+    "duckdb.dll": {
+      "sha256": "8bdbf7cfe619482e64f30e99c628eaee28936c5b10fe8459baea9df8b78095b6",
+      "bytes": 36885288
+    },
+    "libgcc_s_seh-1.dll": {
+      "sha256": "68ca4574b331402879dec403ba4f14491c9b8fc4aa3f4a41432008714b9bc5df",
+      "bytes": 150537
+    },
+    "libstdc++-6.dll": {
+      "sha256": "b30dbd914d903992acb28b38455947153886656beafbd91c465c31aa258f9c45",
+      "bytes": 2659194
+    },
+    "libwinpthread-1.dll": {
+      "sha256": "76cc52adfcdb8c800813b2ae8da42a908934eb1ee54ce8e9744fc8d703c76ee1",
+      "bytes": 64574
+    }
+  },
+  "prior_manifest_sha256": "35842f52578b0d33c14801a059163b3bb1e5b061cf461cba677deec68736f383",
+  "prior_live_exe_sha256": "3c6b2ea4d0bfc4703224c2fdc0099f43dd77a46b99fc11c1e4296a9df00e44a3",
+  "existing_reader_overlay": "25/25 Replace Go files SHA unchanged; overlay-preservation.json",
+  "build": {
+    "toolchain": "existing Go1.26.8 / GCC16.2.0",
+    "network": "GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local",
+    "tags": [
+      "sqlite_fts5",
+      "duckdb_use_lib"
+    ],
+    "script": "Build-KeywordFix-round2.ps1 -Phase build",
+    "result": "exit0 clean committed source; round2-build-receipt.json",
+    "source_commit": "277acc4fac665a73298373688dd2513e3e8eb93c",
+    "source_worktree_clean": true
+  },
+  "source_files": {
+    "internal/application/service/knowledge_process.go": "ecdcc449559e211c391ed2ab750493ce7c9e32a68f0e9ccc2cfa0296447a24f1",
+    "internal/application/service/retriever/indexing_strategy.go": "9666283743b40a099a1641d83d147040778bbea1f825a9ba692c930662119da9",
+    "internal/application/service/retriever/indexing_strategy_test.go": "1fcb3ea8727bfdd9dc40b259093cc18b3d08f2cea78017daa39de236010c91d3",
+    "internal/application/service/knowledge_process_keyword_only_test.go": "ac04417671fb01a90afc38554eb9555b4c7cb5601c719607cb795dbf19665ef0",
+    "internal/application/service/knowledge_delete.go": "8c3033845a8c7b456a0d89e97219115d3b6a39fc39329b68404fa2c6e635e097",
+    "internal/application/service/knowledge_index_dimension.go": "b0159288ec3e5f11962a8344a3c259ab970deb007c0945eb01750013f6a53e16",
+    "docs/LOCAL-KEYWORD-INDEXING-FIX.md": "942196001002d82505fac0bcf3e98a7817a59538576714a7e1a5409c8e9f5b1a"
+  },
+  "launcher": {
+    "original_sha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+    "unchanged": true,
+    "deploy_launcher": false,
+    "reason": "existing KnowledgeServiceClient executable allowlist requires original normal-reader-recovery-v0.8.2 path"
+  },
+  "deployment_targets": {
+    "runtime_exe": "D:/services/weknora/normal-reader-recovery-v0.8.2/weknora.exe",
+    "manifest": "D:/services/weknora/build/reader-recovery-v0.8.2/deployment-evidence.json",
+    "launcher": "UNCHANGED"
+  },
+  "operations_performed": {
+    "service_restart": false,
+    "browser": false,
+    "production_database": false,
+    "test_kb": false,
+    "models": false,
+    "credentials": false
+  },
+  "deployment_plan": "Coordinator backs up old EXE and original manifest, replaces only original-path EXE, updates original manifest.files.weknora.exe SHA and size, appends targeted fix evidence; retains all other original manifest fields and DLLs. This candidate manifest is standalone evidence, NOT a full replacement of the historical manifest.",
+  "tests": {
+    "focused_top_level_pass": 27,
+    "followup_top_level_pass": 9,
+    "followup_metadata_error_cases": 3,
+    "file_worker_and_reparse_bound_unbound": 2,
+    "three_TXT_bound_unbound_cases": 6,
+    "empty_channel_cases": 2,
+    "failed_final": 0,
+    "red_prior_commit_top_level_fail": 2,
+    "red_prior_commit_leaf_fail": 8,
+    "evidence": "round2-validation-summary.json + round2-red-tests.jsonl + round2-focused-tests.jsonl + round2-followup-tests.jsonl",
+    "excluded_invalid_receipt": "round2-red-INVALID-encoding-build-failure.jsonl is NOT regression proof"
+  },
+  "review": {
+    "reviewer": "/root/reviewer",
+    "result": "Round2 source/dimension fix reviewed read-only; final manifest/hash review pending",
+    "effective_sandbox_isolation": "not independently verified"
+  },
+  "task_checkpoint": "0a13df4",
+  "supersedes_fix_commit": "9eebef8e8fc337c7dc7b19ad9b805ece73fe58bd",
+  "scope": "File upload document worker, common chunk indexing, and synchronous ReparseKnowledge cleanup. No embedding client construction/inference for keyword-only; existing tenant-scoped model metadata Dimension is still read. Chunk editing syncChunkIndex and summary refresh are outside this fix. Actual HTTP/runtime acceptance is coordinator-owned and pending.",
+  "binary_provenance": "Bound by manifest, clean commit, source SHA and offline build receipt. handler.CommitID remains upstream; no claim of embedded vcs.revision."
+}

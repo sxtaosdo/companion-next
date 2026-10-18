@@ -1,0 +1,19 @@
+{
+  "accepted": true,
+  "checks": {
+    "sixKeywordQueriesPassed": true,
+    "singleDocumentChunkReplaced": true,
+    "singleDocumentContentHashSame": true,
+    "otherTwoDocumentIndexSnapshotsUnchanged": true,
+    "allCompletedNoPendingNoSummary": true,
+    "threeReadyChunksAndKeywordIndexRows": true,
+    "retrievalUsesNewChunkOnly": true
+  },
+  "uploadRequests": 3,
+  "recoveryReparseRequests": 3,
+  "singleConsistencyReparseRequests": 1,
+  "newCredentials": false,
+  "nativeFrontendSessionOnly": true,
+  "nextIdentityPositivePathAccepted": false,
+  "chunkEditAccepted": false
+}

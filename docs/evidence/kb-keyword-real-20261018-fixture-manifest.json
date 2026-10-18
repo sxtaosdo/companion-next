@@ -1,0 +1,14 @@
+{
+  "01-amber-lantern.txt": {
+    "bytes": 186,
+    "sha256": "3f9d4a460761c79d3430bc622a36bc4fe1708ca823ac2d72d50f74e5a10f6da2"
+  },
+  "02-moon-garden.txt": {
+    "bytes": 148,
+    "sha256": "b44d9ef268e513e026ac8095c23e12f103be29b07c4dde0dbdd21252b784707e"
+  },
+  "03-copper-orbit.txt": {
+    "bytes": 239,
+    "sha256": "c6cb6b8dd5a45e9cdb3d17edabc4cb9381f47068eb4b3024de6f329aaa45a36f"
+  }
+}

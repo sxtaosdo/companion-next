@@ -1,0 +1,13 @@
+{
+  "listening": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8081,
+      "OwningProcess": 2492
+    }
+  ],
+  "exeSha256": "11abf6df9abe6503f3da8bd542cf3cf907ce90f311ad6dd6ad0d97b7d870cbe3",
+  "launcherSha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+  "pid": 2492,
+  "executable": "D:/services/weknora/normal-reader-recovery-v0.8.2/weknora.exe"
+}

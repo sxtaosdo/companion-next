@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-18T13:43:39.314419+00:00",
+  "stage": "uploaded-three-files-processing-failed-before-index",
+  "testKB": "c5f0a1bd-5748-4716-ab5c-36f08378a3c0",
+  "uploadCount": 3,
+  "uploadRequestsSucceeded": true,
+  "processingCompleted": false,
+  "reason": "File processing initializes configured embedding model even for keyword-only; constructor SSRF validation rejects existing DNS restricted-range result before inference. Security checks retained.",
+  "retryAction": "No re-upload. Fix pure-keyword upper processing path, then reparse only these three own failed documents.",
+  "ownDocuments": [
+    "420b32ba-7b7c-4e02-b217-67dae10290a1",
+    "597308d8-4b49-49e4-8bc9-910283ad2ec5",
+    "c3f20493-a45a-4ec6-a5ae-2b58ce4645b0"
+  ],
+  "original1647MetadataUnchanged": true,
+  "originalCounts": {
+    "chunks": 59428,
+    "indexRows": 2269,
+    "vectorMappings": 2264
+  },
+  "noCredentialsCreated": true,
+  "noSecurityChanges": true,
+  "separateRemainingGap": "chunk.go syncChunkIndex editing path still initializes an embedding model; no chunk edit executed or accepted"
+}

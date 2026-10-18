@@ -1,0 +1,6 @@
+{
+  "markers": [
+    "COMPANION_KB_UPLOAD:{\"ok\":true,\"items\":[{\"name\":\"01-amber-lantern.txt\",\"submitted\":true,\"success\":true,\"id\":\"420b32ba-7b7c-4e02-b217-67dae10290a1\",\"status\":\"pending\"},{\"name\":\"02-moon-garden.txt\",\"submitted\":true,\"success\":true,\"id\":\"597308d8-4b49-49e4-8bc9-910283ad2ec5\",\"status\":\"pending\"},{\"name\":\"03-copper-orbit.txt\",\"submitted\":true,\"success\":true,\"id\":\"c3f20493-a45a-4ec6-a5ae-2b58ce4645b0\",\"status\":\"pending\"}],\"noInferenceConfig\":{\"summary_enabled\":false,\"enable_multimodel\":false,\"vlm_config\":{\"enabled\":false},\"asr_config\":{\"enabled\":false},\"question_generation_config\":{\"enabled\":false},\"graph_enabled\":false,\"extract_config\":{\"enabled\":false}}}",
+    "COMPANION_KB_UPLOAD_STATUS:{\"started\":true,\"items\":[{\"name\":\"01-amber-lantern.txt\",\"submitted\":true,\"success\":true,\"id\":\"420b32ba-7b7c-4e02-b217-67dae10290a1\",\"status\":\"pending\"},{\"name\":\"02-moon-garden.txt\",\"submitted\":true,\"success\":true,\"id\":\"597308d8-4b49-49e4-8bc9-910283ad2ec5\",\"status\":\"pending\"},{\"name\":\"03-copper-orbit.txt\",\"submitted\":true,\"success\":true,\"id\":\"c3f20493-a45a-4ec6-a5ae-2b58ce4645b0\",\"status\":\"pending\"}],\"done\":true}"
+  ]
+}

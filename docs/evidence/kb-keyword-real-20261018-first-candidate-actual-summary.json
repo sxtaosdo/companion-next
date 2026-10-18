@@ -1,0 +1,49 @@
+{
+  "firstCandidateDeployment": {
+    "completed": true,
+    "pid": 23720,
+    "binding": "127.0.0.1:8081",
+    "exeSha256": "3c6b2ea4d0bfc4703224c2fdc0099f43dd77a46b99fc11c1e4296a9df00e44a3",
+    "sourceCommit": "9eebef8e8fc337c7dc7b19ad9b805ece73fe58bd",
+    "exeHasLocalVcsRevision": false
+  },
+  "actualUpload": {
+    "files": [
+      {
+        "file": "01-amber-lantern.txt",
+        "bytes": 186
+      },
+      {
+        "file": "02-moon-garden.txt",
+        "bytes": 148
+      },
+      {
+        "file": "03-copper-orbit.txt",
+        "bytes": 239
+      }
+    ],
+    "nativeFrontendExistingSession": true,
+    "newCredentials": false,
+    "successfulRequests": 3,
+    "processingCompleted": 0,
+    "processingFailed": 3,
+    "duplicateUploads": 0
+  },
+  "scopeProtection": {
+    "originalKB": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+    "originalDocuments": 1647,
+    "selectedMetadataHashUnchanged": true,
+    "chunkCount": 59428,
+    "indexRows": 2269,
+    "vectorMappings": 2264,
+    "bodyContentsNotRead": true,
+    "metadataHashAndCountsDoNotProveContentIdentity": true
+  },
+  "remaining": {
+    "upperPipelineModelInitialization": "confirmed-failure-under-fix",
+    "chunkEditReindexModelDependency": "confirmed-code-gap-no-write-test",
+    "nativeNextKnowledgeIdentity": "not-injected/not-accepted",
+    "semanticOrAgentConversation": "not-executed",
+    "originalLibraryBulkRecovery": "not-executed"
+  }
+}

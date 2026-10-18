@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-18T13:40:05.202179+00:00",
+  "phase": "complete",
+  "sameRuntimePath": true,
+  "launcherChanged": false,
+  "newCredentials": false,
+  "steps": [
+    {
+      "control": "stop",
+      "state": {
+        "running": false,
+        "frameable": false
+      }
+    },
+    {
+      "control": "start",
+      "state": {
+        "running": true,
+        "frameable": false
+      }
+    }
+  ],
+  "oldExeSha256": "d2a17caf94f3615d75bce831a85248b140dfb705add0aee069bea767f0d90863",
+  "newExeSha256": "3c6b2ea4d0bfc4703224c2fdc0099f43dd77a46b99fc11c1e4296a9df00e44a3",
+  "fixCommit": "9eebef8e8fc337c7dc7b19ad9b805ece73fe58bd",
+  "databaseBackupFiles": [
+    {
+      "name": "weknora.db",
+      "bytes": 207044608,
+      "sha256": "5d12761bae9ef5f3a5cfc341c5d3f6940be5cfcb6b58958e73af37cc3e6aebd8"
+    },
+    {
+      "name": "weknora.db-shm",
+      "bytes": 32768,
+      "sha256": "fd4c9fda9cd3f9ae7c962b0ddf37232294d55580e1aa165aa06129b8549389eb"
+    },
+    {
+      "name": "weknora.db-wal",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "original1647Unchanged": true,
+  "migrationUnchanged": true,
+  "testDocuments": 0,
+  "rollbackNeeded": false
+}

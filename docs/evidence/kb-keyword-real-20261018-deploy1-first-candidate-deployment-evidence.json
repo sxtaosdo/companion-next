@@ -1,0 +1,82 @@
+{
+  "preparedAt": "2026-10-18T13:39:00.244179+00:00",
+  "upstream_commit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+  "local_extension": "reader-recovery-v1 + kb-keyword-routing-v1",
+  "checkpoint": "a866b0cc51b65f34517c28e14a6603e9605122c0",
+  "fix_commit": "9eebef8e8fc337c7dc7b19ad9b805ece73fe58bd",
+  "files": {
+    "weknora.exe": {
+      "sha256": "3c6b2ea4d0bfc4703224c2fdc0099f43dd77a46b99fc11c1e4296a9df00e44a3",
+      "bytes": 219051520
+    },
+    "duckdb.dll": {
+      "sha256": "8bdbf7cfe619482e64f30e99c628eaee28936c5b10fe8459baea9df8b78095b6",
+      "bytes": 36885288
+    },
+    "libgcc_s_seh-1.dll": {
+      "sha256": "68ca4574b331402879dec403ba4f14491c9b8fc4aa3f4a41432008714b9bc5df",
+      "bytes": 150537
+    },
+    "libstdc++-6.dll": {
+      "sha256": "b30dbd914d903992acb28b38455947153886656beafbd91c465c31aa258f9c45",
+      "bytes": 2659194
+    },
+    "libwinpthread-1.dll": {
+      "sha256": "76cc52adfcdb8c800813b2ae8da42a908934eb1ee54ce8e9744fc8d703c76ee1",
+      "bytes": 64574
+    }
+  },
+  "prior_manifest_sha256": "7b1b33edf55be1ab50b44427bb2102f684a55d28bf7f96130d8ac36dad95db2c",
+  "prior_live_exe_sha256": "d2a17caf94f3615d75bce831a85248b140dfb705add0aee069bea767f0d90863",
+  "existing_reader_overlay": "25/25 Replace Go files SHA unchanged; overlay-preservation.json",
+  "build": {
+    "toolchain": "existing Go1.26.8 / GCC16.2.0",
+    "network": "GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local",
+    "tags": [
+      "sqlite_fts5",
+      "duckdb_use_lib"
+    ],
+    "script": "Build-KeywordFix.ps1 -Phase build",
+    "result": "exit0 after committing final review fixes",
+    "source_commit": "9eebef8e8fc337c7dc7b19ad9b805ece73fe58bd",
+    "source_worktree_clean": true
+  },
+  "source_files": {
+    "internal/application/service/knowledge_process.go": "b81cd38200504d3b47cf489f7a97b173d20b8aa1fe771d2b865369fbc54b9543",
+    "internal/application/service/retriever/indexing_strategy.go": "9666283743b40a099a1641d83d147040778bbea1f825a9ba692c930662119da9",
+    "internal/application/service/retriever/indexing_strategy_test.go": "1fcb3ea8727bfdd9dc40b259093cc18b3d08f2cea78017daa39de236010c91d3",
+    "internal/application/service/knowledge_process_keyword_only_test.go": "513041bb9976a3f89c1ad4e87809ed6ac77c95227315884edc38a6c6a2de192c"
+  },
+  "launcher": {
+    "original_sha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+    "unchanged": true,
+    "deploy_launcher": false,
+    "reason": "existing KnowledgeServiceClient executable allowlist requires original normal-reader-recovery-v0.8.2 path"
+  },
+  "deployment_targets": {
+    "runtime_exe": "D:/services/weknora/normal-reader-recovery-v0.8.2/weknora.exe",
+    "manifest": "D:/services/weknora/build/reader-recovery-v0.8.2/deployment-evidence.json",
+    "launcher": "UNCHANGED"
+  },
+  "operations_performed": {
+    "service_restart": false,
+    "browser": false,
+    "production_database": false,
+    "test_kb": false,
+    "models": false,
+    "credentials": false
+  },
+  "deployment_plan": "Coordinator backs up old EXE and original manifest, replaces only original-path EXE, updates original manifest.files.weknora.exe SHA and size, appends targeted fix evidence; retains all other original manifest fields and DLLs. This candidate manifest is standalone evidence, NOT a full replacement of the historical manifest.",
+  "tests": {
+    "focused_top_level_pass": 23,
+    "followup_empty_channel_cases": 2,
+    "followup_three_TXT_bound_unbound_cases": 6,
+    "failed": 0,
+    "evidence": "validation-summary.json + focused-tests.jsonl + followup-tests.jsonl"
+  },
+  "review": {
+    "reviewer": "/root/reviewer",
+    "result": "original P2 closed; no new P1/P2; followup receipts checked read-only",
+    "effective_sandbox_isolation": "not independently verified"
+  }
+}

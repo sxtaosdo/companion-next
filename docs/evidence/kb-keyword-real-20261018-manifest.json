@@ -1,0 +1,130 @@
+{
+  "kb-keyword-real-20261018-accepted-results.json": {
+    "sha256": "20fe5bd69688214c9e5305e4e3d7a7a07f4c46cac3c0d4fe2d2c2bee7c0f5f52",
+    "bytes": 582
+  },
+  "kb-keyword-real-20261018-browser-upload-receipts.json": {
+    "sha256": "7586c1f6cbc927a6944a596b4ba86de0674d81d5cac5e5ed9917d5d7f22ea3a8",
+    "bytes": 1268
+  },
+  "kb-keyword-real-20261018-upload-errors.json": {
+    "sha256": "c602e9e4e72feb59876432858d48e6115229fcfd88ee3fa0a021ceb89d4a0d61",
+    "bytes": 937
+  },
+  "kb-keyword-real-20261018-upload-processing-receipt.json": {
+    "sha256": "4bf5afb82256e5ebce6f5baf84cbf9a37c3ad1ef435e52fb71da544550b01857",
+    "bytes": 1083
+  },
+  "kb-keyword-real-20261018-first-candidate-actual-summary.json": {
+    "sha256": "3139eef7cc0b173a799d92da71ef3d865ebd9e5f8ea01596efee47999795935d",
+    "bytes": 1421
+  },
+  "kb-keyword-real-20261018-browser-final-receipts.json": {
+    "sha256": "7547f2caa47ecf3cf3ae881ce2c5a96a0900a30b552054a8e9261ae92e5ff1ff",
+    "bytes": 5681
+  },
+  "kb-keyword-real-20261018-browser-final-restored.json": {
+    "sha256": "d202a72b269013fd2296aac328eab145be09bb23345a2ec1cd8e8d96ce195272",
+    "bytes": 185
+  },
+  "kb-keyword-real-20261018-index-before-single-reparse.json": {
+    "sha256": "de04fb4a9f46f249871e68ecb7ed5df63dbac88178d0d63de26e3e3e9150bf76",
+    "bytes": 2105
+  },
+  "kb-keyword-real-20261018-index-after-single-reparse.json": {
+    "sha256": "8f87b0f7aa687790df15f98b0dfffd03db29109b281dcfe7a1d14a642bdcd913",
+    "bytes": 2105
+  },
+  "kb-keyword-real-20261018-fixture-manifest.json": {
+    "sha256": "c7af2da2e95e2c24dd9f0b95adef01b3fffb5be7cfb3af9f83dbd420ace3e736",
+    "bytes": 396
+  },
+  "kb-keyword-real-20261018-final-companion-state.json": {
+    "sha256": "30a97ab6ea4bcfadacbdd1023ac29363d783340977855d932c1d372b6b7cad71",
+    "bytes": 585
+  },
+  "kb-keyword-real-20261018-final-protected-repositories.json": {
+    "sha256": "91a04193467a75a0dac6f891b8508434cf23dc342c9254c6d7790e2e6448400b",
+    "bytes": 1380
+  },
+  "kb-keyword-real-20261018-final-processes.json": {
+    "sha256": "071d3dd94fb51e325255dcc7e7c31e578b178a112078a53cfa4350f374d8e583",
+    "bytes": 228
+  },
+  "kb-keyword-real-20261018-final-runtime.json": {
+    "sha256": "3bd8ad8eb91da3032a04db35fb161f6d0de41eaf9f661fc8b57830b6f463cc8f",
+    "bytes": 392
+  },
+  "kb-keyword-real-20261018-native-completed-3txt-content.png": {
+    "sha256": "626ce5266d04d921e34e8cc216de9ac8a0c2ee768f1a2a62b27305db3f332c39",
+    "bytes": 38996
+  },
+  "kb-keyword-real-20261018-deploy1-deployment.json": {
+    "sha256": "487669188966384678d4cc9200126baa902e0dc20971e85a829c279a628b67a2",
+    "bytes": 1221
+  },
+  "kb-keyword-real-20261018-deploy1-before.json": {
+    "sha256": "962d5798c901660550bd3da22410acc16e17fcaf0227c20f46073312a07125bc",
+    "bytes": 381
+  },
+  "kb-keyword-real-20261018-deploy1-after.json": {
+    "sha256": "b9a53a5e5382c9b341de1e44fc2c7642d0e7f13d612679101c1d4c0192fcc69f",
+    "bytes": 381
+  },
+  "kb-keyword-real-20261018-deploy1-after-upload.json": {
+    "sha256": "3078b22c5b1a6956566e2a209124812d3a06c281be8ff78c9cfe1098c1304f51",
+    "bytes": 872
+  },
+  "kb-keyword-real-20261018-deploy1-authorized-state-delta.json": {
+    "sha256": "fd80ed45a65c1f2934498e730fa02b6502f850335e7b784c0573cf58363662b2",
+    "bytes": 525
+  },
+  "kb-keyword-real-20261018-deploy1-checkpoint-failed-before-second-deploy-receipt.json": {
+    "sha256": "25eaef854694c8ed8d00ed54ece6cc8e2180fcd83f632eaef5fe9f37f78f2485",
+    "bytes": 1317
+  },
+  "kb-keyword-real-20261018-deploy1-checkpoint-completed-final-receipt.json": {
+    "sha256": "0c450576efc8edab5bfe6a69a3d46fb6eb847f21b7b9ebc5d07555fdf277d23a",
+    "bytes": 1326
+  },
+  "kb-keyword-real-20261018-deploy1-original-startup-baseline.json": {
+    "sha256": "7cab4e158e3b08aa5f7952aea59d5c289b37b2b789043e9117c6d50836d8e3b7",
+    "bytes": 675
+  },
+  "kb-keyword-real-20261018-deploy1-first-candidate-deployment-evidence.json": {
+    "sha256": "ae6bc7f2fc2e3c74afe795bd48544219c742930e73402076e75abb20fa2acc6d",
+    "bytes": 3780
+  },
+  "kb-keyword-real-20261018-deploy2-deployment.json": {
+    "sha256": "c3bedea08ddd843c33b823ac5bf062b8a0519aaac7800167a99464bb41d8af2c",
+    "bytes": 1273
+  },
+  "kb-keyword-real-20261018-deploy2-after.json": {
+    "sha256": "515a2fd2c55b1251dffc1157a9c7c7fd178523e59e34e5dfd2d8e340dbfe0fc8",
+    "bytes": 872
+  },
+  "kb-keyword-real-20261018-deploy2-after-reparse3.json": {
+    "sha256": "4b91bd287e9956f20023102d7daf20757283557267700332ce40d373a0aee563",
+    "bytes": 881
+  },
+  "kb-keyword-real-20261018-deploy2-final.json": {
+    "sha256": "512a0f36fd67f2a673d24aaa4cb3d8f1057cd4f573b95597daae53810a7aa82b",
+    "bytes": 881
+  },
+  "kb-keyword-real-20261018-candidate.json": {
+    "sha256": "a8e18d8be19c3388cab291d74a583be9c8e6da99a98f761e540b7f42bd6100c4",
+    "bytes": 5161
+  },
+  "kb-keyword-real-20261018-offline-tests.json": {
+    "sha256": "5a78a06ca988017784ccb3cd6e28cff20514757fa80e6f69f277c6ba1de12c56",
+    "bytes": 4714
+  },
+  "kb-keyword-real-20261018-deployment-handoff.md": {
+    "sha256": "0a3e06ca768b23c8fb8d6be4c368cbbc86f7eae75264bc4d17e71b4df9b84001",
+    "bytes": 3481
+  },
+  "kb-keyword-real-20261018-request-config.json": {
+    "sha256": "d6885f6fa5c010042d38b4e14c4885bbbaa629e6f7b01672990993ea9ba3907d",
+    "bytes": 10084
+  }
+}
