@@ -21,3 +21,20 @@ Next保留登记独立动作，恢复Bridge必选及Creator/Codex独立选择，
 Deployment is pending guarded replacement and formal UI session restoration. No real project installation, Creator launch, client configuration write, model or cloud operation has been performed.
 
 Follow-up review closed the adapter pre-decode path too: invalid contract version/options now become options-mismatch before store polling; actual adapter-to-store tests cover version, shape, missing metadata and different flags. Latest adapter+contract tests: 302 passed. Original mixed/CRLF line endings restored for unchanged wizard and connection-store lines.
+
+## Final deployment outcome — blocked safely, original page restored
+
+2026-10-18 02:44 UTC: implementation commits are Next cb139f5/.65 + ee2a82c/.66 and backend f3071db. The approved guarded-stop attempt returned HTTP409 DAEMON_DRAIN_BLOCKED: Background observation has not finished. A restricted process/listener query initially appeared empty; the mandatory system-level replacement check found PID2100 STILL_ACTIVE and aborted before any binary write. Elevated authenticated /v1/daemon/inflight then confirmed original PID2100, original epoch 8e0b37e6-c3f4-4451-824d-05fb8102c043, original daemon SHA f3323..., phase OPEN and no pending setup/build/client operation. No forced termination, second stop retry or lifecycle modification occurred.
+
+Next .66 static entry was briefly switched, then atomically restored from its verified backup because the corresponding backend could not be deployed. Final live page remains 30e1739/.62, product version 1.3.173. Both old and new hashed assets are retained. Daemon and CLI bytes are unchanged; no restart occurred, so the ordinary browser session/epoch remains valid. Formal ui reauthentication was unnecessary. GET /v1/setup/options-v1 on the actual old runtime returns500 (old generic task lookup), proving the live runtime still lacks the new contract. This is not a successful backend deployment.
+
+Independent Edge verification passed seven candidate cases: four Creator/Codex combinations, unsupported server (zero setup POST),409 conflict, and mismatched202. Candidate static bytes and ALL business API calls were intercepted in an isolated browser context; six fake setup POSTs, real business POST=0, installs=0, Creator starts=0, client configuration writes=0. This validates the candidate, not the live backend. Separately fetched all six restored live .62 HTTP files:200 and exact previous SHA matches. Screenshot candidate-bridge-only.png shows false/false confirmation and completion without configured-MCP prompt.
+
+Evidence directory: C:/Users/33272/AppData/Local/Temp/companion-setup-options-20261018/
+- verified-build-proof.json: byte-identical original reconstruction; only three approved source files changed in candidate.
+- candidate-browser-proof.json: seven intercepted Edge cases and six actual restored live-file SHA checks.
+- deployment-result.json: initial static .66 switch; SUPERSEDED by deployment-rollback.json.
+- deployment-rollback.json: restored .62 index hash9843f1f1847ff77f03dd16aa4e124b97c9a559a460ad5463f52bc94dd143564e.
+- final-protection.json: original22dirty paths retained; all dirty byte hashes unchanged since task commit; overlapping files reconstruct from original dirty baseline plus task-only patch; daemon/CLI unchanged.
+
+Remaining blocker: existing daemon lifecycle observation prevents guarded stop. Its lifecycle source already contains parallel owner modifications and is outside the approved installation-API scope. The responsible lifecycle work must resolve this before deploying the prepared API/Next pair. Real four-combination installation and real client configuration writes remain intentionally untested. No new listener, model, real Creator, cloud upload, software install, release or push was performed.
