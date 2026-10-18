@@ -1,6 +1,6 @@
 # Companion Next 当前对齐矩阵（2026-10-17）
 
-状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源30e1739/.62，产品页1.3.173，32180/PID2100；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
+状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源352fb27/.68，产品页1.3.173，32180/PID9764；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
 
 | 功能 | 已实现且验证的范围 | 缺失 / 未验证 | 证据 |
 | --- | --- | --- | --- |
@@ -12,7 +12,7 @@
 | 添加/初始化工程布局 | 原Creator3.8.8 scaffold；隔离Temp工程201真实接口及UI | 无实际Creator启动验收 | project-scaffold-local.md |
 | 打开/停止/重启/唤起/目录/移除 | 生命周期适配、操作隔离与UI回执 | 本轮不启动Creator，完整真实动作未验 | creator-operations与其测试 |
 | Preview/Profiler控制入口 | ready工程预览/探测/状态/刷新及Profiler已接原接口，330+46分组测试、六文件HTTP SHA及隔离Edge6操作通过 | **真实运行待验**；本轮无真实Creator/Preview/Profiler执行，历史96资源验收不能替代入口真实运行 | preview-profiler-entry-20261018.md；9319ddd/.48 |
-| 登记/完整及分项安装 | 现网.62原配色/布局/确认/任务轮询、Agent及工具范围；候选352fb27/.68与后端f3071db已完成冻结选项、同项复用/异项409、202/GET回显核对；后端41、适配器/合同302及Edge7候选用例通过 | **候选未部署**：原daemon停止守卫DAEMON_DRAIN_BLOCKED；静态入口已还原.62，现网仍无严格选项合同。真实安装/Creator/客户端配置写入未执行 | [严格安装合同与阻塞证据](strict-setup-options-20261018.md) |
+| 登记/完整及分项安装 | .68与后端f3071db已配套部署：Bridge必选、Creator/Codex独立选择、冻结选项、同项复用/异项409、202/GET核对；后端41、适配器/合同302、UI36和Edge7候选用例通过；现网六静态HTTP哈希及两个真实合同GET200/version1通过，原UI会话及实时订阅恢复 | 真实四组合安装、真实Creator及客户端配置写入未执行；202/409行为为隔离假执行器证据，未在生产触发真实安装冲突 | [安装合同部署及证据](strict-setup-options-20261018.md) |
 | 安装完成使用示例 | 原文/缺省/复制/换行、失败不显示、断开不复活，三分支Edge | 完成回执不证明本次选项执行或真实连接 | d982a34/.42；setup-completion-usage-20261017.md |
 | 工程空态/最近调用本地计时 | 已核实空登记可开原添加向导，筛选无匹配同时清空两个本地筛选；运行100ms/结束1s本地更新耗时；67项回归和Edge3分支已部署 | 不以读取失败冒充空工程；没有为本地计时新增请求 | project-empty-call-meta-20261018.md，f903bc2/.54 |
 | 弹窗内斜杠焦点 | CLI、安装、Creator及可见modal保留焦点，关闭后恢复工程搜索；92项回归及Edge5场景已部署 | 外部客户端协议唤起仍未迁移 | modal-search-shortcut-20261018.md，2524d9b/.50 |
@@ -48,3 +48,7 @@
 ## 2026-10-18 strict installation follow-up
 
 Code candidate: Next352fb27/.68 + backend f3071db. Final live: Next30e1739/.62, original daemon PID2100/SHA f3323..., phaseOPEN, same epoch. The authorized stop guard rejected background observation completion; binary replacement check aborted. Static .66 switch was rolled back and six live-file hashes reverified. Therefore strict partial installation is implemented and tested as a candidate, but is NOT a live aligned feature. See strict-setup-options-20261018.md for precise fake/real evidence and remaining lifecycle-owner blocker.
+
+## 2026-10-18 03:02 UTC — installation deployment complete
+
+Supersedes the earlier .62 rollback/pending status above. Live Next352fb27/.68 + backend f3071db, PID9764/OPEN, actual daemonSHA0b9c2e28... verified. Two original developer tabs were recorded and normally navigated to about:blank; all counters/unknown reached zero, guarded CLI stop/start PASSED, formal ui and both original tabs/realtime restored. Six actual static HTTP files and both setup contract endpoints passed hash/version verification. No lifecycle/guard change, forced kill, real installation, Creator start or client config write. Old22dirty and rollback backups preserved. See approved-live-verification.json and the installation document for actual versus isolated evidence. Other matrix rows retain their own remaining gaps; whole-backend parity is not complete.

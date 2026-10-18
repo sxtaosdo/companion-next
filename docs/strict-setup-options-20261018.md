@@ -44,3 +44,25 @@ Screenshot follow-up: strict-mode reuse acknowledgement, section heading and rec
 Final candidate352fb27/.68: production build and six-file manifest-68.json passed; seven Edge interception cases rerun passed with strict acknowledgement/verified footer assertions, production business POST=0. See candidate-browser-proof-68-final.json and candidate-bridge-only-68-final.png. The live .62 six-file HTTP hashes, PID2100/epoch and original daemon bytes were again checked unchanged. Latest code candidate is .68; the subsequent docs-only checkpoint does not change deployed or candidate build identity.
 
 The final browser fixture uses the required original built-in preset labels. All four completed combinations also wait for valid tool-scope readback (full, enabled0/disabled0), including configureCodex=false. Earlier English-label fixture was correctly rejected by the existing decoder; product code was unchanged. Final seven cases and restored live-file hashes passed again.
+
+## Final authorized deployment succeeded — supersedes earlier blocked/rollback status
+
+2026-10-18 03:02 UTC. User/parent explicitly authorized temporary navigation of only the related developer-backend tabs. Read-only inspection found TWO original related tabs in ordinary Edge2992: http://127.0.0.1:32180 and http://127.0.0.1:32180/next/index.html#/projects. Their URLs, runtime identities and selection were recorded. Navigating both normally to about:blank reduced all counters to zero in two consecutive authenticated snapshots, unknown=[]. The original guarded CLI stop then returned PASSED. No guard/lifecycle change or forced process kill was needed.
+
+Deployed Next352fb27/.68 and backend f3071db. New daemon PID9764, Node25, phaseOPEN; running entry and actual disk SHA256 both0b9c2e28d7993201cc31e99329b2a58c06087c2fb7f06e8b0e6277242c2197ab. Candidate map bytes also match. Original unmodified daemon reconstruction was byte-identical before the authorized three-file installation overlay. No unrelated lifecycle update was bundled.
+
+Actual authenticated HTTP verification: all SIX .68 static files200 and exact manifest-68 hashes; GET /v1/setup/options-v1 and cookie-authenticated GET /api/setup/options-v1 both200 with {optionsContractVersion:1,strictOptions:true,reusePolicy:same-effective-options}. Installation202 frozen echo and409 conflict remain verified by isolated fake-executor service/HTTP tests, not by installing a real project on production.
+
+Original CLI ui returned PASSED/opened:true and restored formal browser authentication. Both original tab identities/URLs and selected Next tab were restored; only this task's extra CLI authentication tab was closed. Ordinary UI has no Forbidden, original realtime-enabled state restored by the existing button, and the actual UIA label is event-stream-connected. Edge window retained; no cookies cleared, other pages changed or persistent permissions edited. Seven registered projects currently report Bridge unreachable; no Creator was launched to alter that boundary.
+
+Final protection: all22dirty paths and their recorded bytes match preflight, original CLI6085072... unchanged, rollback backups retained (original daemon/map and .62 static entry), all historical hashed assets preserved. No real installation POST, Creator start, client-configuration write, model start, software install, push/release or cloud upload.
+
+Final evidence in Temp/companion-setup-options-20261018:
+- approved-paused-tabs.json / approved-tabs-navigation.json / approved-idle-before-stop.json: original URLs/selection, normal navigation and all-zero barrier.
+- approved-stop-result.json / approved-start-result.json / approved-formal-ui-result.json: original guarded stop/start/UI PASSED.
+- approved-static-deployment.json / runtime-deployment.json: guarded file replacement with backups.
+- approved-live-verification.json: deployed source/hash, new identity, six actual HTTP hashes, both real contract endpoints, ordinary browser restoration.
+- approved-browser-restoration.json / approved-realtime-connected.json: original tabs, session and connected realtime restored.
+- approved-final-protection.json: old22dirty, original CLI and lifecycle protection.
+
+Remaining unverified boundaries: real four-combination installation, real Creator/Preview/Profiler, real client-config writes and real concurrent409 production conflict. These were not triggered to manufacture acceptance. The previous deployment blocker is resolved through normal page lifecycle; no further deployment permission is needed for this completed change. Whole old/new feature parity is still not claimed.
