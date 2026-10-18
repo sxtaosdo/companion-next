@@ -14,3 +14,10 @@
 独立只读review发现：原effectiveToolNames校验未知旧覆盖会使所有类别禁用。已修正为仅在计数临时投影中过滤未知名，实际草稿未知覆盖仍显示且保留，完整导出/保存校验继续拒绝未知项。新增实际UI点击回归后复核无剩余具体问题。
 
 4文件100项单worker定向回归通过（草稿store/UI、正式保存store/UI），最终strict类型和workspace构建通过。初始strict提示checkbox回调隐式any，已显式unknown并以value===true接收；最终严格检查通过。沿用本链55静态通过/1平台跳过的入口机制验证，本片未改打包机制，不重复全套测试。无真实配置/模型/Creator写入，待既定静态部署及隔离Edge验收。
+
+
+## 已部署验收
+
+源dcd9d70/.52已部署，备份40旧静态文件，旧hash资源保留。六文件HTTP SHA匹配；隔离Edge4组通过：1/2半选、搜索隐藏成员仍整类选中、整类取消与折叠、未知覆盖保留且已知类别可操作。仅2个原目录/范围GET fixture，业务POST0、真实配置写入0，页面错误0。首次脚本写错解析按钮完整名称，改按实际原按钮前缀后通过，未重复发布。截图scope-selection.png已查看；证据C:/Users/33272/AppData/Local/Temp/companion-tool-scope-selection-20261018/browser-proof.json及deployment-result.json。PID2100/epoch/OPEN不变。
+
+继续核对工程空状态操作、最近调用摘要耗时和相对时间（旧renderProjectEmpty、call-meta.ts），均可仅恢复前端，不增加接口。
