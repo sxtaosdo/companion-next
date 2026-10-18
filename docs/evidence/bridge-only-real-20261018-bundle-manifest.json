@@ -1,0 +1,14 @@
+{
+  "dist/main.js": "767bee162608e4c4bc9a9889eb7598bfc391af7cc2d03c2d7f2f55018aa0b74f",
+  "dist/main.js.map": "048335c2f76441c05523fdc53ca0efb24294819db3ace8cc72ed551e9b9aa4d0",
+  "dist/mcp-server.cjs": "b53000efbccc7fc8463bfd4625a5baacf91f98d9e1ac922938f2009a10711884",
+  "dist/mcp-server.cjs.map": "b6bfc4536535b9e550c6778114de0714d9c2ce88b1b53b2a24d8030992cadebb",
+  "dist/mcp-server.mjs": "926c0556cc2ac6667244a531827cd992109dafd58d7a6537a9648c8f3aa58cb6",
+  "dist/mcp-server.mjs.map": "391bbd3b211478156b91cb1f531d7b0e1ddfb197ac1566b8aad3e02e626ba7ab",
+  "dist/panel.js": "132c72991714edffd5ec2b06c2af92dd3edb29e0ce8ae2c4ff9f29bec369f457",
+  "dist/panel.js.map": "57c76044ddd31284eabc4a0df3c6345147e554ee82ad9296d6b01f9872ca1ff3",
+  "dist/scene.js": "87306e55afd591f6524a54cedae49d229ef12f8f9c01edd51745b96cdda2e5a8",
+  "dist/scene.js.map": "742ddfdcb2db0bec07e92a18c27fa414e2c978c979eb358269c8338d4fa45421",
+  "package.json": "bbfc2d37be4b6d126e5fb99b56df34b32dc677235b07c8588796f8b62a69fdcf",
+  "static/icon.svg": "aeae3a635cf9fbd46dea1099ccbc41ac5bfe886cd1ee2d0189074d08de0ef284"
+}

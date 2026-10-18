@@ -1,3 +1,5 @@
+2026-10-18 13:13 UTC: production Bridge-only (00) Next wizard installation, complete/current readback and managed-file conflict rejection have real receipts; original state restored. Other combinations and production different-options409 remain unverified. See [bounded acceptance](bridge-only-real-20261018.md).
+
 2026-10-18 最新：[Windows聚焦修复](windows-focus-fix-20261018.md)已部署，真实Next按钮200且实际Creator前台回读通过并恢复。知识库多天未闭环原因、1647文档/1493遗留未完成及官方方案比较见[只读复盘](knowledge-retrospective-20261018.md)；知识身份仍未注入。
 
 当前原生窗口/IDE续验以[native-ui-receipt-20261018.md](native-ui-receipt-20261018.md)为准：目录取消、默认桌面目录确认、真实Explorer、Cursor接收后取消已通过；聚焦原失败已修复，真实Next前台回读已通过（见顶部最新回执），Codex因可能覆盖现有草稿未投递。知识库已有受限reader可复用候选，当前有效性未查，不需默认新建密钥。

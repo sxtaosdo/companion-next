@@ -1,3 +1,5 @@
+2026-10-18 13:13 UTC: production Bridge-only (00) Next wizard installation, complete/current readback and managed-file conflict rejection have real receipts; original state restored. Other combinations and production different-options409 remain unverified. See [bounded acceptance](bridge-only-real-20261018.md).
+
 2026-10-18 聚焦最新结果：宿主修复已按原guarded流程部署，真实Next点击后OS前台为原Creator并恢复。知识身份未注入，Creator、模型及WeKnora未重启；Companion daemon按授权guarded重启。详见[聚焦交付](windows-focus-fix-20261018.md)、[当前矩阵](parity-remaining-safe-20261018.md)与[知识库只读复盘](knowledge-retrospective-20261018.md)。下方历史状态保留。
 
 2026-10-18 10:39 UTC 当前剩余项以[续验矩阵](parity-remaining-safe-20261018.md)为准：Preview／Profiler复用已通过证据；本轮真实Next“仅登记201→移除200”通过并恢复登记表原字节。目录窗口、打开目录和聚焦仍未验收。知识服务运行、CLI兼容，但检索auth=missing，同步no_source，不能算正向流程通过。下方历史时点记录保留。

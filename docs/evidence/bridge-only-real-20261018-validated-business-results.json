@@ -1,0 +1,30 @@
+{
+  "sourceReceipt": "attempt3/execution.json",
+  "originalHarnessAccepted": false,
+  "harnessIssue": "Expected phrase used hand-dong; actual rejection uses hand-gong. No product-code defect established. No business replay performed.",
+  "validated": {
+    "realNextWizard00": true,
+    "strictOptionsBothFalse": true,
+    "firstInstallComplete": true,
+    "productionBundleVersion": "0.3.138",
+    "allBundleFilesMatch": 12,
+    "repeatInstallCurrent": true,
+    "manualModificationRejected": true,
+    "modifiedTargetPreservedUntilCleanup": "Derived from finally CAS: cleanup only restores the task edit when current bytes equal tampered bytes; cleanup succeeded.",
+    "registryBytesAtConflict": "Not separately asserted: stale phrase check short-circuited that check. Final registry bytes were verified restored.",
+    "allRecordedRestorationChecks": {
+      "registry": true,
+      "managed": true,
+      "presets": true,
+      "package": true,
+      "rootEntries": true,
+      "assetsEmpty": true
+    },
+    "originalCreatorDaemonReposUnchanged": true
+  },
+  "limits": [
+    "No production different-options409: retained prior isolated evidence only.",
+    "No Creator load, Codex configuration, runtime verification or model activity was requested.",
+    "No source files or shared service restart performed."
+  ]
+}

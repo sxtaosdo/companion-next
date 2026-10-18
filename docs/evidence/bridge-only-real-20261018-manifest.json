@@ -1,0 +1,18 @@
+{
+  "bridge-only-real-20261018-execution.json": {
+    "bytes": 7600,
+    "sha256": "77117e4f9f30661ec49b102d7279ae12e38e252b277172201c04aafc7c13f9a6"
+  },
+  "bridge-only-real-20261018-validated-business-results.json": {
+    "bytes": 1323,
+    "sha256": "32979a0347783e79070c47329b7628a097f4d1afb2496a337a3a4ed04302efab"
+  },
+  "bridge-only-real-20261018-bundle-manifest.json": {
+    "bytes": 1090,
+    "sha256": "a551c8517bdcbb041937be749e35fcb14a24399712cf52b5c322deb60b9a3646"
+  },
+  "bridge-only-real-20261018-next-complete.png": {
+    "bytes": 217097,
+    "sha256": "715706817e52a96ec8c001575bfb3499756e0ff49d3aca5ce98368c5783fffe9"
+  }
+}

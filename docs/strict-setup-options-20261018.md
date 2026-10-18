@@ -66,3 +66,8 @@ Final evidence in Temp/companion-setup-options-20261018:
 - approved-final-protection.json: old22dirty, original CLI and lifecycle protection.
 
 Remaining unverified boundaries: real four-combination installation, real Creator/Preview/Profiler, real client-config writes and real concurrent409 production conflict. These were not triggered to manufacture acceptance. The previous deployment blocker is resolved through normal page lifecycle; no further deployment permission is needed for this completed change. Whole old/new feature parity is still not claimed.
+
+
+## 2026-10-18 bounded production 00 acceptance
+
+Actual Next00 installation has bounded business receipts: production12-file hash match, repeat current, managed-file rejection, and original state restoration. The original harness accepted=false wording mismatch is retained and qualified. See [actual receipts and limits](bridge-only-real-20261018.md). This does not verify10/01/11 or production different-options409.
