@@ -5,6 +5,7 @@ export const frontendIdentity = { name: 'Companion Next', version, releaseDate: 
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；完整业务迁移未完成', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  { version, date: '2026-10-18', title: '保留预览与Profiler成功回执', changes: ['预览或性能采集收到有效回执后只刷新调用统计，避免额外Creator状态读取失败将刚返回的结果清空；工程路径、运行实例、会话和来源变化时原有失效保护保持。'] },
   { version, date: '2026-10-18', title: '恢复原模型服务与管理面板', changes: ['模型服务属于旧后台迁移范围；恢复原启动器启动 / 关闭及固定8090原面板，复用原各模型 / ComfyUI操作，不另造一致性控制。进入模型页只读状态，启停仍逐次确认；已有GPU服务不为验收切换，不恢复旧批量生成。'] },
   { version, date: '2026-10-18', title: '修复实时更新切页恢复', changes: ['工程页离开时暂停事件流及读取并保留用户启用意图；返回同一来源自动恢复，主动停止 / 断开 / 来源变更仍保持停止。返回读取由实时通道负责，避免与页面初载重复；不新增设置，不改变知识服务或模型状态。'] },
   { version, date: '2026-10-18', title: '更新同源保存与真实库存验收说明', changes: ['按已核证据修正帮助与迁移页：隔离任务的原生保存取消 / 已知失败 / 成功已验，工程只读库存733项曾与原接口及页面一致。用户原图片库仍未切换，完整图片任务动作与Codex自动回收未开放；仅更新文案，不重复业务验收。'] },
