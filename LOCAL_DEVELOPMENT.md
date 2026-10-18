@@ -1,5 +1,7 @@
 # Windows本地开发交接
 
+2026-10-18 工程展示恢复仅Next view+纯formatter；缺耗时保留未知，不冒充0。67项定向、strict/一次构建通过，等待静态与Edge验收，见docs/project-empty-call-meta-20261018.md。
+
 2026-10-18 类别选择仅改现有草稿组件/store，无新接口；100项回归、最终strict/构建通过，旧未知项仅在计数投影中过滤，不从真实draft清除。详见docs/tool-scope-selection-20261018.md。
 
 2026-10-18 搜索快捷键modal保护：仅一处原handler及相邻迁移页类型helper；92项定向通过，最终strict/构建通过。部署源与文档时点分别记录，详见docs/modal-search-shortcut-20261018.md。

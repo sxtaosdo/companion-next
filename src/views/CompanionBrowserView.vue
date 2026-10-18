@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import ProjectPreviewActions from '../components/ProjectPreviewActions.vue'
+import { formatProjectCallMeta } from '../domain/project-call-meta'
+import { useProjectOperationLaneStore } from '../stores/project-operation-lane'
 import LogTools from '../components/LogTools.vue'
 import InfoTip from '../components/InfoTip.vue'
 import ProjectStatusTag from '../components/ProjectStatusTag.vue'
@@ -19,7 +21,7 @@ import { useCompanionBrowserStore } from '../stores/companion-browser'
 import { companionBrowserProvider, companionEventProvider } from '../companion-browser-integration'
 import { projectDisplayPathKey, projectDisplayRank } from '../domain/companion-project-display'
 import { LOG_SOURCES, LOG_LEVELS, runtimeStateLabel } from '../domain/companion-browser'
-const store=useCompanionBrowserStore(),route=useRoute(),router=useRouter(),operations=useCreatorOperationsStore()
+const store=useCompanionBrowserStore(),route=useRoute(),router=useRouter(),operations=useCreatorOperationsStore(),projectLane=useProjectOperationLaneStore()
 const creatorDialog=ref<InstanceType<typeof CreatorOperationDialog>|null>(null)
 const setupDialog=ref<InstanceType<typeof ProjectSetupWizard>|null>(null),setupDialogOpen=ref(false)
 watch(()=>operations.dialogOpen||setupDialogOpen.value,open=>store.pauseProjectPolling(open),{flush:'sync',immediate:true})
@@ -76,13 +78,22 @@ const matching=computed(()=>store.projects.filter(project=>{
 function isExpanded(id:string){if(id in expanded.value)return expanded.value[id];try{const value=sessionStorage.getItem(`project-card-expanded:${id}`);if(value==='1'||value==='0')return value==='1'}catch{/* denied preference storage does not prevent reads */}return state(id)?.state!=='stopped'}
 function toggle(id:string){const value=!isExpanded(id);expanded.value={...expanded.value,[id]:value};try{sessionStorage.setItem(`project-card-expanded:${id}`,value?'1':'0')}catch{/* noncritical preference only */}}
 function dashboardFor(path:string){return store.dashboard.find(item=>projectDisplayPathKey(item.path)===projectDisplayPathKey(path))}
+const callNow=ref(Date.now()),callVisible=ref(document.visibilityState==='visible')
+let callTimer:ReturnType<typeof setInterval>|undefined
+const callDelay=computed(()=>{
+ if(!callVisible.value||tab.value!=='projects'||!store.connected)return 0
+ const calls=matching.value.filter(project=>isExpanded(project.id)).map(project=>store.counts?.latest[project.id]).filter(call=>!!call)
+ return calls.length?calls.some(call=>call!.status==='running')?100:1000:0
+})
+watch(callDelay,delay=>{if(callTimer!==undefined)clearInterval(callTimer);callTimer=undefined;if(delay){callNow.value=Date.now();callTimer=setInterval(()=>{callNow.value=Date.now()},delay)}},{immediate:true})
+function clearProjectFilters(){query.value='';filter.value='all'}
 function displayDate(value:string|number|undefined){if(value===undefined)return '未记录';const date=new Date(value);return Number.isFinite(date.getTime())?date.toLocaleString():'时间未知'}
 async function copy(text:string){try{await navigator.clipboard.writeText(text);ElMessage.success('已复制')}catch{ElMessage.warning('复制未完成，请手动选择复制。')}}
 function showCalls(id:string){store.setCallContext(id,false);void router.push({path:'/projects',query:{tab:'calls'}});void store.loadCalls()}
 function callProject(value:string){store.setCallContext(value,store.failedOnly);void store.loadCalls()}
 function callFilter(value:boolean){store.setCallContext(store.callProjectId,value);void store.loadCalls()}
 function shortcuts(event:KeyboardEvent){if(cliOpen.value||setupDialogOpen.value||operations.dialogOpen||Array.from(document.querySelectorAll('[role="dialog"][aria-modal="true"],dialog[open]')).some(dialog=>dialog.getClientRects().length>0))return;const node=event.target as HTMLElement|null;if(event.key==='/'&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!node?.closest('input,textarea,select,[contenteditable="true"]')&&tab.value==='projects'){event.preventDefault();queryInput.value?.focus()}}
-function visibility(){store.setLiveVisibility(document.visibilityState==='visible')}
+function visibility(){callVisible.value=document.visibilityState==='visible';store.setLiveVisibility(callVisible.value)}
 visibility();document.addEventListener('visibilitychange',visibility)
 const liveLabel=computed(()=>({off:'实时更新未启用',connecting:'事件流连接中',open:'事件流已连接',retrying:'事件流冷却重连中',suspended:'页面隐藏，实时读取已暂停',failed:'事件流已停止，工程轮询仍独立运行'})[store.liveState])
 document.addEventListener('keydown',shortcuts)
@@ -90,7 +101,7 @@ watch(passiveRead,passive=>{if(passive)filter.value='all'},{flush:'sync',immedia
 watch(companionBrowserProvider,next=>{if(store.provider&&store.provider!==next)store.disconnect()},{flush:'sync',immediate:true})
 watch(companionEventProvider,()=>{store.stopLive()},{flush:'sync'})
 useCompanionProjectEntry(store, () => tab.value === 'projects')
-onBeforeUnmount(()=>{mounted=false;logResizeObserver?.disconnect();window.removeEventListener('resize',updateLatest);store.cancelReads();store.pauseProjectPolling(false);document.removeEventListener('keydown',shortcuts);document.removeEventListener('visibilitychange',visibility)})
+onBeforeUnmount(()=>{mounted=false;if(callTimer!==undefined)clearInterval(callTimer);logResizeObserver?.disconnect();window.removeEventListener('resize',updateLatest);store.cancelReads();store.pauseProjectPolling(false);document.removeEventListener('keydown',shortcuts);document.removeEventListener('visibilitychange',visibility)})
 </script>
 <template>
  <section class="companion-browser-page" data-testid="companion-browser-page">
@@ -123,9 +134,12 @@ onBeforeUnmount(()=>{mounted=false;logResizeObserver?.disconnect();window.remove
     <div v-if="isExpanded(project.id)" :id="`project-detail-${project.id}`" class="companion-project-body"><p class="companion-project-path">{{ project.path }}</p><div class="planner-import-actions"><el-button v-if="projectSetupProvider" size="small" :disabled="!operations.canPrepare(project.id,'open-folder')" @click="openSetup(project.id)">安装 / 更新接入</el-button><el-button v-if="creatorOperationsProvider" :icon="FolderOpened" size="small" :disabled="!operations.canPrepare(project.id,'open-folder')" @click="openCreator(project.id,'open-folder')">打开目录</el-button><el-button v-if="creatorOperationsProvider" :icon="Delete" size="small" type="danger" plain :disabled="!operations.canPrepare(project.id,'remove-registration')" @click="openCreator(project.id,'remove-registration')">移除登记</el-button><el-button :icon="DocumentCopy" size="small" @click="copy(project.path)">复制路径</el-button><el-button size="small" @click="copy(project.id)">复制工程 ID</el-button><el-button size="small" @click="openCli(project.id)">使用 CLI</el-button><el-button size="small" @click="showTools(project.id)">工具范围</el-button><el-button size="small" @click="showCalls(project.id)">查看调用记录</el-button></div>
      <ProjectPreviewActions v-if="state(project.id)?.state==='ready'" :project-id="project.id"/>
      <dl class="companion-project-details"><div><dt>当前 Creator</dt><dd>{{ state(project.id)?.creatorVersion || '未读取' }}</dd></div><div><dt>工程要求版本</dt><dd>{{ project.requiredCreatorVersion || '未记录' }}</dd></div><div><dt>Creator 权限</dt><dd>{{ state(project.id)?.capabilityProfile || 'unknown' }}<InfoTip label="Creator 权限说明" text="这是 Bridge 返回的能力状态，不代表当前工程的工具预设范围。"/></dd></div><div><dt>最近打开</dt><dd>{{ !dashboardRead ? '未读取' : displayDate(dashboardFor(project.path)?.lastOpenedAt) }}</dd></div><div><dt>调用总数</dt><dd>{{ store.counts?.counts[project.id]??'未记录' }}<InfoTip label="调用统计说明" text="本服务会话内的调用次数，服务重启后重新计数。没有记录不推断为零。"/></dd></div><div><dt>原始状态</dt><dd>{{ state(project.id)?.state??'unknown' }}</dd></div></dl>
-     <p v-if="state(project.id)?.lastError" class="form-help">状态说明：{{ state(project.id)?.lastError }}</p><button v-if="store.counts?.latest[project.id]" type="button" class="form-help project-call-summary" :aria-label="`查看 ${project.name} 的调用记录`" @click="showCalls(project.id)">最近调用：{{ store.counts.latest[project.id]?.operationNameZh }} · {{ store.counts.latest[project.id]?.status }} · {{ displayDate(store.counts.latest[project.id]?.startedAt) }}</button>
+     <p v-if="state(project.id)?.lastError" class="form-help">状态说明：{{ state(project.id)?.lastError }}</p><button v-if="store.counts?.latest[project.id]" type="button" class="form-help project-call-summary" :aria-label="`查看 ${project.name} 的调用记录`" @click="showCalls(project.id)">{{ formatProjectCallMeta(store.counts.latest[project.id],callNow) }}</button>
     </div>
-   </article><el-empty v-if="!matching.length" :description="store.connected?'当前筛选没有登记工程':'连接后显示工程'"/>
+   </article><el-empty v-if="!matching.length" :description="store.projectError?'工程读取失败，请重新读取':!store.connected?'连接后显示工程':!store.projects.length?'尚未登记工程':'当前筛选没有登记工程'">
+    <el-button v-if="store.connected&&!store.projectError&&!store.projects.length&&projectSetupProvider" type="primary" :disabled="store.projectLoading||projectLane.locked||store.provider!==companionBrowserProvider" @click="openSetup('')">添加项目</el-button>
+    <el-button v-else-if="store.connected&&store.projects.length" @click="clearProjectFilters">清除筛选</el-button>
+   </el-empty>
 
   </section>
   <section v-if="tab==='logs'" class="panel"><div class="section-heading"><h2>日志查询</h2><span>{{ store.logsRead?`${store.logs.length} 条返回记录`:'日志未读取' }}</span></div>
