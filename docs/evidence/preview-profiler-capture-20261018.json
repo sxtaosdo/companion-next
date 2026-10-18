@@ -1,0 +1,2641 @@
+{
+  "schemaVersion": "profiler-evidence-v1",
+  "capture": {
+    "extensionVersion": "2.2.23",
+    "collectorVersion": "2.2.23",
+    "contractVersion": "profiler-result-v2",
+    "capturedAt": 1792319005038,
+    "window": {
+      "durationMs": 15000,
+      "warmupMs": 3000,
+      "requestedDurationMs": 15000,
+      "startedAt": 1792318990038,
+      "endedAt": 1792319005038,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      }
+    },
+    "probe": {
+      "detected": true,
+      "extensionVersion": "2.2.23",
+      "collectorVersion": "2.2.23",
+      "contractVersion": "profiler-result-v2",
+      "engineVersion": "3.8.8",
+      "generation": "3.x",
+      "adapter": "cocos-3.8",
+      "capabilities": {
+        "metrics": true,
+        "resources": true,
+        "nodes": true,
+        "rendering2D": true,
+        "rendering3D": true,
+        "captureWindow": true,
+        "runtimeEvents": true,
+        "findings": true
+      },
+      "message": ""
+    },
+    "metrics": {
+      "sampleCount": 848,
+      "sources": [
+        "director.tick"
+      ],
+      "fps": {
+        "count": 848,
+        "average": 56.554543907985284,
+        "min": 56.07115235853228,
+        "p95": 57.03048180924287,
+        "max": 57.142857142857146
+      },
+      "frameMs": {
+        "count": 848,
+        "average": 0.47334905667230487,
+        "min": 0.19999999552965164,
+        "p95": 0.6999999955296516,
+        "max": 1.7000000029802322
+      },
+      "logicMs": {
+        "count": 848,
+        "average": 0.008726415083796348,
+        "min": 0,
+        "p95": 0.10000000149011612,
+        "max": 0.19999999552965164
+      },
+      "renderMs": {
+        "count": 848,
+        "average": 0.440801886876799,
+        "min": 0.19999999552965164,
+        "p95": 0.6000000014901161,
+        "max": 1.6000000014901161
+      },
+      "drawCalls": {
+        "count": 848,
+        "average": 3,
+        "min": 3,
+        "p95": 3,
+        "max": 3
+      },
+      "triangles": {
+        "count": 848,
+        "average": 362,
+        "min": 362,
+        "p95": 362,
+        "max": 362
+      },
+      "overBudgetCount": 0,
+      "overBudgetRatio": 0
+    },
+    "resources": {
+      "scannedAt": 1792319005041,
+      "items": [
+        {
+          "id": "1c02ae6f-4492-4915-b8f8-7492a3b1e4cd",
+          "uuid": "1c02ae6f-4492-4915-b8f8-7492a3b1e4cd",
+          "name": "internal/builtin-graphics",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "f0416e68-0200-4b77-a926-4f9d16e494da"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "ui-graphics-material [f0416e68-0200-4b77-a926-4f9d16e494da] → internal/builtin-graphics [1c02ae6f-4492-4915-b8f8-7492a3b1e4cd]"
+          ],
+          "referencePathText": "ui-graphics-material [f0416e68-0200-4b77-a926-4f9d16e494da] → internal/builtin-graphics [1c02ae6f-4492-4915-b8f8-7492a3b1e4cd]"
+        },
+        {
+          "id": "60f7195c-ec2a-45eb-ba94-8955f60e81d0",
+          "uuid": "60f7195c-ec2a-45eb-ba94-8955f60e81d0",
+          "name": "for2d/builtin-sprite",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 6,
+          "dependencyRefCount": 6,
+          "referenceCount": 6,
+          "referrers": [
+            "efe8e2a3-eace-427b-b4f1-cb8a937ec77d",
+            "e9aa9a3e-5b2b-4ac7-a2c7-073de2b2b24f",
+            "50f4348b-c883-4e2f-8f11-ce233b859fa1",
+            "fda095cb-831d-4601-ad94-846013963de8",
+            "f92806d7-1768-443f-afe8-12bcde84d0f0",
+            "dd3a144d-ab7f-41f0-82b8-2e43a090d496"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "ui-sprite-gray-material [efe8e2a3-eace-427b-b4f1-cb8a937ec77d] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]",
+            "ui-base-material [e9aa9a3e-5b2b-4ac7-a2c7-073de2b2b24f] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]",
+            "ui-alpha-test-material [50f4348b-c883-4e2f-8f11-ce233b859fa1] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]",
+            "ui-sprite-material [fda095cb-831d-4601-ad94-846013963de8] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]",
+            "ui-sprite-alpha-sep-material [f92806d7-1768-443f-afe8-12bcde84d0f0] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]",
+            "ui-sprite-gray-alpha-sep-material [dd3a144d-ab7f-41f0-82b8-2e43a090d496] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]"
+          ],
+          "referencePathText": "ui-sprite-gray-material [efe8e2a3-eace-427b-b4f1-cb8a937ec77d] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]；ui-base-material [e9aa9a3e-5b2b-4ac7-a2c7-073de2b2b24f] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]；ui-alpha-test-material [50f4348b-c883-4e2f-8f11-ce233b859fa1] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]；ui-sprite-material [fda095cb-831d-4601-ad94-846013963de8] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]；ui-sprite-alpha-sep-material [f92806d7-1768-443f-afe8-12bcde84d0f0] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]；ui-sprite-gray-alpha-sep-material [dd3a144d-ab7f-41f0-82b8-2e43a090d496] → for2d/builtin-sprite [60f7195c-ec2a-45eb-ba94-8955f60e81d0]"
+        },
+        {
+          "id": "efe8e2a3-eace-427b-b4f1-cb8a937ec77d",
+          "uuid": "efe8e2a3-eace-427b-b4f1-cb8a937ec77d",
+          "name": "ui-sprite-gray-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "e9aa9a3e-5b2b-4ac7-a2c7-073de2b2b24f",
+          "uuid": "e9aa9a3e-5b2b-4ac7-a2c7-073de2b2b24f",
+          "name": "ui-base-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "810e96e4-e456-4468-9b59-f4e8f39732c0",
+          "uuid": "810e96e4-e456-4468-9b59-f4e8f39732c0",
+          "name": "internal/builtin-clear-stencil",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "8bbdbcdd-5cd4-4100-b6d5-b7c9625b6107"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "default-clear-stencil [8bbdbcdd-5cd4-4100-b6d5-b7c9625b6107] → internal/builtin-clear-stencil [810e96e4-e456-4468-9b59-f4e8f39732c0]"
+          ],
+          "referencePathText": "default-clear-stencil [8bbdbcdd-5cd4-4100-b6d5-b7c9625b6107] → internal/builtin-clear-stencil [810e96e4-e456-4468-9b59-f4e8f39732c0]"
+        },
+        {
+          "id": "8bbdbcdd-5cd4-4100-b6d5-b7c9625b6107",
+          "uuid": "8bbdbcdd-5cd4-4100-b6d5-b7c9625b6107",
+          "name": "default-clear-stencil",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "50f4348b-c883-4e2f-8f11-ce233b859fa1",
+          "uuid": "50f4348b-c883-4e2f-8f11-ce233b859fa1",
+          "name": "ui-alpha-test-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "fda095cb-831d-4601-ad94-846013963de8",
+          "uuid": "fda095cb-831d-4601-ad94-846013963de8",
+          "name": "ui-sprite-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "f92806d7-1768-443f-afe8-12bcde84d0f0",
+          "uuid": "f92806d7-1768-443f-afe8-12bcde84d0f0",
+          "name": "ui-sprite-alpha-sep-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "f0416e68-0200-4b77-a926-4f9d16e494da",
+          "uuid": "f0416e68-0200-4b77-a926-4f9d16e494da",
+          "name": "ui-graphics-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "dd3a144d-ab7f-41f0-82b8-2e43a090d496",
+          "uuid": "dd3a144d-ab7f-41f0-82b8-2e43a090d496",
+          "name": "ui-sprite-gray-alpha-sep-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "511d2633-09a7-4bdd-ac42-f778032124b3",
+          "uuid": "511d2633-09a7-4bdd-ac42-f778032124b3",
+          "name": "pipeline/skybox",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "970b0598-bcb0-4714-91fb-2e81440dccd8",
+          "uuid": "970b0598-bcb0-4714-91fb-2e81440dccd8",
+          "name": "util/splash-screen",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "9361fd90-ba52-4f84-aa93-6e878fd576ca",
+          "uuid": "9361fd90-ba52-4f84-aa93-6e878fd576ca",
+          "name": "pipeline/planar-shadow",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "5c601d96-e4c7-4698-991b-7ee674b11079",
+          "uuid": "5c601d96-e4c7-4698-991b-7ee674b11079",
+          "name": "pipeline/copy-pass",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "871c3b6c-7379-419d-bda3-794b239ab90d",
+          "uuid": "871c3b6c-7379-419d-bda3-794b239ab90d",
+          "name": "util/profiler",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "ba21476f-2866-4f81-9c4d-6e359316e448",
+          "uuid": "ba21476f-2866-4f81-9c4d-6e359316e448",
+          "name": "default-physics-material",
+          "type": "PhysicsMaterial",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal, main",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "5d45aa00-e064-4938-b314-4265f0c2258c",
+          "uuid": "5d45aa00-e064-4938-b314-4265f0c2258c",
+          "name": "pipeline/deferred-lighting",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "711ebe11-f673-4cd9-9a83-63c60ba54c5b",
+          "uuid": "711ebe11-f673-4cd9-9a83-63c60ba54c5b",
+          "name": "particles/builtin-billboard",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "78e0584a-4343-4727-8f37-e14e65c2a2db"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "default-billboard-material [78e0584a-4343-4727-8f37-e14e65c2a2db] → particles/builtin-billboard [711ebe11-f673-4cd9-9a83-63c60ba54c5b]"
+          ],
+          "referencePathText": "default-billboard-material [78e0584a-4343-4727-8f37-e14e65c2a2db] → particles/builtin-billboard [711ebe11-f673-4cd9-9a83-63c60ba54c5b]"
+        },
+        {
+          "id": "78e0584a-4343-4727-8f37-e14e65c2a2db",
+          "uuid": "78e0584a-4343-4727-8f37-e14e65c2a2db",
+          "name": "default-billboard-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "17debcc3-0a6b-4b8a-b00b-dc58b885581e",
+          "uuid": "17debcc3-0a6b-4b8a-b00b-dc58b885581e",
+          "name": "particles/builtin-particle-trail",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "081cab31-dccd-428e-8652-f2404cc81c47"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "default-trail-material [081cab31-dccd-428e-8652-f2404cc81c47] → particles/builtin-particle-trail [17debcc3-0a6b-4b8a-b00b-dc58b885581e]"
+          ],
+          "referencePathText": "default-trail-material [081cab31-dccd-428e-8652-f2404cc81c47] → particles/builtin-particle-trail [17debcc3-0a6b-4b8a-b00b-dc58b885581e]"
+        },
+        {
+          "id": "081cab31-dccd-428e-8652-f2404cc81c47",
+          "uuid": "081cab31-dccd-428e-8652-f2404cc81c47",
+          "name": "default-trail-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "971bdb23-3ff6-43eb-b422-1c30165a3663",
+          "uuid": "971bdb23-3ff6-43eb-b422-1c30165a3663",
+          "name": "particles/builtin-particle-gpu",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "14da1725-c4c2-42b4-ab08-ee0aeb6898b3"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "default-particle-gpu-material [14da1725-c4c2-42b4-ab08-ee0aeb6898b3] → particles/builtin-particle-gpu [971bdb23-3ff6-43eb-b422-1c30165a3663]"
+          ],
+          "referencePathText": "default-particle-gpu-material [14da1725-c4c2-42b4-ab08-ee0aeb6898b3] → particles/builtin-particle-gpu [971bdb23-3ff6-43eb-b422-1c30165a3663]"
+        },
+        {
+          "id": "14da1725-c4c2-42b4-ab08-ee0aeb6898b3",
+          "uuid": "14da1725-c4c2-42b4-ab08-ee0aeb6898b3",
+          "name": "default-particle-gpu-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "1d08ef62-a503-4ce2-8b9a-46c90873f7d3",
+          "uuid": "1d08ef62-a503-4ce2-8b9a-46c90873f7d3",
+          "name": "legacy/terrain",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "c27215d8-6835-4b68-bfbb-bdeac6100c04",
+          "uuid": "c27215d8-6835-4b68-bfbb-bdeac6100c04",
+          "name": "for2d/builtin-spine",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "b5d6115f-0370-4d7c-aad3-c194cc71cf98"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "default-spine-material [b5d6115f-0370-4d7c-aad3-c194cc71cf98] → for2d/builtin-spine [c27215d8-6835-4b68-bfbb-bdeac6100c04]"
+          ],
+          "referencePathText": "default-spine-material [b5d6115f-0370-4d7c-aad3-c194cc71cf98] → for2d/builtin-spine [c27215d8-6835-4b68-bfbb-bdeac6100c04]"
+        },
+        {
+          "id": "b5d6115f-0370-4d7c-aad3-c194cc71cf98",
+          "uuid": "b5d6115f-0370-4d7c-aad3-c194cc71cf98",
+          "name": "default-spine-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "6a2d0734-bd9e-4ddf-946e-caa52498cb75",
+          "uuid": "6a2d0734-bd9e-4ddf-946e-caa52498cb75",
+          "name": "pipeline/post-process/tone-mapping",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "d1346436-ac96-4271-b863-1f4fdead95b0",
+          "uuid": "d1346436-ac96-4271-b863-1f4fdead95b0",
+          "name": "particles/builtin-particle",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "c0143906-9aed-447e-9436-2ae8512d1b6e"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "default-particle-material [c0143906-9aed-447e-9436-2ae8512d1b6e] → particles/builtin-particle [d1346436-ac96-4271-b863-1f4fdead95b0]"
+          ],
+          "referencePathText": "default-particle-material [c0143906-9aed-447e-9436-2ae8512d1b6e] → particles/builtin-particle [d1346436-ac96-4271-b863-1f4fdead95b0]"
+        },
+        {
+          "id": "c0143906-9aed-447e-9436-2ae8512d1b6e",
+          "uuid": "c0143906-9aed-447e-9436-2ae8512d1b6e",
+          "name": "default-particle-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "a3cd009f-0ab0-420d-9278-b9fdab939bbc",
+          "uuid": "a3cd009f-0ab0-420d-9278-b9fdab939bbc",
+          "name": "builtin-unlit",
+          "type": "EffectAsset",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 2,
+          "dependencyRefCount": 2,
+          "referenceCount": 2,
+          "referrers": [
+            "d930590d-bb92-4cc8-8bd1-23cd027f9edf",
+            "bcd64cc6-2dd9-43f6-abbe-66318d332032"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "missing-material [d930590d-bb92-4cc8-8bd1-23cd027f9edf] → builtin-unlit [a3cd009f-0ab0-420d-9278-b9fdab939bbc]",
+            "missing-effect-material [bcd64cc6-2dd9-43f6-abbe-66318d332032] → builtin-unlit [a3cd009f-0ab0-420d-9278-b9fdab939bbc]"
+          ],
+          "referencePathText": "missing-material [d930590d-bb92-4cc8-8bd1-23cd027f9edf] → builtin-unlit [a3cd009f-0ab0-420d-9278-b9fdab939bbc]；missing-effect-material [bcd64cc6-2dd9-43f6-abbe-66318d332032] → builtin-unlit [a3cd009f-0ab0-420d-9278-b9fdab939bbc]"
+        },
+        {
+          "id": "d930590d-bb92-4cc8-8bd1-23cd027f9edf",
+          "uuid": "d930590d-bb92-4cc8-8bd1-23cd027f9edf",
+          "name": "missing-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "bcd64cc6-2dd9-43f6-abbe-66318d332032",
+          "uuid": "bcd64cc6-2dd9-43f6-abbe-66318d332032",
+          "name": "missing-effect-material",
+          "type": "Material",
+          "category": "Material",
+          "source": "assetManager.assets",
+          "bundle": "internal",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 0,
+          "dependencyRefCount": 0,
+          "referenceCount": 0,
+          "referrers": [],
+          "status": "引用为 0，等待释放",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [],
+          "referencePathText": ""
+        },
+        {
+          "id": "40ee0bc7-f379-4384-85c6-08cd40b59f82",
+          "uuid": "40ee0bc7-f379-4384-85c6-08cd40b59f82",
+          "name": "40ee0bc7-f379-4384-85c6-08cd40b59f82",
+          "type": "ImageAsset",
+          "category": "IMG",
+          "source": "assetManager.assets",
+          "bundle": "",
+          "cpuBytes": 0,
+          "vramBytes": 0,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a"
+          ],
+          "status": "正常",
+          "confidence": "不可估算",
+          "detail": "",
+          "referencePaths": [
+            "coin-pouch-variant-ui-20261017-96x96-fe10e97c530d [40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941] → 40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a [40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a] → 40ee0bc7-f379-4384-85c6-08cd40b59f82 [40ee0bc7-f379-4384-85c6-08cd40b59f82]"
+          ],
+          "referencePathText": "coin-pouch-variant-ui-20261017-96x96-fe10e97c530d [40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941] → 40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a [40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a] → 40ee0bc7-f379-4384-85c6-08cd40b59f82 [40ee0bc7-f379-4384-85c6-08cd40b59f82]"
+        },
+        {
+          "id": "40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a",
+          "uuid": "40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a",
+          "name": "40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a",
+          "type": "Texture2D",
+          "category": "Texture",
+          "source": "assetManager.assets",
+          "bundle": "",
+          "cpuBytes": 36864,
+          "vramBytes": 36864,
+          "refCount": 1,
+          "dependencyRefCount": 1,
+          "referenceCount": 1,
+          "referrers": [
+            "40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941"
+          ],
+          "status": "正常",
+          "confidence": "估算",
+          "detail": "96×96 RGBA8",
+          "referencePaths": [
+            "coin-pouch-variant-ui-20261017-96x96-fe10e97c530d [40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941] → 40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a [40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a]"
+          ],
+          "referencePathText": "coin-pouch-variant-ui-20261017-96x96-fe10e97c530d [40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941] → 40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a [40ee0bc7-f379-4384-85c6-08cd40b59f82@6c48a]"
+        },
+        {
+          "id": "40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941",
+          "uuid": "40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941",
+          "name": "coin-pouch-variant-ui-20261017-96x96-fe10e97c530d",
+          "type": "SpriteFrame",
+          "category": "Texture",
+          "source": "assetManager.assets",
+          "bundle": "",
+          "cpuBytes": 0,
+          "vramBytes": 16777216,
+          "refCount": 1,
+          "dependencyRefCount": 0,
+          "referenceCount": 1,
+          "referrers": [],
+          "status": "正常",
+          "confidence": "估算",
+          "detail": "2048×2048 RGBA8",
+          "referencePaths": [
+            "引擎 refCount=1（运行时未暴露具体持有者）"
+          ],
+          "referencePathText": "引擎 refCount=1（运行时未暴露具体持有者）"
+        }
+      ],
+      "summary": [
+        {
+          "category": "Material",
+          "count": 33,
+          "cpuBytes": 0,
+          "vramBytes": 0
+        },
+        {
+          "category": "IMG",
+          "count": 1,
+          "cpuBytes": 0,
+          "vramBytes": 0
+        },
+        {
+          "category": "Texture",
+          "count": 2,
+          "cpuBytes": 36864,
+          "vramBytes": 16814080
+        }
+      ],
+      "totals": {
+        "textureBytes": 17154864,
+        "bufferBytes": 56540,
+        "source": "Cocos GFX memoryStatus",
+        "confidence": "引擎统计"
+      }
+    },
+    "nodes": {
+      "scannedAt": 1792319005044,
+      "items": [
+        {
+          "id": "15d1180d-e6da-45e8-b749-0d7d5387af0a",
+          "parentId": null,
+          "name": "Node0",
+          "path": "Scene",
+          "depth": 0,
+          "childCount": 3,
+          "subtreeCount": 6,
+          "componentCount": 0,
+          "components": [],
+          "active": true,
+          "activeSelf": true,
+          "isPrefab": true,
+          "isPrefabRoot": false,
+          "prefabAssetUuid": "",
+          "prefabFileId": "HxIRiAtdXb1k0SzFtIm2WJ",
+          "resourceUuids": [],
+          "drawCallEstimate": 0,
+          "triangles": 0,
+          "textureVramBytes": 0,
+          "rendererCount": 0,
+          "editableProperties": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "value": ""
+            },
+            {
+              "key": "active",
+              "label": "Active",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "key": "layer",
+              "label": "Layer",
+              "type": "number",
+              "value": 1073741824,
+              "min": 0,
+              "max": 4294967295,
+              "step": 1
+            },
+            {
+              "key": "position.x",
+              "label": "Position X",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.y",
+              "label": "Position Y",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.z",
+              "label": "Position Z",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "rotation.x",
+              "label": "Rotation X",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.y",
+              "label": "Rotation Y",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.z",
+              "label": "Rotation Z",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "scale.x",
+              "label": "Scale X",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.y",
+              "label": "Scale Y",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.z",
+              "label": "Scale Z",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            }
+          ],
+          "componentGroups": [],
+          "order": 0,
+          "childIds": [
+            "evKQ+pwD5r3uwx6YUQf4bo",
+            "db8J+9K4lMILgdh2xrgjlT",
+            "Node.725"
+          ]
+        },
+        {
+          "id": "evKQ+pwD5r3uwx6YUQf4bo",
+          "parentId": "15d1180d-e6da-45e8-b749-0d7d5387af0a",
+          "name": "Main Camera",
+          "path": "Scene/Main Camera",
+          "depth": 1,
+          "childCount": 0,
+          "subtreeCount": 0,
+          "componentCount": 1,
+          "components": [
+            "Camera"
+          ],
+          "active": true,
+          "activeSelf": true,
+          "isPrefab": false,
+          "isPrefabRoot": false,
+          "prefabAssetUuid": "",
+          "prefabFileId": "",
+          "resourceUuids": [],
+          "drawCallEstimate": 0,
+          "triangles": 0,
+          "textureVramBytes": 0,
+          "rendererCount": 0,
+          "editableProperties": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "value": "Main Camera"
+            },
+            {
+              "key": "active",
+              "label": "Active",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "key": "layer",
+              "label": "Layer",
+              "type": "number",
+              "value": 1073741824,
+              "min": 0,
+              "max": 4294967295,
+              "step": 1
+            },
+            {
+              "key": "position.x",
+              "label": "Position X",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.y",
+              "label": "Position Y",
+              "type": "number",
+              "value": 10,
+              "step": 0.1
+            },
+            {
+              "key": "position.z",
+              "label": "Position Z",
+              "type": "number",
+              "value": 10,
+              "step": 0.1
+            },
+            {
+              "key": "rotation.x",
+              "label": "Rotation X",
+              "type": "number",
+              "value": -45,
+              "step": 1
+            },
+            {
+              "key": "rotation.y",
+              "label": "Rotation Y",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.z",
+              "label": "Rotation Z",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "scale.x",
+              "label": "Scale X",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.y",
+              "label": "Scale Y",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.z",
+              "label": "Scale Z",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            }
+          ],
+          "componentGroups": [
+            {
+              "id": "CELbSCwUHgY0Bcywd/5oJi",
+              "index": 0,
+              "name": "cc.Camera",
+              "enabled": true,
+              "script": {
+                "className": "cc.Camera",
+                "componentUuid": "CELbSCwUHgY0Bcywd/5oJi",
+                "scriptUuid": "cc.Camera",
+                "scriptPath": "",
+                "kind": "引擎组件"
+              },
+              "editableProperties": [
+                {
+                  "key": "enabled",
+                  "label": "enabled",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "priority",
+                  "label": "priority",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "visibility",
+                  "label": "visibility",
+                  "type": "number",
+                  "value": 1822425087
+                },
+                {
+                  "key": "clearFlags",
+                  "label": "clearFlags",
+                  "type": "number",
+                  "value": 14
+                },
+                {
+                  "key": "clearColor.x",
+                  "label": "clearColor.x",
+                  "type": "number",
+                  "value": 0.2
+                },
+                {
+                  "key": "clearColor.y",
+                  "label": "clearColor.y",
+                  "type": "number",
+                  "value": 0.2
+                },
+                {
+                  "key": "clearColor.z",
+                  "label": "clearColor.z",
+                  "type": "number",
+                  "value": 0.2
+                },
+                {
+                  "key": "clearColor.w",
+                  "label": "clearColor.w",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "clearDepth",
+                  "label": "clearDepth",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "clearStencil",
+                  "label": "clearStencil",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "projection",
+                  "label": "projection",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "fovAxis",
+                  "label": "fovAxis",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "fov",
+                  "label": "fov",
+                  "type": "number",
+                  "value": 45
+                },
+                {
+                  "key": "orthoHeight",
+                  "label": "orthoHeight",
+                  "type": "number",
+                  "value": 10
+                },
+                {
+                  "key": "near",
+                  "label": "near",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "far",
+                  "label": "far",
+                  "type": "number",
+                  "value": 1000
+                },
+                {
+                  "key": "aperture",
+                  "label": "aperture",
+                  "type": "number",
+                  "value": 19
+                },
+                {
+                  "key": "shutter",
+                  "label": "shutter",
+                  "type": "number",
+                  "value": 7
+                },
+                {
+                  "key": "iso",
+                  "label": "iso",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "rect.x",
+                  "label": "rect.x",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "rect.y",
+                  "label": "rect.y",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "rect.z",
+                  "label": "rect.z",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "rect.w",
+                  "label": "rect.w",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "usePostProcess",
+                  "label": "usePostProcess",
+                  "type": "boolean",
+                  "value": false
+                },
+                {
+                  "key": "screenScale",
+                  "label": "screenScale",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "inEditorMode",
+                  "label": "inEditorMode",
+                  "type": "boolean",
+                  "value": false
+                },
+                {
+                  "key": "cameraType",
+                  "label": "cameraType",
+                  "type": "number",
+                  "value": -1
+                },
+                {
+                  "key": "trackingType",
+                  "label": "trackingType",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "hideFlags",
+                  "label": "hideFlags",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ],
+          "order": 1,
+          "childIds": []
+        },
+        {
+          "id": "db8J+9K4lMILgdh2xrgjlT",
+          "parentId": "15d1180d-e6da-45e8-b749-0d7d5387af0a",
+          "name": "Canvas",
+          "path": "Scene/Canvas",
+          "depth": 1,
+          "childCount": 2,
+          "subtreeCount": 2,
+          "componentCount": 2,
+          "components": [
+            "UITransform",
+            "Canvas"
+          ],
+          "active": true,
+          "activeSelf": true,
+          "isPrefab": false,
+          "isPrefabRoot": false,
+          "prefabAssetUuid": "",
+          "prefabFileId": "",
+          "resourceUuids": [],
+          "drawCallEstimate": 0,
+          "triangles": 0,
+          "textureVramBytes": 0,
+          "rendererCount": 0,
+          "editableProperties": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "value": "Canvas"
+            },
+            {
+              "key": "active",
+              "label": "Active",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "key": "layer",
+              "label": "Layer",
+              "type": "number",
+              "value": 33554432,
+              "min": 0,
+              "max": 4294967295,
+              "step": 1
+            },
+            {
+              "key": "position.x",
+              "label": "Position X",
+              "type": "number",
+              "value": 640,
+              "step": 0.1
+            },
+            {
+              "key": "position.y",
+              "label": "Position Y",
+              "type": "number",
+              "value": 360,
+              "step": 0.1
+            },
+            {
+              "key": "position.z",
+              "label": "Position Z",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "rotation.x",
+              "label": "Rotation X",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.y",
+              "label": "Rotation Y",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.z",
+              "label": "Rotation Z",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "scale.x",
+              "label": "Scale X",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.y",
+              "label": "Scale Y",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.z",
+              "label": "Scale Z",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            }
+          ],
+          "componentGroups": [
+            {
+              "id": "5bgByQoLBEx4e5UZs5aLky",
+              "index": 0,
+              "name": "cc.UITransform",
+              "enabled": true,
+              "script": {
+                "className": "cc.UITransform",
+                "componentUuid": "5bgByQoLBEx4e5UZs5aLky",
+                "scriptUuid": "cc.UITransform",
+                "scriptPath": "",
+                "kind": "引擎组件"
+              },
+              "editableProperties": [
+                {
+                  "key": "enabled",
+                  "label": "enabled",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "contentSize.x",
+                  "label": "contentSize.x",
+                  "type": "number",
+                  "value": 1280
+                },
+                {
+                  "key": "contentSize.y",
+                  "label": "contentSize.y",
+                  "type": "number",
+                  "value": 720
+                },
+                {
+                  "key": "width",
+                  "label": "width",
+                  "type": "number",
+                  "value": 1280
+                },
+                {
+                  "key": "height",
+                  "label": "height",
+                  "type": "number",
+                  "value": 720
+                },
+                {
+                  "key": "anchorPoint.x",
+                  "label": "anchorPoint.x",
+                  "type": "number",
+                  "value": 0.5
+                },
+                {
+                  "key": "anchorPoint.y",
+                  "label": "anchorPoint.y",
+                  "type": "number",
+                  "value": 0.5
+                },
+                {
+                  "key": "anchorX",
+                  "label": "anchorX",
+                  "type": "number",
+                  "value": 0.5
+                },
+                {
+                  "key": "anchorY",
+                  "label": "anchorY",
+                  "type": "number",
+                  "value": 0.5
+                },
+                {
+                  "key": "hideFlags",
+                  "label": "hideFlags",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "id": "64HgFS2BxFEJXXBDEXj/uS",
+              "index": 1,
+              "name": "cc.Canvas",
+              "enabled": true,
+              "script": {
+                "className": "cc.Canvas",
+                "componentUuid": "64HgFS2BxFEJXXBDEXj/uS",
+                "scriptUuid": "cc.Canvas",
+                "scriptPath": "",
+                "kind": "引擎组件"
+              },
+              "editableProperties": [
+                {
+                  "key": "enabled",
+                  "label": "enabled",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "renderMode",
+                  "label": "renderMode",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "alignCanvasWithScreen",
+                  "label": "alignCanvasWithScreen",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "hideFlags",
+                  "label": "hideFlags",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ],
+          "order": 2,
+          "childIds": [
+            "a6zKK9SY9Dm60erXnGVEj3",
+            "23hztDLANPI74dUbx2P9oO"
+          ]
+        },
+        {
+          "id": "a6zKK9SY9Dm60erXnGVEj3",
+          "parentId": "db8J+9K4lMILgdh2xrgjlT",
+          "name": "Camera",
+          "path": "Scene/Canvas/Camera",
+          "depth": 2,
+          "childCount": 0,
+          "subtreeCount": 0,
+          "componentCount": 1,
+          "components": [
+            "Camera"
+          ],
+          "active": true,
+          "activeSelf": true,
+          "isPrefab": false,
+          "isPrefabRoot": false,
+          "prefabAssetUuid": "",
+          "prefabFileId": "",
+          "resourceUuids": [],
+          "drawCallEstimate": 0,
+          "triangles": 0,
+          "textureVramBytes": 0,
+          "rendererCount": 0,
+          "editableProperties": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "value": "Camera"
+            },
+            {
+              "key": "active",
+              "label": "Active",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "key": "layer",
+              "label": "Layer",
+              "type": "number",
+              "value": 1073741824,
+              "min": 0,
+              "max": 4294967295,
+              "step": 1
+            },
+            {
+              "key": "position.x",
+              "label": "Position X",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.y",
+              "label": "Position Y",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.z",
+              "label": "Position Z",
+              "type": "number",
+              "value": 1000,
+              "step": 0.1
+            },
+            {
+              "key": "rotation.x",
+              "label": "Rotation X",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.y",
+              "label": "Rotation Y",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.z",
+              "label": "Rotation Z",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "scale.x",
+              "label": "Scale X",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.y",
+              "label": "Scale Y",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.z",
+              "label": "Scale Z",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            }
+          ],
+          "componentGroups": [
+            {
+              "id": "89/XlQsLxADaKCJVyHI3+F",
+              "index": 0,
+              "name": "cc.Camera",
+              "enabled": true,
+              "script": {
+                "className": "cc.Camera",
+                "componentUuid": "89/XlQsLxADaKCJVyHI3+F",
+                "scriptUuid": "cc.Camera",
+                "scriptPath": "",
+                "kind": "引擎组件"
+              },
+              "editableProperties": [
+                {
+                  "key": "enabled",
+                  "label": "enabled",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "priority",
+                  "label": "priority",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "visibility",
+                  "label": "visibility",
+                  "type": "number",
+                  "value": 33554432
+                },
+                {
+                  "key": "clearFlags",
+                  "label": "clearFlags",
+                  "type": "number",
+                  "value": 6
+                },
+                {
+                  "key": "clearColor.x",
+                  "label": "clearColor.x",
+                  "type": "number",
+                  "value": 0.2
+                },
+                {
+                  "key": "clearColor.y",
+                  "label": "clearColor.y",
+                  "type": "number",
+                  "value": 0.2
+                },
+                {
+                  "key": "clearColor.z",
+                  "label": "clearColor.z",
+                  "type": "number",
+                  "value": 0.2
+                },
+                {
+                  "key": "clearColor.w",
+                  "label": "clearColor.w",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "clearDepth",
+                  "label": "clearDepth",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "clearStencil",
+                  "label": "clearStencil",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "projection",
+                  "label": "projection",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "fovAxis",
+                  "label": "fovAxis",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "fov",
+                  "label": "fov",
+                  "type": "number",
+                  "value": 45
+                },
+                {
+                  "key": "orthoHeight",
+                  "label": "orthoHeight",
+                  "type": "number",
+                  "value": 1293.027989821883
+                },
+                {
+                  "key": "near",
+                  "label": "near",
+                  "type": "number",
+                  "value": 0.1
+                },
+                {
+                  "key": "far",
+                  "label": "far",
+                  "type": "number",
+                  "value": 2000
+                },
+                {
+                  "key": "aperture",
+                  "label": "aperture",
+                  "type": "number",
+                  "value": 19
+                },
+                {
+                  "key": "shutter",
+                  "label": "shutter",
+                  "type": "number",
+                  "value": 7
+                },
+                {
+                  "key": "iso",
+                  "label": "iso",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "rect.x",
+                  "label": "rect.x",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "rect.y",
+                  "label": "rect.y",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "rect.z",
+                  "label": "rect.z",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "rect.w",
+                  "label": "rect.w",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "usePostProcess",
+                  "label": "usePostProcess",
+                  "type": "boolean",
+                  "value": false
+                },
+                {
+                  "key": "screenScale",
+                  "label": "screenScale",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "inEditorMode",
+                  "label": "inEditorMode",
+                  "type": "boolean",
+                  "value": false
+                },
+                {
+                  "key": "cameraType",
+                  "label": "cameraType",
+                  "type": "number",
+                  "value": -1
+                },
+                {
+                  "key": "trackingType",
+                  "label": "trackingType",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "hideFlags",
+                  "label": "hideFlags",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ],
+          "order": 3,
+          "childIds": []
+        },
+        {
+          "id": "23hztDLANPI74dUbx2P9oO",
+          "parentId": "db8J+9K4lMILgdh2xrgjlT",
+          "name": "CoinPouchVariantUi96",
+          "path": "Scene/Canvas/CoinPouchVariantUi96",
+          "depth": 2,
+          "childCount": 0,
+          "subtreeCount": 0,
+          "componentCount": 2,
+          "components": [
+            "UITransform",
+            "Sprite"
+          ],
+          "active": true,
+          "activeSelf": true,
+          "isPrefab": false,
+          "isPrefabRoot": false,
+          "prefabAssetUuid": "",
+          "prefabFileId": "",
+          "resourceUuids": [
+            "fda095cb-831d-4601-ad94-846013963de8",
+            "40ee0bc7-f379-4384-85c6-08cd40b59f82@f9941"
+          ],
+          "drawCallEstimate": 1,
+          "triangles": 0,
+          "textureVramBytes": 16777216,
+          "rendererCount": 1,
+          "editableProperties": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "value": "CoinPouchVariantUi96"
+            },
+            {
+              "key": "active",
+              "label": "Active",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "key": "layer",
+              "label": "Layer",
+              "type": "number",
+              "value": 33554432,
+              "min": 0,
+              "max": 4294967295,
+              "step": 1
+            },
+            {
+              "key": "position.x",
+              "label": "Position X",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.y",
+              "label": "Position Y",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.z",
+              "label": "Position Z",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "rotation.x",
+              "label": "Rotation X",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.y",
+              "label": "Rotation Y",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.z",
+              "label": "Rotation Z",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "scale.x",
+              "label": "Scale X",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.y",
+              "label": "Scale Y",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.z",
+              "label": "Scale Z",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            }
+          ],
+          "componentGroups": [
+            {
+              "id": "8dPNt1e2tOALTnq3m+wVVS",
+              "index": 0,
+              "name": "cc.UITransform",
+              "enabled": true,
+              "script": {
+                "className": "cc.UITransform",
+                "componentUuid": "8dPNt1e2tOALTnq3m+wVVS",
+                "scriptUuid": "cc.UITransform",
+                "scriptPath": "",
+                "kind": "引擎组件"
+              },
+              "editableProperties": [
+                {
+                  "key": "enabled",
+                  "label": "enabled",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "contentSize.x",
+                  "label": "contentSize.x",
+                  "type": "number",
+                  "value": 96
+                },
+                {
+                  "key": "contentSize.y",
+                  "label": "contentSize.y",
+                  "type": "number",
+                  "value": 96
+                },
+                {
+                  "key": "width",
+                  "label": "width",
+                  "type": "number",
+                  "value": 96
+                },
+                {
+                  "key": "height",
+                  "label": "height",
+                  "type": "number",
+                  "value": 96
+                },
+                {
+                  "key": "anchorPoint.x",
+                  "label": "anchorPoint.x",
+                  "type": "number",
+                  "value": 0.5
+                },
+                {
+                  "key": "anchorPoint.y",
+                  "label": "anchorPoint.y",
+                  "type": "number",
+                  "value": 0.5
+                },
+                {
+                  "key": "anchorX",
+                  "label": "anchorX",
+                  "type": "number",
+                  "value": 0.5
+                },
+                {
+                  "key": "anchorY",
+                  "label": "anchorY",
+                  "type": "number",
+                  "value": 0.5
+                },
+                {
+                  "key": "hideFlags",
+                  "label": "hideFlags",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "id": "3brQYM7blOc4dZ851yONnX",
+              "index": 1,
+              "name": "cc.Sprite",
+              "enabled": true,
+              "script": {
+                "className": "cc.Sprite",
+                "componentUuid": "3brQYM7blOc4dZ851yONnX",
+                "scriptUuid": "cc.Sprite",
+                "scriptPath": "",
+                "kind": "引擎组件"
+              },
+              "editableProperties": [
+                {
+                  "key": "enabled",
+                  "label": "enabled",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "type",
+                  "label": "type",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "fillType",
+                  "label": "fillType",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "fillCenter.x",
+                  "label": "fillCenter.x",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "fillCenter.y",
+                  "label": "fillCenter.y",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "fillStart",
+                  "label": "fillStart",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "fillRange",
+                  "label": "fillRange",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "trim",
+                  "label": "trim",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "grayscale",
+                  "label": "grayscale",
+                  "type": "boolean",
+                  "value": false
+                },
+                {
+                  "key": "sizeMode",
+                  "label": "sizeMode",
+                  "type": "number",
+                  "value": 2
+                },
+                {
+                  "key": "color.x",
+                  "label": "color.x",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "color.y",
+                  "label": "color.y",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "color.z",
+                  "label": "color.z",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "color.w",
+                  "label": "color.w",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "stencilStage",
+                  "label": "stencilStage",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "srcBlendFactor",
+                  "label": "srcBlendFactor",
+                  "type": "number",
+                  "value": 2
+                },
+                {
+                  "key": "priority",
+                  "label": "priority",
+                  "type": "number",
+                  "value": 2147516416
+                }
+              ]
+            }
+          ],
+          "order": 4,
+          "childIds": []
+        },
+        {
+          "id": "Node.725",
+          "parentId": "15d1180d-e6da-45e8-b749-0d7d5387af0a",
+          "name": "PROFILER_NODE",
+          "path": "Scene/PROFILER_NODE",
+          "depth": 1,
+          "childCount": 1,
+          "subtreeCount": 1,
+          "componentCount": 0,
+          "components": [],
+          "active": true,
+          "activeSelf": true,
+          "isPrefab": false,
+          "isPrefabRoot": false,
+          "prefabAssetUuid": "",
+          "prefabFileId": "",
+          "resourceUuids": [],
+          "drawCallEstimate": 0,
+          "triangles": 0,
+          "textureVramBytes": 0,
+          "rendererCount": 0,
+          "editableProperties": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "value": "PROFILER_NODE"
+            },
+            {
+              "key": "active",
+              "label": "Active",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "key": "layer",
+              "label": "Layer",
+              "type": "number",
+              "value": 1073741824,
+              "min": 0,
+              "max": 4294967295,
+              "step": 1
+            },
+            {
+              "key": "position.x",
+              "label": "Position X",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.y",
+              "label": "Position Y",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.z",
+              "label": "Position Z",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "rotation.x",
+              "label": "Rotation X",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.y",
+              "label": "Rotation Y",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.z",
+              "label": "Rotation Z",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "scale.x",
+              "label": "Scale X",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.y",
+              "label": "Scale Y",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.z",
+              "label": "Scale Z",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            }
+          ],
+          "componentGroups": [],
+          "order": 5,
+          "childIds": [
+            "Node.726"
+          ]
+        },
+        {
+          "id": "Node.726",
+          "parentId": "Node.725",
+          "name": "Profiler_Root",
+          "path": "Scene/PROFILER_NODE/Profiler_Root",
+          "depth": 2,
+          "childCount": 0,
+          "subtreeCount": 0,
+          "componentCount": 1,
+          "components": [
+            "MeshRenderer"
+          ],
+          "active": true,
+          "activeSelf": true,
+          "isPrefab": false,
+          "isPrefabRoot": false,
+          "prefabAssetUuid": "",
+          "prefabFileId": "",
+          "resourceUuids": [],
+          "drawCallEstimate": 1,
+          "triangles": 180,
+          "textureVramBytes": 0,
+          "rendererCount": 1,
+          "editableProperties": [
+            {
+              "key": "name",
+              "label": "Name",
+              "type": "text",
+              "value": "Profiler_Root"
+            },
+            {
+              "key": "active",
+              "label": "Active",
+              "type": "boolean",
+              "value": true
+            },
+            {
+              "key": "layer",
+              "label": "Layer",
+              "type": "number",
+              "value": 268435456,
+              "min": 0,
+              "max": 4294967295,
+              "step": 1
+            },
+            {
+              "key": "position.x",
+              "label": "Position X",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.y",
+              "label": "Position Y",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "position.z",
+              "label": "Position Z",
+              "type": "number",
+              "value": 0,
+              "step": 0.1
+            },
+            {
+              "key": "rotation.x",
+              "label": "Rotation X",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.y",
+              "label": "Rotation Y",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "rotation.z",
+              "label": "Rotation Z",
+              "type": "number",
+              "value": 0,
+              "step": 1
+            },
+            {
+              "key": "scale.x",
+              "label": "Scale X",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.y",
+              "label": "Scale Y",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            },
+            {
+              "key": "scale.z",
+              "label": "Scale Z",
+              "type": "number",
+              "value": 1,
+              "step": 0.1
+            }
+          ],
+          "componentGroups": [
+            {
+              "id": "Comp.414",
+              "index": 0,
+              "name": "cc.MeshRenderer",
+              "enabled": true,
+              "script": {
+                "className": "cc.MeshRenderer",
+                "componentUuid": "Comp.414",
+                "scriptUuid": "cc.MeshRenderer",
+                "scriptPath": "",
+                "kind": "引擎组件"
+              },
+              "editableProperties": [
+                {
+                  "key": "enabled",
+                  "label": "enabled",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "shadowBias",
+                  "label": "shadowBias",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "shadowNormalBias",
+                  "label": "shadowNormalBias",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "shadowCastingMode",
+                  "label": "shadowCastingMode",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "shadowCastingModeForInspector",
+                  "label": "shadowCastingModeForInspector",
+                  "type": "boolean",
+                  "value": false
+                },
+                {
+                  "key": "receiveShadow",
+                  "label": "receiveShadow",
+                  "type": "number",
+                  "value": 1
+                },
+                {
+                  "key": "receiveShadowForInspector",
+                  "label": "receiveShadowForInspector",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "enableMorph",
+                  "label": "enableMorph",
+                  "type": "boolean",
+                  "value": true
+                },
+                {
+                  "key": "isGlobalStandardSkinObject",
+                  "label": "isGlobalStandardSkinObject",
+                  "type": "boolean",
+                  "value": false
+                },
+                {
+                  "key": "visibility",
+                  "label": "visibility",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "key": "priority",
+                  "label": "priority",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            }
+          ],
+          "order": 6,
+          "childIds": []
+        }
+      ]
+    },
+    "rendering": {
+      "scannedAt": 1792319005045,
+      "captureEnabled": true,
+      "captureReady": true,
+      "batches2D": [
+        {
+          "order": 0,
+          "nodeId": "23hztDLANPI74dUbx2P9oO",
+          "uuid": "23hztDLANPI74dUbx2P9oO",
+          "name": "CoinPouchVariantUi96",
+          "path": "Node/Canvas/CoinPouchVariantUi96",
+          "component": "Sprite",
+          "signature": "348609768|0|1305724900|1/2/4/1/4|0|",
+          "dataHash": 348609768,
+          "stencil": 0,
+          "mask": false,
+          "materialId": "fda095cb-831d-4601-ad94-846013963de8",
+          "materialName": "ui-sprite-material",
+          "materialHash": 0,
+          "materialPasses": 1,
+          "blend": "1/2/4/1/4",
+          "textureId": "1305724900",
+          "textureUuid": "Tex.168",
+          "textureName": "coin-pouch-variant-ui-20261017-96x96-fe10e97c530d",
+          "textureHash": 1305724900,
+          "textureWidth": 2048,
+          "textureHeight": 2048,
+          "textureVramBytes": 16777216,
+          "textureFormat": "RGBA8",
+          "atlas": "Dynamic Atlas",
+          "atlasKey": "Tex.168",
+          "transformId": "",
+          "id": "1006-1-0",
+          "frameSequence": 1006,
+          "batch": 1,
+          "batchNodeCount": 1,
+          "breakReasons": [
+            "起始批次"
+          ],
+          "breakReason": "起始批次"
+        }
+      ],
+      "models3D": [
+        {
+          "id": "Node.726-mesh-0",
+          "nodeId": "Node.726",
+          "uuid": "Node.726",
+          "name": "Profiler_Root",
+          "path": "Node/PROFILER_NODE/Profiler_Root",
+          "component": "MeshRenderer",
+          "meshName": "Unnamed Mesh",
+          "meshUuid": "unknown",
+          "materialNames": "util/profiler",
+          "materialIds": [
+            "material-0"
+          ],
+          "materialCount": 1,
+          "passCount": 1,
+          "instancing": false,
+          "castShadow": false,
+          "receiveShadow": true,
+          "triangles": 180,
+          "textureVramBytes": 0,
+          "groupCount": 1,
+          "warnings": [],
+          "warningText": "正常",
+          "order": 0
+        }
+      ],
+      "ghostNodes": [],
+      "largeTextures": [],
+      "maskCount": 0,
+      "diagnostics": [
+        {
+          "id": "rendering-good",
+          "severity": "good",
+          "title": "未发现明显渲染风险",
+          "message": "当前启发式阈值内未发现明显异常。"
+        }
+      ]
+    },
+    "events": {
+      "items": [
+        {
+          "id": 8,
+          "time": 1792319005040,
+          "frame": 1006,
+          "source": "console",
+          "kind": "log",
+          "level": "warn",
+          "message": "'%s' is deprecated, please use '%s' instead.  cc.loader cc.assetManager",
+          "values": [
+            {
+              "kind": "string",
+              "preview": "'%s' is deprecated, please use '%s' instead. ",
+              "value": "'%s' is deprecated, please use '%s' instead. "
+            },
+            {
+              "kind": "string",
+              "preview": "cc.loader",
+              "value": "cc.loader"
+            },
+            {
+              "kind": "string",
+              "preview": "cc.assetManager",
+              "value": "cc.assetManager"
+            }
+          ],
+          "location": {
+            "url": "http://192.168.31.100:7456/scripting/engine/bin/.cache/dev/preview/bundled/index.js",
+            "line": 168805,
+            "column": 19
+          }
+        }
+      ],
+      "scannedAt": 1792319005045,
+      "counts": {
+        "log": 0,
+        "warn": 1,
+        "error": 0,
+        "debug": 0,
+        "exception": 0
+      }
+    },
+    "findings": {
+      "items": [],
+      "scannedAt": 1792319005045,
+      "counts": {
+        "info": 0,
+        "warn": 0,
+        "error": 0
+      },
+      "reproSteps": []
+    },
+    "source": {
+      "metrics": [
+        "director.tick"
+      ],
+      "resources": "Cocos GFX memoryStatus",
+      "nodes": "Cocos runtime scene graph",
+      "rendering": "Cocos runtime scene scan and heuristic analysis",
+      "events": "in-page console, cc.log, error and unhandledrejection",
+      "findings": "collector detectors"
+    },
+    "confidence": {
+      "metrics": "engine hook",
+      "resources": "引擎统计",
+      "nodes": "runtime snapshot",
+      "rendering": "heuristic",
+      "events": "in-page hook",
+      "findings": "heuristic"
+    }
+  },
+  "previewUrl": "http://192.168.31.100:7456",
+  "collectorSha256": "cfd239a347708d9f7672bb81ff0ac1f37dfdeec5fa4ded746f1f148c55384a57",
+  "collectorVersion": "2.2.23",
+  "consoleErrors": [],
+  "evidencePath": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\temp\\creator-ai-bridge\\profiler\\capture-1792319005038.json",
+  "agentUsagePath": "P8000/cocos-profiler/docs/agent-usage.md",
+  "nextSteps": [
+    "Read full evidence: D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\temp\\creator-ai-bridge\\profiler\\capture-1792319005038.json",
+    "Read agent contract: P8000/cocos-profiler/docs/agent-usage.md",
+    "No error/warn findings; compare metrics and rendering sections against baseline"
+  ],
+  "findingCodes": [],
+  "statusHint": "Creator AI：Profiler 只读取证完成（0 条 findings 摘要，全文见证据文件）"
+}

@@ -1,0 +1,1150 @@
+{
+  "origin-rejected-approved-real-proof.json": {
+    "sourceSha256": "5d6cf4f917f877e16b35eeff1394f139603385015502cc88a132c803d9568d77",
+    "result": {
+      "authorization": "User 准许 2026-10-18T07:37:26Z; retry requested 10:03:50Z",
+      "steps": [
+        {
+          "kind": "lifecycle",
+          "projectId": "a79f4915296f4091",
+          "action": "start",
+          "dispatchedAt": "2026-10-18T10:08:55.536Z",
+          "outcome": "rejected",
+          "httpStatus": 403,
+          "error": "Lifecycle start 403"
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "68a5dccc481a8588",
+          "action": "start",
+          "dispatchedAt": "2026-10-18T10:08:59.501Z",
+          "outcome": "rejected",
+          "httpStatus": 403,
+          "error": "Lifecycle start 403"
+        }
+      ],
+      "restoration": [
+        "Original restore: Lifecycle start 403"
+      ],
+      "blocked": [],
+      "before": {
+        "original": {
+          "projectId": "68a5dccc481a8588",
+          "state": "error",
+          "lastError": "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志",
+          "launchSource": "dashboard",
+          "dashboardVersion": "2.2.2",
+          "dashboardProgress": "open",
+          "instanceId": "f6e0c9ff-bb8d-4f66-b2e7-447772b04cca"
+        },
+        "fixture": {
+          "projectId": "a79f4915296f4091",
+          "state": "error",
+          "lastError": "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志"
+        }
+      },
+      "error": "Lifecycle start 403",
+      "fixtureStopped": true,
+      "after": {
+        "original": {
+          "projectId": "68a5dccc481a8588",
+          "state": "error",
+          "lastError": "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志",
+          "launchSource": "dashboard",
+          "dashboardVersion": "2.2.2",
+          "dashboardProgress": "open",
+          "instanceId": "f6e0c9ff-bb8d-4f66-b2e7-447772b04cca"
+        },
+        "fixture": {
+          "projectId": "a79f4915296f4091",
+          "state": "error",
+          "lastError": "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志"
+        },
+        "daemon": {
+          "pid": 20116,
+          "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+          "startedAt": "2026-10-18T04:48:30.247Z",
+          "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+          "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+          "nodeVersion": "v25.2.1"
+        }
+      },
+      "beforeSystem": {
+        "creatorRoots": [],
+        "creatorListeners": []
+      }
+    }
+  },
+  "port7458-stopped-approved-real-proof.json": {
+    "sourceSha256": "56ff86706a87eca422b710b1bc76ffe15b9d336ed153bd27a680fea2f1db0473",
+    "result": {
+      "authorization": "User 准许 2026-10-18T07:37:26Z; retry requested 10:03:50Z",
+      "steps": [
+        {
+          "kind": "lifecycle",
+          "projectId": "a79f4915296f4091",
+          "action": "start",
+          "dispatchedAt": "2026-10-18T10:09:51.578Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "ready"
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "a79f4915296f4091",
+          "action": "stop",
+          "dispatchedAt": "2026-10-18T10:10:18.991Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "stopped"
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "68a5dccc481a8588",
+          "action": "start",
+          "dispatchedAt": "2026-10-18T10:10:22.048Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "ready"
+        }
+      ],
+      "restoration": [],
+      "blocked": [],
+      "before": {
+        "original": {
+          "projectId": "68a5dccc481a8588",
+          "state": "error",
+          "lastError": "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志",
+          "launchSource": "dashboard",
+          "dashboardVersion": "2.2.2",
+          "dashboardProgress": "open",
+          "instanceId": "f6e0c9ff-bb8d-4f66-b2e7-447772b04cca"
+        },
+        "fixture": {
+          "projectId": "a79f4915296f4091",
+          "state": "error",
+          "lastError": "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志"
+        }
+      },
+      "fixtureReady": {
+        "state": "ready",
+        "pid": 17144,
+        "sessionId": "2ad55923-e4de-4007-bc57-f55424d6252c"
+      },
+      "error": "New non-approved public listener [{\"LocalAddress\":\"::\",\"LocalPort\":7458,\"OwningProcess\":17144}]",
+      "fixtureUnsavedAfter": false,
+      "fixtureStopped": true,
+      "originalRestored": {
+        "state": "ready",
+        "pid": 23828,
+        "sessionId": "439aa1ff-b1fb-403e-8d6a-7b03516306a3",
+        "unsaved": false
+      },
+      "addedAfterRestore": [
+        {
+          "LocalAddress": "::",
+          "LocalPort": 7456,
+          "OwningProcess": 23828
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 12449,
+          "OwningProcess": 23828
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 8016,
+          "OwningProcess": 23828
+        }
+      ],
+      "after": {
+        "original": {
+          "projectId": "68a5dccc481a8588",
+          "state": "ready",
+          "launchSource": "dashboard",
+          "dashboardVersion": "2.2.2",
+          "dashboardProgress": "open",
+          "instanceId": "3315246e-0c5f-4309-9bee-4d2c9de4a114",
+          "pid": 23828,
+          "creatorVersion": "3.8.8",
+          "sessionId": "439aa1ff-b1fb-403e-8d6a-7b03516306a3",
+          "capabilityProfile": "full-control"
+        },
+        "fixture": {
+          "projectId": "a79f4915296f4091",
+          "state": "stopped",
+          "lastError": "Creator 进程已退出",
+          "launchSource": "dashboard"
+        },
+        "daemon": {
+          "pid": 20116,
+          "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+          "startedAt": "2026-10-18T04:48:30.247Z",
+          "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+          "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+          "nodeVersion": "v25.2.1"
+        }
+      },
+      "beforeSystem": {
+        "creatorRoots": [],
+        "creatorListeners": []
+      },
+      "fixtureSystem": {
+        "creatorRoots": [
+          {
+            "pid": 17144,
+            "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+            "fixture": true,
+            "original": false
+          }
+        ],
+        "creatorListeners": [
+          {
+            "LocalAddress": "::",
+            "LocalPort": 7458,
+            "OwningProcess": 17144
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 5414,
+            "OwningProcess": 17144
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 5406,
+            "OwningProcess": 17144
+          }
+        ]
+      },
+      "afterSystem": {
+        "creatorRoots": [
+          {
+            "pid": 23828,
+            "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+            "fixture": false,
+            "original": true
+          }
+        ],
+        "creatorListeners": [
+          {
+            "LocalAddress": "::",
+            "LocalPort": 7456,
+            "OwningProcess": 23828
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 12449,
+            "OwningProcess": 23828
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 8016,
+            "OwningProcess": 23828
+          }
+        ]
+      }
+    }
+  },
+  "before-receipt-fix-approved-real-proof.json": {
+    "sourceSha256": "1c09a515112f0db0968f1bac328335628e6a6803d9e6ab0eaa3f3308319094a3",
+    "result": {
+      "authorization": "User 准许 2026-10-18T07:37:26Z; retry requested 10:03:50Z",
+      "steps": [
+        {
+          "kind": "lifecycle",
+          "projectId": "68a5dccc481a8588",
+          "action": "stop",
+          "dispatchedAt": "2026-10-18T10:13:00.701Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "stopped"
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "a79f4915296f4091",
+          "action": "start",
+          "dispatchedAt": "2026-10-18T10:13:03.369Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "ready"
+        },
+        {
+          "kind": "next-ui",
+          "action": "start",
+          "projectId": "a79f4915296f4091",
+          "dispatchedAt": "2026-10-18T10:13:24.948Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "replyFile": "next-start-reply.json",
+          "receiptPanelVisible": false
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "a79f4915296f4091",
+          "action": "stop",
+          "dispatchedAt": "2026-10-18T10:13:28.405Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "stopped"
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "68a5dccc481a8588",
+          "action": "start",
+          "dispatchedAt": "2026-10-18T10:13:33.303Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "ready"
+        }
+      ],
+      "restoration": [],
+      "blocked": [],
+      "before": {
+        "original": {
+          "projectId": "68a5dccc481a8588",
+          "state": "ready",
+          "launchSource": "dashboard",
+          "dashboardVersion": "2.2.2",
+          "dashboardProgress": "open",
+          "instanceId": "3315246e-0c5f-4309-9bee-4d2c9de4a114",
+          "pid": 23828,
+          "creatorVersion": "3.8.8",
+          "sessionId": "439aa1ff-b1fb-403e-8d6a-7b03516306a3",
+          "capabilityProfile": "full-control"
+        },
+        "fixture": {
+          "projectId": "a79f4915296f4091",
+          "state": "error",
+          "lastError": "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志",
+          "launchSource": "dashboard"
+        }
+      },
+      "originalUnsavedBefore": false,
+      "fixtureReady": {
+        "state": "ready",
+        "pid": 18584,
+        "sessionId": "f42d1808-3756-4031-a1b7-b1b0dcc5cbbd"
+      },
+      "addedFixtureListeners": [
+        {
+          "LocalAddress": "::",
+          "LocalPort": 7456,
+          "OwningProcess": 18584
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 2553,
+          "OwningProcess": 18584
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 2546,
+          "OwningProcess": 18584
+        }
+      ],
+      "fixtureUnsavedBefore": false,
+      "error": "Non-approved preview URL",
+      "fixtureUnsavedAfter": false,
+      "fixtureStopped": true,
+      "fixturePortProfileRestored": true,
+      "originalRestored": {
+        "state": "ready",
+        "pid": 20540,
+        "sessionId": "4459d2f6-9224-4694-a141-a2ba576fcb37",
+        "unsaved": false
+      },
+      "addedAfterRestore": [
+        {
+          "LocalAddress": "::",
+          "LocalPort": 7456,
+          "OwningProcess": 20540
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 12366,
+          "OwningProcess": 20540
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 6717,
+          "OwningProcess": 20540
+        }
+      ],
+      "after": {
+        "original": {
+          "projectId": "68a5dccc481a8588",
+          "state": "ready",
+          "launchSource": "dashboard",
+          "dashboardVersion": "2.2.2",
+          "dashboardProgress": "open",
+          "instanceId": "a5f6b66b-007a-4808-8196-652644b99172",
+          "pid": 20540,
+          "creatorVersion": "3.8.8",
+          "sessionId": "4459d2f6-9224-4694-a141-a2ba576fcb37",
+          "capabilityProfile": "full-control"
+        },
+        "fixture": {
+          "projectId": "a79f4915296f4091",
+          "state": "stopped",
+          "lastError": "Creator 进程已退出",
+          "launchSource": "dashboard"
+        },
+        "daemon": {
+          "pid": 20116,
+          "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+          "startedAt": "2026-10-18T04:48:30.247Z",
+          "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+          "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+          "nodeVersion": "v25.2.1"
+        }
+      },
+      "beforeSystem": {
+        "creatorRoots": [
+          {
+            "pid": 23828,
+            "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+            "fixture": false,
+            "original": true
+          }
+        ],
+        "creatorListeners": [
+          {
+            "LocalAddress": "::",
+            "LocalPort": 7456,
+            "OwningProcess": 23828
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 12449,
+            "OwningProcess": 23828
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 8016,
+            "OwningProcess": 23828
+          }
+        ]
+      },
+      "fixtureSystem": {
+        "creatorRoots": [
+          {
+            "pid": 18584,
+            "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+            "fixture": true,
+            "original": false
+          }
+        ],
+        "creatorListeners": [
+          {
+            "LocalAddress": "::",
+            "LocalPort": 7456,
+            "OwningProcess": 18584
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 2553,
+            "OwningProcess": 18584
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 2546,
+            "OwningProcess": 18584
+          }
+        ]
+      },
+      "afterSystem": {
+        "creatorRoots": [
+          {
+            "pid": 20540,
+            "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+            "fixture": false,
+            "original": true
+          }
+        ],
+        "creatorListeners": [
+          {
+            "LocalAddress": "::",
+            "LocalPort": 7456,
+            "OwningProcess": 20540
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 12366,
+            "OwningProcess": 20540
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 6717,
+            "OwningProcess": 20540
+          }
+        ]
+      }
+    }
+  },
+  "approved-real-proof.json": {
+    "sourceSha256": "897850f38ede81368a04a0dafd99ec1dbb71108562d18c549b092f44b080633b",
+    "result": {
+      "authorization": "User 准许 2026-10-18T07:37:26Z; retry requested 10:03:50Z",
+      "steps": [
+        {
+          "kind": "lifecycle",
+          "projectId": "68a5dccc481a8588",
+          "action": "stop",
+          "dispatchedAt": "2026-10-18T10:22:31.326Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "stopped"
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "a79f4915296f4091",
+          "action": "start",
+          "dispatchedAt": "2026-10-18T10:22:34.209Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "ready"
+        },
+        {
+          "kind": "next-ui",
+          "action": "start",
+          "projectId": "a79f4915296f4091",
+          "dispatchedAt": "2026-10-18T10:22:56.119Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "replyFile": "next-start-reply.json",
+          "receiptPanelVisible": true
+        },
+        {
+          "kind": "next-ui",
+          "action": "reload",
+          "projectId": "a79f4915296f4091",
+          "dispatchedAt": "2026-10-18T10:23:02.406Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "replyFile": "next-reload-reply.json",
+          "receiptPanelVisible": true
+        },
+        {
+          "kind": "next-ui",
+          "action": "profiler",
+          "projectId": "a79f4915296f4091",
+          "dispatchedAt": "2026-10-18T10:23:05.683Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "replyFile": "next-profiler-reply.json",
+          "receiptPanelVisible": true,
+          "profilerSuccessVisible": true
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "a79f4915296f4091",
+          "action": "stop",
+          "dispatchedAt": "2026-10-18T10:23:28.410Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "stopped"
+        },
+        {
+          "kind": "lifecycle",
+          "projectId": "68a5dccc481a8588",
+          "action": "start",
+          "dispatchedAt": "2026-10-18T10:23:33.283Z",
+          "outcome": "response",
+          "httpStatus": 200,
+          "state": "ready"
+        }
+      ],
+      "restoration": [],
+      "blocked": [],
+      "before": {
+        "original": {
+          "projectId": "68a5dccc481a8588",
+          "state": "ready",
+          "launchSource": "dashboard",
+          "dashboardVersion": "2.2.2",
+          "dashboardProgress": "open",
+          "instanceId": "a5f6b66b-007a-4808-8196-652644b99172",
+          "pid": 20540,
+          "creatorVersion": "3.8.8",
+          "sessionId": "4459d2f6-9224-4694-a141-a2ba576fcb37",
+          "capabilityProfile": "full-control"
+        },
+        "fixture": {
+          "projectId": "a79f4915296f4091",
+          "state": "error",
+          "lastError": "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志",
+          "launchSource": "dashboard"
+        }
+      },
+      "originalUnsavedBefore": false,
+      "fixtureReady": {
+        "state": "ready",
+        "pid": 23032,
+        "sessionId": "a15f2597-a994-4b4b-9ca3-12ef772c4b8f"
+      },
+      "addedFixtureListeners": [
+        {
+          "LocalAddress": "::",
+          "LocalPort": 7456,
+          "OwningProcess": 23032
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 12435,
+          "OwningProcess": 23032
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 1381,
+          "OwningProcess": 23032
+        }
+      ],
+      "fixtureUnsavedBefore": false,
+      "actualPreview": {
+        "reportedUrl": "http://192.168.31.100:7456/",
+        "accessedOrigin": "http://127.0.0.1:7456",
+        "ownHostValidated": true,
+        "canvasVisible": true,
+        "pageErrors": []
+      },
+      "profilerReply": {
+        "schemaVersion": "profiler-evidence-v1",
+        "contractVersion": "profiler-result-v2",
+        "findings": [],
+        "findingCodes": [],
+        "metrics": {
+          "sampleCount": 848,
+          "overBudgetCount": 0,
+          "overBudgetRatio": 0,
+          "fps": {
+            "count": 848,
+            "average": 56.554543907985284,
+            "min": 56.07115235853228,
+            "p95": 57.03048180924287,
+            "max": 57.142857142857146
+          },
+          "frameMs": {
+            "count": 848,
+            "average": 0.47334905667230487,
+            "min": 0.19999999552965164,
+            "p95": 0.6999999955296516,
+            "max": 1.7000000029802322
+          }
+        },
+        "previewUrl": "http://192.168.31.100:7456",
+        "collectorSha256": "cfd239a347708d9f7672bb81ff0ac1f37dfdeec5fa4ded746f1f148c55384a57",
+        "collectorVersion": "2.2.23",
+        "consoleErrors": [],
+        "evidencePath": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\temp\\creator-ai-bridge\\profiler\\capture-1792319005038.json",
+        "agentUsagePath": "P8000/cocos-profiler/docs/agent-usage.md",
+        "nextSteps": [
+          "Read full evidence: D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\temp\\creator-ai-bridge\\profiler\\capture-1792319005038.json",
+          "Read agent contract: P8000/cocos-profiler/docs/agent-usage.md",
+          "No error/warn findings; compare metrics and rendering sections against baseline"
+        ],
+        "statusHint": "Creator AI：Profiler 只读取证完成（0 条 findings 摘要，全文见证据文件）"
+      },
+      "passed": true,
+      "fixtureUnsavedAfter": false,
+      "fixtureStopped": true,
+      "fixturePortProfileRestored": true,
+      "originalRestored": {
+        "state": "ready",
+        "pid": 18252,
+        "sessionId": "e04e7299-680f-4109-a829-8cac07a51bd4",
+        "unsaved": false
+      },
+      "addedAfterRestore": [
+        {
+          "LocalAddress": "::",
+          "LocalPort": 7456,
+          "OwningProcess": 18252
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 9524,
+          "OwningProcess": 18252
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 9507,
+          "OwningProcess": 18252
+        }
+      ],
+      "after": {
+        "original": {
+          "projectId": "68a5dccc481a8588",
+          "state": "ready",
+          "launchSource": "dashboard",
+          "dashboardVersion": "2.2.2",
+          "dashboardProgress": "open",
+          "instanceId": "646806f1-583b-4c78-aff2-289007ea6239",
+          "pid": 18252,
+          "creatorVersion": "3.8.8",
+          "sessionId": "e04e7299-680f-4109-a829-8cac07a51bd4",
+          "capabilityProfile": "full-control"
+        },
+        "fixture": {
+          "projectId": "a79f4915296f4091",
+          "state": "stopped",
+          "lastError": "Creator 进程已退出",
+          "launchSource": "dashboard"
+        },
+        "daemon": {
+          "pid": 20116,
+          "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+          "startedAt": "2026-10-18T04:48:30.247Z",
+          "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+          "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+          "nodeVersion": "v25.2.1"
+        }
+      },
+      "beforeSystem": {
+        "creatorRoots": [
+          {
+            "pid": 20540,
+            "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+            "fixture": false,
+            "original": true
+          }
+        ],
+        "creatorListeners": [
+          {
+            "LocalAddress": "::",
+            "LocalPort": 7456,
+            "OwningProcess": 20540
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 12366,
+            "OwningProcess": 20540
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 6717,
+            "OwningProcess": 20540
+          }
+        ]
+      },
+      "fixtureSystem": {
+        "creatorRoots": [
+          {
+            "pid": 23032,
+            "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+            "fixture": true,
+            "original": false
+          }
+        ],
+        "creatorListeners": [
+          {
+            "LocalAddress": "::",
+            "LocalPort": 7456,
+            "OwningProcess": 23032
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 12435,
+            "OwningProcess": 23032
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 1381,
+            "OwningProcess": 23032
+          }
+        ]
+      },
+      "afterSystem": {
+        "creatorRoots": [
+          {
+            "pid": 18252,
+            "path": "C:\\ProgramData\\cocos\\editors\\Creator\\3.8.8\\CocosCreator.exe",
+            "fixture": false,
+            "original": true
+          }
+        ],
+        "creatorListeners": [
+          {
+            "LocalAddress": "::",
+            "LocalPort": 7456,
+            "OwningProcess": 18252
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 9524,
+            "OwningProcess": 18252
+          },
+          {
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": 9507,
+            "OwningProcess": 18252
+          }
+        ]
+      }
+    }
+  },
+  "fixture-port-adjustment.json": {
+    "sourceSha256": "5f591dd793105c13fcb1821ad45455ef58be51c4514cd239dbaec86e8c185401",
+    "result": {
+      "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\profiles\\v2\\packages\\server.json",
+      "before": 7458,
+      "temporary": 7456,
+      "beforeSha256": "2bf78c603be78c9b070891c15ac07bc62403703c3e23a2f73d271e9d5ecfc44a",
+      "temporarySha256": "e02c85356446e696f75d83e70db83d2629eb6dd8e76d0e69ce1b457f5c3df3b9",
+      "onlyTaskFixtureLocalProfile": true,
+      "originalBusinessProjectUntouched": true,
+      "networkOrSecurityPermissionsChanged": false
+    }
+  },
+  "next-start-reply.json": {
+    "sourceSha256": "bdfb51bed1699736436d779d80724549675291aae9e4e60ef688c0e5c3ccb438",
+    "result": {
+      "available": true,
+      "running": true,
+      "url": "http://192.168.31.100:7456",
+      "connections": 0,
+      "startedAt": "2026-10-18T10:22:56.249Z",
+      "sessionId": "a15f2597-a994-4b4b-9ca3-12ef772c4b8f",
+      "stopSupported": false
+    }
+  },
+  "next-reload-reply.json": {
+    "sourceSha256": "2eb2d3745f4f5ffc2430148f16ca3f4a79cc09126c9d7177814d2c35be543e7b",
+    "result": {
+      "available": true,
+      "running": true,
+      "url": "http://192.168.31.100:7456",
+      "connections": 1,
+      "startedAt": "2026-10-18T10:22:56.249Z",
+      "sessionId": "a15f2597-a994-4b4b-9ca3-12ef772c4b8f",
+      "stopSupported": false
+    }
+  },
+  "next-profiler-reply.json": {
+    "sourceSha256": "6535cf8bb4c0611ea59d2689de3b970f1bebf549cc7972615d62890b3ea6d0c5",
+    "result": {
+      "schemaVersion": "profiler-evidence-v1",
+      "contractVersion": "profiler-result-v2",
+      "findings": [],
+      "findingCodes": [],
+      "metrics": {
+        "sampleCount": 848,
+        "overBudgetCount": 0,
+        "overBudgetRatio": 0,
+        "fps": {
+          "count": 848,
+          "average": 56.554543907985284,
+          "min": 56.07115235853228,
+          "p95": 57.03048180924287,
+          "max": 57.142857142857146
+        },
+        "frameMs": {
+          "count": 848,
+          "average": 0.47334905667230487,
+          "min": 0.19999999552965164,
+          "p95": 0.6999999955296516,
+          "max": 1.7000000029802322
+        }
+      },
+      "previewUrl": "http://192.168.31.100:7456",
+      "collectorSha256": "cfd239a347708d9f7672bb81ff0ac1f37dfdeec5fa4ded746f1f148c55384a57",
+      "collectorVersion": "2.2.23",
+      "consoleErrors": [],
+      "evidencePath": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\temp\\creator-ai-bridge\\profiler\\capture-1792319005038.json",
+      "agentUsagePath": "P8000/cocos-profiler/docs/agent-usage.md",
+      "nextSteps": [
+        "Read full evidence: D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\temp\\creator-ai-bridge\\profiler\\capture-1792319005038.json",
+        "Read agent contract: P8000/cocos-profiler/docs/agent-usage.md",
+        "No error/warn findings; compare metrics and rendering sections against baseline"
+      ],
+      "statusHint": "Creator AI：Profiler 只读取证完成（0 条 findings 摘要，全文见证据文件）"
+    }
+  },
+  "six-http-proof.json": {
+    "sourceSha256": "0a843533acac8abec609aa2779f38d038d6cf9ff260a5531ed9c364a5f595899",
+    "result": {
+      "passed": true,
+      "files": [
+        {
+          "path": "favicon.svg",
+          "status": 200,
+          "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+        },
+        {
+          "path": "index.html",
+          "status": 200,
+          "sha256": "b137807c582258142c41a286da9aacd80ef172bda7a0ebca093d174e47e7fce8"
+        },
+        {
+          "path": "assets/about-icon-BaVeClOr.svg",
+          "status": 200,
+          "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+        },
+        {
+          "path": "assets/donation-qr-D7kdLLAm.png",
+          "status": 200,
+          "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+        },
+        {
+          "path": "assets/index-BpygnKPc.js",
+          "status": 200,
+          "sha256": "9d6aa006a78bacf534bdd7c4e3c4455781aca8a0ac897ef7610c642fed1de21d"
+        },
+        {
+          "path": "assets/index-BygpCdDN.css",
+          "status": 200,
+          "sha256": "b6bbed5c800e30c25f4cdf73b12b14f6e1370cfa55722476c93172484f4ea047"
+        }
+      ],
+      "daemon": {
+        "pid": 20116,
+        "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+        "startedAt": "2026-10-18T04:48:30.247Z",
+        "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+        "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+        "nodeVersion": "v25.2.1"
+      }
+    }
+  },
+  "protection-after.json": {
+    "sourceSha256": "f0c13b3acf6ccc8ab2f3a26722e7249cc5bf9ff3ca48834cf078bb03bca4c763",
+    "result": {
+      "shared": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyHashChanges": [],
+        "trackedHashChanges": [],
+        "missing": [],
+        "workPatchSame": true,
+        "indexPatchSame": true,
+        "trackedFilesChecked": 0,
+        "existingDirtyFilesChecked": 22
+      },
+      "fixture": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyHashChanges": [],
+        "trackedHashChanges": [],
+        "missing": [],
+        "workPatchSame": true,
+        "indexPatchSame": true,
+        "trackedFilesChecked": 69,
+        "existingDirtyFilesChecked": 7
+      },
+      "original": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyHashChanges": [],
+        "trackedHashChanges": [],
+        "missing": [],
+        "workPatchSame": true,
+        "indexPatchSame": true,
+        "trackedFilesChecked": 1053,
+        "existingDirtyFilesChecked": 226
+      },
+      "fixturePortProfile": {
+        "restoredBytes": true,
+        "originalSha256": "2bf78c603be78c9b070891c15ac07bc62403703c3e23a2f73d271e9d5ecfc44a"
+      },
+      "daemonBundleSha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+      "cliBundleSha256": "6085072c7c9c7901b1a77d9392785209f9b80c00334a509afd9947f72cde87b8",
+      "liveStaticFilesSame": {
+        "favicon.svg": true,
+        "index.html": true,
+        "assets/about-icon-BaVeClOr.svg": true,
+        "assets/donation-qr-D7kdLLAm.png": true,
+        "assets/index-BpygnKPc.js": true,
+        "assets/index-BygpCdDN.css": true
+      },
+      "finalRuntime": {
+        "original": {
+          "state": "ready",
+          "pid": 18252,
+          "sessionId": "e04e7299-680f-4109-a829-8cac07a51bd4",
+          "unsaved": false
+        },
+        "fixtureStopped": true,
+        "daemon": {
+          "pid": 20116,
+          "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+          "startedAt": "2026-10-18T04:48:30.247Z",
+          "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+          "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+          "nodeVersion": "v25.2.1"
+        },
+        "restorationErrors": []
+      },
+      "profilerArtifact": {
+        "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\temp\\creator-ai-bridge\\profiler\\capture-1792319005038.json",
+        "exists": true,
+        "bytes": 83479,
+        "sha256": "bea4715475a0c42f0192544cdccc333fbe5d60e308042f54aa4f6ab26acba147",
+        "schemaVersion": "profiler-evidence-v1",
+        "captureKeys": [
+          "extensionVersion",
+          "collectorVersion",
+          "contractVersion",
+          "capturedAt",
+          "window",
+          "probe",
+          "metrics",
+          "resources",
+          "nodes",
+          "rendering",
+          "events",
+          "findings",
+          "source",
+          "confidence"
+        ],
+        "sampleCount": 848,
+        "consoleErrorCount": 0
+      }
+    }
+  },
+  "deployment/deployment-result.json": {
+    "sourceSha256": "123cca63968ca99e1b5e5af75c69fe9db5c21f632a9fc11ded7a61db7c1bad64",
+    "result": {
+      "ok": true,
+      "source": "3815f193f62734073d7e7a696d8b4c72e3c6da55",
+      "localVersion": "1.3.173.100",
+      "productVersion": "1.3.173",
+      "files": {
+        "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+        "index.html": "b137807c582258142c41a286da9aacd80ef172bda7a0ebca093d174e47e7fce8",
+        "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+        "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+        "assets/index-BpygnKPc.js": "9d6aa006a78bacf534bdd7c4e3c4455781aca8a0ac897ef7610c642fed1de21d",
+        "assets/index-BygpCdDN.css": "b6bbed5c800e30c25f4cdf73b12b14f6e1370cfa55722476c93172484f4ea047"
+      },
+      "writes": [
+        "assets/index-BpygnKPc.js",
+        "index.html"
+      ],
+      "originalDirtyPathsAndHashesUnchanged": true,
+      "runtimeAndCliUnchanged": true,
+      "oldStaticAssetsPreserved": true,
+      "daemonRestarted": false,
+      "originalLibraryAccessed": false,
+      "rollback": "Verify current index hash then atomically restore backup-static/index.html; retain all hash assets."
+    }
+  },
+  "deployment/deployment-prepared.json": {
+    "sourceSha256": "7d5d4070d3df9f68aacb79f4f57849d6deacd6d56fd2ebfb28fc69cc2bc06efe",
+    "result": {
+      "source": "3815f193f62734073d7e7a696d8b4c72e3c6da55",
+      "before": {
+        "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+        "index.html": "69d1a8a64d3bb62f2e524460956947e32b4a00a5c50ddcca33f8e4bde820b82a",
+        "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+        "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+        "assets/index-4sCvidlJ.js": "0b3ed04f27da91d9132ee3377013c091d6dc11f40dc69a1554a694424cba4a6e",
+        "assets/index-7TlmnpAd.js": "ce01a9cb5d6ae0f334798bea8b1ab3883bb8c1c4ecd6c14dd88928ef8e705268",
+        "assets/index-AGwNwR0Z.js": "893240fa7ddb989a1e66379278459119a76e07d4dd06c5e57c2c0ddfe14fcfac",
+        "assets/index-B39P9Ksd.js": "972e78213e81d1eaded11a69e013e98f88014851ef400ea33aa14f9ccf562b95",
+        "assets/index-B7anPY1k.js": "afdc568823c08eb5aa2e1161782650b0e2e4c133d93d2b27e547e54c4242b0f6",
+        "assets/index-BaJ-eth5.css": "1883cbef30e7e1ecaad6bd17421866bade98e5ac0733574705a01c890581daaf",
+        "assets/index-BaZPIQDA.css": "15fec78de8872cded6915343245a92362f46af10ab89dc47684c2ba1952fb969",
+        "assets/index-BBv9_P-u.css": "2ea727d1c4d7061abbdb4e5e26cb015546c6aca1c36f347b326fd40ce46eae58",
+        "assets/index-BCHwwncD.js": "f6b94fecfcb281e71d184d4c7261ea118667fb134bd1323fe70368001d82c3b8",
+        "assets/index-BEbOoq-J.js": "cf524412235ad84a0c09de29240601027ec35f9ecd6e4de26143602ef0a50b41",
+        "assets/index-BEuNUqYc.js": "fa3fdde6c965dc6fd21d56a9a336c5c7226502698843ee5428521be0ac5e205b",
+        "assets/index-BG3zkN6n.css": "871b21a099c129683d041676301cfc20843e1d016d41731afcce4c86448d0cc2",
+        "assets/index-Bl7QSGA3.css": "4ca9ad9c284bc3daabac6d9709beefcba6894e79642211c03be38cd20e101e84",
+        "assets/index-BLTwrGCp.css": "855b4a80eb61511b87f77532342d8aab76da28ee7f0cf7a93ea25a3649826cf8",
+        "assets/index-BLZP7lTS.js": "f34fb3759b089f2f9816b525b5e4a26d949ca907091065149238f5d13a4998f7",
+        "assets/index-BmCNTDuV.css": "8b4c459ade7224718bc8f7c2dbef4022523b39ae1a91f55eaa82191d212bcdca",
+        "assets/index-BS4nt8-3.css": "9a65aaadc743ccb2730f44e7f97c6bc6f3878296ab56c87f50901941107c1ae6",
+        "assets/index-BUkcs9UO.js": "ea821d4027ec11bb4f36141e465d640646601758efd87d67cce5729440a6ce9e",
+        "assets/index-BygpCdDN.css": "b6bbed5c800e30c25f4cdf73b12b14f6e1370cfa55722476c93172484f4ea047",
+        "assets/index-C48gjHAZ.css": "bc76672426c8c1ba60e3af7e62bec34aab4abd0bff7f1af9cf5d3a09852af22f",
+        "assets/index-C5sODCBB.css": "c3cec1d0835a2be9e0a113b30c309ca6b053a6a02030ac5f2bea1e70ed0aff69",
+        "assets/index-C62oab55.js": "cb4e193c4efa7fc986edfef18c1df356e44e843826cb31aea53a6cd5e229f8dc",
+        "assets/index-CbFzaURR.js": "1d94290465c089e5c6311d3d6d344a436c358e3b6b408b94387246d6ccb1245f",
+        "assets/index-CbwonE2F.js": "cadebc30add722a50eef4ea24518becf20a35b82f293f719133e62db06228f5b",
+        "assets/index-Cc2A4bY-.css": "ee89fecd3606b973f9087c8c6e00683050e4543983de29857edc7ff7d43b20c4",
+        "assets/index-CE52IKvt.css": "1d06b278aaff4a330ea6ba75d2bede3d8973a026965d78d153df9849f88d222e",
+        "assets/index-CGe5WL0Z.css": "d8bada2cd86e277b327b57fcc033dd3c6408f19413f14af654645dcedad9cb53",
+        "assets/index-CHDl0L-_.css": "7c1f12fd9d7f7d9de9ddfdab3582b7b2819996f918622861d03e4046fac50bef",
+        "assets/index-CIVlaRcf.js": "ea6d5545e9d23e88bcd7905f5993de13f595b8afedf569369a62e7bec5be8bc8",
+        "assets/index-Cm9Xw-Ng.js": "cf89b16d3be2b90c8a34f97a8ae5f4b59d3ea4f6ac1d92fda9c7ed4be6058301",
+        "assets/index-CnnBDWQK.css": "4da68a41be2759ff04e103301ca090c51366df4c5b9c697d34fe391e9a106de0",
+        "assets/index-CPJuYXb9.js": "cb6657bc904087f4bd0cc15a77d8c9a329eb195ad358e14a5e3640d8b2be752e",
+        "assets/index-Cs3qU8jX.css": "549df46df31fdb3bbf438f6f810c6ff62a236841da5f578122330fb4b655d4c8",
+        "assets/index-CVQ4BnJb.css": "82ef32f164eb5a0054e69942387c428cafc2a353a6d279a9e53d67c5f08fffd6",
+        "assets/index-CXcfVXmi.css": "aae6a2f550df9919b22dedff496d324548153298023c89695e52ebf11582de91",
+        "assets/index-CZl-STpV.js": "411d4fb1dacbf458c5340510072709f8b8b0ed99b6621dc3d3ffed9038d29bd5",
+        "assets/index-D-LJ_kyr.js": "916360b111de2411ebfc31ec860704a990670278e283d8888a2ac93378fb6dbe",
+        "assets/index-D2Z0-1IK.js": "ce3408bf2f74568a4dc29168e6a8037d6d96bfa7714464975b59f2b6972cdd8c",
+        "assets/index-D2zHdkVu.css": "0ee447a14564c5bd5d0994441fdb3792291919f39c6a05422af8d7f339b65b87",
+        "assets/index-D8_X97fm.js": "982a94abe995d95bfbacc6f673c4f8a9f9e71b281c32371a48953aa399351165",
+        "assets/index-DGnFzTWq.css": "4a9851f9dcd94ab86058bd09d5842ec1bd1c4693c46aad533b4d637edf7001c5",
+        "assets/index-Dqala6ny.css": "01a4e03d9b5a63305396267770db3db701189cbd185ee92b86e8c2f9133f3bb6",
+        "assets/index-Dqdb9OCO.js": "4c984ac6a9403fda47733dec01223967c6f22e3412208b22b78b27e9774ed0b0",
+        "assets/index-DRqkgBYx.js": "4916f488b831a91258a737c2d42315a28dd40e93bcfbc914fbc531db6c4711bd",
+        "assets/index-Dtnax-OZ.css": "c6170498b99ac6c40a187435a332bdd439ff7fbd7d3e9a088c15999390f6353e",
+        "assets/index-Dtx9Hd6p.js": "5041e6e1b2ec30a4da9a7e50b97fc2cd074005007cd9cee7ee1b346c69843dbf",
+        "assets/index-DVyF6XSu.js": "5d0a571c7e6ee4287d5e6f08379c72a1be0cd61487c29148105bd06c99e1f698",
+        "assets/index-DykBpVjB.js": "5e43ace5c9518c08145a98e9fa0146bf8248a4225551129f8915af81d087beb9",
+        "assets/index-D_n_iCGL.css": "c6c453f46f5010f0d6e1970c5b2bcb1a56a5a23935519cb9eb887ee2a79d4b50",
+        "assets/index-eTCwDiyS.css": "ba1005f8564714fb361248f4a14b2696034333a2837119fdf08724d2bff66545",
+        "assets/index-gFbqGyI9.css": "acc48f00dd5b04ed15c85cc5eadc85eeea90650b2eec6ad8c2ef3c8e911646e7",
+        "assets/index-MvAQl_Vx.js": "e237d34fd0dafcf5bf72154750660563e9d55a92318021df09fd66e058c791a5",
+        "assets/index-OCidcyQv.css": "828a3d01cf0cb9b7e1f79e8a0be28f065af0408aad58099c61913f52bdf69ac4",
+        "assets/index-pfLIJ4q9.css": "ae18dcb0b22f4f748f81ae74711e43389405ac02b3af028b59844f93210d6e6a",
+        "assets/index-q5kVf4uj.js": "577456b7e00b33714f8d157448170d2f1f014cdf83b0e5afe62309ea234bb4af",
+        "assets/index-u8ClkJpI.js": "54775b45cacd93feef84402c49d7331bea046c896dcce1bf92a62b1de5a02a3e",
+        "assets/index-Ug1PqAvX.css": "8e32c537ccd51f9a4b34ce6a35e6d285e13f141d2dd27a70d6812f23287ee7b3",
+        "assets/index-W3W5uKIL.js": "ad93fa921a67434c827fa9f1559b38ae6ef40917efb6a9d3e25294e942924dc9",
+        "assets/index-wUSpAKRW.css": "39cb059cd6502c54a0268107d8fe465eaf821ff9f9f1af427ebab82e22075775",
+        "assets/index-WUxrQlAK.css": "86daa630b99948f4e013bc32bd1b470b4938391c95a55dc462a620468b98343f",
+        "assets/index-XI7D_BrX.js": "9be14ed4d8aa8f525047e7feb7c30a5459ab0b96021846f614e4adfe879b3f16",
+        "assets/index-ZPRTkbOD.js": "0333066ccde949e8ac0d65174df9371d61a0728e667dff894b7c3fb7537d5351",
+        "assets/index-_rnjKa5X.js": "45edd331f84d806ce4d546f456afda75d34a15ed2359f17a2b5eb2e98cbb145a"
+      },
+      "expected": {
+        "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+        "index.html": "b137807c582258142c41a286da9aacd80ef172bda7a0ebca093d174e47e7fce8",
+        "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+        "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+        "assets/index-BpygnKPc.js": "9d6aa006a78bacf534bdd7c4e3c4455781aca8a0ac897ef7610c642fed1de21d",
+        "assets/index-BygpCdDN.css": "b6bbed5c800e30c25f4cdf73b12b14f6e1370cfa55722476c93172484f4ea047"
+      },
+      "atUtc": "2026-10-18T10:21:32.593791+00:00"
+    }
+  },
+  "baseline": {
+    "reposBeforeSha256": "f13b022aeb40953d97d4a569623726626212f6c97eae9e28f579cb4c42b2669e",
+    "checkpoint": "96e9596 / 1.3.173.99",
+    "initialActualState": "No Creator process for either project; both status error and no PID",
+    "approval": {
+      "userAllowedAtUtc": "2026-10-18T07:37:26Z",
+      "retryRequestedAtUtc": "2026-10-18T10:03:50Z",
+      "explicitReply": "准许"
+    }
+  },
+  "validation": {
+    "redRegression": "Old implementation failed: acknowledged preview receipt became undefined after extra status read",
+    "greenPreviewUiAndAdapterCases": 41,
+    "strictTypes": "passed",
+    "workspaceBuild": "passed with existing large-chunk warning",
+    "readonlyCandidateBuild": "passed; not deployed",
+    "reviewer": "No P1/P2; readonly effective isolation not verified",
+    "deployedSource": "3815f193f62734073d7e7a696d8b4c72e3c6da55",
+    "wholeBackendParityClaim": false,
+    "nativePreviewStopSupported": false
+  },
+  "preview-profiler-capture-20261018.json": {
+    "sourceSha256": "bea4715475a0c42f0192544cdccc333fbe5d60e308042f54aa4f6ab26acba147",
+    "persistedSha256": "bea4715475a0c42f0192544cdccc333fbe5d60e308042f54aa4f6ab26acba147",
+    "bytes": 83479
+  },
+  "preview-profiler-next-ui-20261018.png": {
+    "sourceSha256": "af936de3fbd9a2b94833375cfbe88226cff06415ad012d16fea36ca721e4fecf",
+    "persistedSha256": "af936de3fbd9a2b94833375cfbe88226cff06415ad012d16fea36ca721e4fecf",
+    "bytes": 107802
+  },
+  "preview-profiler-canvas-20261018.png": {
+    "sourceSha256": "a38714dba45c7c76cea4de2880f4f4e7c6bdce161217776744b25622ce66998c",
+    "persistedSha256": "a38714dba45c7c76cea4de2880f4f4e7c6bdce161217776744b25622ce66998c",
+    "bytes": 42780
+  }
+}

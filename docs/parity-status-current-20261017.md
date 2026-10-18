@@ -1,3 +1,5 @@
+2026-10-18 已授权Next预览/刷新/Profiler实机验收完成：正式按钮各200，回执留存、实际画布无页面错误；Profiler848样本、0findings/consoleErrors，原证据已冻结。已修复成功后额外Creator状态读清掉回执的缺陷（3815f19/.100，41定向+types/build/review通过并部署）。早期旧profile曾短暂监听7458即被守卫停净；最终复用7456测试并恢复profile原bytes和原工程18252/ready/unsaved=false。旧后台及两工程跟踪文件/既有修改不变。Creator授权待办已解除，其他迁移未验证项仍各自保留，见[本批真实证据](preview-profiler-approved-20261018.md)。
+
 2026-10-18 知识启动503已独立修复：原powershell.exe5.1继承Core模块路径导致Get-FileHash不可用；原启动脚本仅增加进程级PSHOME模块目录，未改全局环境或守卫。Next原启动一次200，weknora20364只绑定127.0.0.1:8081，原登录页只读验证通过。原SAMEORIGIN/self安全头阻止跨端口iframe，Next正确外开回退；问答/同步/认证仍未执行。原数据库state-check元数据前后相等，daemon/Creator/模型保持，Creator切换审批继续等待。见[知识恢复实证](knowledge-start-recovery-20261018.md)。下方503为修复前记录。
 
 2026-10-18 本批真实验收更新：Next 正式预设新建201、改名200、草稿保存200（名称/core→full）、下载导出、导入201、隔离工程分配200、引用删除409、清理删除200已验证，原预设文件完整字节恢复。Next现有工程Preview探测/状态各200，但回包running=false；start/reload/Profiler因Creator切换被自动审批拒绝而未执行。知识启动一次503，实际iframe/问答/同步未通过；编辑器payload交接仍未验证。daemon20116、Creator23740和Heretic3260保留；旧后台/两工程Git及源字节核对一致。整体尚未完全验收对齐，详见[逐项真实验收矩阵](remaining-real-acceptance-20261018.md)与长期证据。以下原有记录按历史时点阅读。
