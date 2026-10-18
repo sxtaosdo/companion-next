@@ -26,3 +26,16 @@ describe('ready-only old Preview and Profiler controls',()=>{
  it('does not clear unknown protection when another project or runtime changes',async()=>{const api=fixture();api.run=vi.fn(async()=>{throw new PreviewActionError('network-error')});const {store,browser}=await setup(api);await button('预览').trigger('click');await flushPromises();browser.projects=[...browser.projects,{id:'1123456789abcdef',name:'Other',path:'/other'}];await flushPromises();expect(store.isUnknown(id)).toBe(true);expect(await store.run(id,'start')).toBe(false);expect(api.run).toHaveBeenCalledTimes(1)})
  it('uses inert text for escaped backend JSON and does not embed or open its URL',async()=>{const api=createPreviewActionsProvider({fetch:async()=>new Response(JSON.stringify({available:false,running:false,stopSupported:false,message:'<img src=x onerror=alert(1)> token=private'}),{headers:{'Content-Type':'application/json'}})});await setup(api);await button('探测').trigger('click');await flushPromises();expect(wrapper!.find('img').exists()).toBe(false);expect(wrapper!.find('iframe').exists()).toBe(false);expect(wrapper!.text()).not.toContain('private');expect(wrapper!.text()).toContain('Preview 不可用')})
 })
+
+
+describe('last successful Preview diagnostic context',()=>{
+ it('records Preview receipts, preserves across runtime/display changes, and excludes Profiler',async()=>{
+  const {store,browser}=await setup(fixture());expect(store.lastPreviewProjectId).toBe('');expect(await store.run(id,'probe')).toBe(true);expect(store.lastPreviewProjectId).toBe(id);store.invalidate();expect(store.lastPreviewProjectId).toBe(id);browser.statuses=[{projectId:id,state:'stopped',capabilityProfile:'unknown'}];expect(store.lastPreviewProjectId).toBe(id);browser.statuses=[{projectId:id,state:'ready',capabilityProfile:'read-only'}];await store.run(id,'profiler');expect(store.lastPreviewProjectId).toBe(id)
+ })
+ it.each(['removed','path','disconnect','registration'])('permanently discards obsolete context on %s',async change=>{
+  const {store,browser}=await setup(fixture());await store.run(id,'status');const projects=browser.projects;if(change==='removed')browser.projects=[];else if(change==='path')browser.projects=[{...projects[0]!,path:'/changed'}];else if(change==='disconnect')browser.disconnect();else companionBrowserProvider.value=null;expect(store.lastPreviewProjectId).toBe('');browser.projects=projects;expect(store.lastPreviewProjectId).toBe('')
+ })
+ it('does not treat Profiler as a Preview receipt or record rejected requests',async()=>{
+  const api=fixture(),{store}=await setup(api);await store.run(id,'profiler');expect(store.lastPreviewProjectId).toBe('');api.run=vi.fn(async()=>{throw new PreviewActionError('network-error')});await store.run(id,'probe');expect(store.lastPreviewProjectId).toBe('')
+ })
+})

@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, shallowRef, watch } from 'vue'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
+import { usePreviewActionsStore } from '../stores/preview-actions'
 import { useLogToolsStore } from '../stores/log-tools'
 import { logToolsProvider } from '../log-tools-integration'
-const browser=useCompanionBrowserStore(),tools=useLogToolsStore()
+const browser=useCompanionBrowserStore(),tools=useLogToolsStore(),preview=usePreviewActionsStore()
 const emit=defineEmits<{cleared:[]}>()
 let mounted=true
 const displayed=shallowRef<typeof tools.prepared>(null)
 watch(()=>tools.prepared,value=>{if(value)displayed.value=value},{flush:'sync',immediate:true})
-const target=computed(()=>browser.logFilter.projectIds?.[0]??browser.projects[0]?.id)
+const target=computed(()=>browser.logFilter.projectIds?.[0]??(preview.lastPreviewProjectId||browser.projects[0]?.id))
 const clearScope=computed(()=>{
  const r=displayed.value?.request
  return r?.action==='clear'&&r.projectIds.length?r.projectIds.map(id=>browser.projects.find(p=>p.id===id)?.name??id).join('、'):'全部工程及后台'
@@ -31,7 +32,7 @@ onBeforeUnmount(()=>{mounted=false;tools.invalidate()})
   <el-button :disabled="!tools.available||!target" @click="prepareDiagnostic">导出诊断</el-button>
   <el-dialog :model-value="!!tools.prepared" :title="displayed?.request.action==='clear'?'清除日志':'导出诊断'" width="560px" @update:model-value="!$event&&tools.cancelConfirmation()">
    <template v-if="displayed?.request.action==='clear'"><p>清除范围：{{ clearScope }}</p><p>仅按工程清除内存日志，来源、级别和关键字不会限制清除范围。磁盘 NDJSON 保留；本页没有撤销功能。</p></template>
-   <template v-else><p>工程：{{ diagnosticName }}</p><p>读取该工程状态及最多1000条内存日志，可能更新后台状态和诊断记录。结果在本页展示，可另行保存本机。</p><p>沿用旧选择顺序：首个日志工程；未选择时使用首个登记工程。</p></template>
+   <template v-else><p>工程：{{ diagnosticName }}</p><p>读取该工程状态及最多1000条内存日志，可能更新后台状态和诊断记录。结果在本页展示，可另行保存本机。</p><p>沿用旧选择顺序：首个日志工程；未选择时使用最近取得 Preview 回执的工程，再回退到首个登记工程。</p></template>
    <template #footer><el-button @click="tools.cancelConfirmation()">取消</el-button><el-button :type="displayed?.request.action==='clear'?'danger':'primary'" :disabled="!tools.available" @click="confirm">{{ displayed?.request.action==='clear'?'确认清除':'读取诊断' }}</el-button></template>
   </el-dialog>
   <div v-if="tools.message||tools.unknownClear" class="log-tool-message" role="status">{{ tools.message }}<span v-if="tools.unknownClear"> 清除结果未知，本次会话不再发送清除；请先核对日志，停止等待不会取消后台操作。</span></div>

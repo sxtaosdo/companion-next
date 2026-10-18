@@ -2,6 +2,9 @@ import { afterEach,describe,it,expect,vi } from 'vitest'
 import { createPinia } from 'pinia'
 import { mount,flushPromises,type VueWrapper,DOMWrapper } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
+import { usePreviewActionsStore } from '../src/stores/preview-actions'
+import { previewActionsProvider } from '../src/preview-actions-integration'
+import { companionBrowserProvider } from '../src/companion-browser-integration'
 import LogTools from '../src/components/LogTools.vue'
 import { useCompanionBrowserStore } from '../src/stores/companion-browser'
 import { useLogToolsStore } from '../src/stores/log-tools'
@@ -14,7 +17,7 @@ let wrapper:VueWrapper|undefined
 const json=(v:unknown)=>new Response(JSON.stringify(v),{headers:{'Content-Type':'application/json'}})
 async function setup(api:LogToolsProvider){const pinia=createPinia(),browser=useCompanionBrowserStore(pinia);logToolsProvider.value=api;await browser.connect({label:'isolated reader',loadProjects:async()=>({projects:[{id,name:'First',path:'/first'},{id:other,name:'Second',path:'/second'}],statuses:[],dashboard:[],warnings:[]}),loadCounts:async()=>({sessionId:'s',counts:{},latest:{}}),loadLogs:async()=>[],loadCalls:async()=>({sessionId:'s',total:0,retained:0,records:[]})});wrapper=mount(LogTools,{attachTo:document.body,global:{plugins:[pinia,ElementPlus]}});await flushPromises();return {browser,tools:useLogToolsStore(pinia),lane:useProjectOperationLaneStore(pinia)}}
 function button(text:string){return new DOMWrapper(document.body).findAll('button').find(b=>b.text()===text)!}
-afterEach(()=>{wrapper?.unmount();wrapper=undefined;logToolsProvider.value=null;document.body.innerHTML='';vi.restoreAllMocks()})
+afterEach(()=>{wrapper?.unmount();wrapper=undefined;logToolsProvider.value=null;previewActionsProvider.value=null;companionBrowserProvider.value=null;document.body.innerHTML='';vi.restoreAllMocks()})
 describe('approved log tool confirmation and source boundaries',()=>{
  it('does not delete before confirmation; scope ignores message filters and clears only selected projects',async()=>{
   const fetch=vi.fn(async()=>json({cleared:2}));const {browser}=await setup(createLogToolsProvider({fetch}));browser.logFilter={projectIds:[other],sources:['bridge'],levels:['error'],search:'only visible'}
@@ -29,4 +32,11 @@ describe('approved log tool confirmation and source boundaries',()=>{
   let resolve!:(r:Response)=>void;const fetch=vi.fn(()=>new Promise<Response>(r=>{resolve=r}));const {browser,tools,lane}=await setup(createLogToolsProvider({fetch}));await button('导出诊断').trigger('click');await button('读取诊断').trigger('click');await flushPromises();expect(lane.locked).toBe(true);browser.disconnect();await flushPromises();expect(lane.locked).toBe(true);resolve(json({projectId:id,generatedAt:'2026-10-17T00:00:00Z',status:{projectId:id},logs:[]}));await flushPromises();expect(tools.diagnostic).toBeNull();expect(lane.locked).toBe(false)
  })
  it('uses same-Pinia lane so other project actions cannot race with confirmation send',async()=>{const run=vi.fn();const {tools,lane}=await setup({label:'fixture',run,waitForIdle:async()=>{}});expect(tools.prepare({action:'clear',projectIds:[]})).toBe(true);const lease=lane.acquire('existing operation')!;expect(await tools.send()).toBe(false);expect(run).not.toHaveBeenCalled();lane.release(lease)})
+})
+
+
+describe('diagnostic target priority',()=>{
+ it('prefers explicit log project, then last Preview, then first registration without sending',async()=>{
+  const run=vi.fn(),{browser,tools}=await setup({label:'fixture',run,waitForIdle:async()=>{}});companionBrowserProvider.value=browser.provider;const projects=browser.projects;browser.statuses=projects.map(p=>({projectId:p.id,state:'ready',capabilityProfile:'read-only'}));browser.provider!.loadProjects=async()=>({projects,statuses:browser.statuses,dashboard:[],warnings:[]});previewActionsProvider.value={label:'fixture',run:async input=>({...input,text:'{}'}),waitForIdle:async()=>{}};const preview=usePreviewActionsStore();await preview.run(other,'probe');expect(preview.lastPreviewProjectId).toBe(other);await button('导出诊断').trigger('click');expect(tools.prepared?.request).toEqual({action:'diagnostic',projectId:other});tools.cancelConfirmation();browser.logFilter.projectIds=[id];await button('导出诊断').trigger('click');expect(tools.prepared?.request).toEqual({action:'diagnostic',projectId:id});tools.cancelConfirmation();browser.logFilter.projectIds=[];browser.projects=projects.filter(p=>p.id!==other);await button('导出诊断').trigger('click');expect(tools.prepared?.request).toEqual({action:'diagnostic',projectId:id});expect(run).not.toHaveBeenCalled()
+ })
 })

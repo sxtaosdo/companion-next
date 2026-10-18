@@ -67,6 +67,10 @@ watch(logPane,node=>{logResizeObserver?.disconnect();if(node&&typeof ResizeObser
 watch(()=>store.logs,async()=>{const node=logPane.value,stick=!!node&&node.scrollHeight>node.clientHeight+1&&nearLogBottom(node);await nextTick();if(!mounted)return;if(stick&&node===logPane.value)scrollLatest();else updateLatest()},{deep:true,flush:'pre'})
 window.addEventListener('resize',updateLatest)
 const passiveRead=computed(()=>(store.provider ?? companionBrowserProvider.value)?.runtimeProbesEnabled===false)
+// User filter edits query immediately in the normal workspace; live delivery keeps its existing queue.
+watch(()=>JSON.stringify(store.logFilter),()=>{
+ if(tab.value==='logs'&&store.connected&&!passiveRead.value&&creatorOperationsProvider.value&&store.provider===companionBrowserProvider.value&&document.visibilityState==='visible'&&(!store.liveEnabled||store.logsPaused))void store.refreshLogs()
+},{flush:'post'})
 const dashboardRead=computed(()=>!passiveRead.value&&(store.dashboardRead||(store.provider ?? companionBrowserProvider.value)?.dashboardDiscoveryEnabled!==false))
 const state=(id:string)=>store.statuses.find(status=>status.projectId===id)
 const matching=computed(()=>store.projects.filter(project=>{

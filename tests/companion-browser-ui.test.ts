@@ -11,6 +11,7 @@ import { projectDisplayPathKey, projectDisplayRank } from '../src/domain/compani
 import CompanionBrowserView from '../src/views/CompanionBrowserView.vue'
 import { useCompanionBrowserStore } from '../src/stores/companion-browser'
 import { companionBrowserProvider, companionEventProvider, registerCompanionBrowserProvider, isCompanionReadHost } from '../src/companion-browser-integration'
+import { createCreatorOperationsProvider } from '../src/adapters/creator-operations'
 import { creatorOperationsProvider } from '../src/creator-operations-integration'
 import { projectSetupProvider } from '../src/project-setup-integration'
 import type { CompanionEventHandlers } from '../src/domain/companion-live'
@@ -142,5 +143,15 @@ describe('Companion read UI and host identity',()=>{
  it('retains actual connection errors instead of reducing them to transient success notices',async()=>{
   const p=fixture();vi.mocked(p.loadProjects).mockRejectedValue(new Error('原服务不可达'));registerCompanionBrowserProvider(p);const {store}=await setup();await button('连接 Companion').trigger('click');await flushPromises()
   expect(store.connected).toBe(false);expect(wrapper!.text()).toContain('工程读取失败');expect(wrapper!.text()).toContain('原服务不可达');expect(wrapper!.findAll('.companion-project-card')).toHaveLength(0)
+ })
+})
+
+
+describe('normal workspace explicit log filter reads',()=>{
+ it.each([false,true])('queries edited filters with live paused=%s without dispatching Creator',async paused=>{
+  const fetch=vi.fn();creatorOperationsProvider.value=createCreatorOperationsProvider({fetch});const p=fixture();registerCompanionBrowserProvider(p);const {store}=await setup('/projects?tab=logs');await store.connect(p);await flushPromises();expect(p.loadLogs).not.toHaveBeenCalled();store.liveEnabled=paused;store.logsPaused=paused;store.logFilter.search='exact';await flushPromises();expect(p.loadLogs).toHaveBeenCalledTimes(1);expect(p.loadLogs).toHaveBeenLastCalledWith(expect.objectContaining({search:'exact'}),expect.any(AbortSignal));expect(fetch).not.toHaveBeenCalled()
+ })
+ it.each(['/projects','/projects?tab=calls','passive'])('does not auto-query outside normal visible log workspace: %s',async mode=>{
+  creatorOperationsProvider.value=createCreatorOperationsProvider({fetch:vi.fn()});const p:CompanionBrowserProvider={...fixture(),...(mode==='passive'?{runtimeProbesEnabled:false}:{})};registerCompanionBrowserProvider(p);const {store}=await setup(mode==='passive'?'/projects?tab=logs':mode);await store.connect(p);store.logFilter.search='new';await flushPromises();expect(p.loadLogs).not.toHaveBeenCalled()
  })
 })
