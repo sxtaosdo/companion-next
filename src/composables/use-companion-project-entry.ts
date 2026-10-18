@@ -18,6 +18,8 @@ export function useCompanionProjectEntry(store: ReturnType<typeof useCompanionBr
     // A blocked entry is consumed. Releasing a confirmation, lane or error barrier
     // never creates an unsolicited read or a failure/retry loop.
     attempted = true
+    // Explicit live work owns the return snapshot and open-time count read.
+    if (store.liveEnabled && store.livePageActive && store.connected && store.provider === source) return
     if (store.projectLoading || store.countsLoading || store.projectPollingPaused || lane.locked
       || operations.blocksAutomaticProjectRead(source) || setup.blocksAutomaticProjectRead(source)) return
     const current = new AbortController()

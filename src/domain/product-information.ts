@@ -5,6 +5,7 @@ export const frontendIdentity = { name: 'Companion Next', version, releaseDate: 
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；完整业务迁移未完成', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  { version, date: '2026-10-18', title: '修复实时更新切页恢复', changes: ['工程页离开时暂停事件流及读取并保留用户启用意图；返回同一来源自动恢复，主动停止 / 断开 / 来源变更仍保持停止。返回读取由实时通道负责，避免与页面初载重复；不新增设置，不改变知识服务或模型状态。'] },
   { version, date: '2026-10-18', title: '更新同源保存与真实库存验收说明', changes: ['按已核证据修正帮助与迁移页：隔离任务的原生保存取消 / 已知失败 / 成功已验，工程只读库存733项曾与原接口及页面一致。用户原图片库仍未切换，完整图片任务动作与Codex自动回收未开放；仅更新文案，不重复业务验收。'] },
   { version, date: '2026-10-18', title: '恢复 Agent 原单会话问答流程', changes: ['恢复旧 Agent 下拉与刷新、提问、返回 sessionId 的追问、本地新对话、等待 / 停止等待和完整 JSON 答复。请求仅为原 agentId / query / 可选 sessionId；跨 Agent / 来源不复用旧会话，未知结果不自动重发，与 KB 问答及同步互斥。旧接口没有持久会话列表、创建 / 切换 / 删除或流式能力，不新增这些。仅用隔离假响应和拦截请求验证，未实际问答、调用模型或写服务端会话。'] },
   { version, date: '2026-10-18', title: '恢复知识同步来源与原执行流程', changes: ['恢复旧折叠同步区、逐源批准 / 启用 / writer 就绪投影、来源选择、同步演练及执行。请求仅发送原 sourceId / channel；回执严格核对排队身份，UNKNOWN 不自动重发。进度沿用手动刷新后的任务和 SHA，不把排队回执当作索引完成。仅通过隔离假数据与拦截请求验证，未执行真实同步、知识库写入或模型调用。'] },

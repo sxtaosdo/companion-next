@@ -102,14 +102,14 @@ function callProject(value:string){store.setCallContext(value,store.failedOnly);
 function callFilter(value:boolean){store.setCallContext(store.callProjectId,value);void store.loadCalls()}
 function shortcuts(event:KeyboardEvent){if(cliOpen.value||setupDialogOpen.value||operations.dialogOpen||Array.from(document.querySelectorAll('[role="dialog"][aria-modal="true"],dialog[open]')).some(dialog=>dialog.getClientRects().length>0))return;const node=event.target as HTMLElement|null;if(event.key==='/'&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!node?.closest('input,textarea,select,[contenteditable="true"]')&&tab.value==='projects'){event.preventDefault();queryInput.value?.focus()}}
 function visibility(){callVisible.value=document.visibilityState==='visible';store.setLiveVisibility(callVisible.value)}
-visibility();document.addEventListener('visibilitychange',visibility)
 const liveLabel=computed(()=>({off:'实时更新未启用',connecting:'事件流连接中',open:'事件流已连接',retrying:'事件流冷却重连中',suspended:'页面隐藏，实时读取已暂停',failed:'事件流已停止，工程轮询仍独立运行'})[store.liveState])
 document.addEventListener('keydown',shortcuts)
 watch(passiveRead,passive=>{if(passive)filter.value='all'},{flush:'sync',immediate:true})
 watch(companionBrowserProvider,next=>{if(store.provider&&store.provider!==next)store.disconnect()},{flush:'sync',immediate:true})
-watch(companionEventProvider,()=>{store.stopLive()},{flush:'sync'})
+watch(companionEventProvider,next=>store.reconcileLiveProvider(next),{flush:'sync',immediate:true})
+visibility();store.setLivePageActive(true);document.addEventListener('visibilitychange',visibility)
 useCompanionProjectEntry(store, () => tab.value === 'projects')
-onBeforeUnmount(()=>{mounted=false;if(callTimer!==undefined)clearInterval(callTimer);logResizeObserver?.disconnect();window.removeEventListener('resize',updateLatest);store.cancelReads();store.pauseProjectPolling(false);document.removeEventListener('keydown',shortcuts);document.removeEventListener('visibilitychange',visibility)})
+onBeforeUnmount(()=>{mounted=false;if(callTimer!==undefined)clearInterval(callTimer);logResizeObserver?.disconnect();window.removeEventListener('resize',updateLatest);store.suspendReads();store.pauseProjectPolling(false);document.removeEventListener('keydown',shortcuts);document.removeEventListener('visibilitychange',visibility)})
 </script>
 <template>
  <section class="companion-browser-page" data-testid="companion-browser-page">

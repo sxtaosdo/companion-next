@@ -4,6 +4,7 @@ import { defineComponent, h, onBeforeUnmount, watch } from 'vue'
 import { createMemoryHistory, createRouter, RouterView } from 'vue-router'
 import ElementPlus, { ElMessage } from 'element-plus'
 import CompanionBrowserView from '../src/views/CompanionBrowserView.vue'
+import { useRegisteredProjectPage } from '../src/composables/use-registered-project-page'
 import { projectSetupProvider } from '../src/project-setup-integration'
 import ProjectSetupWizard from '../src/components/ProjectSetupWizard.vue'
 import { ProjectSetupError, type ProjectSetupProvider } from '../src/domain/project-setup'
@@ -233,5 +234,40 @@ describe('normal project entry in the actual BrowserView', () => {
     await router.push('/projects?unrelated=value'); await flushPromises(); expect(source.loadProjects).toHaveBeenCalledTimes(2)
     useCompanionBrowserStore().disconnect(); await router.push('/projects?tab=logs'); await router.push('/projects'); await flushPromises()
     expect(source.loadProjects).toHaveBeenCalledTimes(2); expect(useCompanionBrowserStore().connected).toBe(false)
+  })
+})
+
+
+describe('actual project route realtime navigation',()=>{
+  async function routes(){
+    vi.useFakeTimers();const source=reader(),channels:Array<{signal:AbortSignal|undefined;close:ReturnType<typeof vi.fn>}>=[]
+    const events={label:'offline route events',subscribe:vi.fn((handlers:import('../src/domain/companion-live').CompanionEventHandlers,signal?:AbortSignal)=>{const close=vi.fn();channels.push({signal,close});handlers.onOpen();return close})}
+    registerCompanionBrowserProvider(source,events,{projectEntry:'read'})
+    const router=createRouter({history:createMemoryHistory(),routes:[{path:'/projects',component:CompanionBrowserView},{path:'/away',component:defineComponent({render:()=>h('div','away')})},{path:'/shared',component:defineComponent({setup(){useRegisteredProjectPage();return ()=>h('div','shared production entry')}})}]})
+    await router.push('/projects');wrapper=mount(defineComponent({render:()=>h(RouterView)}),{global:{plugins:[pinia,router,ElementPlus]}});await flushPromises()
+    return {source,events,channels,router,store:useCompanionBrowserStore()}
+  }
+  it('resumes exactly one stream and snapshot after route return, but preserves a user stop',async()=>{
+    const {source,events,channels,router,store}=await routes();store.startLive(events);await vi.advanceTimersByTimeAsync(0);await flushPromises()
+    const reads=vi.mocked(source.loadProjects).mock.calls.length,countsBefore=vi.mocked(source.loadCounts).mock.calls.length
+    await router.push('/away');await flushPromises();expect(store.liveEnabled).toBe(true);expect(store.liveState).toBe('suspended');expect(channels[0]!.signal?.aborted).toBe(true);expect(channels[0]!.close).toHaveBeenCalledTimes(1)
+    await router.push('/projects');await flushPromises();await vi.advanceTimersByTimeAsync(0);await flushPromises()
+    expect(store.liveState).toBe('open');expect(channels).toHaveLength(2);expect(source.loadProjects).toHaveBeenCalledTimes(reads+1);expect(source.loadCounts).toHaveBeenCalledTimes(countsBefore+1)
+    await vi.advanceTimersByTimeAsync(2999);expect(source.loadProjects).toHaveBeenCalledTimes(reads+1);await vi.advanceTimersByTimeAsync(1);expect(source.loadProjects).toHaveBeenCalledTimes(reads+2)
+    const stop=wrapper!.findAll('button').find(button=>button.text()==='停止实时更新');expect(stop).toBeDefined();await stop!.trigger('click');expect(store.liveEnabled).toBe(false)
+    await router.push('/away');await router.push('/projects');await flushPromises();await vi.advanceTimersByTimeAsync(0)
+    expect(store.liveState).toBe('off');expect(channels).toHaveLength(2)
+  })
+  it('keeps realtime suspended through shared overview/resource entry and help, then resumes once',async()=>{
+    const {source,events,channels,router,store}=await routes();store.startLive(events);await vi.advanceTimersByTimeAsync(0)
+    await router.push('/shared');await flushPromises();expect(store.liveEnabled).toBe(true);expect(store.livePageActive).toBe(false);expect(store.liveState).toBe('suspended');expect(channels).toHaveLength(1)
+    await router.push('/away');await flushPromises();const reads=vi.mocked(source.loadProjects).mock.calls.length;await vi.advanceTimersByTimeAsync(6000);expect(source.loadProjects).toHaveBeenCalledTimes(reads);expect(channels).toHaveLength(1)
+    await router.push('/projects');await flushPromises();await vi.advanceTimersByTimeAsync(0);expect(store.liveState).toBe('open');expect(channels).toHaveLength(2);expect(source.loadProjects).toHaveBeenCalledTimes(reads+1)
+  })
+  it('does not resume an old event source replaced while the project page is unmounted',async()=>{
+    const {events,channels,router,store}=await routes();store.startLive(events);await vi.advanceTimersByTimeAsync(0);await router.push('/away');await flushPromises()
+    const subscribe=vi.fn();companionEventProvider.value={label:'replacement',subscribe}
+    await router.push('/projects');await flushPromises();await vi.advanceTimersByTimeAsync(0)
+    expect(store.liveEnabled).toBe(false);expect(store.liveState).toBe('off');expect(channels).toHaveLength(1);expect(subscribe).not.toHaveBeenCalled()
   })
 })

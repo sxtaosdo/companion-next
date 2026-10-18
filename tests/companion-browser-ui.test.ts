@@ -111,13 +111,13 @@ describe('Companion read UI and host identity',()=>{
   const old=fixture();registerCompanionBrowserProvider(old);const pinia=createPinia(),store=useCompanionBrowserStore(pinia);await store.connect(old);registerCompanionBrowserProvider(fixture());const router=createRouter({history:createMemoryHistory(),routes:[{path:'/projects',component:CompanionBrowserView}]});await router.push('/projects');await router.isReady();wrapper=mount(CompanionBrowserView,{global:{plugins:[pinia,router,ElementPlus]}});await flushPromises();expect(store.connected).toBe(false);expect(store.provider).toBeNull();expect(store.projects).toEqual([])
  })
  it('disconnects on composition-root changes and cancels pending reads on unmount',async()=>{
-  const p=fixture();registerCompanionBrowserProvider(p);const {store}=await setup();await store.connect(p);registerCompanionBrowserProvider(fixture());await flushPromises();expect(store.connected).toBe(false);expect(store.projects).toEqual([]);const cancel=vi.spyOn(store,'cancelReads');wrapper!.unmount();wrapper=undefined;expect(cancel).toHaveBeenCalledTimes(1)
+  const p=fixture();registerCompanionBrowserProvider(p);const {store}=await setup();await store.connect(p);registerCompanionBrowserProvider(fixture());await flushPromises();expect(store.connected).toBe(false);expect(store.projects).toEqual([]);const cancel=vi.spyOn(store,'suspendReads');wrapper!.unmount();wrapper=undefined;expect(cancel).toHaveBeenCalledTimes(1)
  })
  it('requires a second explicit action for realtime and cleans it up on unmount',async()=>{
   const p=fixture(),close=vi.fn();let handlers!:CompanionEventHandlers;const subscribe=vi.fn((h:CompanionEventHandlers)=>{handlers=h;return close});registerCompanionBrowserProvider(p,{label:'OFFLINE SSE',subscribe});const {store}=await setup()
   expect(button('启用实时更新').attributes('disabled')).toBeDefined();await store.connect(p);await flushPromises();expect(subscribe).not.toHaveBeenCalled();await button('启用实时更新').trigger('click');expect(subscribe).toHaveBeenCalledTimes(1);handlers.onOpen();await flushPromises()
   expect(wrapper!.get('[data-testid="live-state"]').text()).toBe('事件流已连接');expect(wrapper!.text()).not.toContain('没有回放或心跳');expect(await tip('实时更新说明')).toContain('没有回放或心跳')
-  wrapper!.unmount();wrapper=undefined;expect(close).toHaveBeenCalledTimes(1);expect(store.liveEnabled).toBe(false)
+  wrapper!.unmount();wrapper=undefined;expect(close).toHaveBeenCalledTimes(1);expect(store.liveEnabled).toBe(true);expect(store.liveState).toBe('suspended')
  })
  it('pauses only live logs through the visible controls',async()=>{
   registerCompanionBrowserProvider(fixture(),{label:'OFFLINE SSE',subscribe:()=>()=>{}});const {store}=await setup('/projects?tab=logs');await store.connect(companionBrowserProvider.value!);await button('启用实时更新').trigger('click');await button('暂停实时日志').trigger('click')
