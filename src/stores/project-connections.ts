@@ -17,7 +17,7 @@ export const useProjectConnectionsStore=defineStore('project-connections',()=>{
  const available=computed(()=>browser.connected&&!!browser.provider&&toRaw(browser.provider)===toRaw(companionBrowserProvider.value)&&!!projectConnectionsProvider.value&&!browser.projectLoading&&!lane.locked&&!busy.value)
  const key=(request:ConnectionRequest)=>JSON.stringify([request.projectId,request.kind,request.kind==='client'?request.target:request.setupOperationId])
  function block(request:ConnectionRequest){const k=key(request);if(!blocked.value.includes(k))blocked.value=[...blocked.value,k]}
- function scopeCurrent(request:ConnectionRequest){return request.kind==='client'||(setup.completedUsage?.project.id===request.projectId&&setup.setupReceipt?.phase==='complete'&&setup.setupReceipt.operationId===request.setupOperationId)}
+ function scopeCurrent(request:ConnectionRequest){return request.kind==='client'||(setup.completedSetup?.project.id===request.projectId&&setup.setupReceipt?.phase==='complete'&&setup.setupReceipt.operationId===request.setupOperationId)}
  function prepare(owner:symbol,projectId:string,requests:ConnectionRequest[]){
   if(!available.value)return false
   prepared.value=null;message.value=null;receipts.value=[]
@@ -36,7 +36,7 @@ export const useProjectConnectionsStore=defineStore('project-connections',()=>{
   if(active?.owner===owner){active.cancelled=true;if(active.awaiting&&active.request)block(active.request);active.controller.abort()}
  }
  function current(p:Prepared){return browser.connected&&toRaw(browser.provider)===p.source&&toRaw(companionBrowserProvider.value)===p.source&&projectConnectionsProvider.value===p.api&&identity(p.project.id)===p.identity&&p.requests.every(scopeCurrent)}
- watch(()=>[browser.provider,browser.connected,companionBrowserProvider.value,projectConnectionsProvider.value,JSON.stringify(browser.projects.map(p=>[p.id,p.name,p.path])),setup.completedUsage,setup.setupReceipt?.operationId],()=>{
+ watch(()=>[browser.provider,browser.connected,companionBrowserProvider.value,projectConnectionsProvider.value,JSON.stringify(browser.projects.map(p=>[p.id,p.name,p.path])),setup.completedSetup,setup.setupReceipt?.operationId],()=>{
   if(prepared.value&&!current(prepared.value))prepared.value=null
   if(active&&activePrepared&&!current(activePrepared))cancel(active.owner)
  },{flush:'sync'})

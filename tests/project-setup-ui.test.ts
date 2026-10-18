@@ -156,3 +156,12 @@ describe('020 original setup dialog color scope',()=>{
   }finally{style.remove()}
  })
 })
+
+describe('strict setup selection confirmation',()=>{
+ it.each([[false,false],[true,false],[false,true],[true,true]])('shows and sends frozen Creator=%s Codex=%s choices',async(startCreator,configureCodex)=>{
+  vi.useFakeTimers();const {api,store}=await setup();const effectiveOptions={startCreator,configureCodex};const startStrict=vi.fn(async()=>({operationId,optionsContractVersion:1 as const,effectiveOptions,reused:false}));registerProjectSetupProvider({...api,startStrict});vi.mocked(api.status).mockResolvedValue({...snapshot('complete'),optionsContractVersion:1,effectiveOptions,...(configureCodex?{mcpName:'cocos-fake'}:{})});await flushPromises();await openFull()
+  const checks=body().findAll('.setup-consents input[type="checkbox"]');for(const index of [0,3,4])await checks[index]!.setValue(true);await checks[1]!.setValue(startCreator);await checks[2]!.setValue(configureCodex);await flushPromises();await click('核对所选安装步骤')
+  const confirmation=body().get('[data-testid="full-setup-confirm"]').text();expect(confirmation).toContain(startCreator?'Creator 启动及验证':'Creator 不启动');expect(confirmation).toContain(configureCodex?'Codex 配置':'Codex 不配置');expect(store.preparedSetup?.effectiveOptions).toEqual(effectiveOptions)
+  await click('确认执行所选安装步骤');expect(startStrict).toHaveBeenCalledWith(id,effectiveOptions,expect.any(AbortSignal));expect(api.start).not.toHaveBeenCalled();await vi.advanceTimersByTimeAsync(1000);await flushPromises();expect(store.setupReceipt?.phase).toBe('complete');expect(body().find('[data-testid="setup-completion-usage"]').exists()).toBe(configureCodex)
+ })
+})

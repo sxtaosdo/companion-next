@@ -1,8 +1,8 @@
 import { computed, ref, shallowRef, toRaw, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type { CompanionBrowserProvider, ManagedProject } from '../domain/companion-browser'
-import { PROJECT_SETUP_LIMITS, ProjectSetupError, buildSetupCompletionPrompt, SETUP_STAGES, validateProjectPath, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
-import type { ProjectSetupProvider, SetupSnapshot } from '../domain/project-setup'
+import { PROJECT_SETUP_LIMITS, ProjectSetupError, buildSetupCompletionPrompt, SETUP_STAGES, sameSetupOptions, validateProjectPath, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
+import type { ProjectSetupProvider, SetupSnapshot, EffectiveSetupOptions } from '../domain/project-setup'
 import { projectSetupProvider } from '../project-setup-integration'
 import { useCompanionBrowserStore } from './companion-browser'
 import { useProjectOperationLaneStore } from './project-operation-lane'
@@ -25,6 +25,7 @@ export interface PreparedSetup {
   readonly project: Readonly<ManagedProject>
   readonly sourceLabel: string
   readonly consents: Readonly<SetupConsents>
+  readonly effectiveOptions?: EffectiveSetupOptions
   readonly observedAt: string
   readonly snapshotRevision: number
 }
@@ -37,6 +38,8 @@ export interface RegistrationReceipt {
 export interface SetupReceipt {
   readonly phase: 'submitting' | 'tracking' | 'paused' | 'complete' | 'failed' | 'unknown' | 'rejected' | 'not-dispatched'
   readonly project: Readonly<ManagedProject>
+  readonly effectiveOptions?: EffectiveSetupOptions
+  readonly reused?: boolean
   readonly operationId?: string
   readonly snapshot?: Readonly<SetupSnapshot>
   readonly message: string
@@ -68,6 +71,7 @@ interface SetupOperation {
   controller?: AbortController
   epoch: number
   dispatched: boolean
+  reused?: boolean
   accepted: boolean
   detached: boolean
   terminal: boolean
@@ -165,7 +169,8 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
     clearPrepared()
     const reason = blockingReason()
     if (reason) { error.value = reason; return null }
-    if (!consents || consentKeys.some(key => consents[key] !== true)) {
+    const strict=typeof writer()?.startStrict==='function'
+    if (!consents || (strict ? consents.installBridge!==true||consents.acknowledgeReuse!==true||consents.acknowledgeToolScope!==true||typeof consents.startCreator!=='boolean'||typeof consents.configureCodex!=='boolean' : consentKeys.some(key => consents[key] !== true))) {
       error.value = '必须逐项明确同意 Bridge、Creator、Codex，以及任务复用与工具范围限制，才能准备完整接入。'; return null
     }
     let target: Readonly<ManagedProject>
@@ -177,7 +182,8 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
     } catch { error.value = '请选择当前真实读取的已登记工程；不能直接按未登记路径接入。'; return null }
     if (barriers.some(barrier => barrier.path === target.path)) { error.value = unknownRegistration; return null }
     const binding = makeBinding(target), preview = freeze({ project: target, sourceLabel: sourceLabel(binding),
-      consents: Object.fromEntries(consentKeys.map(key => [key, true])) as unknown as SetupConsents,
+      consents: Object.fromEntries(consentKeys.map(key => [key, consents[key]])) as unknown as SetupConsents,
+      ...(strict?{effectiveOptions:{startCreator:consents.startCreator,configureCodex:consents.configureCodex}}:{}),
       observedAt: binding.observedAt, snapshotRevision: binding.revision })
     setupApprovals.set(preview, binding); preparedSetup.value = preview; error.value = ''
     return preview
@@ -234,7 +240,7 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
   function setupResult(op: SetupOperation, phase: SetupReceipt['phase'], message: string, snapshot?: Readonly<SetupSnapshot>) {
     completionBinding.value = phase === 'complete' ? op.binding : null
     error.value = phase === 'tracking' || phase === 'complete' ? '' : message
-    setupReceipt.value = freeze({ phase, project: op.preview.project, ...(op.operationId ? { operationId: op.operationId } : {}),
+    setupReceipt.value = freeze({ phase, project: op.preview.project, ...(op.preview.effectiveOptions?{effectiveOptions:op.preview.effectiveOptions}:{}),...(op.reused===undefined?{}:{reused:op.reused}), ...(op.operationId ? { operationId: op.operationId } : {}),
       ...(snapshot ? { snapshot } : setupReceipt.value?.snapshot ? { snapshot: setupReceipt.value.snapshot } : {}), message })
   }
   function clearTimers() { clearTimeout(pollTimer); clearTimeout(deadlineTimer); pollTimer = deadlineTimer = undefined }
@@ -305,12 +311,17 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
     let accepted = false
     try {
       if (!sameContext(binding, preview.project) || !visible.value || controller.signal.aborted) throw new ProjectSetupError('aborted', 'not-dispatched')
-      const result = await abortable(controller, () => { op.dispatched = true; return binding.writer.start(preview.project.id, controller.signal) })
+      const result = await abortable(controller, () => { op.dispatched = true; return preview.effectiveOptions ? binding.writer.startStrict!(preview.project.id,preview.effectiveOptions,controller.signal) : binding.writer.start(preview.project.id, controller.signal) })
       if (result === cancelled || op.epoch !== epoch || op.detached || !sameContext(binding, preview.project)) {
         if (op.epoch === epoch) pause(op)
       } else {
         if (!result || typeof result !== 'object') throw new ProjectSetupError('invalid-shape')
         const id = validOperationId(result.operationId)
+        if(preview.effectiveOptions){
+          const actual=result as {optionsContractVersion?:unknown;effectiveOptions?:unknown;reused?:unknown}
+          if(actual.optionsContractVersion!==1||typeof actual.reused!=='boolean'||!sameSetupOptions(actual.effectiveOptions,preview.effectiveOptions))throw new ProjectSetupError('invalid-shape')
+          op.reused=actual.reused
+        }
         op.operationId = id; op.accepted = true; accepted = true; tracking.value = true; pending.value = false
         if (pollCurrent(op, epoch)) { beginBudget(op); setupResult(op, 'tracking', acceptedMessage) }
       }
@@ -336,12 +347,15 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
     try {
       const result = await abortable(controller, () => op.binding.writer.status(op.operationId!, controller.signal))
       if (result === cancelled || !verifySetupContext(op) || !pollCurrent(op, epoch)) return
-      const snapshot = validSnapshot(result, op.operationId, op.preview.project)
+      const snapshot = validSnapshot(result, op.operationId, op.preview.project, op.preview.effectiveOptions)
       if (snapshot.stage === 'complete' || snapshot.stage === 'failed') {
         op.terminal = true; tracking.value = false; clearTimers()
-        setupResult(op, snapshot.stage, snapshot.stage === 'complete' ? completedMessage : failedMessage, snapshot)
+        setupResult(op, snapshot.stage, snapshot.stage === 'complete' ? (op.preview.effectiveOptions ? `后台报告所选安装步骤完成：Bridge 已处理；Creator ${op.preview.effectiveOptions.startCreator?'已选择启动及验证':'未选择，未由本任务启动'}；Codex ${op.preview.effectiveOptions.configureCodex?'已选择配置':'未选择，未由本任务配置'}。请另行读取当前运行状态。` : completedMessage) : failedMessage, snapshot)
       } else setupResult(op, 'tracking', acceptedMessage, snapshot)
-    } catch {
+    } catch (cause) {
+      if(pollCurrent(op,epoch)&&cause instanceof ProjectSetupError&&cause.code==='options-mismatch'){
+        pause(op,cause.message);setupResult(op,'unknown',cause.message);return
+      }
       if (pollCurrent(op, epoch)) pause(op, '任务状态查询未能核实，已暂停自动查询；后台可能继续执行。可明确恢复同一任务的只读查询，不会重发接入。')
     } finally {
       if (op.controller === controller) op.controller = undefined
@@ -379,11 +393,16 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
   }
   function leave() { visible.value = false; stopWaiting() }
   function setVisible(next: boolean) { visible.value = next === true; if (!visible.value) stopWaiting() }
-  const completedUsage = computed(() => {
+  const completedSetup = computed(() => {
     const receipt=setupReceipt.value,binding=completionBinding.value
     if(!receipt||receipt.phase!=='complete'||receipt.snapshot?.stage!=='complete'||receipt.snapshot.failureReported===true||!binding||!sameContext(binding,receipt.project))return null
-    const prompt=buildSetupCompletionPrompt(receipt.snapshot.mcpName)
-    return prompt?freeze({project:receipt.project,prompt}):null
+    return freeze({project:receipt.project})
+  })
+  const completedUsage=computed(()=>{
+    const completed=completedSetup.value,receipt=setupReceipt.value
+    if(!completed||receipt?.effectiveOptions?.configureCodex===false)return null
+    const prompt=buildSetupCompletionPrompt(receipt?.snapshot?.mcpName)
+    return prompt?freeze({project:completed.project,prompt}):null
   })
   function contextChanged() {
     if(completionBinding.value&&(!setupReceipt.value||!sameContext(completionBinding.value,setupReceipt.value.project)))completionBinding.value=null
@@ -417,7 +436,7 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
     }
   }, { flush: 'sync' })
   return { preparedRegistration: computed(() => preparedRegistration.value), preparedSetup: computed(() => preparedSetup.value),
-    completedUsage, registrationReceipt: computed(() => registrationReceipt.value), setupReceipt: computed(() => setupReceipt.value),
+    completedSetup, completedUsage, registrationReceipt: computed(() => registrationReceipt.value), setupReceipt: computed(() => setupReceipt.value),
     pending: computed(() => pending.value), tracking: computed(() => tracking.value), error: computed(() => error.value), canResume,
     prepareRegistration, sendRegistration, prepareSetup, sendSetup, resume, stopWaiting, clearPrepared, leave, setVisible, blocksAutomaticProjectRead }
 })
@@ -442,7 +461,7 @@ function validProject(value: unknown): Readonly<ManagedProject> {
   return freeze({ id: project.id, name: project.name, path: project.path,
     ...(project.requiredCreatorVersion === undefined ? {} : { requiredCreatorVersion: project.requiredCreatorVersion }) })
 }
-function validSnapshot(value: unknown, id: string, project: Readonly<ManagedProject>): Readonly<SetupSnapshot> {
+function validSnapshot(value: unknown, id: string, project: Readonly<ManagedProject>, expected?:EffectiveSetupOptions): Readonly<SetupSnapshot> {
   if (!value || typeof value !== 'object') return invalid()
   const snapshot = value as SetupSnapshot
   if (validOperationId(snapshot.id) !== id || snapshot.projectPath !== project.path
@@ -450,6 +469,11 @@ function validSnapshot(value: unknown, id: string, project: Readonly<ManagedProj
     || !SETUP_STAGES.includes(snapshot.stage) || !text(snapshot.startedAt, 128) || !text(snapshot.updatedAt, 128)
     || !Number.isFinite(Date.parse(snapshot.startedAt)) || !Number.isFinite(Date.parse(snapshot.updatedAt))) return invalid()
   const result: SetupSnapshot = { id, projectPath: project.path, stage: snapshot.stage, startedAt: snapshot.startedAt, updatedAt: snapshot.updatedAt }
+  if(expected){
+    if(snapshot.optionsContractVersion!==1||!sameSetupOptions(snapshot.effectiveOptions,expected))throw new ProjectSetupError('options-mismatch')
+    if((!expected.configureCodex&&snapshot.mcpName!==undefined)||(!expected.startCreator&&snapshot.runtime!==undefined))throw new ProjectSetupError('options-mismatch')
+    result.optionsContractVersion=1;result.effectiveOptions={...expected}
+  }
   if (snapshot.projectId !== undefined) result.projectId = snapshot.projectId
   if (snapshot.projectName !== undefined) { if (!text(snapshot.projectName, 512)) return invalid(); result.projectName = snapshot.projectName }
   if (snapshot.bridge !== undefined) {

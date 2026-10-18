@@ -1,10 +1,18 @@
 import type { ManagedProject } from './companion-browser'
 export const SETUP_STAGES = ['registering','installing-bridge','opening-dashboard','waiting-bridge','configuring-codex','verifying','complete','failed'] as const
 export type SetupStage = typeof SETUP_STAGES[number]
+export interface EffectiveSetupOptions { readonly startCreator:boolean; readonly configureCodex:boolean }
+export interface StrictSetupStarted { readonly operationId:string; readonly optionsContractVersion:1; readonly effectiveOptions:EffectiveSetupOptions; readonly reused:boolean }
+export function sameSetupOptions(value:unknown,expected:EffectiveSetupOptions):boolean {
+ if(!value||typeof value!=='object'||Array.isArray(value))return false
+ const actual=value as Record<string,unknown>
+ return Object.keys(actual).sort().join(',')==='configureCodex,startCreator'&&actual.startCreator===expected.startCreator&&actual.configureCodex===expected.configureCodex
+}
 export interface SetupSnapshot {
  id:string; projectPath:string; projectId?:string; projectName?:string; stage:SetupStage; startedAt:string; updatedAt:string
  bridge?:{status:'installed'|'updated'|'current';version:string;targetPath:string}
  runtime?:{projectId:string;state:'stopped'|'launching'|'bridge-wait'|'ready'|'stopping'|'crashed'|'incompatible'|'error';creatorVersion?:string}
+ optionsContractVersion?:1; effectiveOptions?:EffectiveSetupOptions
  mcpName?:string; failureReported?:boolean; errorCode?:string
 }
 export interface ProjectSetupProvider {
@@ -16,6 +24,8 @@ export interface ProjectSetupProvider {
  register(path:string,signal?:AbortSignal):Promise<ManagedProject>
  /** Explicit full setup only. Provider sends true/true, never omitted defaults or codexPath. */
  start(projectId:string,signal?:AbortSignal):Promise<{operationId:string}>
+ /** Dedicated v1 route; an old server must reject before any setup side effect. */
+ startStrict?(projectId:string,options:EffectiveSetupOptions,signal?:AbortSignal):Promise<StrictSetupStarted>
  status(operationId:string,signal?:AbortSignal):Promise<SetupSnapshot>
  waitForIdle():Promise<void>
 }
@@ -40,10 +50,10 @@ export function validateProjectScaffoldInput(value:unknown):ProjectScaffoldInput
 export function projectScaffoldTarget(input:ProjectScaffoldInput):string {
  return input.mode==='initialize'?input.path:input.parentPath.replace(/[\\/]+$/u,'')+(input.parentPath.startsWith('/')?'/':'\\')+input.projectName
 }
-export type ProjectSetupErrorCode='invalid-input'|'busy'|'aborted'|'timeout'|'forbidden'|'backend-failure'|'invalid-shape'|'response-too-large'|'network-error'
+export type ProjectSetupErrorCode='invalid-input'|'busy'|'aborted'|'timeout'|'forbidden'|'backend-failure'|'invalid-shape'|'response-too-large'|'network-error'|'options-unsupported'|'options-conflict'|'options-mismatch'
 export class ProjectSetupError extends Error {
  constructor(readonly code:ProjectSetupErrorCode,readonly outcome:'not-dispatched'|'rejected'|'unknown'='unknown'){
-  super(({ 'invalid-input':'工程路径或任务标识无效，未发送。',busy:'上次请求仍在等待或清理，未发送新请求。',aborted:'已停止等待，后台任务不会因此取消。',timeout:'等待超时，后台结果未知；不会自动重发。',forbidden:'原宿主会话或同源校验拒绝请求。','backend-failure':'原后台未返回有效结果；可能已有部分影响，请核对。','invalid-shape':'无法核实原后台回执，结果未知。','response-too-large':'回执超出读取预算，结果未知。','network-error':'请求未正常返回，结果未知。'} satisfies Record<ProjectSetupErrorCode,string>)[code]);this.name='ProjectSetupError'
+  super(({ 'invalid-input':'工程路径或任务标识无效，未发送。',busy:'上次请求仍在等待或清理，未发送新请求。',aborted:'已停止等待，后台任务不会因此取消。',timeout:'等待超时，后台结果未知；不会自动重发。',forbidden:'原宿主会话或同源校验拒绝请求。','backend-failure':'原后台未返回有效结果；可能已有部分影响，请核对。','invalid-shape':'无法核实原后台回执，结果未知。','response-too-large':'回执超出读取预算，结果未知。','options-unsupported':'当前服务不支持严格分项安装，安装请求未发送。','options-mismatch':'安装合同或有效选项与确认值不匹配，结果 UNKNOWN；写入屏障保留，不会自动重发。','options-conflict':'同路径有不同选项的进行中任务，本次请求已拒绝；请核实原任务。','network-error':'请求未正常返回，结果未知。'} satisfies Record<ProjectSetupErrorCode,string>)[code]);this.name='ProjectSetupError'
  }
 }
 export const PROJECT_SETUP_LIMITS=Object.freeze({timeoutMs:120000,maxResponseBytes:128*1024,maxResponseChunks:512,maxPath:4096,pollMs:1000,maxPollMs:15*60*1000})

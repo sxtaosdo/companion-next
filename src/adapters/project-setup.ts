@@ -1,7 +1,7 @@
 import { RUNTIME_STATES } from '../domain/companion-browser'
 import type { ManagedProject } from '../domain/companion-browser'
-import { PROJECT_SETUP_LIMITS, ProjectSetupError, SETUP_STAGES, validateProjectPath, validateProjectScaffoldInput, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
-import type { ProjectScaffoldResult, ProjectSetupErrorCode, ProjectSetupProvider, SetupSnapshot } from '../domain/project-setup'
+import { PROJECT_SETUP_LIMITS, ProjectSetupError, SETUP_STAGES, sameSetupOptions, validateProjectPath, validateProjectScaffoldInput, validateSetupOperationId, validateSetupProjectId } from '../domain/project-setup'
+import type { ProjectScaffoldResult, ProjectSetupErrorCode, ProjectSetupProvider, SetupSnapshot, EffectiveSetupOptions, StrictSetupStarted } from '../domain/project-setup'
 export { PROJECT_SETUP_LIMITS, ProjectSetupError } from '../domain/project-setup'
 export type ProjectSetupPath = '/api/projects' | '/api/projects/scaffold' | '/api/pick-directory' | '/api/setup' | `/api/setup/${string}`
 export type ProjectSetupFetch = (input: ProjectSetupPath, init: RequestInit) => Promise<Response>
@@ -115,8 +115,18 @@ function decodeScaffold(value:unknown):ProjectScaffoldResult {
 function decodeStarted(value: unknown): { operationId: string } {
   const raw = object(value)
   required(raw, ['operationId'])
-  if (Object.keys(raw).length !== 1) throw fail('invalid-shape')
+  if (Object.keys(raw).some(key=>!['operationId','optionsContractVersion','effectiveOptions','reused'].includes(key))) throw fail('invalid-shape')
   return { operationId: operationId(raw.operationId) }
+}
+function decodeOptions(value:unknown):EffectiveSetupOptions {
+ const raw=object(value)
+ if(typeof raw.startCreator!=='boolean'||typeof raw.configureCodex!=='boolean'||Object.keys(raw).sort().join(',')!=='configureCodex,startCreator')throw fail('invalid-shape')
+ return Object.freeze({startCreator:raw.startCreator,configureCodex:raw.configureCodex})
+}
+function decodeStrictStarted(value:unknown,expected:EffectiveSetupOptions):StrictSetupStarted {
+ const raw=object(value), started=decodeStarted(raw)
+ if(raw.optionsContractVersion!==1||typeof raw.reused!=='boolean'||!sameSetupOptions(raw.effectiveOptions,expected))throw fail('invalid-shape')
+ return Object.freeze({...started,optionsContractVersion:1,effectiveOptions:decodeOptions(raw.effectiveOptions),reused:raw.reused})
 }
 function decodeSnapshot(value: unknown, requestedId: string): SetupSnapshot {
   const raw = object(value)
@@ -148,6 +158,10 @@ function decodeSnapshot(value: unknown, requestedId: string): SetupSnapshot {
     if (typeof raw.errorCode !== 'string') throw fail('invalid-shape')
     if (backendCodes.includes(raw.errorCode)) result.errorCode = raw.errorCode
   }
+  if(Object.hasOwn(raw,'optionsContractVersion')||Object.hasOwn(raw,'effectiveOptions')) {
+    if(raw.optionsContractVersion!==1)throw fail('invalid-shape')
+    result.optionsContractVersion=1;result.effectiveOptions=decodeOptions(raw.effectiveOptions)
+  }
   // Unknown fields, raw errors, details, executable/connection paths, tokens, sessions and PIDs are never projected.
   // Even complete does not prove the submitted options ran: the host may have reused an active path's operation.
   return result
@@ -156,6 +170,7 @@ function serverFailure(value: unknown, status: number): ProjectSetupError {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return fail('invalid-shape')
   const raw = value as Record<string, unknown>, keys = Object.keys(raw)
   if (status === 403 && keys.length === 1 && keys[0] === 'error' && raw.error === 'Forbidden') return fail('forbidden', 'rejected')
+  if(status===409&&raw.code==='SETUP_OPTIONS_CONFLICT'&&raw.retryable===false)return fail('options-conflict','rejected')
   if (Object.hasOwn(raw, 'error') && typeof raw.error === 'string') return fail('backend-failure')
   return fail('invalid-shape')
 }
@@ -210,6 +225,7 @@ export function createProjectSetupProvider(options: { fetch: ProjectSetupFetch; 
       if (!/^application\/json(?:\s*;|\s*$)/i.test(response.headers.get('content-type') ?? '')) { discardBody(response, track); throw fail('invalid-shape') }
       const raw = await boundedJson(response, controller.signal, abortError, track)
       if (controller.signal.aborted) throw abortError()
+      if(path==='/api/setup/options-v1'&&(response.status===404||response.status===405))throw fail('options-unsupported',method==='POST'?'rejected':'not-dispatched')
       if (!response.ok) throw serverFailure(raw, response.status)
       if (response.status !== status) throw fail('invalid-shape')
       return decode(raw)
@@ -241,6 +257,22 @@ export function createProjectSetupProvider(options: { fetch: ProjectSetupFetch; 
       let target: string
       try { target = safePath(path) } catch { throw fail('invalid-input', 'not-dispatched') }
       return request('/api/projects', 'POST', 201, decodeProject, JSON.stringify({ path: target }), signal)
+    },
+    async startStrict(id,selected,signal) {
+      let target:string, expected:EffectiveSetupOptions
+      try {
+        target=validateSetupProjectId(id)
+        if(typeof selected?.startCreator!=='boolean'||typeof selected?.configureCodex!=='boolean'||!sameSetupOptions(selected,selected))throw new Error('options')
+        expected=Object.freeze({startCreator:selected.startCreator,configureCodex:selected.configureCodex})
+      }catch{throw fail('invalid-input','not-dispatched')}
+      try {
+        await request('/api/setup/options-v1','GET',200,raw=>{
+          const capability=object(raw)
+          if(capability.optionsContractVersion!==1||capability.strictOptions!==true||capability.reusePolicy!=='same-effective-options')throw fail('options-unsupported','not-dispatched')
+        },undefined,signal)
+      }catch(cause){throw fail(cause instanceof ProjectSetupError?cause.code:'options-unsupported','not-dispatched')}
+      await idle
+      return request('/api/setup/options-v1','POST',202,raw=>decodeStrictStarted(raw,expected),JSON.stringify({projectId:target,...expected}),signal)
     },
     async start(id, signal) {
       let target: string

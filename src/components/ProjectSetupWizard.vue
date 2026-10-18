@@ -44,9 +44,11 @@ function selectDashboard(item:DashboardProject){
  if(lane.locked||!projects.connected||!item.exists||!projects.dashboard.includes(item))return
  sourceMode.value='dashboard';path.value=item.path;projectId.value=registered(item)?.id??''
 }
+const strictOptions=computed(()=>typeof projectSetupProvider.value?.startStrict==='function')
+const completedSetup=computed(()=>open.value&&store.completedSetup?.project.id===selected.value?.id?store.completedSetup:null)
 const completionUsage=computed(()=>open.value&&store.completedUsage?.project.id===selected.value?.id?store.completedUsage:null)
-watch(()=>[completionUsage.value?.project.id,completionUsage.value?.project.path,store.setupReceipt?.operationId],()=>{agentsSkipped.value=false},{flush:'sync'})
-const allConsented=computed(()=>Object.values(consents.value).every(value=>value===true))
+watch(()=>[completedSetup.value?.project.id,completedSetup.value?.project.path,store.setupReceipt?.operationId],()=>{agentsSkipped.value=false},{flush:'sync'})
+const allConsented=computed(()=>strictOptions.value ? consents.value.installBridge&&consents.value.acknowledgeReuse&&consents.value.acknowledgeToolScope : Object.values(consents.value).every(value=>value===true))
 const activeTask=computed(()=>!!store.setupReceipt&&['submitting','tracking','paused','unknown'].includes(store.setupReceipt.phase))
 const resumableTask=computed(()=>!!store.setupReceipt&&['paused','unknown'].includes(store.setupReceipt.phase))
 const hasReceipt=computed(()=>!!store.registrationReceipt||!!store.setupReceipt||!!scaffold.receipt)
@@ -188,9 +190,9 @@ defineExpose({openForProject:show,close})
      <el-checkbox v-model="consents.acknowledgeToolScope" :disabled="lane.locked">同意按当前工具范围接入；缺少绑定时可能是 full（全部工具），本向导不改变范围</el-checkbox>
      <el-checkbox v-model="consents.acknowledgeReuse" :disabled="lane.locked">接受可能复用已有任务；原选项 / 实际步骤无法核验，完成回执不能证明本次选项已执行</el-checkbox>
     </div>
-    <el-alert type="info" :closable="false" title="仅支持完整接入。严格只装 Bridge 或保证不配置 Codex 暂不可提交：后台复用任务时不核对新选项。"/>
-    <el-button :disabled="!projects.connected||!selected||!allConsented||lane.locked" @click="prepareFull">核对完整安装接入</el-button>
-    <div v-if="store.preparedSetup" class="setup-confirm" data-testid="full-setup-confirm"><strong>{{ store.preparedSetup.project.name }} · {{ store.preparedSetup.project.id }}</strong><p>{{ store.preparedSetup.project.path }}</p><p>来源：{{ store.preparedSetup.sourceLabel }}</p><p>将请求安装 Bridge、启动 Creator 和配置 Codex。202 仅表示任务已接受；关闭 / 停止等待不取消后台。刷新页面会丢失本页任务记录和互斥保护；本页不能锁定其他标签页或客户端。</p><el-button type="warning" @click="submitFull">确认完整安装并接入 Codex</el-button></div>
+    <el-alert type="info" :closable="false" :title="strictOptions?'Bridge 必选；Creator 与 Codex 可独立选择。服务须支持严格选项合同，否则不会发送安装请求。':'仅支持完整接入。严格只装 Bridge 或保证不配置 Codex 暂不可提交：后台复用任务时不核对新选项。'"/>
+    <el-button :disabled="!projects.connected||!selected||!allConsented||lane.locked" @click="prepareFull">{{ strictOptions?'核对所选安装步骤':'核对完整安装接入' }}</el-button>
+    <div v-if="store.preparedSetup" class="setup-confirm" data-testid="full-setup-confirm"><strong>{{ store.preparedSetup.project.name }} · {{ store.preparedSetup.project.id }}</strong><p>{{ store.preparedSetup.project.path }}</p><p>来源：{{ store.preparedSetup.sourceLabel }}</p><p>将请求安装 Bridge；Creator {{ store.preparedSetup.effectiveOptions ? (store.preparedSetup.effectiveOptions.startCreator?'启动及验证':'不启动') : '启动及验证' }}；Codex {{ store.preparedSetup.effectiveOptions ? (store.preparedSetup.effectiveOptions.configureCodex?'配置':'不配置') : '配置' }}。202 仅表示任务已接受；关闭 / 停止等待不取消后台。刷新页面会丢失本页任务记录和互斥保护；本页不能锁定其他标签页或客户端。</p><el-button type="warning" @click="submitFull">{{ strictOptions?'确认执行所选安装步骤':'确认完整安装并接入 Codex' }}</el-button></div>
    </section>
   <section v-if="hasReceipt" class="setup-step setup-receipts" aria-label="登记与接入回执">
    <h3>当前回执</h3>
@@ -203,7 +205,7 @@ defineExpose({openForProject:show,close})
     <strong>安装接入 · {{ store.setupReceipt.project.name }}</strong><p>{{ store.setupReceipt.project.id }} · {{ store.setupReceipt.project.path }}</p>
     <p>{{ store.setupReceipt.message }}</p><p v-if="store.setupReceipt.operationId">任务 ID：{{ store.setupReceipt.operationId }}</p>
     <template v-if="store.setupReceipt.snapshot"><p>后台阶段：{{ setupStageLabel(store.setupReceipt.snapshot.stage) }} · {{ store.setupReceipt.snapshot.updatedAt }}</p><p v-if="store.setupReceipt.snapshot.bridge">Bridge 回执：{{ store.setupReceipt.snapshot.bridge.status }} · {{ store.setupReceipt.snapshot.bridge.version }}<br>{{ store.setupReceipt.snapshot.bridge.targetPath }}</p><p v-if="store.setupReceipt.snapshot.runtime">当时运行回执：{{ store.setupReceipt.snapshot.runtime.state }}，不是当前状态验证。</p><p v-if="store.setupReceipt.snapshot.mcpName">后台返回的 MCP 名称：{{ store.setupReceipt.snapshot.mcpName }}；不证明当前配置或工具范围。</p></template>
-    <template v-if="completionUsage&&projectConnectionsProvider&&store.setupReceipt?.operationId"><SetupToolScopePanel :project-id="completionUsage.project.id" :setup-operation-id="store.setupReceipt.operationId"/><AgentRegistrationPanel v-if="!agentsSkipped" :project-id="completionUsage.project.id" wizard @skip="agentsSkipped=true"/><p v-else>已跳过本步 Agent 注册；先前已完成的配置不变。</p></template><SetupCompletionUsage v-if="completionUsage" :usage="completionUsage"/>
+    <template v-if="completedSetup&&projectConnectionsProvider&&store.setupReceipt?.operationId"><SetupToolScopePanel :project-id="completedSetup.project.id" :setup-operation-id="store.setupReceipt.operationId"/><AgentRegistrationPanel v-if="!agentsSkipped" :project-id="completedSetup.project.id" wizard @skip="agentsSkipped=true"/><p v-else>已跳过本步 Agent 注册；先前已完成的配置不变。</p></template><SetupCompletionUsage v-if="completionUsage" :usage="completionUsage"/>
     <p>可能复用同路径任务，但接口不返回原始选项或复用标记，无法核验实际执行范围。complete 不证明本次全部步骤已执行，也不证明 Creator 当前就绪。</p>
     <el-button v-if="activeTask" :disabled="!store.canResume" @click="store.resume()">继续读取接入进度</el-button>
    </article>
