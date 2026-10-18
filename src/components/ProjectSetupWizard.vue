@@ -179,7 +179,7 @@ defineExpose({openForProject:show,close})
     <el-button :disabled="!projects.connected||lane.locked||sourceMode==='create'||sourceMode==='initialize'" @click="store.prepareRegistration(path)">核对仅登记</el-button>
     <div v-if="store.preparedRegistration" class="setup-confirm" data-testid="registration-confirm"><p>待发送路径：{{ store.preparedRegistration.path }}</p><p>来源：{{ store.preparedRegistration.sourceLabel }}</p><p>仅发送登记请求；成功后重读工程与状态，可能探测 Bridge 并更新诊断日志。</p><el-button type="primary" @click="register">确认仅登记此路径</el-button></div>
    </section>
-   <section class="setup-step"><h3>2. 完整安装接入</h3>
+   <section class="setup-step"><h3>2. {{ strictOptions?'安装步骤选择':'完整安装接入' }}</h3>
     <el-select popper-class="project-setup-select-popper" v-model="projectId" :disabled="lane.locked" aria-label="安装接入登记工程" placeholder="选择已登记工程"><el-option v-for="project in projects.projects" :key="project.id" :value="project.id" :label="`${project.name} · ${project.id}`"/></el-select>
     <p v-if="selected">{{ selected.name }} · {{ selected.id }}<br>{{ selected.path }}</p>
     <p>以下五项均需主动勾选。安装可能覆盖未登记的 extensions/creator-ai-bridge 保留目录；失败不保证回滚，Codex 写入或迁移失败也可能留下部分配置。</p>
@@ -188,7 +188,7 @@ defineExpose({openForProject:show,close})
      <el-checkbox v-model="consents.startCreator" :disabled="lane.locked">允许经 Dashboard 启动 / 复用 Creator 并验证 Bridge</el-checkbox>
      <el-checkbox v-model="consents.configureCodex" :disabled="lane.locked">允许配置 / 迁移 Codex 中此工程的持久 MCP 接入</el-checkbox>
      <el-checkbox v-model="consents.acknowledgeToolScope" :disabled="lane.locked">同意按当前工具范围接入；缺少绑定时可能是 full（全部工具），本向导不改变范围</el-checkbox>
-     <el-checkbox v-model="consents.acknowledgeReuse" :disabled="lane.locked">接受可能复用已有任务；原选项 / 实际步骤无法核验，完成回执不能证明本次选项已执行</el-checkbox>
+     <el-checkbox v-model="consents.acknowledgeReuse" :disabled="lane.locked">{{ strictOptions?'接受仅复用相同有效选项的任务；不同选项将拒绝，不会自动重发':'接受可能复用已有任务；原选项 / 实际步骤无法核验，完成回执不能证明本次选项已执行' }}</el-checkbox>
     </div>
     <el-alert type="info" :closable="false" :title="strictOptions?'Bridge 必选；Creator 与 Codex 可独立选择。服务须支持严格选项合同，否则不会发送安装请求。':'仅支持完整接入。严格只装 Bridge 或保证不配置 Codex 暂不可提交：后台复用任务时不核对新选项。'"/>
     <el-button :disabled="!projects.connected||!selected||!allConsented||lane.locked" @click="prepareFull">{{ strictOptions?'核对所选安装步骤':'核对完整安装接入' }}</el-button>
@@ -206,7 +206,7 @@ defineExpose({openForProject:show,close})
     <p>{{ store.setupReceipt.message }}</p><p v-if="store.setupReceipt.operationId">任务 ID：{{ store.setupReceipt.operationId }}</p>
     <template v-if="store.setupReceipt.snapshot"><p>后台阶段：{{ setupStageLabel(store.setupReceipt.snapshot.stage) }} · {{ store.setupReceipt.snapshot.updatedAt }}</p><p v-if="store.setupReceipt.snapshot.bridge">Bridge 回执：{{ store.setupReceipt.snapshot.bridge.status }} · {{ store.setupReceipt.snapshot.bridge.version }}<br>{{ store.setupReceipt.snapshot.bridge.targetPath }}</p><p v-if="store.setupReceipt.snapshot.runtime">当时运行回执：{{ store.setupReceipt.snapshot.runtime.state }}，不是当前状态验证。</p><p v-if="store.setupReceipt.snapshot.mcpName">后台返回的 MCP 名称：{{ store.setupReceipt.snapshot.mcpName }}；不证明当前配置或工具范围。</p></template>
     <template v-if="completedSetup&&projectConnectionsProvider&&store.setupReceipt?.operationId"><SetupToolScopePanel :project-id="completedSetup.project.id" :setup-operation-id="store.setupReceipt.operationId"/><AgentRegistrationPanel v-if="!agentsSkipped" :project-id="completedSetup.project.id" wizard @skip="agentsSkipped=true"/><p v-else>已跳过本步 Agent 注册；先前已完成的配置不变。</p></template><SetupCompletionUsage v-if="completionUsage" :usage="completionUsage"/>
-    <p>可能复用同路径任务，但接口不返回原始选项或复用标记，无法核验实际执行范围。complete 不证明本次全部步骤已执行，也不证明 Creator 当前就绪。</p>
+    <p v-if="store.setupReceipt.effectiveOptions">已核实选项：Bridge 安装；Creator {{ store.setupReceipt.effectiveOptions.startCreator?'启动及验证':'未选择' }}；Codex {{ store.setupReceipt.effectiveOptions.configureCodex?'配置':'未选择' }}。{{ store.setupReceipt.reused===true?'复用相同选项任务。':store.setupReceipt.reused===false?'新建任务。':'' }}complete 表示该任务步骤完成；当前运行状态需另行读取。</p><p v-else>可能复用同路径任务，但接口不返回原始选项或复用标记，无法核验实际执行范围。complete 不证明本次全部步骤已执行，也不证明 Creator 当前就绪。</p>
     <el-button v-if="activeTask" :disabled="!store.canResume" @click="store.resume()">继续读取接入进度</el-button>
    </article>
    <p class="setup-record-note">回执仅保留在本页；关闭 / 停止等待不取消后台任务，刷新页面会丢失记录。</p>
