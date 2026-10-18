@@ -9,7 +9,7 @@ const states = () => ({ knowledge: { running: true, frameable: true }, model: { 
 const tick = async () => { for (let i = 0; i < 16; i++) await Promise.resolve() }
 function deferred<T>() { let resolve!: (value: T) => void, reject!: (reason: unknown) => void; const promise = new Promise<T>((a, b) => { resolve = a; reject = b }); return { promise, resolve, reject } }
 function fixture() {
-  const provider: LocalServiceOperationsProvider = { label: 'OFFLINE STOP', run: vi.fn(async (input): Promise<LocalServiceOperationReply> => input.service === 'knowledge' && input.action === 'start' ? { service: 'knowledge', action: 'start', state: { running: true, frameable: false } } : stopped(input.service)), waitForIdle: vi.fn(async () => {}) }
+  const provider: LocalServiceOperationsProvider = { label: 'OFFLINE STOP', run: vi.fn(async (input): Promise<LocalServiceOperationReply> => input.action === 'start' ? input.service === 'model' ? { service: 'model', action: 'start', state: { running: true } } : { service: 'knowledge', action: 'start', state: { running: true, frameable: false } } : stopped(input.service)), waitForIdle: vi.fn(async () => {}) }
   const readProvider = knowledgeFixture(); vi.mocked(readProvider.loadServiceStates).mockResolvedValue(states())
   const context: LocalServiceContext = { provider, readProvider, scopeKey: 'knowledge' }
   const store = useLocalServiceOperationsStore(); store.syncContext(context); return { provider, readProvider, store, context }
@@ -123,9 +123,9 @@ describe('UNKNOWN and stale-response fences', () => {
 
 describe('knowledge start confirmation and result semantics', () => {
   const offline = () => ({ knowledge: { running: false, frameable: false }, model: { running: false }, warnings: [] })
-  it('requires an explicit unreachable snapshot, never unknown or running, and still forbids model start', async () => {
+  it('requires an explicit unreachable snapshot, never unknown or running, for both original start targets', async () => {
     const { store, readProvider, provider } = fixture(); expect(store.prepare('knowledge', 'start')).toBeNull(); await store.refresh(); expect(store.prepare('knowledge', 'start')).toBeNull()
-    vi.mocked(readProvider.loadServiceStates).mockResolvedValue(offline()); await store.refresh(); expect(store.canPrepare('knowledge', 'start')).toBe(true); expect(store.canPrepare('model', 'start')).toBe(false); expect(store.prepare('model', 'start')).toBeNull()
+    vi.mocked(readProvider.loadServiceStates).mockResolvedValue(offline()); await store.refresh(); expect(store.canPrepare('knowledge', 'start')).toBe(true); expect(store.canPrepare('model', 'start')).toBe(true); expect(store.prepare('model', 'start')?.service).toBe('model')
     expect(provider.run).not.toHaveBeenCalled()
   })
   it('freezes original script side effects and consumes each start confirmation once', async () => {
@@ -146,4 +146,10 @@ describe('knowledge start confirmation and result semantics', () => {
     result.resolve({ service: 'knowledge', action: 'start', state: { running: true, frameable: true } }); await pending; await store.refresh()
     expect(store.records[0]).toMatchObject({ action: 'start', status: 'unknown', detached: true, reply: null }); expect(store.prepare('knowledge', 'start')).toBeNull(); expect(provider.run).toHaveBeenCalledOnce()
   })
+})
+
+
+describe('model launcher one-use start confirmation',()=>{
+ it('requires stopped status and binds receipt to the model action, without claiming generation',async()=>{const {store,readProvider,provider}=fixture();expect(store.prepare('model','start')).toBeNull();await store.refresh();expect(store.prepare('model','start')).toBeNull();vi.mocked(readProvider.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});await store.refresh();const prepared=store.prepare('model','start')!;expect(prepared.impact).toContain('0.0.0.0:8090');expect(await store.execute(prepared,false)).toBe(false);expect(await store.execute(prepared,true)).toBe(true);expect(provider.run).toHaveBeenCalledOnce();expect(store.records[0]!.message).toContain('不代表模型已加载');expect(await store.execute(prepared,true)).toBe(false)})
+ it('keeps cancelled model start UNKNOWN after late success and re-read',async()=>{const {store,readProvider,provider}=fixture(),pending=deferred<LocalServiceOperationReply>();vi.mocked(readProvider.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});vi.mocked(provider.run).mockReturnValue(pending.promise);await store.refresh();const operation=store.execute(store.prepare('model','start'),true);store.cancel();pending.resolve({service:'model',action:'start',state:{running:true}});await operation;await store.refresh();expect(store.blockedUnknown).toBe(true);expect(store.canPrepare('model','start')).toBe(false);expect(store.records[0]!.reply).toBeNull()})
 })

@@ -5,6 +5,7 @@ export const frontendIdentity = { name: 'Companion Next', version, releaseDate: 
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；完整业务迁移未完成', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  { version, date: '2026-10-18', title: '恢复原模型服务与管理面板', changes: ['模型服务属于旧后台迁移范围；恢复原启动器启动 / 关闭及固定8090原面板，复用原各模型 / ComfyUI操作，不另造一致性控制。进入模型页只读状态，启停仍逐次确认；已有GPU服务不为验收切换，不恢复旧批量生成。'] },
   { version, date: '2026-10-18', title: '修复实时更新切页恢复', changes: ['工程页离开时暂停事件流及读取并保留用户启用意图；返回同一来源自动恢复，主动停止 / 断开 / 来源变更仍保持停止。返回读取由实时通道负责，避免与页面初载重复；不新增设置，不改变知识服务或模型状态。'] },
   { version, date: '2026-10-18', title: '更新同源保存与真实库存验收说明', changes: ['按已核证据修正帮助与迁移页：隔离任务的原生保存取消 / 已知失败 / 成功已验，工程只读库存733项曾与原接口及页面一致。用户原图片库仍未切换，完整图片任务动作与Codex自动回收未开放；仅更新文案，不重复业务验收。'] },
   { version, date: '2026-10-18', title: '恢复 Agent 原单会话问答流程', changes: ['恢复旧 Agent 下拉与刷新、提问、返回 sessionId 的追问、本地新对话、等待 / 停止等待和完整 JSON 答复。请求仅为原 agentId / query / 可选 sessionId；跨 Agent / 来源不复用旧会话，未知结果不自动重发，与 KB 问答及同步互斥。旧接口没有持久会话列表、创建 / 切换 / 删除或流式能力，不新增这些。仅用隔离假响应和拦截请求验证，未实际问答、调用模型或写服务端会话。'] },
@@ -53,7 +54,7 @@ export const helpTopics = [
   { id: 'tools', group: 'Cocos Bridge', title: '工具清单与权限范围', paragraphs: ["旧版可查看工具清单，并为工程选择工具范围 / 预设。这是工具可见范围设置，不等同于 Creator 执行权限。", "本帮助小节可显式读取目录、当前范围和预设，并按原流程编辑、克隆、导入、导出、保存、删除及分配工程范围。类别展开、类别内全选 / 取消先修改草稿，正式写入另行确认；仅支持普通删除；被引用时拒绝，不发送会使关联工程回退 full 的强制删除。UNKNOWN 不自动重发。旧接口没有 expectedHash，并发原子保护和真实持久写入尚未验收；本地草稿本身不会改变后台范围。"], destination: "/migration?feature=tools", action: "查看工具范围实现与验收边界" },
   { id: 'knowledge-can', group: '知识库', title: '能够做什么', paragraphs: ['旧版提供知识库 / 文档 / 切片列表、详情、原文预览、检索和问答，以及已登记来源的同步演练与执行。', '当前已接原查询、KB 问答及同步来源选择 / 演练 / 排队回执。同步执行仍受服务端逐源批准、启用和 writer 就绪限制；排队不等于索引完成。Agent 选择、单会话追问与本地新对话已接；实际同步和模型调用未验收。'], destination: '/knowledge', action: '打开知识查询与同步' },
   { id: 'knowledge-cannot', group: '知识库', title: '不能做什么', paragraphs: ['旧版明确说明页面不直接提供新增、删除或上传知识库内容；缺少对话权限不应扩大成全面不可用。', '本页不能批准来源、开启 writer、设置凭据或直接改写数据库。同步只按原登记来源调用演练 / 执行，未确认结果不自动重发；原文预览也不等于文件已保存。'], destination: '/migration?feature=knowledge', action: '查看知识保留表' },
-  { id: 'models', group: '模型服务', title: '模型服务', paragraphs: ['旧版可启动 / 关闭本机模型服务启动器，允许时嵌入页面。关闭启动器不等于停止已经运行的模型。', '可显式读取启动器状态及确认关闭启动器；可达不等于模型已加载或 Comfy 已连接。原启动会监听局域网并可能补启代理，当前未开放该启动动作。'], destination: '/migration?feature=models', action: '查看模型服务保留项' },
+  { id: 'models', group: '模型服务', title: '模型服务', paragraphs: ['旧版可启动 / 关闭本机模型服务启动器，允许时嵌入页面。关闭启动器不等于停止已经运行的模型。', '模型页读取原启动器状态，恢复启动 / 关闭及固定8090管理面板；各模型和ComfyUI工作流仍在原面板操作。原启动会监听局域网并可能补启代理，确认前说明影响；可达不等于模型加载或一致性实验通过。'], destination: '/knowledge?tab=models', action: '打开模型服务' },
 ] as const
 
 export const migrationFeatures = [
@@ -64,7 +65,7 @@ export const migrationFeatures = [
   { id: 'logs', title: '日志中心与诊断导出', status: "日志工具条已接 · 实机待验", detail: "已接日志 GET / SSE、等级 / 来源 / 工程 / 关键字筛选、暂停 / 恢复、清空、导出和诊断；手动刷新保留当前列表与滚动位置。清空和诊断按原接口分别确认，明确区分内存记录与文件日志；真实清空和 Creator 诊断链路尚未验收。", destination: "/projects?tab=logs" },
   { id: 'calls', title: '调用记录与进行中详情', status: '实时读取已接 · 实机待验', detail: '调用统计 / 最近摘要、全部与失败、每页50与更多、结果摘要、实时合并和会话重置已接源码。重连重新核对快照，但无事件回放，不能保证断线完整性；实际宿主待验。不重放调用。', destination: '/projects?tab=calls' },
   { id: 'knowledge', title: '知识库', status: '查询 / 问答 / 同步源码已接', detail: '库、文档、块片段、Agent列表与原文预览已接；KB问答有独立发送确认。同步沿用逐源 approved / enabled / writerReady 门禁、来源选择、独立演练、执行排队回执及手动状态核对。排队不等于索引完成；UNKNOWN 不重发。Agent 列表选择、单会话追问 / 本地重置已接；实际同步、Agent 问答和模型调用未验收。', destination: '/knowledge' },
-  { id: 'models', title: '模型服务', status: '状态 / 关闭已接', detail: '真实启动器探针和逐次确认关闭已接；关闭启动器不等于停止模型。原启动可能开放局域网及代理，未开放此动作；Comfy详细健康仍需同源安全投影。实际宿主待验。', destination: '/knowledge?tab=models' },
+  { id: 'models', title: '模型服务', status: '原启停 / 管理面板已接', detail: '恢复原模型启动器状态、逐次确认启停及固定8090原面板。各模型 / ComfyUI操作沿用原界面，关闭启动器不等于停止模型。模型服务是迁移范围；真实GPU切换或一致性生成另需明确目标与运行窗口，不自动恢复旧批量任务。', destination: '/knowledge?tab=models' },
   { id: 'cli', title: '使用 CLI 与复制件', status: "原文复制与编辑器交接已接", detail: "原工程提示词、绑定工程 ID、全文复制、换行和折叠均已接入；CLI、帮助和安装完成示例可先复制再按固定协议唤起 Cursor / Codex。复制不会执行 CLI、安装 Skill 或向外部 Agent 提交任务；真实应用接收结果仍受本机协议与客户端状态限制。", destination: "/projects" },
   { id: 'mcp', title: 'MCP 注册与接入向导', status: "五客户端注册 / 分项安装已接", detail: "工程卡片五客户端注册、安装完成后的 Agent 多选 / 全选 / 跳过和工具范围确认已接入。Bridge 必选，Creator / Codex 可独立选择；专用安装合同回显有效选项和复用标记，不匹配保持 UNKNOWN。实际客户端配置与真实安装组合尚未验收；不能把页面入口、202或复制文本当作配置成功。", destination: "/projects" },
   { id: 'tools', title: '工具清单、范围与工程编辑', status: '预设读写源码已接', detail: '工具目录、范围、页面草稿及 JSON 交换保留；正常工作区创建、更新、导入、工程分配与无引用删除逐次确认。旧更新无hash并发保护；不强制删除回退full，UNKNOWN不自动重发。MCP 注册和预设持久写入的真实客户端验收仍待完成。', destination: '/help?topic=tools' },

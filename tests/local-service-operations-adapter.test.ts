@@ -32,7 +32,7 @@ describe('audited v148 service stop contract, fake transport only', () => {
     for (const timeoutMs of [0, -1, NaN, Infinity, 120_001]) expect(() => createLocalServiceOperationsProvider({ fetch: fixture(), timeoutMs })).toThrow(RangeError)
     expect(fetch).not.toHaveBeenCalled()
   })
-  it.each(['start', 'restart', 'launch', 'stop/../start', '', null])('cannot dispatch unaudited or noncontract action %s', async action => {
+  it.each(['restart', 'launch', 'stop/../start', '', null])('cannot dispatch unaudited or noncontract action %s', async action => {
     const fetch = fixture(); await failure(createLocalServiceOperationsProvider({ fetch }).run({ ...input(), action } as never), 'invalid-input', 'not-dispatched'); expect(fetch).not.toHaveBeenCalled()
   })
   it.each(['knowledge-service', 'model-service', '../PRIVATE', 'https://PRIVATE', 'cli', '', null])('rejects unsafe target %s', async service => {
@@ -145,4 +145,12 @@ describe('audited original knowledge start only', () => {
   it('has sufficient bounded time for the original 60-second script plus 45-second service wait', () => {
     expect(LOCAL_SERVICE_OPERATION_LIMITS.timeoutMs).toBe(120_000)
   })
+})
+
+
+describe('original model launcher start, isolated transport',()=>{
+ const request={service:'model',action:'start'} as const
+ it('uses the fixed original POST {} and accepts only a running launcher receipt',async()=>{const fetch=fixture({running:true}),provider=createLocalServiceOperationsProvider({fetch});expect(await provider.run(request)).toEqual({...request,state:{running:true}});expect(fetch).toHaveBeenCalledOnce();expect(fetch.mock.calls[0]).toEqual(['/api/model-service/start',expect.objectContaining({method:'POST',body:'{}',credentials:'same-origin'})])})
+ it.each([{running:false},{running:true,error:'PRIVATE'},{running:true,frameable:true},{running:'true'}])('does not accept invalid start response %#',async raw=>{await failure(createLocalServiceOperationsProvider({fetch:fixture(raw)}).run(request),'invalid-shape')})
+ it('distinguishes an original 503 start failure and retains the common operation lane',async()=>{await failure(createLocalServiceOperationsProvider({fetch:fixture(json({running:false,error:'PRIVATE'},503))}).run(request),'backend-failure','reported-failure');const pending=deferred<Response>(),fetch=vi.fn<LocalServiceOperationFetch>(()=>pending.promise),provider=createLocalServiceOperationsProvider({fetch});const start=provider.run(request);await flush();await failure(provider.run(input()),'busy','not-dispatched');pending.resolve(json({running:true}));await start;await provider.waitForIdle();expect(fetch).toHaveBeenCalledOnce()})
 })

@@ -1,7 +1,7 @@
 import type { LocalService, LocalServiceOperationCode, LocalServiceOperationOutcome, LocalServiceOperationReply, LocalServiceOperationRequest, LocalServiceOperationsProvider } from '../domain/local-service-operations'
 import { LOCAL_SERVICE_OPERATION_LIMITS, LocalServiceOperationError, normalizeLocalServiceOperation } from '../domain/local-service-operations'
 export { LOCAL_SERVICE_OPERATION_LIMITS, LocalServiceOperationError } from '../domain/local-service-operations'
-export type LocalServiceOperationPath = '/api/knowledge-service/start' | '/api/knowledge-service/stop' | '/api/model-service/stop'
+export type LocalServiceOperationPath = '/api/knowledge-service/start' | '/api/knowledge-service/stop' | '/api/model-service/stop' | '/api/model-service/start'
 export type LocalServiceOperationFetch = (input: LocalServiceOperationPath, init: RequestInit) => Promise<Response>
 const localFailures = new WeakSet<LocalServiceOperationError>()
 const fail = (code: LocalServiceOperationCode, outcome: LocalServiceOperationOutcome = 'unknown') => {
@@ -62,16 +62,16 @@ function decodeResponse(value: unknown, status: number, request: LocalServiceOpe
   const state = stateEnvelope(value, service)
   if (status === 503 && state.running !== expectedRunning && state.hasError) throw fail('backend-failure', 'reported-failure')
   if (status !== 200 || state.running !== expectedRunning || state.hasError) throw fail('invalid-shape')
-  return service === 'knowledge' ? (action === 'start' ? { service, action, state: { running: true, frameable: state.frameable! } } : { service, action, state: { running: false, frameable: false } }) : { service, action: 'stop', state: { running: false } }
+  return service === 'knowledge' ? (action === 'start' ? { service, action, state: { running: true, frameable: state.frameable! } } : { service, action, state: { running: false, frameable: false } }) : action === 'start' ? { service, action, state: { running: true } } : { service, action, state: { running: false } }
 }
-/** Two audited stop endpoints and the original audited knowledge start. No model start, global fetch, CLI, arbitrary URL, retry or polling. */
+/** Fixed original knowledge/model start/stop endpoints; no global fetch, CLI, arbitrary URL, retry or polling. */
 export function createLocalServiceOperationsProvider(options: { fetch: LocalServiceOperationFetch; timeoutMs?: number }): LocalServiceOperationsProvider {
   if (typeof options?.fetch !== 'function') throw new TypeError('服务操作适配器需要显式注入同源 fetch。')
   const transport = options.fetch, timeoutMs = options.timeoutMs ?? LOCAL_SERVICE_OPERATION_LIMITS.timeoutMs
   if (!Number.isFinite(timeoutMs) || timeoutMs < 1 || timeoutMs > LOCAL_SERVICE_OPERATION_LIMITS.timeoutMs) throw new RangeError('服务操作超时必须为 1 至 120000 毫秒。')
   let inFlight: object | undefined, idle = Promise.resolve()
   return Object.freeze({
-    label: 'Companion 同源服务操作（v148 路由与原知识启动脚本已核，实机未验）',
+    label: 'Companion 同源服务操作（原知识 / 模型启动器路由，逐次确认）',
     waitForIdle: () => idle,
     async run(input, signal): Promise<LocalServiceOperationReply> {
       if (signal?.aborted) throw fail('aborted', 'not-dispatched')
@@ -106,7 +106,7 @@ export function createLocalServiceOperationsProvider(options: { fetch: LocalServ
           if (controller.signal.aborted) throw abortError()
           invoked = true
           try {
-            const path: LocalServiceOperationPath = request.service === 'knowledge' ? `/api/knowledge-service/${request.action}` : '/api/model-service/stop'
+            const path: LocalServiceOperationPath = request.service === 'knowledge' ? `/api/knowledge-service/${request.action}` : `/api/model-service/${request.action}`
             return Promise.resolve(transport(path, {
               method: 'POST', mode: 'same-origin', credentials: 'same-origin', redirect: 'error', cache: 'no-store',
               headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: '{}',

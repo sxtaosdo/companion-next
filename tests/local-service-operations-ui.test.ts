@@ -12,9 +12,9 @@ import { useWorkspaceStore } from '../src/stores/workspace'
 import { LocalServiceOperationError, type LocalServiceOperationsProvider, type LocalServiceOperationReply } from '../src/domain/local-service-operations'
 import { knowledgeFixture, deferred } from './knowledge-read-fixture'
 let wrapper: VueWrapper | undefined
-function provider(): LocalServiceOperationsProvider { return { label: 'OFFLINE STOP UI', run: vi.fn(async (input): Promise<LocalServiceOperationReply> => input.service === 'knowledge' && input.action === 'start' ? { service: 'knowledge', action: 'start', state: { running: true, frameable: false } } : input.service === 'model' ? { service: 'model', action: 'stop', state: { running: false } } : { service: 'knowledge', action: 'stop', state: { running: false, frameable: false } }), waitForIdle: vi.fn(async () => {}) } }
-async function setup(options: { p?: LocalServiceOperationsProvider | null; modelsOnly?: boolean } = {}) {
-  const pinia = createPinia(), p = options.p === undefined ? provider() : options.p, r = knowledgeFixture()
+function provider(): LocalServiceOperationsProvider { return { label: 'OFFLINE STOP UI', run: vi.fn(async (input): Promise<LocalServiceOperationReply> => input.action === 'start' ? input.service === 'model' ? { service: 'model', action: 'start', state: { running: true } } : { service: 'knowledge', action: 'start', state: { running: true, frameable: false } } : input.service === 'model' ? { service: 'model', action: 'stop', state: { running: false } } : { service: 'knowledge', action: 'stop', state: { running: false, frameable: false } }), waitForIdle: vi.fn(async () => {}) } }
+async function setup(options: { p?: LocalServiceOperationsProvider | null; modelsOnly?: boolean; r?: ReturnType<typeof knowledgeFixture> } = {}) {
+  const pinia = createPinia(), p = options.p === undefined ? provider() : options.p, r = options.r ?? knowledgeFixture()
   registerKnowledgeReadProvider(r); if (p) registerLocalServiceOperationsProvider(p)
   const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/:pathMatch(.*)*', component: { template: '<div />' } }] }); await router.push('/knowledge'); await router.isReady()
   wrapper = mount(LocalServiceControls, { props: { modelsOnly: options.modelsOnly }, attachTo: document.body, global: { plugins: [pinia, ElementPlus, router] } }); await flushPromises()
@@ -77,14 +77,14 @@ describe('explicit service-control UI and source protection', () => {
     await router.push('/knowledge');await flushPromises();await stop('知识库服务');await click('读取当前服务状态')
     expect(store.blockedUnknown).toBe(true);expect(wrapper!.find('iframe').exists()).toBe(false)
   })
-  it.each([true, false])('never embeds model or missing write host when modelsOnly=%s', async modelsOnly => {
-    const {r}=await setup({modelsOnly,p:modelsOnly?undefined:null});vi.mocked(r.loadServiceStates).mockResolvedValue({knowledge:{running:true,frameable:true},model:{running:true},warnings:[]})
+  it.each([true, false])('never embeds without a write host when modelsOnly=%s', async modelsOnly => {
+    const {r}=await setup({modelsOnly,p:null});vi.mocked(r.loadServiceStates).mockResolvedValue({knowledge:{running:true,frameable:true},model:{running:true},warnings:[]})
     await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(false)
   })
   it('does not turn the old model iframe into a new external-link capability', async () => {
     const { r, p } = await setup({ modelsOnly: true })
     vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
-    await click('读取当前服务状态');expect(wrapper!.findAll('a,iframe')).toHaveLength(0);expect(p.run).not.toHaveBeenCalled()
+    await click('读取当前服务状态');expect(wrapper!.findAll('a')).toHaveLength(0);expect(wrapper!.get('iframe').attributes('src')).toBe('http://127.0.0.1:8090/');expect(p.run).not.toHaveBeenCalled()
   })
   it('removes the old link during refresh and on failed reads, without retaining success', async () => {
     const { r } = await setup();vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
@@ -105,7 +105,7 @@ describe('explicit service-control UI and source protection', () => {
     const { p, r } = await setup(); expect(r.loadServiceStates).not.toHaveBeenCalled(); expect(r.status).not.toHaveBeenCalled(); expect(p.run).not.toHaveBeenCalled()
     expect(button('核对关闭模型启动器').attributes('disabled')).toBeDefined(); expect(wrapper!.findAll('iframe,a,object,img')).toHaveLength(0)
     expect(wrapper!.findAll('button').some(value => value.text().includes('启动') && !value.text().includes('关闭模型启动器'))).toBe(false)
-    expect(wrapper!.text()).toContain('没有接入启动操作'); expect(wrapper!.text()).toContain('不能保证只关闭本页')
+    expect(wrapper!.text()).toContain('沿用原本机启动器面板'); expect(wrapper!.text()).toContain('不能保证只关闭本页')
   })
   it('explains absent capability and does not silently use read-only builds', async () => {
     const { r } = await setup({ p: null }); expect(button('读取当前服务状态').attributes('disabled')).toBeDefined(); expect(wrapper!.text()).toContain('当前构建未接入服务启停能力'); expect(r.loadServiceStates).not.toHaveBeenCalled()
@@ -174,8 +174,21 @@ describe('knowledge start UI retains original flow with explicit side-effect rev
     await click('确认并启动这一次'); expect(p.run).toHaveBeenCalledOnce(); expect(vi.mocked(p.run).mock.calls[0]![0]).toEqual({ service: 'knowledge', action: 'start' })
     expect(wrapper!.text()).toContain('已收到启动回执'); expect(wrapper!.text()).toContain('不代表登录、检索或索引就绪'); expect(wrapper!.findAll('iframe,a,object')).toHaveLength(0)
   })
-  it('never offers model start even when launcher is explicitly unreachable', async () => {
+  it('restores model start after explicitly unreachable launcher state', async () => {
     const { r } = await setup({ modelsOnly: true }); vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: false, frameable: false }, model: { running: false }, warnings: [] }); await click('读取当前服务状态')
-    expect(wrapper!.findAll('button').some(value => value.text().startsWith('核对启动') || value.text().startsWith('确认并启动'))).toBe(false); expect(wrapper!.text()).toContain('8092 局域网代理')
+    expect(button('核对启动模型启动器').attributes('disabled')).toBeUndefined(); await click('核对启动模型启动器'); expect(wrapper!.text()).toContain('0.0.0.0:8090'); expect(wrapper!.text()).toContain('8092 局域网代理')
   })
+})
+
+
+describe('original model page iframe lifecycle',()=>{
+ it('reads status on model entry only, embeds the original page and does not dispatch an operation',async()=>{const {r,p}=await setup({modelsOnly:true});expect(r.loadServiceStates).toHaveBeenCalledOnce();expect(r.status).not.toHaveBeenCalled();expect(p.run).not.toHaveBeenCalled();expect(wrapper!.get('iframe').attributes()).toMatchObject({src:'http://127.0.0.1:8090/',title:'本地 AI 服务启动器',referrerpolicy:'no-referrer'});expect(wrapper!.find('a').exists()).toBe(false)})
+ it('removes model frame on refresh failure, confirmation and leaving model tab',async()=>{const {r}=await setup({modelsOnly:true});expect(wrapper!.find('iframe').exists()).toBe(true);const pending=deferred<Awaited<ReturnType<typeof r.loadServiceStates>>>();vi.mocked(r.loadServiceStates).mockReturnValueOnce(pending.promise);await button('读取当前服务状态').trigger('click');expect(wrapper!.find('iframe').exists()).toBe(false);pending.reject(Error('offline'));await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false);await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(true);await click('核对关闭模型启动器');expect(wrapper!.find('iframe').exists()).toBe(false);await wrapper!.setProps({modelsOnly:false});await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false)})
+ it('confirms only one model-start and refreshes status without loading a model',async()=>{const {r,p}=await setup({modelsOnly:true});vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});await click('读取当前服务状态');await click('核对启动模型启动器');expect(p.run).not.toHaveBeenCalled();const checkbox=wrapper!.get('[aria-label="确认本次服务启动"]');await (checkbox.element.matches('input')?checkbox:checkbox.get('input')).setValue(true);vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:true},warnings:[]});await click('确认并启动这一次');expect(p.run).toHaveBeenCalledOnce();expect(vi.mocked(p.run).mock.calls[0]![0]).toEqual({service:'model',action:'start'});expect(wrapper!.text()).toContain('不代表模型已加载');expect(wrapper!.get('iframe').attributes('src')).toBe('http://127.0.0.1:8090/')})
+})
+
+
+describe('serial model entry probe during source/tab changes',()=>{
+ it.each(['source','tab'] as const)('waits for the previous read and probes only the latest %s context once',async change=>{const first=knowledgeFixture(),pending=deferred<Awaited<ReturnType<typeof first.loadServiceStates>>>();vi.mocked(first.loadServiceStates).mockReturnValueOnce(pending.promise).mockResolvedValue({model:{running:false},warnings:[]});const {p,store}=await setup({modelsOnly:true,r:first});expect(store.reading).toBe(true);let current=first;if(change==='source'){current=knowledgeFixture();vi.mocked(current.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});registerKnowledgeReadProvider(current)}else{await wrapper!.setProps({modelsOnly:false});await wrapper!.setProps({modelsOnly:true})}await flushPromises();expect(current.loadServiceStates).toHaveBeenCalledTimes(change==='source'?0:1);pending.resolve({model:{running:true},warnings:[]});await flushPromises();expect(current.loadServiceStates).toHaveBeenCalledTimes(change==='source'?1:2);expect(store.states?.model?.running).toBe(false);expect(wrapper!.find('iframe').exists()).toBe(false);expect(p.run).not.toHaveBeenCalled();await flushPromises();expect(current.loadServiceStates).toHaveBeenCalledTimes(change==='source'?1:2)})
+ it('drops a queued entry probe on unmount instead of starting a detached request',async()=>{const first=knowledgeFixture(),pending=deferred<Awaited<ReturnType<typeof first.loadServiceStates>>>();vi.mocked(first.loadServiceStates).mockReturnValue(pending.promise);await setup({modelsOnly:true,r:first});await wrapper!.setProps({modelsOnly:false});await wrapper!.setProps({modelsOnly:true});wrapper!.unmount();wrapper=undefined;pending.resolve({model:{running:true},warnings:[]});await flushPromises();expect(first.loadServiceStates).toHaveBeenCalledOnce()})
 })

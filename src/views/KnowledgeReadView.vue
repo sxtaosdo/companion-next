@@ -26,18 +26,18 @@ function selectDocument(id:string){if(isKnowledgeRequestId(id))store.documentId=
 <template>
   <section class="knowledge-read-workspace">
     <div class="section-card knowledge-connect">
-      <div><h2>{{ modelsOnly?'模型服务状态':'知识库 · 查询与原文' }}</h2><p>原 Companion 同源读取。下方查询不自动执行；KB 问答有独立发送确认；Agent 提问和同步均在对应区域单独操作，不自动执行或启动服务。</p></div>
-      <div class="knowledge-actions"><el-button :disabled="!knowledgeReadProvider || store.statusLoading || store.loading || knowledgeSyncPending || knowledgeAgentPending" :loading="store.statusLoading" @click="knowledgeReadProvider && store.connect(knowledgeReadProvider)">{{ store.provider?'重新连接':'连接知识服务' }}</el-button><el-button v-if="store.provider" :disabled="store.loading || store.statusLoading || knowledgeSyncPending || knowledgeAgentPending" @click="store.refreshStatus">刷新状态</el-button><el-button v-if="store.provider" @click="store.disconnect">断开并清空</el-button></div>
+      <div><h2>{{ modelsOnly?'模型服务':'知识库 · 查询与原文' }}</h2><p>{{ modelsOnly ? '沿用原本机启动器；进入页面只读取状态，不自动启停各模型或执行生成任务。' : '原 Companion 同源读取。下方查询不自动执行；KB 问答有独立发送确认；Agent 提问和同步均在对应区域单独操作，不自动执行或启动服务。' }}</p></div>
+      <div v-if="!modelsOnly" class="knowledge-actions"><el-button :disabled="!knowledgeReadProvider || store.statusLoading || store.loading || knowledgeSyncPending || knowledgeAgentPending" :loading="store.statusLoading" @click="knowledgeReadProvider && store.connect(knowledgeReadProvider)">{{ store.provider?'重新连接':'连接知识服务' }}</el-button><el-button v-if="store.provider" :disabled="store.loading || store.statusLoading || knowledgeSyncPending || knowledgeAgentPending" @click="store.refreshStatus">刷新状态</el-button><el-button v-if="store.provider" @click="store.disconnect">断开并清空</el-button></div>
     </div>
     <el-alert v-if="!knowledgeReadProvider" type="info" :closable="false" :title="passiveReadBuild ? '此只读预览未启用状态探测' : '当前宿主未接入原 Companion 知识接口'" :description="passiveReadBuild ? '原知识状态会执行 CLI / 同步状态查询；此构建暂不注册知识与模型连接。功能源码保留在其他专用构建，没有判断原服务离线。' : '需要 Companion 专用构建及原服务同源托管。图片审阅服务的认证不能用于此页；不会跨域连接或自动启动后台。'"/>
-    <div class="knowledge-status-grid">
+    <div v-if="!modelsOnly" class="knowledge-status-grid">
       <article class="section-card"><h3>CLI 与检索</h3><dl><dt>CLI</dt><dd>{{ status ? (status.cli.available ? (status.cli.compatible ? '可用且兼容' : '不兼容') : '不可用') : '未读取' }}<span v-if="status?.cli.version"> · {{ status.cli.version }}</span></dd><dt>认证</dt><dd>{{ status ? authLabel[status.retrieval.auth] : '未读取' }}</dd><dt>关键词验证</dt><dd>{{ status ? (status.retrieval.keyword==='verified'?'后端已有检索验证':'尚未验证') : '未读取' }}</dd><dt>默认知识库</dt><dd>{{ status?.retrieval.kbId || '未读取' }}</dd></dl><p v-if="status?.cli.error" role="alert">{{ status.cli.error.message }}</p><p v-if="store.statusError" role="alert">{{ store.statusError }}</p><small>状态来自上次显式读取；服务可达不等于认证或检索通过。</small></article>
-      <article class="section-card"><h3>知识服务</h3><p class="knowledge-state">{{ store.services?.knowledge ? (store.services.knowledge.running?'服务可达':'服务当前不可达') : '未读取 / 未知' }}</p><p>此卡保留连接时读取的状态。下方服务控制独立读取、逐次确认启停；知识库状态明确允许内嵌时显示原管理页，模型管理尚未接入。</p></article>
+      <article class="section-card"><h3>知识服务</h3><p class="knowledge-state">{{ store.services?.knowledge ? (store.services.knowledge.running?'服务可达':'服务当前不可达') : '未读取 / 未知' }}</p><p>此卡保留连接时读取的状态。下方服务控制独立读取、逐次确认启停；知识库状态明确允许内嵌时显示原管理页；模型服务页保留原启动器。</p></article>
       <article class="section-card"><h3>模型启动器</h3><p class="knowledge-state">{{ store.services?.model ? (store.services.model.running?'启动器可达':'启动器当前不可达') : '未读取 / 未知' }}</p><p>此卡显示连接时读取的启动器可达性；不代表模型已加载、Comfy 已连接或 GPU 已就绪。</p></article>
     </div>
     <el-alert v-if="store.serviceError || store.services?.warnings.length" type="warning" :closable="false" :title="store.serviceError || store.services?.warnings.join('；') || ''"/>
     <LocalServiceControls :models-only="modelsOnly"/>
-    <p v-if="modelsOnly" class="knowledge-note">现有关闭能力只针对模型启动器；各模型的启动、停止和管理页面尚未接入。</p>
+    <p v-if="modelsOnly" class="knowledge-note">启动 / 关闭服务只针对原启动器；各模型的启停、ComfyUI及其工作流沿用上方原面板，切换 GPU 服务前先核对当前任务。</p>
     <template v-else>
       <KnowledgeConversationPanel/>
       <KnowledgeAgentPanel/>

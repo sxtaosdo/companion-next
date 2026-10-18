@@ -1,10 +1,11 @@
-/** Source-proven service controls: v148 routes plus audited original knowledge start script. Model start stays unavailable. */
+/** Source-proven service controls: v148 routes plus audited original knowledge start script. Original model launcher lifecycle and fixed embedded panel. */
 export type LocalService = 'knowledge' | 'model'
 export type LocalServiceAction = 'start' | 'stop'
-export type LocalServiceOperationRequest = { service: 'knowledge'; action: LocalServiceAction } | { service: 'model'; action: 'stop' }
+export type LocalServiceOperationRequest = { service: 'knowledge'; action: LocalServiceAction } | { service: 'model'; action: LocalServiceAction }
 export type LocalServiceOperationReply =
   | { service: 'knowledge'; action: 'start'; state: { running: true; frameable: boolean } }
   | { service: 'knowledge'; action: 'stop'; state: { running: false; frameable: false } }
+  | { service: 'model'; action: 'start'; state: { running: true } }
   | { service: 'model'; action: 'stop'; state: { running: false } }
 export interface LocalServiceOperationsProvider {
   readonly label: string
@@ -16,7 +17,7 @@ export type LocalServiceOperationOutcome = 'not-dispatched' | 'rejected' | 'repo
 export type LocalServiceOperationCode = 'invalid-input' | 'busy' | 'aborted' | 'timeout' | 'forbidden' | 'backend-failure' | 'invalid-shape' | 'response-too-large' | 'network-error'
 export const LOCAL_SERVICE_OPERATION_LIMITS = Object.freeze({ timeoutMs: 120_000, maxResponseBytes: 8192, maxResponseChunks: 64, maxRecords: 20 })
 export const LOCAL_SERVICE_START_GAPS = Object.freeze({
-  model: '原模型启动器会监听 0.0.0.0:8090，并可能补启 8092 局域网代理；涉及网络暴露，启动需要另行审批。当前没有接入启动操作或各模型管理界面。',
+  model: '沿用原本机启动器面板；各模型与 ComfyUI 操作仍在原面板内完成。切换 GPU 服务可能中断当前任务，请先核对占用。',
 })
 export class LocalServiceOperationError extends Error {
   constructor(readonly code: LocalServiceOperationCode, readonly outcome: LocalServiceOperationOutcome) {
@@ -39,9 +40,8 @@ export function normalizeLocalServiceOperation(value: unknown): LocalServiceOper
   if (keys.length !== 2 || keys.some(key => key !== 'service' && key !== 'action')) throw invalid()
   const service = Object.getOwnPropertyDescriptor(value, 'service'), action = Object.getOwnPropertyDescriptor(value, 'action')
   if (!service || !action || !('value' in service) || !('value' in action)
-    || !['knowledge', 'model'].includes(service.value) || !['start', 'stop'].includes(action.value)
-    || (service.value === 'model' && action.value !== 'stop')) throw invalid()
-  return service.value === 'knowledge' ? { service: 'knowledge', action: action.value as LocalServiceAction } : { service: 'model', action: 'stop' }
+    || !['knowledge', 'model'].includes(service.value) || !['start', 'stop'].includes(action.value)) throw invalid()
+  return service.value === 'knowledge' ? { service: 'knowledge', action: action.value as LocalServiceAction } : { service: 'model', action: action.value as LocalServiceAction }
 }
 export function decodeLocalServiceOperationReply(value: unknown, request: LocalServiceOperationRequest): LocalServiceOperationReply {
   const { service, action } = request
@@ -57,7 +57,7 @@ export function decodeLocalServiceOperationReply(value: unknown, request: LocalS
     return action === 'start' ? { service, action, state: { running: true, frameable: state.frameable } } : { service, action, state: { running: false, frameable: false } }
   }
   if (Object.keys(state).length !== 1) throw invalid()
-  return { service, action: 'stop', state: { running: false } }
+  return action === 'start' ? { service, action, state: { running: true } } : { service, action, state: { running: false } }
 }
 export function localServiceLabel(service: LocalService): string { return service === 'knowledge' ? '知识库服务' : '模型启动器' }
 export function localServiceStopImpact(service: LocalService): string {
@@ -67,4 +67,5 @@ export function localServiceStopImpact(service: LocalService): string {
 }
 
 export const KNOWLEDGE_SERVICE_START_IMPACT = '将调用原宿主现有启动脚本，原 PowerShell 子进程使用 ExecutionPolicy Bypass。读取既有 JWT 秘密到进程环境并核验既有权限，不创建或改写秘密、ACL 或永久执行策略。固定监听 127.0.0.1:8081，写检查摘要、日志和 PID，沿用现有数据库与文件存储。原应用沙箱配置为 disabled；不能保证启动后的业务请求不写数据库。'
-export function localServiceOperationImpact(service: LocalService, action: LocalServiceAction): string { return action === 'start' && service === 'knowledge' ? KNOWLEDGE_SERVICE_START_IMPACT : localServiceStopImpact(service) }
+export const MODEL_SERVICE_START_IMPACT = '将调用原宿主已有模型服务启动入口；8090 已可达时复用，否则用既有启动器监听 0.0.0.0:8090。原后台监测已运行 Denova 时可能补启 8092 局域网代理；不更改网络权限或凭据。这里只启动管理页，不主动加载或切换模型；各模型启停与 GPU 冲突仍由原面板处理。'
+export function localServiceOperationImpact(service: LocalService, action: LocalServiceAction): string { return action === 'start' ? service === 'knowledge' ? KNOWLEDGE_SERVICE_START_IMPACT : MODEL_SERVICE_START_IMPACT : localServiceStopImpact(service) }

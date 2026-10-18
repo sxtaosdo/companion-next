@@ -109,7 +109,7 @@ export const useLocalServiceOperationsStore = defineStore('local-service-operati
     }
   }
   function canPrepare(service: LocalService, action: LocalServiceAction = 'stop'): boolean {
-    return ['knowledge', 'model'].includes(service) && ['start', 'stop'].includes(action) && !(service === 'model' && action === 'start')
+    return ['knowledge', 'model'].includes(service) && ['start', 'stop'].includes(action)
       && valid(binding.value) && !reading.value && !transportPending.value && !unknown.value && snapshot.value?.[service]?.running === (action === 'stop')
   }
   function prepare(service: LocalService, action: LocalServiceAction = 'stop'): PreparedLocalServiceOperation | null {
@@ -134,7 +134,7 @@ export const useLocalServiceOperationsStore = defineStore('local-service-operati
       if (reply === cancelled || op.cancelled || binding.value !== current || generation !== op.generation) markUnknown(op)
       else {
         const decoded = freeze(decodeLocalServiceOperationReply(reply, normalizeLocalServiceOperation({ service: op.service, action: op.action })))
-        replaceRecord(op.id, { status: 'acknowledged', reply: decoded, message: op.action === 'start' ? '原后台回执：知识库服务可达。这不代表登录、检索或索引就绪；请显式重新读取当前状态。' : '原后台回执：服务当前不可达。这不证明所有相关进程均已结束；请显式重新读取当前状态。' }); succeeded = true
+        replaceRecord(op.id, { status: 'acknowledged', reply: decoded, message: op.action === 'start' ? op.service === 'knowledge' ? '原后台回执：知识库服务可达。这不代表登录、检索或索引就绪；请显式重新读取当前状态。' : '原后台回执：模型启动器可达。这不代表模型已加载或 ComfyUI 已就绪。' : '原后台回执：服务当前不可达。这不证明所有相关进程均已结束；请显式重新读取当前状态。' }); succeeded = true
       }
     } catch (cause) {
       if (op.cancelled) markUnknown(op)
