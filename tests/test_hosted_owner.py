@@ -1,5 +1,7 @@
 """Offline shutdown/lease contract; no network, original cache or model."""
 import contextlib
+import os
+import sys
 import io
 import json
 import threading
@@ -10,6 +12,27 @@ from unittest.mock import patch
 from bridge import hosted_owner
 
 class HostLifecycle(unittest.TestCase):
+    @unittest.skipUnless(os.name == "nt", "Windows process standard-handle regression")
+    def test_child_nul_does_not_replace_control_stdin_or_crt_fd_and_restores_on_error(self):
+        import ctypes
+        from ctypes import wintypes
+        import msvcrt
+        kernel=ctypes.WinDLL("kernel32",use_last_error=True)
+        kernel.GetStdHandle.argtypes=[wintypes.DWORD]
+        kernel.GetStdHandle.restype=wintypes.HANDLE
+        key=wintypes.DWORD(-10 & 0xffffffff)
+        previous=kernel.GetStdHandle(key)
+        stream=sys.stdin
+        crt=msvcrt.get_osfhandle(0)
+        with self.assertRaisesRegex(ValueError,"fixture"):
+            with hosted_owner.isolated_child_stdin():
+                self.assertNotEqual(kernel.GetStdHandle(key),previous)
+                self.assertIs(sys.stdin,stream)
+                self.assertEqual(msvcrt.get_osfhandle(0),crt)
+                raise ValueError("fixture")
+        self.assertEqual(kernel.GetStdHandle(key),previous)
+        self.assertEqual(msvcrt.get_osfhandle(0),crt)
+
     def test_lease_waits_for_active_handler_busy_and_worker(self):
         events=[]
         busy=threading.Event();busy.set()

@@ -1,6 +1,8 @@
 """Daemon-owned original Owner, private stdin maintenance, no frontend token API."""
 from __future__ import annotations
 import argparse
+from contextlib import contextmanager
+import os
 import json
 from pathlib import Path
 import sys
@@ -9,8 +11,41 @@ import time
 from .launch_picker import load_review_backend, resolve_export, _check_application
 from .picker_bridge import attach_bridge
 
+@contextmanager
+def isolated_child_stdin():
+    """Keep maintenance sys.stdin; Windows grandchildren inherit NUL instead.
+
+    A blocking ReadFile on the inherited maintenance pipe can block Windows
+    child initialization. Change only the process standard-handle table, never
+    CRT fd0/sys.stdin, and restore after every handler/worker has drained.
+    """
+    if os.name != "nt":
+        yield
+        return
+    import ctypes
+    from ctypes import wintypes
+    import msvcrt
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.GetStdHandle.argtypes = [wintypes.DWORD]
+    kernel.GetStdHandle.restype = wintypes.HANDLE
+    kernel.SetStdHandle.argtypes = [wintypes.DWORD, wintypes.HANDLE]
+    kernel.SetStdHandle.restype = wintypes.BOOL
+    standard_input = wintypes.DWORD(-10 & 0xffffffff)
+    previous = kernel.GetStdHandle(standard_input)
+    if previous in (None, ctypes.c_void_p(-1).value):
+        raise RuntimeError("owner control input unavailable")
+    with open(os.devnull, "rb", buffering=0) as sink:
+        if not kernel.SetStdHandle(standard_input, msvcrt.get_osfhandle(sink.fileno())):
+            raise RuntimeError("owner child input isolation failed")
+        try:
+            yield
+        finally:
+            if not kernel.SetStdHandle(standard_input, previous):
+                raise RuntimeError("owner child input restoration failed")
+
+
 def serve(review_root: str, cache: str) -> None:
-    with load_review_backend(review_root) as modules:
+    with isolated_child_stdin(), load_review_backend(review_root) as modules:
         store = resolve_export(modules, "taskStore:TaskStore")(Path(cache), restore=False)
         lease = resolve_export(modules, "taskStore:CacheLease")(store)
         server = None
@@ -79,7 +114,6 @@ def serve(review_root: str, cache: str) -> None:
             server = None
             lease.close()
             lease = None
-            emit({"event": "closed"})
         finally:
             # Startup failure can only release after handlers/workers have drained too.
             if server is not None:
@@ -93,6 +127,9 @@ def serve(review_root: str, cache: str) -> None:
                 server.server_close()
             if lease is not None:
                 lease.close()
+    # Acknowledge only after child stdin has been restored too.
+    print('{"event":"closed"}', flush=True)
+
 
 def main():
     parser = argparse.ArgumentParser()
