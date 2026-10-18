@@ -24,3 +24,15 @@
 源码提交后按原六静态备份/新增哈希资源/原子切换index部署，保留旧资产、运行bundle/CLI、旧仓并行修改和用户窗口。仅验证真实SSE导航恢复及主动停止保持，不再验保存/733库存/目录/知识服务。最终HTTP哈希、真实页面结果与源提交见后续同文记录。
 
 证据目录：`C:/Users/33272/AppData/Local/Temp/companion-sse-navigation-fix-20261018/`。部署前文档只表示源码已修复并完成离线验证，不能冒充实机通过。
+
+## 最终交付（通过）
+
+实现源81ea56c2df7757433f5f3514f57c827a590f73da / 内部.92，产品1.3.173。最终vue-tsc和正式workspace构建通过，旧bundle/CLI、共享脏路径/逐文件哈希/暂存和工作补丁均保持。六静态按备份、追加哈希资源、原子index切换交付；认证HTTP六哈希一致。无需服务重启或用户窗口刷新，旧哈希资源保留。
+
+本次唯一实际SSE验证脚本在独立认证无GPU Edge执行：启用真实流→真实概览（生产共享入口）→帮助→返回工程页，离页流关闭且共享页不恢复，返回自动open。返回仅GET projects/status/counts各1次、events1条；同时活动流最多1条。主动停止后再帮助/工程往返仍off，累计只建立2条真实流，全部结束关闭；无合成事件，不宣称回放或长时无遗漏。pageErrors=[]、blocked=[]、实际业务写0。没有库存/保存/目录/知识/模型/同步/安装/客户端配置/预设/新任务请求。
+
+证据：deployment-prepared.json、deployment-result.json、real-sse-http-proof.json、real-auto-resume.png、real-stop-preserved.png、backup-static/。daemon20116的PID/startupEpoch/入口SHA在实机前后保持，phase OPEN、unknown为空。用户原窗口未触碰，自建浏览器关闭。静态回滚先核当前index哈希，再原子恢复本目录backup-static/index.html，保留全部哈希资产，不覆盖并行工作。
+
+复审角色实际完成两轮只读检查；第二轮源代码无新P1/P2，所提测试激活步骤已修正并单项通过。135个不同受影响用例通过，不额外重跑完整套件。后续仅记录文档，不重标以上静态源。
+
+原验收发现的自动恢复缺口已关闭；知识服务未运行仍单列外部依赖，本轮未启动。到此结束本修复，不扩大其它迁移验收。
