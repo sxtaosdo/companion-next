@@ -1,6 +1,6 @@
 # Windows 聚焦修复候选（2026-10-18）
 
-状态：Accepted（候选准备与验证完成，**未装载到共享32180**）。基线1256a93；无新增UI/协议/安全设置，无旧cocos-mcp工作树修改。
+状态：Accepted（已装载到共享32180并通过真实Next聚焦回归）。基线1256a93；无新增UI/协议/安全设置，无旧cocos-mcp工作树修改。
 
 ## 缺陷与修复
 
@@ -26,8 +26,20 @@
 
 scripts/prepare-windows-focus-overlay.mjs只在任务Temp输出，从当前live source map重建基线。原运行JS SHA为35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699；重建JS字节一致。最终候选SHA为148f28ad4989a038de1825beae197c4db9947f3209a8f22cf07ec330047df526；已改变源仅platform.ts、已新增源仅windows-focus.ts。不覆盖旧22项并行修改，不捆绑生命周期修改。
 
-候选位于Temp/companion-focus-fix-20261018/runtime-build-release/candidate/。尚未替换正式文件，daemon仍原实例。因此当前32180聚焦行为未因此改变，矩阵仍保留“端到端未通过”。
+候选位于Temp/companion-focus-fix-20261018/runtime-build-release/candidate/。准备阶段未替换正式文件；本轮获得部署/重启授权澄清后已按原guarded流程装载，真实Next端到端回归通过，见下方部署回执。
 
-装载需要的具体动作：协调一个32180共享Companion维护窗口；记录并暂时暂停仅相关后台页的轮询/SSE，观察原guarded drain全部已知计数为0且unknown为空；原CLI正常停止daemon（不强杀）；备份并仅替换daemon JS及map；原配置启动，不注入任何知识身份；恢复相关页认证和实时连接；核对原Creator PID/session及已有修改，再在Next点击聚焦，读取实际前台PID并恢复窗口。若guard拒绝或有未知动作立即停止，不绕过。会中断Companion cookie/SSE/MCP及宿主自有空闲child；不调用Creator/模型/WeKnora停止，但须回读确认。准备阶段曾沿用“不重启共享服务”边界。后续已明确该最近限制仅针对知识身份调查，并重申既有开发后台部署、服务重启授权；因此允许按上述guarded流程装载聚焦补丁。知识身份仍禁止注入。结果待真实装载及Next回归回执追加。
+装载需要的具体动作：协调一个32180共享Companion维护窗口；记录并暂时暂停仅相关后台页的轮询/SSE，观察原guarded drain全部已知计数为0且unknown为空；原CLI正常停止daemon（不强杀）；备份并仅替换daemon JS及map；原配置启动，不注入任何知识身份；恢复相关页认证和实时连接；核对原Creator PID/session及已有修改，再在Next点击聚焦，读取实际前台PID并恢复窗口。若guard拒绝或有未知动作立即停止，不绕过。会中断Companion cookie/SSE/MCP及宿主自有空闲child；不调用Creator/模型/WeKnora停止，但须回读确认。准备阶段曾沿用“不重启共享服务”边界。后续已明确该最近限制仅针对知识身份调查，并重申既有开发后台部署、服务重启授权；因此允许按上述guarded流程装载聚焦补丁。知识身份仍禁止注入。此为准备阶段历史计划；实际装载及Next回归已完成，见下方回执。
 
 知识库身份方案与Codex草稿核查独立，不是装载聚焦补丁的前置条件，且该维护窗口不得夹带凭据注入。
+
+## 已授权装载及真实回归
+
+源码e41e1b2 / 1.3.173.107。两个新鲜inflight快照全部计数0、unknown=[]；原CLI guarded stop PASSED，旧20116正常退出且32180解除监听，再仅替换原生宿主JS/map及当前Next静态入口/新hash资产。无强杀、旧CLI未改、旧静态hash资产保留、旧工作树快照未变。
+
+新daemon PID17672、epoch dda70363-e8a1-4faa-a374-049e1cdfa84f，运行SHA148f28ad4989a038de1825beae197c4db9947f3209a8f22cf07ec330047df526，与候选一致。CLI以限定系统基础环境及已知非敏感Owner路径启动，不读取环境通配符，不带知识身份；同一既有directed-acceptance-cache与Next bridge/public-image-review路径恢复。知识CLI可用兼容、auth=missing、writer/scheduler=false；Owner capabilities200。
+
+真实Next聚焦按钮仅一笔focus POST，200/ok=true后独立OS回读为Creator PID18252、窗口459944；前后ready/session e04e7299-680f-4109-a829-8cac07a51bd4不变，随后恢复原Codex19688/525512。六个正式cookie静态HTTP200且SHA全部匹配，blocked=[]、pageErrors=[]。原浏览器2992/591250两原RuntimeId及projects/overview URL保留并刷新认证，只关闭CLI ui创建的附加认证页；原selected标志未正确保存，最终选择原Overview标签，未声称精确恢复最初选中项。普通UI可见原工程、无Forbidden。
+
+最终projects/presets原字节、三仓库HEAD/status/diff/index快照均未变化；原窗口都在、Cursor测试进程/窗为空、原前台恢复。现有模型launcher7292、llama-server3260、WeKnora20364仍在，未调用启停/推理/同步。
+
+自动审批曾拒绝环境变量通配符值检查（潜在敏感字段），整条命令未执行；已删除该读取并使用不含知识凭据的限定启动环境，没有绕过拒绝读取值。类型查找与测试脚本错误均在准备阶段修正，未变更系统/安全设置。这里的成功不包含知识正向查询、Codex草稿投递或整张迁移矩阵完成。

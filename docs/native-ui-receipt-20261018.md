@@ -1,3 +1,5 @@
+2026-10-18 聚焦最新结果：宿主修复已按原guarded流程部署，真实Next点击后OS前台为原Creator并恢复。知识身份未注入，Creator、模型及WeKnora未重启；Companion daemon按授权guarded重启。详见[聚焦交付](windows-focus-fix-20261018.md)、[当前矩阵](parity-remaining-safe-20261018.md)与[知识库只读复盘](knowledge-retrospective-20261018.md)。下方历史状态保留。
+
 # 原生窗口与 IDE 接收续验（2026-10-18）
 
 状态：Accepted。范围仅新 Companion 对旧 Companion；基线2942ed1。桌面操作由根串行执行，客户端路由/知识身份源码由既有子 agent 只读并行查证。不是整张矩阵完成报告。
