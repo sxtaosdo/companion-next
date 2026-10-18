@@ -171,7 +171,7 @@ export const useProjectSetupStore = defineStore('project-setup', () => {
     if (reason) { error.value = reason; return null }
     const strict=typeof writer()?.startStrict==='function'
     if (!consents || (strict ? consents.installBridge!==true||consents.acknowledgeReuse!==true||consents.acknowledgeToolScope!==true||typeof consents.startCreator!=='boolean'||typeof consents.configureCodex!=='boolean' : consentKeys.some(key => consents[key] !== true))) {
-      error.value = '必须逐项明确同意 Bridge、Creator、Codex，以及任务复用与工具范围限制，才能准备完整接入。'; return null
+      error.value = strict ? '必须明确同意 Bridge 安装、任务复用与工具范围限制，并选择是否启动 Creator 和配置 Codex，才能准备安装。' : '必须逐项明确同意 Bridge、Creator、Codex，以及任务复用与工具范围限制，才能准备完整接入。'; return null
     }
     let target: Readonly<ManagedProject>
     try {

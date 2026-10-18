@@ -182,7 +182,7 @@ defineExpose({openForProject:show,close})
    <section class="setup-step"><h3>2. {{ strictOptions?'安装步骤选择':'完整安装接入' }}</h3>
     <el-select popper-class="project-setup-select-popper" v-model="projectId" :disabled="lane.locked" aria-label="安装接入登记工程" placeholder="选择已登记工程"><el-option v-for="project in projects.projects" :key="project.id" :value="project.id" :label="`${project.name} · ${project.id}`"/></el-select>
     <p v-if="selected">{{ selected.name }} · {{ selected.id }}<br>{{ selected.path }}</p>
-    <p>以下五项均需主动勾选。安装可能覆盖未登记的 extensions/creator-ai-bridge 保留目录；失败不保证回滚，Codex 写入或迁移失败也可能留下部分配置。</p>
+    <p>{{ strictOptions?'Bridge 安装、任务复用与工具范围须明确同意；Creator 和 Codex 可独立选择。':'以下五项均需主动勾选。' }}安装可能覆盖未登记的 extensions/creator-ai-bridge 保留目录；失败不保证回滚，Codex 写入或迁移失败也可能留下部分配置。</p>
     <div class="setup-consents">
      <el-checkbox v-model="consents.installBridge" :disabled="lane.locked">允许安装 / 更新 / 接管该工程的 Bridge 扩展及安装登记</el-checkbox>
      <el-checkbox v-model="consents.startCreator" :disabled="lane.locked">允许经 Dashboard 启动 / 复用 Creator 并验证 Bridge</el-checkbox>
