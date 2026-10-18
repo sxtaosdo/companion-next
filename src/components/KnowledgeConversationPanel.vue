@@ -5,6 +5,7 @@ import { useKnowledgeConversationStore } from '../stores/knowledge-conversation'
 import { useWorkspaceStore } from '../stores/workspace'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
 import { useRegisteredProjectStore } from '../stores/registered-project'
+import { knowledgeSyncPending } from '../knowledge-sync-integration'
 import { knowledgeReadProvider } from '../knowledge-read-integration'
 import { knowledgeConversationProvider } from '../knowledge-conversation-integration'
 import { companionBrowserProvider } from '../companion-browser-integration'
@@ -44,7 +45,7 @@ onBeforeUnmount(()=>chat.leave())
     <section v-if="chat.prepared" class="conversation-confirm" aria-label="本次发送确认">
       <h4>尚未发送：核对冻结内容</h4><p>来源 {{ chat.prepared.providerLabel }} · 知识库 {{ chat.prepared.kbId }}</p><p>会话 {{ chat.prepared.sessionId || '新会话' }}</p><pre>{{ chat.prepared.query }}</pre>
       <el-checkbox v-model="confirmed" aria-label="确认本次知识库发送">我确认向此知识库的已配置模型发送以上问题，了解服务端可能保存会话</el-checkbox>
-      <el-button type="warning" :disabled="!confirmed || chat.busy || chat.transportPending" @click="send">确认并发送这一次</el-button>
+      <el-button type="warning" :disabled="!confirmed || chat.busy || chat.transportPending || knowledgeSyncPending" @click="send">确认并发送这一次</el-button>
     </section>
     <div class="conversation-reset"><el-checkbox v-model="resetConfirmed" aria-label="确认开始新知识会话">结束当前本地会话绑定，保留旧记录；不删除服务端历史</el-checkbox><el-button :disabled="!resetConfirmed || chat.transportPending" @click="reset">开始新会话</el-button></div>
     <section class="conversation-history" aria-live="polite"><h4>本页发送记录（{{ chat.turns.length }} / 20）</h4><p v-if="!chat.turns.length">尚无发送记录，不显示示例回答。</p>

@@ -1,3 +1,4 @@
+import { knowledgeSyncPending } from '../knowledge-sync-integration'
 import { computed, ref, shallowRef, toRaw, triggerRef, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { isKnowledgeRequestId } from '../domain/knowledge-read'
@@ -75,7 +76,7 @@ export const useKnowledgeConversationStore = defineStore('knowledge-conversation
   const capacityAvailable = computed(() => records.value.length < KNOWLEDGE_CONVERSATION_STORE_LIMITS.maxTurns
     && retainedBytes.value + KNOWLEDGE_CONVERSATION_STORE_LIMITS.maxTurnBytes <= KNOWLEDGE_CONVERSATION_STORE_LIMITS.maxBytes)
   const busy = computed(() => phase.value === 'sending')
-  const canPrepare = computed(() => validContext(binding.value) && !pending.value && !blocked.value && capacityAvailable.value && query.value.trim().length > 0)
+  const canPrepare = computed(() => validContext(binding.value) && !knowledgeSyncPending.value && !pending.value && !blocked.value && capacityAvailable.value && query.value.trim().length > 0)
   const completedCount = computed(() => records.value.filter(record => !['sending', 'unknown'].includes(record.status)).length)
   function revoke() {
     if (preview.value) approvals.delete(preview.value)
@@ -128,7 +129,7 @@ export const useKnowledgeConversationStore = defineStore('knowledge-conversation
   }
   function prepareSend(): PreparedKnowledgeConversation | null {
     revoke()
-    if (pending.value || blocked.value) return null
+    if (knowledgeSyncPending.value || pending.value || blocked.value) return null
     if (!capacityAvailable.value) { error.value = capacityMessage; return null }
     const current = binding.value
     if (!validContext(current)) { phase.value = 'invalidated'; error.value = '请先读取并明确当前知识库和来源，再准备发送。'; return null }
@@ -140,7 +141,7 @@ export const useKnowledgeConversationStore = defineStore('knowledge-conversation
     } catch { phase.value = 'not-dispatched'; error.value = '问题或知识库标识不符合要求，请修改后重新确认；没有发送请求。'; return null }
   }
   async function send(prepared: PreparedKnowledgeConversation | null, confirmed: boolean): Promise<boolean> {
-    if (confirmed !== true || !prepared || prepared !== preview.value || pending.value || blocked.value || !capacityAvailable.value) return false
+    if (knowledgeSyncPending.value || confirmed !== true || !prepared || prepared !== preview.value || pending.value || blocked.value || !capacityAvailable.value) return false
     const approval = approvals.get(prepared), current = binding.value
     if (!approval || !validContext(current) || approval.binding !== current || approval.generation !== generation
       || approval.revision !== revision.value || approval.queryRevision !== queryRevision) return false

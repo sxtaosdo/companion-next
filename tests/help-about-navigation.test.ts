@@ -337,7 +337,7 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.text()).toContain('不是旧 Companion 的完整替换'); expect(wrapper!.text()).toContain(legacyReference.currentTarget)
     expect(migrationFeatures.find(item=>item.id==='logs')?.status).toBe('日志工具条已接 · 实机待验')
     expect(migrationFeatures.find(item=>item.id==='calls')?.status).toBe('实时读取已接 · 实机待验')
-    expect(migrationFeatures.find((entry) => entry.id === 'knowledge')?.status).toBe('查询 / 问答源码已接')
+    expect(migrationFeatures.find((entry) => entry.id === 'knowledge')?.status).toBe('查询 / 问答 / 同步源码已接')
     expect(migrationFeatures.find((entry) => entry.id === 'models')?.status).toBe('状态 / 关闭已接')
     expect(migrationFeatures.find(entry=>entry.id==='cli')?.status).toBe('原文复制与编辑器交接已接')
     expect(migrationFeatures.find(entry=>entry.id==='tools')?.status).toBe('预设读写源码已接')

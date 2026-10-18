@@ -7,6 +7,8 @@ export type KnowledgeChannel = 'local' | 'official'
 export interface KnowledgeIssue { code: string; message: string; reason?: KnowledgePolicyReason }
 export interface KnowledgeSource {
   id: string; label: string; channel: KnowledgeChannel
+  /** Omitted flags are unknown and never grant writer access. */
+  approved?: boolean; enabled?: boolean; writerReady?: boolean
   targetSha?: string; completedSha?: string
   freshness?: 'unknown' | 'current' | 'stale' | 'blocked' | 'syncing' | 'disabled'
   pending?: number

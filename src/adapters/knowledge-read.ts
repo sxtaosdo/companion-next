@@ -89,6 +89,7 @@ function source(value: unknown): KnowledgeSource {
   const id = text(raw.id, endpoint, 64, false)
   if (!/^[a-z][a-z0-9._-]{0,63}$/.test(id)) throw fail(endpoint, 'invalid-shape')
   const result: KnowledgeSource = { id, label: text(raw.label, endpoint, 100), channel: oneOf(raw.channel, ['local', 'official'], endpoint) }
+  for (const key of ['approved', 'enabled', 'writerReady'] as const) if (raw[key] !== undefined) result[key] = bool(raw[key], endpoint)
   for (const key of ['targetSha', 'completedSha'] as const) if (raw[key] !== undefined) result[key] = sha(raw[key], endpoint)
   if (raw.freshness !== undefined) result.freshness = oneOf(raw.freshness, ['unknown', 'current', 'stale', 'blocked', 'syncing', 'disabled'] as const, endpoint)
   if (raw.pending !== undefined) result.pending = count(raw.pending, endpoint)

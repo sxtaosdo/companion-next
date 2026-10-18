@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import KnowledgeSyncPanel from '../components/KnowledgeSyncPanel.vue'
+import { knowledgeSyncPending } from '../knowledge-sync-integration'
 import KnowledgeConversationPanel from '../components/KnowledgeConversationPanel.vue'
 import LocalServiceControls from '../components/LocalServiceControls.vue'
 import { computed, onBeforeUnmount, watch } from 'vue'
@@ -9,7 +11,7 @@ import { isKnowledgeRequestId } from '../domain/knowledge-read'
 const store=useKnowledgeReadStore(),route=useRoute()
 const modelsOnly=computed(()=>route.query.tab==='models')
 const passiveReadBuild=import.meta.env.MODE==='companion-readonly'
-const blocked=computed(()=>!store.provider||store.loading||store.statusLoading)
+const blocked=computed(()=>!store.provider||store.loading||store.statusLoading||knowledgeSyncPending.value)
 const status= computed(()=>store.status)
 const authLabel={missing:'未配置',configured:'已配置，尚未验证',verified:'后端已验证',denied:'认证被拒绝'}
 const actionLabel={search:'关键词检索',bases:'知识库列表',base:'知识库详情',documents:'文档列表',document:'文档详情',original:'原文预览',chunks:'切片列表',agents:'Agent 列表'}
@@ -22,8 +24,8 @@ function selectDocument(id:string){if(isKnowledgeRequestId(id))store.documentId=
 <template>
   <section class="knowledge-read-workspace">
     <div class="section-card knowledge-connect">
-      <div><h2>{{ modelsOnly?'模型服务状态':'知识库 · 查询与原文' }}</h2><p>原 Companion 同源读取。下方查询不自动执行；问答有独立发送确认，不会同步或启动服务。</p></div>
-      <div class="knowledge-actions"><el-button :disabled="!knowledgeReadProvider || store.statusLoading || store.loading" :loading="store.statusLoading" @click="knowledgeReadProvider && store.connect(knowledgeReadProvider)">{{ store.provider?'重新连接':'连接知识服务' }}</el-button><el-button v-if="store.provider" :disabled="store.loading || store.statusLoading" @click="store.refreshStatus">刷新状态</el-button><el-button v-if="store.provider" @click="store.disconnect">断开并清空</el-button></div>
+      <div><h2>{{ modelsOnly?'模型服务状态':'知识库 · 查询与原文' }}</h2><p>原 Companion 同源读取。下方查询不自动执行；问答有独立发送确认；同步须在下方选择来源并单独操作，不自动执行或启动服务。</p></div>
+      <div class="knowledge-actions"><el-button :disabled="!knowledgeReadProvider || store.statusLoading || store.loading || knowledgeSyncPending" :loading="store.statusLoading" @click="knowledgeReadProvider && store.connect(knowledgeReadProvider)">{{ store.provider?'重新连接':'连接知识服务' }}</el-button><el-button v-if="store.provider" :disabled="store.loading || store.statusLoading || knowledgeSyncPending" @click="store.refreshStatus">刷新状态</el-button><el-button v-if="store.provider" @click="store.disconnect">断开并清空</el-button></div>
     </div>
     <el-alert v-if="!knowledgeReadProvider" type="info" :closable="false" :title="passiveReadBuild ? '此只读预览未启用状态探测' : '当前宿主未接入原 Companion 知识接口'" :description="passiveReadBuild ? '原知识状态会执行 CLI / 同步状态查询；此构建暂不注册知识与模型连接。功能源码保留在其他专用构建，没有判断原服务离线。' : '需要 Companion 专用构建及原服务同源托管。图片审阅服务的认证不能用于此页；不会跨域连接或自动启动后台。'"/>
     <div class="knowledge-status-grid">
@@ -55,7 +57,7 @@ function selectDocument(id:string){if(isKnowledgeRequestId(id))store.documentId=
         <template v-else-if="store.result.kind==='original'"><p>{{ store.result.data.fileName }} · {{ store.result.data.bytes }} 字节{{ store.result.data.truncated?' · 内容已截断':'' }}</p><el-alert v-if="store.result.data.isBase64" type="info" :closable="false" title="二进制原文，仅显示读取元信息；不执行、解码或保存文件。"/><pre v-else>{{ store.result.data.content }}</pre></template>
         <dl v-else><template v-for="(value,key) in store.result.data.item" :key="key"><dt>{{ key }}</dt><dd>{{ value }}</dd></template></dl>
       </section>
-      <section v-if="status" class="section-card"><h3>知识来源登记</h3><p>登记和队列元信息不等于同步或索引已完成。此页没有同步、写入或删除操作。</p><el-alert v-if="status.sync.error" type="warning" :closable="false" :title="status.sync.error.message"/><p v-if="!status.sync.available || status.sync.error">来源登记读取不可用 / 未知，不能按空列表判断没有来源。</p><p v-else-if="!status.sync.sources.length">服务本次未返回登记来源。</p><article v-for="(source,index) in status.sync.sources" :key="`${index}:${source.id}`" class="knowledge-result"><h4>{{ source.label }} · {{ source.channel }}</h4><p>{{ source.id }} · {{ source.freshness ?? '状态未知' }} · 待处理 {{ source.pending ?? '未返回' }}</p><small>目标 {{ source.targetSha ?? '未返回' }} / 完成 {{ source.completedSha ?? '未返回' }}</small><p v-if="source.error">{{ source.error.message }}</p></article></section>
+      <KnowledgeSyncPanel/>
     </template>
   </section>
 </template>

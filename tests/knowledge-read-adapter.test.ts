@@ -262,3 +262,8 @@ describe('knowledge transport budgets, errors and cancellation', () => {
     for (const timeoutMs of [0, -1, Infinity, NaN, 45_001]) expect(() => createKnowledgeReadProvider({ fetch: fixture(), timeoutMs })).toThrow(RangeError)
   })
 })
+
+describe('original sync source writer gate projection',()=>{
+ it.each([true,false])('retains explicit writer flags %s without processing credentials',async flag=>{const fetch=fixture({'/api/knowledge/status':{...status,sync:{...status.sync,sources:[{...source,approved:flag,enabled:flag,writerReady:flag,apiKey:'private'}]}}});const value=await createKnowledgeReadProvider({fetch}).status();expect(value.sync.sources[0]).toMatchObject({approved:flag,enabled:flag,writerReady:flag});expect(JSON.stringify(value)).not.toContain('private')})
+ it.each(['approved','enabled','writerReady'])('rejects non-boolean source gate %s',async key=>{const fetch=fixture({'/api/knowledge/status':{...status,sync:{...status.sync,sources:[{...source,[key]:'true'}]}}});await expect(createKnowledgeReadProvider({fetch}).status()).rejects.toMatchObject({code:'invalid-shape'})})
+})

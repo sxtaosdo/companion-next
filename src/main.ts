@@ -1,3 +1,5 @@
+import { createKnowledgeSyncProvider } from './adapters/knowledge-sync'
+import { registerKnowledgeSyncProvider } from './knowledge-sync-integration'
 import { projectConnectionsProvider } from './project-connections-integration'
 import { createProjectConnectionsProvider } from './adapters/project-connections'
 import { agentHandoffProvider } from './agent-handoff-integration'
@@ -53,6 +55,7 @@ if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatH
   // Normal workspace exposes the approved existing capabilities; readonly keeps
   // its passive boundary. Loopback never replaces session or per-action consent.
   if (normalWorkspaceHost) {
+    registerKnowledgeSyncProvider(createKnowledgeSyncProvider({fetch:window.fetch.bind(window)}))
     projectConnectionsProvider.value=createProjectConnectionsProvider({fetch:window.fetch.bind(window)})
     agentHandoffProvider.value={writeText:async text=>{if(!navigator.clipboard?.writeText)throw Error('clipboard unavailable');await navigator.clipboard.writeText(text)},open:url=>window.location.assign(url)}
     registerPreviewActionsProvider(createPreviewActionsProvider({fetch:window.fetch.bind(window)}))
