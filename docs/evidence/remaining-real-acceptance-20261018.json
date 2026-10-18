@@ -1,0 +1,441 @@
+{
+  "preset-real-proof.json": {
+    "sourceSha256": "75b9be62eae78d5bbf150f9e0cd11b1c50b2f949c40ace2323c109299fd7a08a",
+    "result": {
+      "steps": [
+        {
+          "button": "将当前草稿创建为正式预设",
+          "method": "POST",
+          "path": "/api/tool-presets",
+          "status": 201
+        },
+        {
+          "button": "改名并确认",
+          "method": "PATCH",
+          "path": "/api/tool-presets/preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447",
+          "status": 200
+        },
+        {
+          "button": "为当前工程确认分配预览范围",
+          "method": "POST",
+          "path": "/api/projects/a79f4915296f4091/tool-preset",
+          "status": 200
+        },
+        {
+          "button": "确认删除预览自定义预设",
+          "method": "DELETE",
+          "path": "/api/tool-presets/preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447",
+          "status": 409
+        }
+      ],
+      "exported": true,
+      "error": "locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog').locator('label.el-checkbox').filter({ has: getByRole('dialog').getByRole('checkbox', { name: '确认替换页面预设草稿', exact: true }) })\u001b[22m\n",
+      "events": [
+        {
+          "method": "POST",
+          "path": "/api/tool-presets"
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/tool-presets/preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447"
+        },
+        {
+          "method": "POST",
+          "path": "/api/projects/a79f4915296f4091/tool-preset"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/tool-presets/preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447"
+        }
+      ],
+      "blocked": [],
+      "ownedIds": [
+        "preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447"
+      ],
+      "remainingOwnPresets": [
+        {
+          "id": "preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447",
+          "name": "Next验收1018-updated"
+        }
+      ],
+      "fixtureSelection": "preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447"
+    }
+  },
+  "preset-real-resume-proof.json": {
+    "sourceSha256": "6bcd3f5c43ac8e6fcfb4c2db8435635058d5cec31efcf78868deb657149c4b4c",
+    "result": {
+      "steps": [
+        {
+          "button": "将全部页面草稿导入宿主",
+          "method": "POST",
+          "path": "/api/tool-presets/import",
+          "status": 201
+        },
+        {
+          "button": "确认删除预览自定义预设",
+          "method": "DELETE",
+          "path": "/api/tool-presets/preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447",
+          "status": 200
+        },
+        {
+          "button": "确认删除预览自定义预设",
+          "method": "DELETE",
+          "path": "/api/tool-presets/next-acceptance-20261018-import",
+          "status": 200
+        }
+      ],
+      "imported": true,
+      "fixtureImplicitSelectionRestored": true,
+      "originalStateRestored": true,
+      "events": [
+        {
+          "method": "POST",
+          "path": "/api/tool-presets/import"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/tool-presets/preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/tool-presets/next-acceptance-20261018-import"
+        }
+      ],
+      "blocked": [],
+      "ownedIds": [
+        "preset-bd5bc21e-43f7-47b0-a3b6-92cf1ef96447",
+        "next-acceptance-20261018-import"
+      ],
+      "remainingOwnPresets": [],
+      "fixtureSelection": null
+    }
+  },
+  "preview-probe-status-real-proof.json": {
+    "sourceSha256": "6fcdd8fba50e0b4386602f272c8983885a46d635f86927c95070d93fa30ead29",
+    "result": {
+      "steps": [
+        {
+          "ui": "probe",
+          "httpStatus": 200,
+          "replyKeys": [
+            "available",
+            "running",
+            "url",
+            "connections",
+            "sessionId",
+            "stopSupported",
+            "message"
+          ]
+        },
+        {
+          "ui": "status",
+          "httpStatus": 200,
+          "replyKeys": [
+            "available",
+            "running",
+            "url",
+            "connections",
+            "sessionId",
+            "stopSupported"
+          ]
+        }
+      ],
+      "restoration": [],
+      "before": [
+        {
+          "LocalAddress": "::",
+          "LocalPort": 7456,
+          "OwningProcess": 23740
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 12625,
+          "OwningProcess": 23740
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 11645,
+          "OwningProcess": 23740
+        }
+      ],
+      "originalUnsaved": false,
+      "passed": true,
+      "after": [
+        {
+          "LocalAddress": "::",
+          "LocalPort": 7456,
+          "OwningProcess": 23740
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 12625,
+          "OwningProcess": 23740
+        },
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 11645,
+          "OwningProcess": 23740
+        }
+      ],
+      "blocked": []
+    }
+  },
+  "knowledge-real-proof.json": {
+    "sourceSha256": "37492b030a988b4b5fb3e0df699ef59f16a49cf5bdbaf7838de436001de7ed0a",
+    "result": {
+      "startStatus": 503,
+      "reportedState": {
+        "running": false,
+        "frameable": false,
+        "errorPresent": true
+      },
+      "dispatched": 1,
+      "blocked": [],
+      "responses": [
+        {
+          "path": "/api/knowledge-service/status",
+          "status": 200
+        },
+        {
+          "path": "/api/knowledge-service/start",
+          "status": 503
+        }
+      ],
+      "error": "知识库服务没有启动。",
+      "noOwnerLogin": true,
+      "noQuestionSyncOrModelCalls": true,
+      "ownedBrowserClosed": true
+    }
+  },
+  "knowledge-start-readonly-diagnostics.json": {
+    "sourceSha256": "9407206e5b888c6323bf3e3cd8bdecdef7a3c238567887a9faa526bb31cb446c",
+    "result": {
+      "weknora.exe": {
+        "exists": true,
+        "manifestMatches": true
+      },
+      "duckdb.dll": {
+        "exists": true,
+        "manifestMatches": true
+      },
+      "libgcc_s_seh-1.dll": {
+        "exists": true,
+        "manifestMatches": true
+      },
+      "libstdc++-6.dll": {
+        "exists": true,
+        "manifestMatches": true
+      },
+      "libwinpthread-1.dll": {
+        "exists": true,
+        "manifestMatches": true
+      },
+      "metadata-before.json": {
+        "mtimeUtc": "2026-10-06T02:45:55.750555+00:00",
+        "bytes": 674
+      },
+      "metadata-prestart.json": {
+        "mtimeUtc": "2026-10-16T14:19:01.661755+00:00",
+        "bytes": 1260
+      },
+      "server.pid": {
+        "mtimeUtc": "2026-10-16T14:19:02.230070+00:00",
+        "bytes": 7
+      },
+      "server.stdout.log": {
+        "mtimeUtc": "2026-10-16T14:19:02.175019+00:00",
+        "bytes": 1058
+      },
+      "server.stderr.log": {
+        "mtimeUtc": "2026-10-16T14:19:02.178022+00:00",
+        "bytes": 0
+      }
+    }
+  },
+  "powershell-readonly-child-proof.json": {
+    "sourceSha256": "7a7cbe96f05ddace91ad69cc9a820e95df553a76759bcf7563498967820fb587",
+    "result": [
+      {
+        "stdin": "ignore",
+        "code": 0,
+        "signal": null,
+        "stderr": ""
+      },
+      {
+        "stdin": "pipe",
+        "code": 0,
+        "signal": null,
+        "stderr": ""
+      }
+    ]
+  },
+  "protection-after.json": {
+    "sourceSha256": "77808d559fc55714ac28b8df285a4db9e29cbd1c01110184d671f91eb9abda31",
+    "result": {
+      "shared": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyFileHashChanges": [],
+        "missing": [],
+        "trackedHashChanges": [],
+        "dirtyPaths": 22,
+        "workPatchSame": true,
+        "indexPatchSame": true
+      },
+      "fixture": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyFileHashChanges": [],
+        "missing": [],
+        "trackedHashChanges": [],
+        "dirtyPaths": 1,
+        "workPatchSame": true,
+        "indexPatchSame": true
+      },
+      "original": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyFileHashChanges": [],
+        "missing": [],
+        "trackedHashChanges": [],
+        "dirtyPaths": 170,
+        "workPatchSame": true,
+        "indexPatchSame": true
+      },
+      "presetRestoration": {
+        "semantic": true,
+        "bytes": true
+      },
+      "daemonBundle": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+      "legacyCompanionCliModuleSha256": "7f97a8d9fadcc48fafc482ec11f5d860e1acad8fe12201d2f1cc5d02ea4b67f8",
+      "cliEntryPath": "mcp/dist/companion/creator-ai.js",
+      "cliEntrySha256": "6085072c7c9c7901b1a77d9392785209f9b80c00334a509afd9947f72cde87b8",
+      "presetRestorationAfterDraftSave": {
+        "bytes": true,
+        "semantic": true
+      }
+    }
+  },
+  "runtime-after.json": {
+    "sourceSha256": "30bb14429ccc42d38e6000fe80a6b812b66e3644f6d7b23d47bc2b1f3dc3f1f5",
+    "result": {
+      "daemon": {
+        "pid": 20116,
+        "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+        "startedAt": "2026-10-18T04:48:30.247Z",
+        "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+        "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+        "nodeVersion": "v25.2.1"
+      },
+      "original": {
+        "state": "ready",
+        "pid": 23740,
+        "sessionId": "d4e9a8b9-39e9-4e6b-8fe5-3c237b04c42d"
+      },
+      "fixture": {
+        "state": "error",
+        "pid": null
+      },
+      "model": {
+        "gpuRunning": [
+          "heretic"
+        ],
+        "heretic": {
+          "state": "running",
+          "pid": 3260,
+          "phase": "idle"
+        },
+        "busy": false
+      },
+      "cliEntrySha256": "6085072c7c9c7901b1a77d9392785209f9b80c00334a509afd9947f72cde87b8"
+    }
+  },
+  "approval": {
+    "creatorSwitchRejected": true,
+    "executed": false,
+    "reason": "Original delegated scope prohibits starting Creator or new listeners; stopping shared Creator and starting isolated project risks service disruption and listener changes.",
+    "requestedAction": "Stop original clean Creator, start registered isolated project, exercise Next Preview start/reload/Profiler, then restore original project.",
+    "noRetry": true
+  },
+  "knowledgeReadOnlyStateCheck": {
+    "migration": [
+      [
+        30,
+        0
+      ]
+    ],
+    "quickCheck": "ok",
+    "allStartupTriggerCountsZero": true,
+    "historyHashMatchesBefore": true,
+    "actualStartupFailureCause": "not determined"
+  },
+  "preset-draft-save-real-proof.json": {
+    "sourceSha256": "d789c139394c9f82f4708e74f4030f6dd8a085310fa88f7c977f7128a30b4056",
+    "result": {
+      "steps": [
+        {
+          "button": "将全部页面草稿导入宿主",
+          "method": "POST",
+          "path": "/api/tool-presets/import",
+          "status": 201
+        }
+      ],
+      "imported": true,
+      "error": "locator.click: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('option', { name: 'full 全部', exact: true })\u001b[22m\n",
+      "events": [
+        {
+          "method": "POST",
+          "path": "/api/tool-presets/import"
+        }
+      ],
+      "blocked": [],
+      "ownedIds": [
+        "next-acceptance-20261018-import"
+      ],
+      "remainingOwnPresets": [
+        {
+          "id": "next-acceptance-20261018-import",
+          "name": "Next验收1018-import"
+        }
+      ],
+      "fixtureSelection": null
+    }
+  },
+  "preset-draft-save-resume-proof.json": {
+    "sourceSha256": "e6e66d97585c33ad81d5bf0c19e9eaf7092d8a4239645b18eda3e8d55fd0d7a5",
+    "result": {
+      "steps": [
+        {
+          "button": "用当前草稿保存到预览自定义预设",
+          "method": "PATCH",
+          "path": "/api/tool-presets/next-acceptance-20261018-import",
+          "status": 200
+        },
+        {
+          "button": "确认删除预览自定义预设",
+          "method": "DELETE",
+          "path": "/api/tool-presets/next-acceptance-20261018-import",
+          "status": 200
+        }
+      ],
+      "savedDraftNameAndProfile": true,
+      "originalStateRestored": true,
+      "events": [
+        {
+          "method": "PATCH",
+          "path": "/api/tool-presets/next-acceptance-20261018-import"
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/tool-presets/next-acceptance-20261018-import"
+        }
+      ],
+      "blocked": [],
+      "ownedIds": [
+        "next-acceptance-20261018-import"
+      ],
+      "remainingOwnPresets": [],
+      "fixtureSelection": null
+    }
+  }
+}
