@@ -1,0 +1,43 @@
+{
+  "selectedRestored": true,
+  "closedOnlyNewAuthTabs": [],
+  "restored": [
+    {
+      "url": "http://127.0.0.1:32180/next/index.html",
+      "refreshed": true,
+      "runtimeId": [
+        42,
+        591250,
+        4,
+        0,
+        0,
+        7839
+      ]
+    },
+    {
+      "url": "http://127.0.0.1:32180/next/index.html#/projects",
+      "refreshed": true,
+      "runtimeId": [
+        42,
+        591250,
+        4,
+        0,
+        0,
+        9104
+      ]
+    },
+    {
+      "url": "http://127.0.0.1:32180/next/index.html#/overview",
+      "refreshed": true,
+      "runtimeId": [
+        42,
+        591250,
+        4,
+        0,
+        0,
+        10163
+      ]
+    }
+  ],
+  "originalTabIdsPreserved": true
+}

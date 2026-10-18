@@ -1,3 +1,5 @@
+2026-10-18 13:32 UTC: production Creator-only (10) Next wizard reached complete/current and ready; a differing-options request while active returned production409. Original project restored ready/unsaved=false, registries/profile and protected repository snapshots preserved. Earlier restricted launch environment omission was corrected through the guarded restart without a bundle change. Codex-enabled01/11 and knowledge/model execution remain unverified. See [bounded acceptance](creator-only-real-20261018.md).
+
 2026-10-18 13:13 UTC: production Bridge-only (00) Next wizard installation, complete/current readback and managed-file conflict rejection have real receipts; original state restored. Other combinations and production different-options409 remain unverified. See [bounded acceptance](bridge-only-real-20261018.md).
 
 2026-10-18 聚焦最新结果：宿主修复已按原guarded流程部署，真实Next点击后OS前台为原Creator并恢复。知识身份未注入，Creator、模型及WeKnora未重启；Companion daemon按授权guarded重启。详见[聚焦交付](windows-focus-fix-20261018.md)、[当前矩阵](parity-remaining-safe-20261018.md)与[知识库只读复盘](knowledge-retrospective-20261018.md)。下方历史状态保留。

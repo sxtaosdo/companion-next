@@ -1,3 +1,5 @@
+2026-10-18 13:32 UTC: production Creator-only (10) Next wizard reached complete/current and ready; a differing-options request while active returned production409. Original project restored ready/unsaved=false, registries/profile and protected repository snapshots preserved. Earlier restricted launch environment omission was corrected through the guarded restart without a bundle change. Codex-enabled01/11 and knowledge/model execution remain unverified. See [bounded acceptance](creator-only-real-20261018.md).
+
 2026-10-18 13:13 UTC: production Bridge-only (00) Next wizard installation, complete/current readback and managed-file conflict rejection have real receipts; original state restored. Other combinations and production different-options409 remain unverified. See [bounded acceptance](bridge-only-real-20261018.md).
 
 2026-10-18 最新：[Windows聚焦修复](windows-focus-fix-20261018.md)已部署，真实Next按钮200且实际Creator前台回读通过并恢复。知识库多天未闭环原因、1647文档/1493遗留未完成及官方方案比较见[只读复盘](knowledge-retrospective-20261018.md)；知识身份仍未注入。
