@@ -31,3 +31,6 @@ http-server.ts:456–465与v1的mcp/register只支持POST，target为codex/curso
 证据根C:/Users/33272/AppData/Local/Temp/companion-preview-profiler-20261018：deployment-result.json、browser-proof.json、ordinary-window-proof.json。所有业务按钮测试均为fixture，不能将其称为真实运行通过。
 
 下一只读审计发现：旧app.ts:3459在modal-open时忽略/快捷键，Next只排除输入元素，会在CLI/接入/Creator弹窗抢焦点。下一片先恢复这条保护，沿用已批准旧交互，针对性测试后再部署；另有工具预设按scope类别批量选择缺口，可仅改内存草稿，无新接口。
+
+
+验证更正：.48最终帮助状态文字变化发生在初始strict之后，下一片strict发现MigrationView字面量联合类型比较TS2367。此为静态类型问题，浏览器运行证据仍有效；已在后续快捷键片改用相同语义string helper并最终strict通过。不能将此前初始strict说成.48最终文案的完整类型验证。最终共享22项head/status/diff/dirty字节与daemon SHA保护复验通过，证据final-protection.json。

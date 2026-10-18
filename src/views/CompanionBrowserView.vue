@@ -81,7 +81,7 @@ async function copy(text:string){try{await navigator.clipboard.writeText(text);E
 function showCalls(id:string){store.setCallContext(id,false);void router.push({path:'/projects',query:{tab:'calls'}});void store.loadCalls()}
 function callProject(value:string){store.setCallContext(value,store.failedOnly);void store.loadCalls()}
 function callFilter(value:boolean){store.setCallContext(store.callProjectId,value);void store.loadCalls()}
-function shortcuts(event:KeyboardEvent){const node=event.target as HTMLElement|null;if(event.key==='/'&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!node?.closest('input,textarea,select,[contenteditable="true"]')&&tab.value==='projects'){event.preventDefault();queryInput.value?.focus()}}
+function shortcuts(event:KeyboardEvent){if(cliOpen.value||setupDialogOpen.value||operations.dialogOpen||Array.from(document.querySelectorAll('[role="dialog"][aria-modal="true"],dialog[open]')).some(dialog=>dialog.getClientRects().length>0))return;const node=event.target as HTMLElement|null;if(event.key==='/'&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!node?.closest('input,textarea,select,[contenteditable="true"]')&&tab.value==='projects'){event.preventDefault();queryInput.value?.focus()}}
 function visibility(){store.setLiveVisibility(document.visibilityState==='visible')}
 visibility();document.addEventListener('visibilitychange',visibility)
 const liveLabel=computed(()=>({off:'实时更新未启用',connecting:'事件流连接中',open:'事件流已连接',retrying:'事件流冷却重连中',suspended:'页面隐藏，实时读取已暂停',failed:'事件流已停止，工程轮询仍独立运行'})[store.liveState])
