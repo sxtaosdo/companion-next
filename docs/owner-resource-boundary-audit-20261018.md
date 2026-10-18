@@ -1,3 +1,5 @@
+2026-10-18: Approved B+C narrow Owner host and readonly inventory are implemented and deployed (Nexte2367be/.83; host6ff44f5; daemon25288/SHA35225eb5). Actual preview/selection and native taskTemp PNG+source passed; stable native-success page receipt remains unverified after an original300s chooser timeout. Actual inventory reports503 while Creator/Bridge is unavailable; positive live summary remains unverified. Overall alignment is not complete. See [current acceptance matrix](owner-host-acceptance-20261018.md). Original22 parallel modifications, old UI and original Owner sources preserved.
+
 # 最后两项非模型断点：只读核对与最小方案
 
 状态：Accepted。源码基线5eb6e19/.80，线上静态5138bbf/.79。仅核对源码、既有证据和本地进程；未启动服务、读取用户图片/token/session日志、调用API、重跑Owner/96资源测试或写真实资源。产品代码不变，不构建/部署无变化的静态包。
