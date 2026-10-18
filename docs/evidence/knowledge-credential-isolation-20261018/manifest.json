@@ -1,0 +1,15 @@
+{
+  "originalPatchSha256": "79487bb7bb30636ad4d9a174cf7383502873e4a17b04b1d12db02e731a806eeb",
+  "compression": "gzip with mtime=0 preserves exact patch bytes",
+  "textLogLineEndings": "LF normalized; original logs retained in task Temp",
+  "files": {
+    "build-typecheck.txt": "bde294368bfed77c2cddf8cec271d398aee9cdbab3b26e1059281bd33adb0120",
+    "bundle-verification.json": "5372e18f347f22887e5bd85e906a87c4aac7a18264a0201e3a1433d3d8158dfc",
+    "candidate-commit.json": "079e058a7d59176e9ffa1205367fd1655b907a51027a0a18c9c25ecaf798d741",
+    "credential-isolation.patch.gz": "61c43c22756e13be3e48e074b2030db8f04375ecad3e439717079f23c3c835c6",
+    "focused-tests.txt": "50dadcad46f216e4b4549ab58dc62dc38bac5fd7ef64a7b3c59249ff3d6da8e0",
+    "next-parallel-baseline.json": "48eeabc83423698a70e57041ca4e0f9bfddb7794cef401741cd0072c97ab847e",
+    "review-summary.md": "173f0110faaa53b0a2b088ee23a6fab3beff0dd0c00a2e9cdbd7d17643da3e81",
+    "shared-preservation.json": "21f3d59fb7fd31e3fff9937a550ccfa28ff194ff92c041f7605ae2f80f58e572"
+  }
+}

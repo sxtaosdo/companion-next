@@ -157,8 +157,11 @@ export const useToolPresetsWriteStore = defineStore('tool-presets-write', () => 
     if (!attempt.value || !attemptReader || sending.value || readingBack.value) return
     const frozenAttempt = attempt.value, reader = attemptReader, local = new AbortController(), version = ++observationVersion
     readController = local; readingBack.value = true; observation.value = null; error.value = ''
+    const pending: Promise<unknown>[] = []
     try {
-      const [tools, result] = await Promise.all([reader.loadTools(local.signal), reader.loadPresets(frozenAttempt.projectId || undefined, local.signal)])
+      const toolsRead = reader.loadTools(local.signal); pending.push(toolsRead)
+      const presetsRead = reader.loadPresets(frozenAttempt.projectId || undefined, local.signal); pending.push(presetsRead)
+      const [tools, result] = await Promise.all([toolsRead, presetsRead])
       if (local.signal.aborted || version !== observationVersion) return
       const catalog = decodeToolCatalog(tools), snapshot = decodeToolPresetRead(result)
       for (const preset of snapshot.presets) effectiveToolNames(preset, catalog)
@@ -171,7 +174,11 @@ export const useToolPresetsWriteStore = defineStore('tool-presets-write', () => 
                 : snapshot.presets.some(item => sameToolPreset(item, op.preset, ['id', 'updatedAt']))
       observation.value = freeze({ sourceLabel: frozenAttempt.sourceLabel, projectName: frozenAttempt.projectName, projectPath: frozenAttempt.projectPath, registrationLabel: frozenAttempt.registrationLabel, projectId: frozenAttempt.projectId, snapshot, matches, message: `${matches ? '当前快照与预期一致' : '当前快照与预期不一致或无法对应'}；回读不证明本次请求成功，也不解除跨页面并发风险。` })
     } catch { if (version === observationVersion) error.value = '显式回读未完成；原操作结果保持不变，未自动重试写入。' }
-    finally { if (version === observationVersion) readingBack.value = false; if (readController === local) readController = null }
+    finally {
+      // One rejection does not settle the other reader's underlying I/O.
+      await Promise.allSettled(pending)
+      if (readController === local) { readingBack.value = false; readController = null }
+    }
   }
   function acknowledgeUnknown(approved: boolean): boolean {
     if (!approved || status.value !== 'unknown' || !observation.value || sending.value || readingBack.value) return false
@@ -179,6 +186,6 @@ export const useToolPresetsWriteStore = defineStore('tool-presets-write', () => 
     writtenTools = context?.tools ?? null; writtenPresets = context?.presets ?? null
     return true
   }
-  function leave() { dismiss(); cancelWait(); readController?.abort(); observationVersion++; readingBack.value = false; context = null; signature = ''; revision.value++ }
+  function leave() { dismiss(); cancelWait(); readController?.abort(); observationVersion++; context = null; signature = ''; revision.value++ }
   return { plan, attempt, receipt, observation, status, error, notice, inUseProjectIds, sending, readingBack, needsRefresh, locked, revision, syncContext, prepareCreate, prepareUpdate, prepareRename, prepareImport, prepareAssign, prepareDelete, dismiss, confirm, cancelWait, readBack, acknowledgeUnknown, leave }
 })

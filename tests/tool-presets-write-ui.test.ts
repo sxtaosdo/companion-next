@@ -120,4 +120,64 @@ describe('tool preset production controls remain in the original help panel', ()
     expect(write.status).toBe('unknown'); finish({ kind: 'preset', preset: custom('custom', '已改名'), batchSize: 1 }); await flushPromises()
     expect(write.status).toBe('unknown'); expect(write.receipt).toBeNull(); expect(writer.execute).toHaveBeenCalledTimes(1)
   })
+  it('cancels single-preset overwrite without writing and requires a fresh exact-target confirmation', async () => {
+    const { prime, drafts, writer, read } = await setup(); await prime()
+    const imported = drafts.prepareImport(JSON.stringify({ schemaVersion: 1, presets: [{ ...custom('draft-source', '覆盖后'), enabled: [], disabled: ['scene_save'] }] }))!
+    drafts.applyImport(imported); await flushPromises()
+    await button('用当前草稿保存到预览').trigger('click'); await flushPromises()
+    const review = wrapper!.get('.write-review').text()
+    expect(review).toContain('待保存页面草稿来源：覆盖后 · draft-source')
+    expect(review).toContain('变更前：自定义 · custom')
+    expect(review).toContain('ID：custom；'); expect(review).toContain('显式禁用：[scene_save]')
+    await wrapper!.get('.write-review input[type="checkbox"]').setValue(true)
+    await button('取消本次确认').trigger('click'); await flushPromises()
+    expect(wrapper!.find('.write-review').exists()).toBe(false); expect(writer.execute).not.toHaveBeenCalled()
+    await button('用当前草稿保存到预览').trigger('click'); await flushPromises()
+    expect(button('确认并写入宿主一次').attributes('disabled')).toBeDefined()
+    await confirm()
+    expect(writer.execute).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(writer.execute).mock.calls[0]![0].operation).toMatchObject({ kind: 'update', before: { id: 'custom', enabled: ['scene_save'] }, preset: { id: 'custom', name: '覆盖后', enabled: [], disabled: ['scene_save'] } })
+    expect(read.previewPresetId).toBe('custom'); expect(read.selectedPresetId).toBe('full')
+    expect(drafts.active?.preset.id).toBe('draft-source')
+  })
+  it.each(['update', 'assign', 'import'] as const)('invalidates dispatched %s on project switch without applying its late receipt', async kind => {
+    const { prime, drafts, writer, write, read, projects } = await setup(); await prime()
+    projects.projects = [...projects.projects, { id: 'p2', name: '工程乙', path: '/second-project' }]
+    if (kind !== 'assign') {
+      const imported = drafts.prepareImport(JSON.stringify({ schemaVersion: 1, presets: [custom('draft-source', '草稿来源')] }))!
+      drafts.applyImport(imported)
+    }
+    await flushPromises()
+    let finish!: (receipt: ToolPresetWriteReceipt) => void
+    writer.execute = vi.fn<ToolPresetWriteProvider['execute']>(() => new Promise(resolve => { finish = resolve }))
+    await button(kind === 'update' ? '用当前草稿保存到预览' : kind === 'assign' ? '为当前工程确认分配' : '将全部页面草稿导入').trigger('click')
+    await flushPromises(); await confirm()
+    const operation = vi.mocked(writer.execute).mock.calls[0]![0].operation
+    read.setProjectContext('p2', ['p1', 'p2']); await flushPromises()
+    expect(write.status).toBe('unknown'); expect(write.attempt?.projectId).toBe('p1')
+    expect(vi.mocked(writer.execute).mock.calls[0]![1]?.aborted).toBe(true)
+    if (operation.kind === 'delete') throw new Error('Unexpected deletion')
+    finish({ kind: 'preset', preset: operation.kind === 'import' ? operation.presets[0]! : operation.preset, batchSize: operation.kind === 'import' ? operation.presets.length : 1 })
+    await flushPromises()
+    expect(write.receipt).toBeNull(); expect(write.status).toBe('unknown')
+    expect(read.projectId).toBe('p2'); expect(read.selectedPresetId).toBe('')
+    expect(writer.execute).toHaveBeenCalledTimes(1)
+    expect(wrapper!.text()).not.toContain('宿主已返回本次持久化回执')
+  })
+
+  it.each(['project-return', 'unmount'] as const)('does not continue an old refresh after %s while tools are pending', async change => {
+    const { prime, readProvider, read, projects } = await setup(); await prime()
+    const initialReads = vi.mocked(readProvider.loadPresets).mock.calls.length
+    let finish!: (value: Awaited<ReturnType<ToolPresetReadProvider['loadTools']>>) => void
+    vi.mocked(readProvider.loadTools).mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    await button('显式刷新目录和预设').trigger('click'); await flushPromises()
+    if (change === 'project-return') {
+      projects.projects = [...projects.projects, { id: 'p2', name: '工程乙', path: '/second-project' }]
+      read.setProjectContext('p2', ['p1', 'p2']); read.setProjectContext('p1', ['p1', 'p2'])
+    } else { wrapper!.unmount(); wrapper = undefined }
+    finish([{ name: 'scene_save', displayNameZh: '场景保存', description: 'fixture', profile: 'full', scope: 'scene', access: 'read' }])
+    await flushPromises()
+    expect(readProvider.loadPresets).toHaveBeenCalledTimes(initialReads)
+  })
+
 })

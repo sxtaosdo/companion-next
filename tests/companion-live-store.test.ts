@@ -47,3 +47,45 @@ describe('live call / snapshot reconciliation',()=>{
  it('failed-only skips running/success yet accepts failed terminal and never invents retained count',async()=>{const {e,s}=await setup();s.setCallContext('p1',true);s.startLive(e.provider);e.latest().onCall({sessionId:'s1',total:2,record:record()});expect(s.records).toEqual([]);e.latest().onCall({sessionId:'s1',total:2,record:record(2,'success')});expect(s.records).toEqual([]);e.latest().onCall({sessionId:'s1',total:3,record:record(3,'failed')});expect(s.records.map(r=>r.id)).toEqual(['r3']);expect(s.retained).toBeNull()})
  it('does not accumulate unknown-project maps and caps retained detail at 1000',async()=>{const {e,s}=await setup();s.setCallContext('p1',false);s.startLive(e.provider);e.latest().onCall({sessionId:'s1',total:2,record:{...record(),projectId:'unknown'}});expect(s.counts?.counts.unknown).toBeUndefined();for(let i=1;i<=1100;i++)e.latest().onCall({sessionId:'s1',total:i,record:record(i)});expect(s.records).toHaveLength(1000);expect(s.records[0]?.sequence).toBe(1100)})
 })
+
+
+describe('cross-project navigation during paused reconnect',()=>{
+ it('discards old log reads and stream callbacks, then reconciles only current project after return',async()=>{
+  const {p,e,s}=await setup(),oldLogs=defer<[]>();
+  p.loadLogs=vi.fn().mockImplementationOnce(()=>oldLogs.promise).mockResolvedValue([]);
+  s.logFilter.projectIds=['p1'];s.setCallContext('p1',false);s.startLive(e.provider);
+  const old=e.channels[0]!;old.handlers.onOpen();await settle();
+  await vi.advanceTimersByTimeAsync(400);
+  const oldLogSignal=vi.mocked(p.loadLogs).mock.calls[0]![1]!;
+  s.pauseLogs(true);s.suspendReads();
+  expect(oldLogSignal.aborted).toBe(true);
+  s.logFilter.projectIds=['p2'];s.setCallContext('p2',false);
+  oldLogs.resolve([]);old.handlers.onCall({sessionId:'obsolete',total:9,record:record(9,'success')});old.handlers.onLog();
+  await settle();await vi.advanceTimersByTimeAsync(600_000);
+  expect(s.logsRead).toBe(false);expect(s.records).toEqual([]);expect(s.sessionId).toBe('s1');
+  expect(e.channels).toHaveLength(1);expect(p.loadLogs).toHaveBeenCalledTimes(1);expect(vi.getTimerCount()).toBe(0);
+  p.loadCounts=vi.fn(async()=>({sessionId:'s2',counts:{p1:1,p2:1},latest:{}}));
+  const currentRecord={...record(1,'success'),id:'p2-new',projectId:'p2'};
+  p.loadCalls=vi.fn(async()=>({sessionId:'s2',total:1,retained:1,records:[currentRecord]}));
+  s.setLivePageActive(true);e.latest().onOpen();await settle();
+  // A new daemon session in the HTTP snapshot retires this stream before detail reads.
+  expect(e.channels[1]!.signal?.aborted).toBe(true);
+  await vi.advanceTimersByTimeAsync(0);e.latest().onOpen();await settle();
+  expect(p.loadCalls).toHaveBeenLastCalledWith('p2',{failed:false},expect.any(AbortSignal));
+  expect(s.records.map(r=>r.id)).toEqual(['p2-new']);expect(s.logsPaused).toBe(true);
+  old.handlers.onCall({sessionId:'obsolete',total:20,record:record(20)});old.handlers.onOpen();
+  const current=e.latest();
+  for(let i=0;i<100;i++){
+   current.onCall({sessionId:'s2',total:1,record:currentRecord});
+   current.onCall({sessionId:'s2',total:2,record:record(2,'success')});
+   current.onLog();
+  }
+  expect(s.records.map(r=>r.id)).toEqual(['p2-new']);expect(s.total).toBe(1);expect(s.sessionId).toBe('s2');
+  expect(s.counts?.counts.p1).toBe(2);expect(s.counts?.counts.p2).toBe(1);
+  expect(p.loadLogs).toHaveBeenCalledTimes(1);
+  s.pauseLogs(false);await vi.advanceTimersByTimeAsync(400);
+  expect(p.loadLogs).toHaveBeenCalledTimes(2);
+  expect(p.loadLogs).toHaveBeenLastCalledWith(expect.objectContaining({projectIds:['p2']}),expect.any(AbortSignal));
+  s.stopLive();expect(vi.getTimerCount()).toBe(0);
+ })
+})

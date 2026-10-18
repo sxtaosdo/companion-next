@@ -126,4 +126,50 @@ describe('tool preset writes freeze confirmation and isolate uncertain outcomes'
     const { store, writer } = fixture(); writer.execute = async () => ({ kind: 'preset', preset: custom('wrong', '新名称'), batchSize: 1 })
     await store.confirm(store.prepareRename('新名称')!, true); expect(store.status).toBe('unknown'); expect(store.receipt).toBeNull()
   })
+  it.each(['update', 'assign', 'import'] as const)('keeps %s bound to its original attempt across A→B→A while dispatched', async kind => {
+    const { store, writer, context, reader } = fixture()
+    let finish!: (reply: ToolPresetWriteReceipt) => void, idle!: () => void
+    writer.execute = vi.fn<ToolPresetWriteProvider['execute']>(() => new Promise(resolve => { finish = resolve }))
+    writer.waitForIdle = vi.fn(() => new Promise<void>(resolve => { idle = resolve }))
+    const plan = kind === 'update' ? store.prepareUpdate({ ...custom('draft-source', '覆盖后'), enabled: [], disabled: ['scene_save'] })!
+      : kind === 'assign' ? store.prepareAssign()! : store.prepareImport([custom('import-one', '导入一'), custom('import-two', '导入二')])!
+    const pending = store.confirm(plan, true)
+    const operation = vi.mocked(writer.execute).mock.calls[0]![0].operation
+    const signal = vi.mocked(writer.execute).mock.calls[0]![1]!
+    store.syncContext({ ...context, projectId: 'p2' }); store.syncContext(context)
+    expect(signal.aborted).toBe(true); expect(store.status).toBe('unknown'); expect(store.sending).toBe(true)
+    expect(store.attempt?.projectId).toBe('p1'); expect(store.attempt?.projectPath).toBe('/A')
+    expect(store.prepareRename('不能并发')).toBeUndefined()
+    if (operation.kind === 'delete') throw new Error('Unexpected deletion')
+    finish({ kind: 'preset', preset: operation.kind === 'import' ? operation.presets[0]! : operation.preset, batchSize: operation.kind === 'import' ? operation.presets.length : 1 })
+    await Promise.resolve(); await Promise.resolve()
+    expect(store.sending).toBe(true); expect(store.receipt).toBeNull()
+    idle(); expect(await pending).toBe(false)
+    expect(store.status).toBe('unknown'); expect(store.needsRefresh).toBe(true)
+    await store.readBack()
+    expect(reader.loadPresets).toHaveBeenCalledWith('p1', expect.any(AbortSignal))
+    expect(store.observation?.projectPath).toBe('/A'); expect(store.status).toBe('unknown')
+    expect(writer.execute).toHaveBeenCalledTimes(1)
+  })
+
+  it.each(['tools', 'presets'] as const)('retains the readback lease when %s rejects before the other read settles, including route leave', async failed => {
+    const { store, writer, reader, context } = fixture()
+    writer.execute = async () => { throw new ToolPresetWriteError('timeout', 'unknown') }
+    await store.confirm(store.prepareRename('自定义')!, true)
+    let reject!: (error: Error) => void, finish!: (value: unknown) => void
+    const failedRead = new Promise<never>((_, fail) => { reject = fail })
+    const pendingRead = new Promise<unknown>(resolve => { finish = resolve })
+    reader.loadTools = vi.fn(() => (failed === 'tools' ? failedRead : pendingRead) as ReturnType<ToolPresetReadProvider['loadTools']>)
+    reader.loadPresets = vi.fn(() => (failed === 'presets' ? failedRead : pendingRead) as ReturnType<ToolPresetReadProvider['loadPresets']>)
+    const pending = store.readBack(); reject(new Error('fixture failure'))
+    await Promise.resolve(); await Promise.resolve(); await Promise.resolve()
+    expect(store.readingBack).toBe(true); expect(store.error).toContain('显式回读未完成')
+    store.leave(); store.syncContext(context)
+    expect(store.readingBack).toBe(true); expect(store.locked).toBe(true)
+    await store.readBack(); expect(reader.loadTools).toHaveBeenCalledTimes(1); expect(reader.loadPresets).toHaveBeenCalledTimes(1)
+    finish(failed === 'tools' ? { presets: [...builtins, custom()], selectedPresetId: 'full' } : tools)
+    await pending
+    expect(store.readingBack).toBe(false); expect(store.status).toBe('unknown'); expect(store.observation).toBeNull()
+  })
+
 })

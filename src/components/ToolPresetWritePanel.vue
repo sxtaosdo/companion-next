@@ -27,8 +27,10 @@ const review = computed(() => write.plan)
 const reviewPresets = computed(() => { const operation = review.value?.operation; return operation ? operation.kind === 'import' ? operation.presets : [operation.preset] : [] })
 const before = computed(() => { const op = review.value?.operation; return op?.kind === 'update' ? op.before : op?.kind === 'assign' ? op.previous : op?.kind === 'create' ? op.source : null })
 async function submit() { const plan = write.plan; if (!plan || !confirmed.value) return; const approval = confirmed.value; confirmed.value = false; await write.confirm(plan, approval) }
-async function refresh() { const reader = toolPresetReadProvider.value; if (!reader || write.sending || write.readingBack) return; await read.loadTools(reader); if (read.provider === reader && toolPresetReadProvider.value === reader) await read.loadPresets() }
-onBeforeUnmount(() => write.leave())
+let refreshRevision = 0
+watch([() => read.projectId, () => read.provider, toolPresetReadProvider], () => { refreshRevision++ }, { flush: 'sync' })
+async function refresh() { const reader = toolPresetReadProvider.value; if (!reader || write.sending || write.readingBack) return; const pending = read.loadTools(reader), version = refreshRevision; await pending; if (version === refreshRevision && read.provider === reader && toolPresetReadProvider.value === reader) await read.loadPresets() }
+onBeforeUnmount(() => { refreshRevision++; write.leave() })
 </script>
 <template>
   <section class="tool-preset-write-panel" aria-label="工具预设正式保存" data-testid="tool-preset-write-panel">

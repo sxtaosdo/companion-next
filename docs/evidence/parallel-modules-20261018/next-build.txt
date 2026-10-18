@@ -1,0 +1,18 @@
+typecheck_exit_code=0
+vite v6.4.4 building for companion-workspace...
+transforming...
+鉁?1696 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-companion-workspace/assets/about-icon-BaVeClOr.svg       0.23 kB 鈹?gzip:   0.19 kB
+dist-companion-workspace/index.html                           0.57 kB 鈹?gzip:   0.44 kB
+dist-companion-workspace/assets/donation-qr-D7kdLLAm.png    106.97 kB
+dist-companion-workspace/assets/index-DHoPFkG3.css          430.58 kB 鈹?gzip:  63.63 kB
+dist-companion-workspace/assets/index-CB_jf848.js         1,894.31 kB 鈹?gzip: 616.41 kB
+
+(!) Some chunks are larger than 1100 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+鉁?built in 9.14s
+build_exit_code=0

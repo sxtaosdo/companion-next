@@ -1,0 +1,24 @@
+{
+  "nextBaseline": "867f7e0",
+  "evidenceCheckpoint": "a87ad59",
+  "integratedTestCount": 194,
+  "sharedRuntimeDeployed": false,
+  "sourceSha256": {
+    "src/stores/tool-presets-write.ts": "cc753b01356f267cc0914402bd8671191c6f0fc60af0a2a6342d6d6951eb4811",
+    "src/components/ToolPresetWritePanel.vue": "55ead1e9797eef157c38ea181fcce03afa733a0fe0c9b4da9cf898fe75ea2a3e",
+    "src/domain/product-information.ts": "c6d67a7e015706a0b828c3e065ca3cb07ada852207a93d2500a57e5ee33fe9e5",
+    "tests/companion-live-store.test.ts": "ceb685feeb8ac05c5801e218b507c9784881733c9b4d1d5e5428a8de5dfe4792",
+    "tests/tool-presets-write-store.test.ts": "a30a4d04949d11e4c9fba55df1cd7578d452c1367c495136b31df2a2f10ad093",
+    "tests/tool-presets-write-ui.test.ts": "7d9a44bb7a88dd854a3a5bfde006119f7ade7fd71849b248ad4729bb718ef66f"
+  },
+  "nextStrictTypecheckPassed": true,
+  "workspaceBuildPassed": true,
+  "bundleSha256": {
+    "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+    "index.html": "685ba8679edd3cf491a9b80dbc1839827f7a46022c13fbced8f6c96ced1a9477",
+    "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+    "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+    "assets/index-CB_jf848.js": "e554a007b1ecdb871f4151679852a09ffee93289c24f5f4a49299f6352776054",
+    "assets/index-DHoPFkG3.css": "58f26ff8cc97b9018c181e70984217d8bd663f5f052863bd8deeed6b643377c4"
+  }
+}

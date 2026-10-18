@@ -1,0 +1,11 @@
+
+ RUN  v4.1.10 C:/Users/33272/AppData/Local/Temp/companion-credential-isolation-20261018/worktree/mcp
+
+路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路路
+
+ Test Files  7 passed (7)
+      Tests  91 passed (91)
+   Start at  07:37:21
+   Duration  6.66s (transform 2.17s, setup 0ms, import 4.55s, tests 9.81s, environment 1ms)
+
+exit_code=0
