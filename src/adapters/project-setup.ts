@@ -159,8 +159,10 @@ function decodeSnapshot(value: unknown, requestedId: string): SetupSnapshot {
     if (backendCodes.includes(raw.errorCode)) result.errorCode = raw.errorCode
   }
   if(Object.hasOwn(raw,'optionsContractVersion')||Object.hasOwn(raw,'effectiveOptions')) {
-    if(raw.optionsContractVersion!==1)throw fail('invalid-shape')
-    result.optionsContractVersion=1;result.effectiveOptions=decodeOptions(raw.effectiveOptions)
+    try {
+      if(raw.optionsContractVersion!==1)throw fail('options-mismatch')
+      result.optionsContractVersion=1;result.effectiveOptions=decodeOptions(raw.effectiveOptions)
+    }catch{throw fail('options-mismatch')}
   }
   // Unknown fields, raw errors, details, executable/connection paths, tokens, sessions and PIDs are never projected.
   // Even complete does not prove the submitted options ran: the host may have reused an active path's operation.

@@ -19,3 +19,5 @@ Next保留登记独立动作，恢复Bridge必选及Creator/Codex独立选择，
 - Build reconstructed original 107-file source closure plus 66 live embedded sources. Before applying patch, generated daemon is byte-identical to live f3323c72165a2d2f28f3faf89b3c5811e5df1dafee384303db0bf84811970e70. Candidate hash 0b9c2e28d7993201cc31e99329b2a58c06087c2fb7f06e8b0e6277242c2197ab; all 236 mapped sources match except exactly three authorized setup API files. Original lifecycle preserved. Evidence: Temp/companion-setup-options-20261018/verified-build-proof.json.
 
 Deployment is pending guarded replacement and formal UI session restoration. No real project installation, Creator launch, client configuration write, model or cloud operation has been performed.
+
+Follow-up review closed the adapter pre-decode path too: invalid contract version/options now become options-mismatch before store polling; actual adapter-to-store tests cover version, shape, missing metadata and different flags. Latest adapter+contract tests: 302 passed. Original mixed/CRLF line endings restored for unchanged wizard and connection-store lines.

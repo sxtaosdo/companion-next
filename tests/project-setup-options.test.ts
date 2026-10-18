@@ -54,3 +54,13 @@ describe('strict setup store immutable approvals',()=>{
   vi.useFakeTimers();const {store,lane,consents,provider}=await storeFixture(combinations[0]!,combinations[3]!);expect(await store.sendSetup(store.prepareSetup(id,consents),true)).toBe(true);await vi.advanceTimersByTimeAsync(1000);expect(store.setupReceipt?.phase).toBe('unknown');expect(store.completedSetup).toBeNull();expect(store.completedUsage).toBeNull();expect(lane.locked).toBe(true);expect(provider.startStrict).toHaveBeenCalledTimes(1)
  });
 });
+
+describe('real adapter to store contract conflict',()=>{
+ it.each(['version','invalid-options','missing','different-flags'])('retains UNKNOWN for GET %s',async kind=>{
+  vi.useFakeTimers();const options=combinations[0]!,{store,lane,consents}=await storeFixture(options)
+  const raw:any={id:operationId,projectId:id,projectPath:project.path,stage:'complete',startedAt:time,updatedAt:time,optionsContractVersion:1,effectiveOptions:options}
+  if(kind==='version')raw.optionsContractVersion=2;if(kind==='invalid-options')raw.effectiveOptions={startCreator:'false',configureCodex:false};if(kind==='missing'){delete raw.optionsContractVersion;delete raw.effectiveOptions}if(kind==='different-flags')raw.effectiveOptions=combinations[3]
+  const fetch=vi.fn<ProjectSetupFetch>(async(path,init)=>path==='/api/setup/options-v1'?(init.method==='GET'?json(capabilities):json(started(options),202)):json(raw));projectSetupProvider.value=createProjectSetupProvider({fetch})
+  expect(await store.sendSetup(store.prepareSetup(id,consents),true)).toBe(true);await vi.advanceTimersByTimeAsync(1000);expect(store.setupReceipt?.phase).toBe('unknown');expect(store.completedSetup).toBeNull();expect(lane.locked).toBe(true);expect(fetch.mock.calls.filter(c=>c[1].method==='POST')).toHaveLength(1)
+ })
+})
