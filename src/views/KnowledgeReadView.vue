@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import KnowledgeAgentPanel from '../components/KnowledgeAgentPanel.vue'
+import { knowledgeAgentPending } from '../knowledge-agent-integration'
 import KnowledgeSyncPanel from '../components/KnowledgeSyncPanel.vue'
 import { knowledgeSyncPending } from '../knowledge-sync-integration'
 import KnowledgeConversationPanel from '../components/KnowledgeConversationPanel.vue'
@@ -11,7 +13,7 @@ import { isKnowledgeRequestId } from '../domain/knowledge-read'
 const store=useKnowledgeReadStore(),route=useRoute()
 const modelsOnly=computed(()=>route.query.tab==='models')
 const passiveReadBuild=import.meta.env.MODE==='companion-readonly'
-const blocked=computed(()=>!store.provider||store.loading||store.statusLoading||knowledgeSyncPending.value)
+const blocked=computed(()=>!store.provider||store.loading||store.statusLoading||knowledgeSyncPending.value||knowledgeAgentPending.value)
 const status= computed(()=>store.status)
 const authLabel={missing:'未配置',configured:'已配置，尚未验证',verified:'后端已验证',denied:'认证被拒绝'}
 const actionLabel={search:'关键词检索',bases:'知识库列表',base:'知识库详情',documents:'文档列表',document:'文档详情',original:'原文预览',chunks:'切片列表',agents:'Agent 列表'}
@@ -24,8 +26,8 @@ function selectDocument(id:string){if(isKnowledgeRequestId(id))store.documentId=
 <template>
   <section class="knowledge-read-workspace">
     <div class="section-card knowledge-connect">
-      <div><h2>{{ modelsOnly?'模型服务状态':'知识库 · 查询与原文' }}</h2><p>原 Companion 同源读取。下方查询不自动执行；问答有独立发送确认；同步须在下方选择来源并单独操作，不自动执行或启动服务。</p></div>
-      <div class="knowledge-actions"><el-button :disabled="!knowledgeReadProvider || store.statusLoading || store.loading || knowledgeSyncPending" :loading="store.statusLoading" @click="knowledgeReadProvider && store.connect(knowledgeReadProvider)">{{ store.provider?'重新连接':'连接知识服务' }}</el-button><el-button v-if="store.provider" :disabled="store.loading || store.statusLoading || knowledgeSyncPending" @click="store.refreshStatus">刷新状态</el-button><el-button v-if="store.provider" @click="store.disconnect">断开并清空</el-button></div>
+      <div><h2>{{ modelsOnly?'模型服务状态':'知识库 · 查询与原文' }}</h2><p>原 Companion 同源读取。下方查询不自动执行；KB 问答有独立发送确认；Agent 提问和同步均在对应区域单独操作，不自动执行或启动服务。</p></div>
+      <div class="knowledge-actions"><el-button :disabled="!knowledgeReadProvider || store.statusLoading || store.loading || knowledgeSyncPending || knowledgeAgentPending" :loading="store.statusLoading" @click="knowledgeReadProvider && store.connect(knowledgeReadProvider)">{{ store.provider?'重新连接':'连接知识服务' }}</el-button><el-button v-if="store.provider" :disabled="store.loading || store.statusLoading || knowledgeSyncPending || knowledgeAgentPending" @click="store.refreshStatus">刷新状态</el-button><el-button v-if="store.provider" @click="store.disconnect">断开并清空</el-button></div>
     </div>
     <el-alert v-if="!knowledgeReadProvider" type="info" :closable="false" :title="passiveReadBuild ? '此只读预览未启用状态探测' : '当前宿主未接入原 Companion 知识接口'" :description="passiveReadBuild ? '原知识状态会执行 CLI / 同步状态查询；此构建暂不注册知识与模型连接。功能源码保留在其他专用构建，没有判断原服务离线。' : '需要 Companion 专用构建及原服务同源托管。图片审阅服务的认证不能用于此页；不会跨域连接或自动启动后台。'"/>
     <div class="knowledge-status-grid">
@@ -38,6 +40,7 @@ function selectDocument(id:string){if(isKnowledgeRequestId(id))store.documentId=
     <p v-if="modelsOnly" class="knowledge-note">现有关闭能力只针对模型启动器；各模型的启动、停止和管理页面尚未接入。</p>
     <template v-else>
       <KnowledgeConversationPanel/>
+      <KnowledgeAgentPanel/>
       <section class="section-card knowledge-controls"><h3>只读查询</h3><p>查询会交给原配置的知识服务处理；输入与结果仅保留在本页内存。改变条件会清除旧结果，需手动重新查询。</p>
         <div class="knowledge-actions"><el-button :disabled="blocked" @click="store.run('bases')">读取知识库列表</el-button><el-button :disabled="blocked" @click="store.run('agents')">读取 Agent 列表</el-button></div>
         <div class="knowledge-fields"><label>知识库 ID（可留空使用原默认值）<el-input v-model="store.kbId" maxlength="80" aria-label="知识库 ID" clearable/></label><el-button :disabled="blocked || !isKnowledgeRequestId(store.kbId.trim())" @click="store.run('base')">查看知识库详情</el-button></div>
@@ -45,7 +48,7 @@ function selectDocument(id:string){if(isKnowledgeRequestId(id))store.documentId=
         <div class="knowledge-fields"><label>文档标题筛选（可留空）<el-input v-model="store.documentKeyword" maxlength="512" aria-label="文档筛选"/></label><label class="knowledge-limit">文档上限<el-input-number v-model="store.documentLimit" :min="1" :max="100" :precision="0" aria-label="文档返回上限"/></label><el-button :disabled="blocked" @click="store.run('documents')">读取文档列表</el-button></div>
         <div class="knowledge-fields"><label>文档 ID<el-input v-model="store.documentId" maxlength="80" aria-label="文档 ID" clearable/></label><label class="knowledge-limit">切片上限<el-input-number v-model="store.chunkLimit" :min="1" :max="1000" :precision="0" aria-label="切片返回上限"/></label></div>
         <div class="knowledge-actions"><el-button :disabled="blocked || !isKnowledgeRequestId(store.documentId.trim())" @click="store.run('document')">查看文档详情</el-button><el-button :disabled="blocked || !isKnowledgeRequestId(store.documentId.trim())" @click="store.run('chunks')">读取文档切片</el-button><el-button :disabled="blocked || !isKnowledgeRequestId(store.documentId.trim())" @click="store.run('original')">读取原文预览</el-button></div>
-        <small>原文预览会由原服务创建并清理临时文件；最多返回 1 MiB 内容，不保存到用户目录。Agent 列表不执行 Agent。</small>
+        <small>原文预览会由原服务创建并清理临时文件；最多返回 1 MiB 内容，不保存到用户目录。Agent 列表本身不执行问答；提问在独立 Agent 区进行。</small>
       </section>
       <section class="section-card knowledge-results" aria-live="polite"><h3>{{ store.action ? actionLabel[store.action] : '查询结果' }}</h3>
         <p v-if="store.loading">正在读取，可离开页面取消本次请求…</p><el-alert v-else-if="store.error" type="error" :closable="false" :title="store.error"/><p v-else-if="store.invalidated">条件或页面已变更，旧结果已清空。请重新查询。</p><p v-else-if="!store.result">尚未查询，不显示示例或推测结果。</p>

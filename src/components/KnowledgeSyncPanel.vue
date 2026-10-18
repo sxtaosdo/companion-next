@@ -2,6 +2,7 @@
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import { useKnowledgeReadStore } from '../stores/knowledge-read'
 import { useKnowledgeConversationStore } from '../stores/knowledge-conversation'
+import { knowledgeAgentPending } from '../knowledge-agent-integration'
 import { knowledgeReadProvider } from '../knowledge-read-integration'
 import { hasUnknownKnowledgeSync, markUnknownKnowledgeSync, knowledgeSyncPending, knowledgeSyncProvider } from '../knowledge-sync-integration'
 import { canKnowledgeSync, formatKnowledgeSyncPlan, KnowledgeSyncError, syncPolicyText } from '../domain/knowledge-sync'
@@ -13,7 +14,7 @@ const receipt=shallowRef<{sourceId:string;channel:string;operation:KnowledgeSync
 const key=(source:KnowledgeSource)=>JSON.stringify([source.id,source.channel])
 const source=computed(()=>read.status?.sync.sources.find(s=>key(s)===selected.value))
 const currentRead=computed(()=>Boolean(read.provider&&read.provider===knowledgeReadProvider.value))
-const blocked=computed(()=>!currentRead.value||!knowledgeSyncProvider.value||read.loading||read.statusLoading||busy.value||knowledgeSyncPending.value||chat.busy||chat.transportPending)
+const blocked=computed(()=>!currentRead.value||!knowledgeSyncProvider.value||read.loading||read.statusLoading||busy.value||knowledgeSyncPending.value||knowledgeAgentPending.value||chat.busy||chat.transportPending)
 const canDry=computed(()=>!blocked.value&&canKnowledgeSync(read.status,source.value,false))
 const canRun=computed(()=>!blocked.value&&canKnowledgeSync(read.status,source.value,true)&&!hasUnknownKnowledgeSync(knowledgeSyncProvider.value,selected.value))
 let revision=0,controller:AbortController|undefined
