@@ -12,3 +12,10 @@
 邻接类型修复：.48最后更新runtime状态文案后，原MigrationView两处“尚未迁入”字面量比较触发TS2367；.48初始strict发生在该文案变更前，不是最终文案版本的strict通过证据。本片改为参数string的isNotMigrated比较函数，运行语义不变，最终strict已验证通过。前轮“strict通过”记录按此更正。类型失败时未构建本片候选；最终产物包含该修正。
 
 沿用上一片静态路径/产物检查（55通过/1平台跳过），本片未改打包机制，不重复全套。后续独立Edge验证三个实际弹窗和原生modal的焦点，以及关闭后恢复搜索；仍不执行任何业务POST/安装/Creator。
+
+
+## 已部署验收
+
+源2524d9b/.50已部署，备份38旧文件并保留旧hash资源，仅新增JS/CSS、原子切换index。六文件HTTP SHA匹配，隔离Edge验证CLI、接入、Creator三实际弹窗及原生dialog均不抢/焦点，关闭后搜索恢复，共5例通过。业务POST0、页面错误0；PID2100/epoch/OPEN保持，无重启、无普通用户窗口/Cookie修改。证据C:/Users/33272/AppData/Local/Temp/companion-modal-shortcut-20261018/browser-proof.json、deployment-result.json。
+
+继续恢复工具类别全选/半选/折叠：旧app.ts790–848已有此交互，Next当前仅逐项三态编辑。下一片只改现有内存草稿，不自动保存/分配，不新增接口。
