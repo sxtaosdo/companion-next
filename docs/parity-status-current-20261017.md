@@ -1,6 +1,6 @@
 # Companion Next 当前对齐矩阵（2026-10-17）
 
-状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源352fb27/.68，产品页1.3.173，32180/PID9764；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
+状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源d5e1357/.73，产品页1.3.173，32180/PID9764；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
 
 | 功能 | 已实现且验证的范围 | 缺失 / 未验证 | 证据 |
 | --- | --- | --- | --- |
@@ -52,3 +52,13 @@ Code candidate: Next352fb27/.68 + backend f3071db. Final live: Next30e1739/.62, 
 ## 2026-10-18 03:02 UTC — installation deployment complete
 
 Supersedes the earlier .62 rollback/pending status above. Live Next352fb27/.68 + backend f3071db, PID9764/OPEN, actual daemonSHA0b9c2e28... verified. Two original developer tabs were recorded and normally navigated to about:blank; all counters/unknown reached zero, guarded CLI stop/start PASSED, formal ui and both original tabs/realtime restored. Six actual static HTTP files and both setup contract endpoints passed hash/version verification. No lifecycle/guard change, forced kill, real installation, Creator start or client config write. Old22dirty and rollback backups preserved. See approved-live-verification.json and the installation document for actual versus isolated evidence. Other matrix rows retain their own remaining gaps; whole-backend parity is not complete.
+
+## 2026-10-18 Next help/navigation follow-up (current)
+
+Live code d5e1357/.73 supersedes .68 for static UI; backend f3071db/PID9764/epoch unchanged. Corrected stale help/migration descriptions of implemented directory/scaffold/setup, client registration, log/diagnostics and editor handoff. Project/MCP/Profiler help links now lead to /projects. Old build/screenshot/debug content was help/CLI/MCP, not independent old toolbar dialogs; removed the false missing-dialog claim. Original v148 help and changelog stay exact.
+
+Evidence: help/navigation+legacy tests41/41, vue-tsc, production build, six real HTTP hashes and three isolated Edge navigation cases passed. Shared22dirty bytes/diff and daemon bundle unchanged; no restart or ordinary browser changes. Details and Temp proof paths: [safe follow-up](parity-safe-followup-20261018.md).
+
+Remaining IMPLEMENTATION gaps: (1) Next Agent question/session/stop; original ask API already exists, paused conversation/model scope remains. (2) Next knowledge source selection/dry-run/run/receipt; old backend already carries approved/enabled/writerReady and enforces them. Next projection/flow is missing, not the backend contract. Actual execution separately requires per-source authorization/readiness. (3) normal32180 owner provider/host/session assembly; isolated byte export passes but this production branch is not wired. (4) paused model/AI flows. (5) generic resource inventory/Codex original-byte recovery needs exact owner contract.
+
+Remaining ACCEPTANCE gaps for implemented controls: real four-choice installation/client persistent writes and conflict, real Creator/Preview/Profiler, native chooser, persistent preset mutations/concurrency, long-session SSE/log/history and actual knowledge UI/auth. Do not equate these with missing controls or call all remaining gaps permissions only. Next safe implementation priority is original sync source metadata/readiness projection and isolated plan flow; Agent real conversations remain paused. No new feature design or real sync/model execution is authorized by this help batch.

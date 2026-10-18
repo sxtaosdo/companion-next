@@ -31,3 +31,11 @@ Targeted verification: help-about-navigation + legacy-v148-content41/41 passed, 
 ## Implemented but not fully real-accepted
 
 Real four-choice installation, user client-config writes/concurrent409, Creator start/stop/Preview/Profiler, native directory chooser, persistent tool-preset mutations/concurrency, long-session log/SSE/history and actual knowledge UI/auth remain evidence boundaries. They are not missing Next controls. Current project Bridge unreachable is not a reason to start Creator/model or write clients in this batch. Retain current source/isolated/real evidence separately; no full-suite rerun merely for these boundaries.
+
+## Static deployment and actual Edge proof
+
+Code commit d5e13573840ab95bc244ca906d854c3cf4492c7c / internal1.3.173.73 (product1.3.173), preceded by the .72 task checkpoint. Production companion-workspace build passed. Six actual32180 HTTP file hashes match the candidate; only the new hashed JavaScript asset and atomic index entry changed. All54 previous static files were backed up and old hash assets retained. No daemon restart or ordinary user-window navigation.
+
+Independent authenticated headless Edge passed projects/mcp/profiler help links to /projects, original help sections, corrected runtime gap text and MCP real-acceptance boundary. Business API calls were intercepted; real business writes0. Initial verification-script URL and exact text assertions were corrected; the final browser proof passed. The product needed no further change. PID9764, startupEpoch a9cefe7d-5810-4426-8c2b-43958f12b1d6 and daemon SHA0b9c2e28... stayed identical. Final protection rechecked the original22dirty paths, diff and file bytes plus backend HEAD and daemon bundle.
+
+Evidence folder: C:/Users/33272/AppData/Local/Temp/companion-next-help-followup-20261018/ (manifest.json, deployment-prepared.json, deployment-result.json, browser-proof.json, final-protection.json; backup-static for rollback). No real install/client configuration, Creator/model start, new listener, cloud upload or push occurred. Original browser windows/realtime were not touched. This batch corrects existing help/navigation, not the remaining Agent/sync/owner implementation gaps listed above.
