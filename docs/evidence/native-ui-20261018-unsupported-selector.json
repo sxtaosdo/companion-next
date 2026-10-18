@@ -1,0 +1,207 @@
+{
+  "at": "2026-10-18T10:50:31.063Z",
+  "steps": [
+    {
+      "kind": "confirm",
+      "inputBefore": "C:/Users/33272/AppData/Local/Temp/companion-native-real-20261018/picker-target",
+      "dialog": {
+        "found": true,
+        "handle": 2688832,
+        "items": [
+          {
+            "name": "ѡ�� Cocos Creator ����Ŀ¼",
+            "id": "14146",
+            "type": "ControlType.Pane"
+          },
+          {
+            "name": "ѡ�� Cocos Creator ����Ŀ¼",
+            "id": "",
+            "type": "ControlType.Pane"
+          },
+          {
+            "name": "��������",
+            "id": "100",
+            "type": "ControlType.Pane"
+          },
+          {
+            "name": "ȷ��",
+            "id": "1",
+            "type": "ControlType.Pane"
+          },
+          {
+            "name": "ȡ��",
+            "id": "2",
+            "type": "ControlType.Pane"
+          },
+          {
+            "name": "",
+            "id": "14151",
+            "type": "ControlType.Pane"
+          }
+        ],
+        "pid": 18216
+      },
+      "confirm": {
+        "handle": 2688832,
+        "found": true,
+        "pid": 18216,
+        "confirmPosted": false,
+        "stillOwned": false,
+        "selected": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-native-real-20261018\\picker-target"
+      },
+      "receipt": {
+        "status": 500,
+        "body": {
+          "error": "无法打开系统目录选择器：Command failed: powershell.exe -NoProfile -NonInteractive -Command \nAdd-Type -AssemblyName System.Windows.Forms\n$dialog = New-Object System.Windows.Forms.FolderBrowserDialog\n$dialog.Description = '选择 Cocos Creator 工程目录'\n$dialog.ShowNewFolderButton = $false\nif ($dialog.ShowDialog() -ne [System.Windows.Forms.DialogResult]::OK) { exit 2 }\n[Console]::Out.Write($dialog.SelectedPath)\n\n"
+        }
+      },
+      "inputAfter": "C:/Users/33272/AppData/Local/Temp/companion-native-real-20261018/picker-target",
+      "nativeDialogObserved": true
+    }
+  ],
+  "blocked": [],
+  "desktopBefore": {
+    "foreground": 525512,
+    "foregroundPid": 19688,
+    "windows": [
+      {
+        "handle": 4064554,
+        "class": "ThumbnailDeviceHelperWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 65766,
+        "class": "Shell_TrayWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 525512,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 19688
+      },
+      {
+        "handle": 459944,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 18252
+      },
+      {
+        "handle": 591250,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 2992
+      },
+      {
+        "handle": 196814,
+        "class": "Windows.UI.Core.CoreWindow",
+        "pid": 11240
+      },
+      {
+        "handle": 66462,
+        "class": "EdgeUiInputTopWndClass",
+        "pid": 7604
+      },
+      {
+        "handle": 196632,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65872,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65870,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65868,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65866,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65806,
+        "class": "Progman",
+        "pid": 7604
+      }
+    ]
+  },
+  "registryUnchanged": true,
+  "desktopAfter": {
+    "foreground": 525512,
+    "foregroundPid": 19688,
+    "windows": [
+      {
+        "handle": 4064554,
+        "class": "ThumbnailDeviceHelperWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 65766,
+        "class": "Shell_TrayWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 525512,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 19688
+      },
+      {
+        "handle": 459944,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 18252
+      },
+      {
+        "handle": 591250,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 2992
+      },
+      {
+        "handle": 196814,
+        "class": "Windows.UI.Core.CoreWindow",
+        "pid": 11240
+      },
+      {
+        "handle": 66462,
+        "class": "EdgeUiInputTopWndClass",
+        "pid": 7604
+      },
+      {
+        "handle": 196632,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65872,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65870,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65868,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65866,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65806,
+        "class": "Progman",
+        "pid": 7604
+      }
+    ]
+  },
+  "ok": false
+}

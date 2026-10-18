@@ -1,0 +1,66 @@
+{
+  "native-ui-20261018-codex-draft-definition.json": {
+    "bytes": 2206,
+    "sha256": "0f05e7322fc97bc575d85ec86d79c578737170c9d545b30bb9bd2677a5329a68"
+  },
+  "native-ui-20261018-cursor-after-cancel.json": {
+    "bytes": 130,
+    "sha256": "795e59a6f4ca2f190dad6c53fa2caeb17ce0a4018ae56667df2ffa8211fb9cb8"
+  },
+  "native-ui-20261018-cursor-before.json": {
+    "bytes": 24,
+    "sha256": "cb6feb3301930ff68efa361f9fe15adbea91ae9093b8616da429437e8ef5f540"
+  },
+  "native-ui-20261018-cursor-cleanup.json": {
+    "bytes": 33,
+    "sha256": "b9cd9ed8cd632f7668827c11be86b287938488d6a7ce3d5bd32fb89f878a9c95"
+  },
+  "native-ui-20261018-cursor-received-cancel.json": {
+    "bytes": 256,
+    "sha256": "a280992f90fac7b7455456a3a6cefd5ae607cf5a1d4d2952ef86bda806108839"
+  },
+  "native-ui-20261018-desktop-actions.json": {
+    "bytes": 4323,
+    "sha256": "01e421c536d7d98a1815e213b6bd5be191baa4f95c89e14bb73160f31a05fc6d"
+  },
+  "native-ui-20261018-focus.png": {
+    "bytes": 142339,
+    "sha256": "20249fcf2baa5364926a933610d33e6329494a94bd381249d0a8c86511e5750c"
+  },
+  "native-ui-20261018-identity-clarification.md": {
+    "bytes": 6248,
+    "sha256": "84cfec529595f84f1e98efcae22b59e0a7e1cc7bffe16e4db4720ba9383dddf0"
+  },
+  "native-ui-20261018-installed-routes.json": {
+    "bytes": 9424,
+    "sha256": "533ea1fa55811bd91335eef78a45dc983413b417ddff66d02e17099389ea3840"
+  },
+  "native-ui-20261018-open-folder.png": {
+    "bytes": 170705,
+    "sha256": "0285a765eaae58d2f17e8841836c788dd8b9d196950d9f37ef2464edbd2bd49b"
+  },
+  "native-ui-20261018-picker-cancel.json": {
+    "bytes": 4437,
+    "sha256": "0dd4937d8fc0fb484e9c8dff2cb2c0ca2919373302d061a706625b6e8e655e5a"
+  },
+  "native-ui-20261018-picker-cancel.png": {
+    "bytes": 168057,
+    "sha256": "0098d171a48719a7748b16f5cf5b16ccc97004f271b546a8d59c97be9295435a"
+  },
+  "native-ui-20261018-picker-confirm.json": {
+    "bytes": 4488,
+    "sha256": "77d5d488bd2b6d915ad2c7f5c952a928b3ff6c82ca91a47ce9c62a9c5b379f09"
+  },
+  "native-ui-20261018-picker-confirm.png": {
+    "bytes": 165908,
+    "sha256": "75f2d9d62966041c7a8350a032b954ccd878ca292e4c9d7b5e2b232a83ff581c"
+  },
+  "native-ui-20261018-protection.json": {
+    "bytes": 4186,
+    "sha256": "339213cad02413b9964a3e5db9dbdc3b9a04c76bb659041876ec9fc81a976df9"
+  },
+  "native-ui-20261018-unsupported-selector.json": {
+    "bytes": 5016,
+    "sha256": "6d647beee3d01bf8f88f6841e3267d8061c13564cee024927610570a2866f489"
+  }
+}

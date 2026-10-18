@@ -1,0 +1,199 @@
+{
+  "at": "2026-10-18T10:52:44.986Z",
+  "steps": [
+    {
+      "action": "open-folder",
+      "status": 200,
+      "body": {
+        "ok": true,
+        "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017"
+      }
+    },
+    {
+      "action": "focus",
+      "status": 200,
+      "body": {
+        "ok": true
+      }
+    }
+  ],
+  "blocked": [],
+  "desktopBefore": {
+    "foreground": 525512,
+    "foregroundPid": 19688,
+    "windows": [
+      {
+        "handle": 4064554,
+        "class": "ThumbnailDeviceHelperWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 65766,
+        "class": "Shell_TrayWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 525512,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 19688
+      },
+      {
+        "handle": 459944,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 18252
+      },
+      {
+        "handle": 591250,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 2992
+      },
+      {
+        "handle": 196814,
+        "class": "Windows.UI.Core.CoreWindow",
+        "pid": 11240
+      },
+      {
+        "handle": 66462,
+        "class": "EdgeUiInputTopWndClass",
+        "pid": 7604
+      },
+      {
+        "handle": 196632,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65872,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65870,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65868,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65866,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65806,
+        "class": "Progman",
+        "pid": 7604
+      }
+    ]
+  },
+  "explorerBefore": {
+    "handles": []
+  },
+  "explorerObserved": {
+    "matches": [
+      {
+        "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017",
+        "handle": 1377454,
+        "newWindow": true
+      }
+    ]
+  },
+  "explorerCleanup": {
+    "matches": [
+      {
+        "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017",
+        "handle": 1377454,
+        "newWindow": true,
+        "closed": true
+      }
+    ]
+  },
+  "originalBefore": {
+    "state": "ready",
+    "pid": 18252,
+    "sessionId": "e04e7299-680f-4109-a829-8cac07a51bd4"
+  },
+  "focusObserved": {
+    "foreground": 525512,
+    "foregroundPid": 19688,
+    "windows": [
+      {
+        "handle": 4064554,
+        "class": "ThumbnailDeviceHelperWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 65766,
+        "class": "Shell_TrayWnd",
+        "pid": 7604
+      },
+      {
+        "handle": 525512,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 19688
+      },
+      {
+        "handle": 459944,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 18252
+      },
+      {
+        "handle": 591250,
+        "class": "Chrome_WidgetWin_1",
+        "pid": 2992
+      },
+      {
+        "handle": 196814,
+        "class": "Windows.UI.Core.CoreWindow",
+        "pid": 11240
+      },
+      {
+        "handle": 66462,
+        "class": "EdgeUiInputTopWndClass",
+        "pid": 7604
+      },
+      {
+        "handle": 196632,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65872,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65870,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65868,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65866,
+        "class": "DummyDWMListenerWindow",
+        "pid": 7604
+      },
+      {
+        "handle": 65806,
+        "class": "Progman",
+        "pid": 7604
+      }
+    ]
+  },
+  "originalAfter": {
+    "state": "ready",
+    "pid": 18252,
+    "sessionId": "e04e7299-680f-4109-a829-8cac07a51bd4"
+  },
+  "explorerFinalCleanup": {
+    "matches": []
+  },
+  "registryUnchanged": true
+}
