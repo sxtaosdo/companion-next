@@ -20,8 +20,8 @@
     "sha256": "5d328b6116cbddfe0ed6a211e36cc2d082269b9f3e4479336ed614905188deb8"
   },
   "windows-focus-20261018-deployment.json": {
-    "bytes": 7648,
-    "sha256": "78c23abd479dd8dc79d1bc520ffe98df0e221d114c84de80a31e692f273715f4"
+    "bytes": 7445,
+    "sha256": "cbbf503d19d9258ade161d91801fdbcf37cbb6df4a505788f6b4ef02570a0fdb"
   },
   "windows-focus-20261018-formal-ui.json": {
     "bytes": 81,
