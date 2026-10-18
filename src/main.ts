@@ -1,3 +1,5 @@
+import { createPreviewActionsProvider } from './adapters/preview-actions'
+import { registerPreviewActionsProvider } from './preview-actions-integration'
 import { createLogToolsProvider } from './adapters/log-tools'
 import { registerLogToolsProvider } from './log-tools-integration'
 import { createAiJobActionsProvider } from './adapters/ai-job-actions'
@@ -48,6 +50,7 @@ if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatH
   // Normal workspace exposes the approved existing capabilities; readonly keeps
   // its passive boundary. Loopback never replaces session or per-action consent.
   if (normalWorkspaceHost) {
+    registerPreviewActionsProvider(createPreviewActionsProvider({fetch:window.fetch.bind(window)}))
     registerLogToolsProvider(createLogToolsProvider({fetch:window.fetch.bind(window)}))
     registerAiJobsReadProvider(createAiJobsReadProvider({fetch:window.fetch.bind(window)}))
     registerAiJobActionsProvider(createAiJobActionsProvider({fetch:window.fetch.bind(window)}))
