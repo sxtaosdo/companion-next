@@ -1,5 +1,7 @@
 # Windows本地开发交接
 
+2026-10-18 访问说明：裸Next地址需要当前浏览器会话。403已通过原creator-ai ui正式入口在普通Edge恢复，并以真实接口验证Next及工程/状态/统计200；完整地址http://127.0.0.1:32180/next/index.html#/projects，旧403标签需刷新，守护进程重启后先重新运行ui。[原因、正式命令与两类浏览器证据](docs/access-session-403-20261018.md)。不关闭鉴权，不输出凭据；当前部署仍a8813ac/.44。
+
 2026-10-17 a8813ac/.44工具范围入口已部署验收，证据C:/Users/33272/AppData/Local/Temp/companion-project-tool-scope-20261017/browser-proof.json及final-protection.json。无生产配置写入，Next检查点与部署源分别记录。
 
 2026-10-17 接入完成示例d982a34/.42已部署；本次接续工程工具范围入口，不启动Creator/模型或写客户端配置，使用现有32180/PID2100，保护共享22项修改。详见docs/project-tool-scope-entry-20261017.md。
