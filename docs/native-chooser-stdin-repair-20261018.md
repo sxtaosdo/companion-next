@@ -9,3 +9,5 @@ Two Python tests passed (real Windows handle identity/restoration-on-error and e
 Inventory diagnosis: selected68a5dccc481a8588 colony-flow-food-hunt (P4000). Its path/fingerprint match, but connection file from2026-10-15 points to127.0.0.1:12219; direct TCP and original asset.list log show ECONNREFUSED. Restore only when authorized by opening that same project in Creator and restoring its Bridge extension/current connection; no Creator or new listener was started for this check.
 
 Directed post-deployment cases are prepared in a fresh task-only cache: cancel, known hash-mismatch row failure without output, valid PNG+source success. Original user cache is never read or modified. These page outcomes are not claimed until their actual directed proof is complete.
+
+Final formal verification passed all three native outcomes on daemon20116: cancel no output/history, known SHA row failure no output, success exact PNG+source and UI receipt. Real Bridge recovery and733-row inventory also passed. See owner-host-acceptance-20261018.md and taskTemp directed-formal-proof.json / bridge-recovery/real-inventory-proof.json.
