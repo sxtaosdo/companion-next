@@ -1,6 +1,6 @@
 # Companion Next 当前对齐矩阵（2026-10-17）
 
-状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源d5e1357/.73，产品页1.3.173，32180/PID9764；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
+状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源40d1089/.76，产品页1.3.173，32180/PID9764；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
 
 | 功能 | 已实现且验证的范围 | 缺失 / 未验证 | 证据 |
 | --- | --- | --- | --- |
@@ -30,7 +30,7 @@
 | 知识服务/内嵌页面/外开 | 原启停回执、固定8081外开，running且frameable才内嵌；受控验证 | 真实running=false，未启动模型/服务通验iframe | 8aace09/.38；LocalServiceControls |
 | KB问答/停止/新会话 | 原sender与UNKNOWN会话隔离测试 | 真实模型链路暂停，不宣称通过 | KnowledgeConversationPanel |
 | Agent问答/新会话 | Agent列表读取 | **问答/停止/新会话未迁入** | 初始审计 |
-| 知识同步计划/执行/源管理 | 同步状态读取 | **计划/执行/源管理未迁入**，需先核源授权合同 | route-production-audit-021.md |
+| 知识同步演练/执行/逐源选择 | .76 已迁移原折叠区、逐源授权字段、选择、演练、执行排队回执和手动任务/SHA；隔离定向测试、五组Edge及六静态HTTP哈希通过 | **真实演练/执行均0，实际授权、写入和索引结果未验收**；无新增批准源/开writer/任务取消能力 | [本阶段合同与证据](knowledge-sync-parity-20261018.md) |
 | 模型服务 | 只读状态、启停适配/隔离测试 | 原页/可工作iframe缺；用户暂停全部本地模型工作 | 初始审计 |
 | AI图标/变体/资源导入 | 真实96变体PNG/meta/UUID、独立场景重开/Preview/Build/Smoke已通过 | 不覆盖全部图标生成、上传和通用资源流程；真实生成暂停 | variant-ui-import-20261017.md；历史RUNTIME-96证据 |
 | 通用资源规划/会话交接 | 规划草稿/来源切换/回执列表 | 真实会话字节回收与资源链路未全闭环 | RegisteredProjectResources、AiJobActionsPanel |
@@ -62,3 +62,11 @@ Evidence: help/navigation+legacy tests41/41, vue-tsc, production build, six real
 Remaining IMPLEMENTATION gaps: (1) Next Agent question/session/stop; original ask API already exists, paused conversation/model scope remains. (2) Next knowledge source selection/dry-run/run/receipt; old backend already carries approved/enabled/writerReady and enforces them. Next projection/flow is missing, not the backend contract. Actual execution separately requires per-source authorization/readiness. (3) normal32180 owner provider/host/session assembly; isolated byte export passes but this production branch is not wired. (4) paused model/AI flows. (5) generic resource inventory/Codex original-byte recovery needs exact owner contract.
 
 Remaining ACCEPTANCE gaps for implemented controls: real four-choice installation/client persistent writes and conflict, real Creator/Preview/Profiler, native chooser, persistent preset mutations/concurrency, long-session SSE/log/history and actual knowledge UI/auth. Do not equate these with missing controls or call all remaining gaps permissions only. Next safe implementation priority is original sync source metadata/readiness projection and isolated plan flow; Agent real conversations remain paused. No new feature design or real sync/model execution is authorized by this help batch.
+
+## 2026-10-18 knowledge sync migration (current)
+
+Live static40d1089/.76, preceding checkpointb9fbefd/.75. Old source-selection/dry-run/run flow now implemented in Next with original approved/enabled/writerReady and globalwriterEnabled gates. Dry-run is independent of retrieval auth/CLI; run is exact sourceId/channel and validates original queuedOnly/writePerformed=false receipt. Source jobs/SHA use manual refresh. No new backend/permission/credential/scheduler contract. Session UNKNOWN barrier, lease/cancel semantics and bounded plan display passed readonly review.
+
+Targeted261cases, types/build, six real HTTP hashes and five fully intercepted Edge flows passed. Only3fake syncPOSTs; real dry-run/run/write/model calls all0. User sessions/windows untouched, daemonPID9764/epoch unchanged, old22dirty protected. Evidence: [knowledge sync](knowledge-sync-parity-20261018.md). This supersedes prior remaining-sync-implementation notes above: sync is now an acceptance gap, not a missing Next flow.
+
+Real implementation gaps remain Agent Q&A/session/stop, normal32180 owner-provider/host/session wiring, generic resource inventory/Codex original-byte recovery, and paused model/AI management. Existing real acceptance boundaries for install/client writes/Creator/native chooser/preset persistence/long sessions remain. Whole Companion parity is still incomplete.

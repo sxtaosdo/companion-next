@@ -17,3 +17,22 @@ Readonly next_parity_gap confirmed old exact contracts and behavior. Readonly re
 First isolation batch146passed; expanded regression219passed across sync transport/UI, existing read projection/UI, actual bootstrap and conversation store/UI. Final canonical source gating, current help/changelog and test-fixture type adjustments are verified below. No actual dry-run/run, knowledge writes, model calls or credentials were used. No obsolete writer window or policy override was enabled.
 
 Final targeted verification: nine affected files cover261cases. Sync/read/bootstrap/conversation220passed; the help suite initially found one obsolete pinned knowledge status, updated to include restored sync source. Related help+exact-v148 fingerprints then41/41passed. Vue-tsc passed. No full suite or96asset runtime acceptance repeated. Current help and frontend change log distinguish implemented sync UI from unperformed real sync acceptance. Product/package version remains1.3.173.
+
+## Deployed static candidate and actual browser evidence
+
+Code40d10892ea49fc62b6f30063540a837755be5d7a / internal1.3.173.76, checkpointb9fbefd/.75. Production companion-workspace build passed. Six actual32180 static HTTP SHA256 match the candidate. New hashedJS/CSS assets were created and index switched atomically, with55prior static files backed up and all prior hashed assets retained. No service restart or ordinary-window navigation/refresh.
+
+Independent headless Edge verified five flows against fake status/fully intercepted business APIs: inert mount/collapsed sync and retrieval independence; unapproved-source run denied with explicit official-source dry-run; exact source-bound queued receipt without auto-refresh; explicit manual status refresh displays fake job/completedSHA; UNKNOWN closed error and replay barrier survive leaving/returning. Exactly3syncPOSTs were intercepted (1dry-run,2run); actual sync dry-runs0, actual sync runs0, knowledge writes0, model calls0, knowledge credentials handled0. Ordinary Companion UI authentication was bootstrapped through its existing session mechanism solely for static access; no knowledge credential was read or configured. The browser proof distinguishes fake business evidence from actual static HTTP evidence.
+
+DaemonPID9764, startupEpoch a9cefe7d-5810-4426-8c2b-43958f12b1d6, bundleSHA0b9c2e28... remain identical. Final sharedHEAD/status/diff/file-byte protection confirms all22parallel dirty paths unchanged. Evidence: C:/Users/33272/AppData/Local/Temp/companion-next-knowledge-sync-20261018/manifest.json, deployment-prepared.json, deployment-result.json, browser-proof.json, isolated-sync-ui.png and final-protection.json. Rollback backup-static/index.html is preserved; restore only after checking current entry hash, keep all old/new assets and shared work.
+
+Original sync selection/dry-run/run/status/receipt UI now has no known implementation blocker within the old API contract. Actual policy/auth/write/index completion remains UNVERIFIED, not passed. No backend interface/lifecycle/owner file change, real knowledge bridge operation, permission toggle, old writer-window reactivation, software install, model launch, listener, cloud upload or push occurred.
+
+## Remaining implementation gaps after this stage
+
+1. Next Agent Q&A/stop/new-session UI (old endpoint exists); model/conversation execution stays paused.
+2. Owner image-provider / same-origin host/session assembly for normal32180; isolated original-byte export does not wire this branch.
+3. Generic resource inventory and Codex-session original-byte recovery need the precise existing owner/export/receipt contract.
+4. Original model management and broader AI generation remain paused and incomplete.
+
+Sync now belongs under implemented-but-real-unaccepted, alongside real installation/client configuration/Creator/native chooser/persistent presets and long-session acceptance. There is no new source registry editor, scheduler control or remote cancellation API to invent; these were not old sync controls. Do not run real sync merely to remove this acceptance boundary.
