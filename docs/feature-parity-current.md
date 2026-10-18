@@ -1,3 +1,5 @@
+2026-10-18 收口核对：Owner“完整任务工作流未开放”仅指正式图片窄宿主；保存已验收，Agent/同步入口已实现但真实操作暂停。旧迁移必需、模型暂停、新增功能及原图片库切换的恢复写回副作用，见[收口分类与只读方案](migration-closeout-classification-20261018.md)。本轮未切库/重启/重跑验收；下文部署、PID及待办保留其历史时点。
+
 2026-10-18 最终核对：本轮Owner保存与真实库存已闭环。NUL维护stdin继承修复b82ef59/.85已加载到daemon20116；正式页面取消/已知失败/成功回执与实际0/0/2文件一致。用户新授权下原入口恢复colony-flow-food-hunt Creator23740，原Bridge更新到loopback12625；真实库存733/733/0/0与原asset.list、原聚合器及页面一致。267个工程修改及旧22项并行修改保护通过。整体迁移不据此声称全对齐；见[最新逐项验收](owner-host-acceptance-20261018.md)。
 
 2026-10-18: Approved B+C narrow Owner host and readonly inventory are implemented and deployed (Nexte2367be/.83; host6ff44f5; daemon25288/SHA35225eb5). Actual preview/selection and native taskTemp PNG+source passed; stable native-success page receipt remains unverified after an original300s chooser timeout. Actual inventory reports503 while Creator/Bridge is unavailable; positive live summary remains unverified. Overall alignment is not complete. See [current acceptance matrix](owner-host-acceptance-20261018.md). Original22 parallel modifications, old UI and original Owner sources preserved.
