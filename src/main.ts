@@ -1,3 +1,4 @@
+import { agentHandoffProvider } from './agent-handoff-integration'
 import { createPreviewActionsProvider } from './adapters/preview-actions'
 import { registerPreviewActionsProvider } from './preview-actions-integration'
 import { createLogToolsProvider } from './adapters/log-tools'
@@ -50,6 +51,7 @@ if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatH
   // Normal workspace exposes the approved existing capabilities; readonly keeps
   // its passive boundary. Loopback never replaces session or per-action consent.
   if (normalWorkspaceHost) {
+    agentHandoffProvider.value={writeText:async text=>{if(!navigator.clipboard?.writeText)throw Error('clipboard unavailable');await navigator.clipboard.writeText(text)},open:url=>window.location.assign(url)}
     registerPreviewActionsProvider(createPreviewActionsProvider({fetch:window.fetch.bind(window)}))
     registerLogToolsProvider(createLogToolsProvider({fetch:window.fetch.bind(window)}))
     registerAiJobsReadProvider(createAiJobsReadProvider({fetch:window.fetch.bind(window)}))
