@@ -1,0 +1,225 @@
+{
+  "readonly-prestart-proof.json": {
+    "sourceSha256": "9594b00376b53266563ef113d67567ef74a506c8a3fce31f473ed85876eab6bb",
+    "result": {
+      "code": 1,
+      "signal": null,
+      "elapsedMs": 1282,
+      "stdout": "",
+      "stderr": "Get-FileHash : �޷�����Get-FileHash����ʶ��Ϊ cmdlet���������ű��ļ�������г�������ơ��������Ƶ�ƴд���������·������ȷ\r\n��·����ȷ��Ȼ������һ�Ρ�\r\n����λ�� C:\\Users\\33272\\AppData\\Local\\Temp\\companion-knowledge-start-diagnosis-20261018\\readonly-prestart.ps1:13 �ַ�: \r\n11\r\n+  $kbHash=(Get-FileHash -LiteralPath (Join-Path $kbRoot ('normal-reade ...\r\n+           ~~~~~~~~~~~~\r\n    + CategoryInfo          : ObjectNotFound: (Get-FileHash:String) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : CommandNotFoundException\r\n \r\n",
+      "onlyReadOnlyGuards": true,
+      "noServiceLaunch": true
+    }
+  },
+  "powershell-module-proof.json": {
+    "sourceSha256": "56c9c3b2ac0d3b3d30dc30bfb88b76b7ed0d3671dfbb37192164ee82600e9152",
+    "result": {
+      "code": 1,
+      "stdout": "5.1.26100.9711\r\nC:\\Windows\\System32\\WindowsPowerShell\\v1.0\r\nC:\\Users\\33272\\Documents\\PowerShell\\Modules;C:\\Program Files\\PowerShell\\Modules;c:\\users\\33272\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\Modules;C:\\Users\\33272\\Documents\\WindowsPowerShell\\Modules;C:\\Program Files\\WindowsPowerShell\\Modules;C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules\r\n\r\nName                         Path                                                                                      \r\n----                         ----                                                                                      \r\nMicrosoft.PowerShell.Utility C:\\users\\33272\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershe...\r\nMicrosoft.PowerShell.Utility C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Utility\\Microso...\r\n\r\n\r\n",
+      "stderr": ""
+    }
+  },
+  "module-manifest-comparison.json": {
+    "sourceSha256": "aabd99312f7b0e070abb074c50cb6d088397f8bfc11f9fe0a847aaf16d977032",
+    "result": [
+      {
+        "path": "C:\\Users\\33272\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\Modules\\Microsoft.PowerShell.Utility\\Microsoft.PowerShell.Utility.psd1",
+        "fields": {
+          "ModuleVersion": "\"7.0.0.0\"",
+          "PowerShellVersion": "\"3.0\"",
+          "CompatiblePSEditions": "@(\"Core\")"
+        }
+      },
+      {
+        "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Utility\\Microsoft.PowerShell.Utility.psd1",
+        "fields": {
+          "ModuleVersion": "\"3.1.0.0\"",
+          "PowerShellVersion": "'5.1'",
+          "CompatiblePSEditions": "@('Desktop')"
+        }
+      }
+    ]
+  },
+  "readonly-prestart-fixed-env-proof.json": {
+    "sourceSha256": "9ea1ce74bf8f17ccee632146a32b321ce0cc92ad08d53c09735c9c647c089ea9",
+    "result": {
+      "code": 0,
+      "signal": null,
+      "elapsedMs": 2016,
+      "stdout": "{\"migration\":[[30,0]],\"quick_check\":\"ok\",\"empty_trigger_counts\":{\"task_pending_ops\":0,\"data_sources\":0,\"im_channels\":0,\"mcp_services\":0,\"sync_logs\":0,\"tenant_sandbox_configs\":0,\"temporary_documents\":0,\"fork_snapshot_leases\":0,\"tenant_skills\":0,\"sessions_with_fork_bootstrap\":0},\"mcp_endpoint_state\":{\"count\":1,\"state\":\"approved_disabled\",\"id\":\"8f9d7d6c-cec1-4017-b4a2-ed648f372182\",\"tenant_id\":1,\"tools\":[\"list_knowledge_bases\",\"search_knowledge\",\"grep_chunks\",\"list_documents\",\"read_document\",\"ask\",\"wiki_search\",\"wiki_read_page\",\"wiki_index\"],\"knowledge_base_ids\":[\"da1051a5-3fff-4198-ba55-017ea79df9c3\"]},\"knowledge_statuses\":[[\"completed\",154],[\"finalizing\",356],[\"processing\",1137]],\"knowledge_state_sha256\":\"d761b079368fedeb58fbda195982876a6c1e577621266f4a10560bca2cc41daf\",\"counts\":{\"knowledges\":1647,\"chunks\":59428,\"lite_embeddings\":2269,\"auth_tokens\":36,\"users\":2,\"tenants\":2},\"temporary_kbs\":0}\r\nReadonly guards passed\r\n",
+      "stderr": "",
+      "onlyReadOnlyGuards": true,
+      "noServiceLaunch": true
+    }
+  },
+  "startup-fix.json": {
+    "sourceSha256": "b71f90ede7f31a2af6ba5fb4128a478b1693120696efe852f7c7d948663736f5",
+    "result": {
+      "checkpoint": "95b2f9e",
+      "path": "D:\\services\\weknora\\Start-PilotAccess.ps1",
+      "beforeSha256": "960a29822febd4b942d5f70dfd00c0fa4a64bf4b6c25d1da8676482f04aef8eb",
+      "afterSha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+      "exactAddedStatements": [
+        "$env:PSModulePath = Join-Path $PSHOME 'Modules'"
+      ],
+      "onlyProcessEnvironment": true,
+      "allOtherBytesPreserved": true,
+      "backup": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-knowledge-start-diagnosis-20261018\\Start-PilotAccess.before.ps1",
+      "globalEnvironmentChanged": false,
+      "databaseReset": false,
+      "credentialsChanged": false
+    }
+  },
+  "knowledge-recovery-real-proof.json": {
+    "sourceSha256": "f166aa2985f83ca824365ce7f2a096ba5d130c653424d1947eabbaf7e6ad721f",
+    "result": {
+      "startStatus": 200,
+      "reportedState": {
+        "running": true,
+        "frameable": false,
+        "errorPresent": false
+      },
+      "dispatched": 1,
+      "blocked": [],
+      "responses": [
+        {
+          "path": "/api/knowledge-service/status",
+          "status": 200
+        },
+        {
+          "path": "/api/knowledge-service/start",
+          "status": 200
+        }
+      ],
+      "knowledgeIframe": false,
+      "externalLink": false,
+      "noOwnerLogin": true,
+      "noQuestionSyncOrModelCalls": true,
+      "ownedBrowserClosed": true
+    }
+  },
+  "knowledge-readonly-ui-proof.json": {
+    "sourceSha256": "c8f4b0029a15422f42192ae3618451628f27f7bdcf7f42d1b0f03c00e3d3d626",
+    "result": {
+      "blocked": [],
+      "onlyReadOnly": true,
+      "serviceStartRequests": 0,
+      "status": {
+        "running": true,
+        "frameable": false
+      },
+      "externalLink": {
+        "visible": true,
+        "href": "http://127.0.0.1:8081/",
+        "target": "_blank",
+        "rel": "noopener noreferrer"
+      },
+      "knowledgeIframeCount": 0,
+      "externalPage": {
+        "origin": "http://127.0.0.1:8081",
+        "path": "/login",
+        "title": "WeKnora",
+        "passwordFieldVisible": true
+      },
+      "root": {
+        "status": 200,
+        "path": "/",
+        "xFrameOptions": "SAMEORIGIN",
+        "frameAncestors": "'self'"
+      },
+      "passed": true
+    }
+  },
+  "recovery-protection.json": {
+    "sourceSha256": "14f50e6d4be7b111b7da9065de8822839f56ad87db63b05181095d9a5fdf1b1d",
+    "result": {
+      "allMetadataEqual": true,
+      "historyStateHashEqual": true,
+      "quickCheck": "ok",
+      "allStartupTriggersStillZero": true,
+      "startupScriptAfterShaMatches": true,
+      "servicePid": 20364,
+      "listeners": [
+        {
+          "LocalAddress": "127.0.0.1",
+          "LocalPort": 8081,
+          "OwningProcess": 20364
+        }
+      ],
+      "listenersReadFromGetNetTCPConnection": true,
+      "noOwnerLoginQuestionSyncOrModelRequest": true
+    }
+  },
+  "runtime-after.json": {
+    "sourceSha256": "30bb14429ccc42d38e6000fe80a6b812b66e3644f6d7b23d47bc2b1f3dc3f1f5",
+    "result": {
+      "daemon": {
+        "pid": 20116,
+        "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+        "startedAt": "2026-10-18T04:48:30.247Z",
+        "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+        "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+        "nodeVersion": "v25.2.1"
+      },
+      "original": {
+        "state": "ready",
+        "pid": 23740,
+        "sessionId": "d4e9a8b9-39e9-4e6b-8fe5-3c237b04c42d"
+      },
+      "fixture": {
+        "state": "error",
+        "pid": null
+      },
+      "model": {
+        "gpuRunning": [
+          "heretic"
+        ],
+        "heretic": {
+          "state": "running",
+          "pid": 3260,
+          "phase": "idle"
+        },
+        "busy": false
+      },
+      "cliEntrySha256": "6085072c7c9c7901b1a77d9392785209f9b80c00334a509afd9947f72cde87b8"
+    }
+  },
+  "source-protection-after.json": {
+    "sourceSha256": "00382ed0317f45143ee72fb2669c2fc16509e5d54b2daef6e58ae33240da783a",
+    "result": {
+      "shared": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyHashChanges": [],
+        "missing": [],
+        "workPatchSame": true,
+        "indexPatchSame": true
+      },
+      "fixture": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyHashChanges": [],
+        "missing": [],
+        "workPatchSame": true,
+        "indexPatchSame": true
+      },
+      "original": {
+        "headSame": true,
+        "statusSame": true,
+        "dirtyHashChanges": [],
+        "missing": [],
+        "workPatchSame": true,
+        "indexPatchSame": true
+      }
+    }
+  },
+  "prelaunchObservation": {
+    "weknoraProcessCount": 0,
+    "startPilotAccessProcessCount": 0,
+    "port8081ListenerCount": 0,
+    "observedTwiceBeforeActualLaunch": true,
+    "priorAttemptWasFailedNotUnknown": true,
+    "initialProofReference": "remaining-real-acceptance-20261018.json#knowledge-real-proof.json"
+  },
+  "startupScriptPatch": "--- a/D:/services/weknora/Start-PilotAccess.ps1\n+++ b/D:/services/weknora/Start-PilotAccess.ps1\n@@ -2,6 +2,8 @@\n # Owner login handoff on an isolated copy. No autostart/Windows service.\n # Run in a separate PowerShell process. This does not log in or issue an API key.\n $ErrorActionPreference='Stop'\n+# Windows PowerShell must not auto-load inherited PowerShell 7 modules.\n+$env:PSModulePath = Join-Path $PSHOME 'Modules'\n $kbRoot=$PSScriptRoot\n $kbApp=Join-Path $kbRoot 'pilot-access'\n $kbData='D:/knowledge-data/weknora/pilot-access/weknora.db'\n"
+}
