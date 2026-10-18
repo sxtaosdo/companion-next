@@ -22,3 +22,12 @@
 setup-service.ts:50–60按activeByPath复用任务，复用前不比较startCreator/configureCodex；SetupOperation不回显选项。http-server.ts:394–410支持POST /api/setup传false，但GET /api/setup/:operationId仅读旧快照，无法证明“严格只装Bridge且不启动/不写Codex”。因此不以新勾选项假称严格保证，不调用真实安装。
 
 http-server.ts:456–465与v1的mcp/register只支持POST，target为codex/cursor/trae/kiro/vscode；未找到客户端配置状态GET。项目/daemon状态GET不等于这五种持久配置的读取证据，不能调用register写入来冒充查询；本轮配置读写均0。后续若需补齐安全读取合同，须先提修改旧后端的方案，当前只改Next边界下不自行扩展。
+
+
+## 部署验收与接续
+
+源9319ddd/.48已部署。先备份36旧静态文件，仅新增JS/CSS并原子切换index；六文件HTTP SHA匹配。隔离Edge执行5种成功回执+1次500失败，共6次被拦截操作，真实Preview/Profiler/Creator调用0，生产写入0；验证未ready工程无按钮、无挂载自动请求、JSON仅文本/凭据脱敏、UNKNOWN离页返回仍禁用。截图preview-profiler.png已查看。PID2100/epoch/OPEN保持，原普通Edge/PID2992地址和工程控件仍可见且Forbidden=false，未改窗口/Cookie、不重复启动ui。
+
+证据根C:/Users/33272/AppData/Local/Temp/companion-preview-profiler-20261018：deployment-result.json、browser-proof.json、ordinary-window-proof.json。所有业务按钮测试均为fixture，不能将其称为真实运行通过。
+
+下一只读审计发现：旧app.ts:3459在modal-open时忽略/快捷键，Next只排除输入元素，会在CLI/接入/Creator弹窗抢焦点。下一片先恢复这条保护，沿用已批准旧交互，针对性测试后再部署；另有工具预设按scope类别批量选择缺口，可仅改内存草稿，无新接口。

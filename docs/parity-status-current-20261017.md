@@ -1,6 +1,6 @@
 # Companion Next 当前对齐矩阵（2026-10-17）
 
-状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源a8813ac/.44，产品页1.3.173，32180/PID2100；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
+状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源9319ddd/.48，产品页1.3.173，32180/PID2100；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
 
 | 功能 | 已实现且验证的范围 | 缺失 / 未验证 | 证据 |
 | --- | --- | --- | --- |
@@ -11,7 +11,7 @@
 | Dashboard/目录选择 | 真实只读8条/6登记匹配；系统选择适配及UI | 真实系统选择点击未验 | dashboard-discovery-local.md；project-directory-local.md |
 | 添加/初始化工程布局 | 原Creator3.8.8 scaffold；隔离Temp工程201真实接口及UI | 无实际Creator启动验收 | project-scaffold-local.md |
 | 打开/停止/重启/唤起/目录/移除 | 生命周期适配、操作隔离与UI回执 | 本轮不启动Creator，完整真实动作未验 | creator-operations与其测试 |
-| Preview/Profiler控制入口 | 说明保留 | **入口仍缺**；历史96资源Preview验收不等于后台入口对齐 | product-information runtime；初始审计 |
+| Preview/Profiler控制入口 | ready工程预览/探测/状态/刷新及Profiler已接原接口，330+46分组测试、六文件HTTP SHA及隔离Edge6操作通过 | **真实运行待验**；本轮无真实Creator/Preview/Profiler执行，历史96资源验收不能替代入口真实运行 | preview-profiler-entry-20261018.md；9319ddd/.48 |
 | 登记/完整安装接入 | 旧配色/布局、确认与任务轮询已接，隔离UI | 严格部分安装尚受旧复用任务合同限制，真实安装/客户端配置未执行 | ProjectSetupWizard；setup-completion-usage-20261017.md |
 | 安装完成使用示例 | 原文/缺省/复制/换行、失败不显示、断开不复活，三分支Edge | 完成回执不证明本次选项执行或真实连接 | d982a34/.42；setup-completion-usage-20261017.md |
 | 日志查询/刷新/暂停/滚到底 | 保留DOM/滚动、过滤、工具条回归，已部署 | 长会话/真实200条布局组合未完全验 | log-tools-20261017.md |
