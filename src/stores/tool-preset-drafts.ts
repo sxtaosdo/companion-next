@@ -165,6 +165,25 @@ export const useToolPresetDraftsStore = defineStore('tool-preset-drafts', () => 
     if (mode === 'disabled') disabled.push(toolName)
     return replaceEdited(id, { enabled, disabled })
   }
+  /** One local revision for the complete catalog category, independent of UI search. */
+  function setScopeSelection(id: string, scope: string, selected: boolean): boolean {
+    guardContext(); invalidatePlans(); error.value = ''
+    const original = items.value.find(draft => draft.preset.id === id)?.preset
+    if (!original || original.builtIn || typeof scope !== 'string' || typeof selected !== 'boolean') return false
+    try {
+      if (!context?.provider || !context.toolsReady || context.loading) throw new Error('unverified')
+      const tools = decodeToolCatalog(context.tools).filter(tool => tool.scope === scope)
+      if (!tools.length) throw new Error('unknown scope')
+      const names = new Set(tools.map(tool => tool.name))
+      const enabled = original.enabled.filter(name => !names.has(name)), disabled = original.disabled.filter(name => !names.has(name))
+      for (const tool of tools) {
+        const inherited = original.baseProfile === 'full' || tool.profile === 'core'
+        if (selected && !inherited) enabled.push(tool.name)
+        if (!selected && inherited) disabled.push(tool.name)
+      }
+      return replaceEdited(id, { enabled, disabled })
+    } catch { error.value = '类别不在当前已核实目录中，请重新读取后操作。'; return false }
+  }
   function prepareImport(json: string): PreparedDraftImport | undefined {
     guardContext(); invalidatePlans(); error.value = ''
     try {
@@ -220,5 +239,5 @@ export const useToolPresetDraftsStore = defineStore('tool-preset-drafts', () => 
     guardContext()
     return prepared === exportPlan.value && exportRevision === revision.value && Boolean(ready()) && contextAccepted.value
   }
-  return { drafts, activeId, active, error, revision, contextRevision, validation, preparedImport, preparedExport, backupAvailable, contextAccepted, syncContext, invalidateContext, leave: invalidateContext, acceptCurrentContext, cloneFrom, replaceAsNewCopy, edit, setToolMode, selectActive, prepareImport, applyImport, clearImport, cancelImportPreview: clearImport, remove, restoreBackup, prepareExport, isPreparedCurrent }
+  return { drafts, activeId, active, error, revision, contextRevision, validation, preparedImport, preparedExport, backupAvailable, contextAccepted, syncContext, invalidateContext, leave: invalidateContext, acceptCurrentContext, cloneFrom, replaceAsNewCopy, edit, setToolMode, setScopeSelection, selectActive, prepareImport, applyImport, clearImport, cancelImportPreview: clearImport, remove, restoreBackup, prepareExport, isPreparedCurrent }
 })

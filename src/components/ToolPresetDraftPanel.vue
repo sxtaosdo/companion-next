@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useToolPresetsReadStore } from '../stores/tool-presets-read'
 import { useToolPresetDraftsStore } from '../stores/tool-preset-drafts'
 import { toolPresetReadProvider } from '../tool-presets-read-integration'
+import { effectiveToolNames } from '../domain/tool-presets-read'
 import type { ToolProfile } from '../domain/tool-presets-read'
 const read = useToolPresetsReadStore(), drafts = useToolPresetDraftsStore()
 const opened = ref(false), query = ref(''), importText = ref(''), importPending = ref(false), importError = ref(''), replaceConfirmed = ref(false), restoreConfirmed = ref(false), downloadNotice = ref('')
@@ -18,6 +19,20 @@ const visibleTools = computed(() => {
   const search = query.value.trim().toLocaleLowerCase()
   return read.toolsRead ? read.tools.filter(tool => [tool.name, tool.displayNameZh, tool.scope].join('\n').toLocaleLowerCase().includes(search)) : []
 })
+const collapsedScopes = ref<Record<string, boolean>>(Object.create(null))
+const effectiveNames = computed(() => {
+  if (!active.value || !read.toolsRead || read.toolsLoading || read.presetsLoading || !read.provider || read.provider !== toolPresetReadProvider.value) return null
+  try {
+    const known = new Set(read.tools.map(tool => tool.name)), preset = active.value.preset
+    // Count only known catalog members; retain unknown overrides in the actual draft.
+    return effectiveToolNames({ ...preset, enabled: preset.enabled.filter(name => known.has(name)), disabled: preset.disabled.filter(name => known.has(name)) }, read.tools)
+  } catch { return null }
+})
+const toolGroups = computed(() => [...new Set(visibleTools.value.map(tool => tool.scope))].sort().map(scope => {
+  const all = read.tools.filter(tool => tool.scope === scope)
+  return { scope, tools: visibleTools.value.filter(tool => tool.scope === scope), total: all.length,
+    selected: effectiveNames.value ? all.filter(tool => effectiveNames.value!.has(tool.name)).length : null }
+}))
 const unknownOverrides = computed(() => active.value ? [...active.value.preset.enabled, ...active.value.preset.disabled].filter(name => !read.toolsRead || !read.tools.some(tool => tool.name === name)) : [])
 function mode(name: string) { const preset = active.value?.preset; return preset?.enabled.includes(name) ? 'enabled' : preset?.disabled.includes(name) ? 'disabled' : 'default' }
 function open() { opened.value = true; syncSource() }
@@ -73,7 +88,8 @@ onBeforeUnmount(close)
           <p class="form-help">若导入文件与已读宿主方案 ID/名称冲突，可明确另建副本再命名；不会偷偷改动导入文件身份或覆盖宿主方案。</p>
           <section v-if="unknownOverrides.length" class="draft-unknown"><h4>当前目录无法核验的覆盖项</h4><p>保留原记录，不默认启用或丢弃。可重新读取完整目录，或明确从本地副本移除此覆盖项。</p><div v-for="name in unknownOverrides" :key="name"><code>{{ name }}</code><el-button @click="drafts.setToolMode(active!.preset.id,name,'default')">移除此覆盖项</el-button></div></section>
           <el-input v-model="query" aria-label="搜索本地预设工具" placeholder="只筛选显示，不改变覆盖项" maxlength="256"/>
-          <div class="draft-tool-list"><div v-for="tool in visibleTools" :key="tool.name" class="draft-tool"><div><strong>{{ tool.displayNameZh }}</strong><code>{{ tool.name }}</code><small>{{ tool.scope }} / {{ tool.profile }} / {{ tool.access }}（旧目录标签）</small></div><el-select :model-value="mode(tool.name)" :aria-label="`本地覆盖 ${tool.name}`" @change="(value:'default'|'enabled'|'disabled')=>drafts.setToolMode(active!.preset.id,tool.name,value)"><el-option label="跟随基础范围" value="default"/><el-option label="显式启用" value="enabled"/><el-option label="显式禁用" value="disabled"/></el-select></div></div>
+          <div class="draft-tool-list"><section v-for="group in toolGroups" :key="group.scope" class="draft-tool-category"><div class="draft-category-heading"><button type="button" :aria-expanded="!collapsedScopes[group.scope]" @click="collapsedScopes[group.scope]=!collapsedScopes[group.scope]">{{ group.scope }} · {{ group.selected ?? '?' }}/{{ group.total }}</button><el-checkbox :model-value="group.selected===group.total" :indeterminate="group.selected!==null&&group.selected>0&&group.selected<group.total" :disabled="group.selected===null" :aria-label="`选择 ${group.scope} 全部工具`" @change="(value:unknown)=>drafts.setScopeSelection(active!.preset.id,group.scope,value===true)">整类全选 / 取消</el-checkbox></div><div v-show="!collapsedScopes[group.scope]"><div v-for="tool in group.tools" :key="tool.name" class="draft-tool"><div><strong>{{ tool.displayNameZh }}</strong><code>{{ tool.name }}</code><small>{{ tool.scope }} / {{ tool.profile }} / {{ tool.access }}（旧目录标签）</small></div><el-select :model-value="mode(tool.name)" :aria-label="`本地覆盖 ${tool.name}`" @change="(value:'default'|'enabled'|'disabled')=>drafts.setToolMode(active!.preset.id,tool.name,value)"><el-option label="跟随基础范围" value="default"/><el-option label="显式启用" value="enabled"/><el-option label="显式禁用" value="disabled"/></el-select></div></div></section></div>
+          <p class="form-help">搜索只筛选显示；类别选择作用于完整类别，仅改变当前自定义内存副本，不自动保存或分配。</p>
           <p v-if="!read.toolsRead">工具目录未读，不能把此草稿的成员关系当作已核验；名称/基础范围仍可在本地编辑。</p>
         </section>
       </div>
@@ -86,5 +102,5 @@ onBeforeUnmount(close)
   </section>
 </template>
 <style scoped>
-.preset-draft-entry{border:1px solid #dde5ee;border-radius:10px;padding:16px;margin:18px 0}.preset-draft-entry p{line-height:1.65;overflow-wrap:anywhere}.draft-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.draft-workspace{display:grid;grid-template-columns:180px minmax(0,1fr);gap:20px;margin:18px 0}.draft-workspace nav{display:flex;flex-direction:column;gap:8px}.draft-workspace nav .el-button{margin:0;white-space:normal;min-height:36px;height:auto}.draft-fields{min-width:0}.draft-tool-list{max-height:360px;overflow:auto;margin-top:12px;border:1px solid #e2e7ef}.draft-tool{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border-bottom:1px solid #e2e7ef}.draft-tool>div{display:grid;gap:4px;min-width:0}.draft-tool code,.draft-tool small{overflow-wrap:anywhere}.draft-tool .el-select{width:180px;flex-shrink:0}.draft-unknown,.draft-backup,.draft-import{padding:14px;border:1px solid #e2e7ef;border-radius:8px;margin-top:16px}.draft-unknown>div{display:flex;justify-content:space-between;gap:10px}.draft-import input{max-width:100%;margin-bottom:10px}.draft-validation{padding:10px;background:#f3f7fb}@media(max-width:650px){.draft-workspace{grid-template-columns:1fr}.draft-workspace nav{flex-direction:row;flex-wrap:wrap}.draft-tool{align-items:stretch;flex-direction:column}.draft-tool .el-select{width:100%}}
+.preset-draft-entry{border:1px solid #dde5ee;border-radius:10px;padding:16px;margin:18px 0}.preset-draft-entry p{line-height:1.65;overflow-wrap:anywhere}.draft-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.draft-workspace{display:grid;grid-template-columns:180px minmax(0,1fr);gap:20px;margin:18px 0}.draft-workspace nav{display:flex;flex-direction:column;gap:8px}.draft-workspace nav .el-button{margin:0;white-space:normal;min-height:36px;height:auto}.draft-fields{min-width:0}.draft-category-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px;background:#f3f7fb}.draft-category-heading>button{border:0;background:none;font:inherit;text-align:left;cursor:pointer}.draft-tool-list{max-height:360px;overflow:auto;margin-top:12px;border:1px solid #e2e7ef}.draft-tool{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border-bottom:1px solid #e2e7ef}.draft-tool>div{display:grid;gap:4px;min-width:0}.draft-tool code,.draft-tool small{overflow-wrap:anywhere}.draft-tool .el-select{width:180px;flex-shrink:0}.draft-unknown,.draft-backup,.draft-import{padding:14px;border:1px solid #e2e7ef;border-radius:8px;margin-top:16px}.draft-unknown>div{display:flex;justify-content:space-between;gap:10px}.draft-import input{max-width:100%;margin-bottom:10px}.draft-validation{padding:10px;background:#f3f7fb}@media(max-width:650px){.draft-workspace{grid-template-columns:1fr}.draft-workspace nav{flex-direction:row;flex-wrap:wrap}.draft-tool{align-items:stretch;flex-direction:column}.draft-tool .el-select{width:100%}}
 </style>
