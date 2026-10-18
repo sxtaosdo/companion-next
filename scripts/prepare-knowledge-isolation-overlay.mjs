@@ -1,0 +1,50 @@
+/** Offline preparation only. Never invokes build hooks, daemon stop, or credential loading. */
+import {build} from 'esbuild';
+import {readFile,writeFile,mkdir,cp,copyFile} from 'node:fs/promises';
+import {dirname,join,resolve} from 'node:path';
+import {createHash} from 'node:crypto';
+const out=resolve(process.argv[2]??'');
+const scope=resolve('C:/Users/33272/AppData/Local/Temp/companion-credential-deploy-20261018-r3');
+if(out!==scope)throw Error('TASK_OUTPUT_SCOPE');
+const live='D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion';
+const deps='D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules';
+const prior='C:/Users/33272/AppData/Local/Temp/companion-focus-fix-20261018/runtime-build-release/verified-source';
+const candidate='C:/Users/33272/AppData/Local/Temp/companion-credential-isolation-20261018/worktree';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const original=await readFile(live+'/companion-daemon.js'),mapBytes=await readFile(live+'/companion-daemon.js.map'),map=JSON.parse(mapBytes);
+if(sha(original)!=='148f28ad4989a038de1825beae197c4db9947f3209a8f22cf07ec330047df526')throw Error('LIVE_BASELINE_CHANGED');
+await mkdir(out);const sourceRoot=join(out,'verified-source');await cp(prior,sourceRoot,{recursive:true,errorOnExist:true,force:false});
+for(let i=0;i<map.sources.length;i++)if(map.sources[i].includes('/verified-source/')){
+ const rel=map.sources[i].split('/verified-source/')[1];if(rel.split(/[\\/]/).includes('..'))throw Error('SOURCE_SCOPE');
+ const p=join(sourceRoot,rel);await mkdir(dirname(p),{recursive:true});await writeFile(p,map.sourcesContent[i]);
+}
+const common={absWorkingDir:join(sourceRoot,'mcp'),bundle:true,platform:'node',format:'esm',target:'node20',sourcemap:true,nodePaths:[deps],external:['playwright','playwright-core','chromium-bidi','fsevents','better-sqlite3','typescript'],banner:{js:"import {createRequire} from 'node:module';const require=createRequire(import.meta.url);"}};
+await mkdir(join(out,'baseline'));await build({...common,entryPoints:['src/companion-daemon.ts'],outfile:join(out,'baseline/companion-daemon.js')});
+if(!(await readFile(join(out,'baseline/companion-daemon.js'))).equals(original))throw Error('BASELINE_REBUILD_NOT_IDENTICAL');
+for(const rel of ['companion/knowledge-adapter.ts','companion/knowledge-isolation.ts','companion/knowledge-worker-core.ts','knowledge-worker.ts'])await copyFile(join(candidate,'mcp/src',rel),join(sourceRoot,'mcp/src',rel));
+const path=join(sourceRoot,'mcp/src/companion-daemon.ts');let s=await readFile(path,'utf8');
+const replace=(old,value)=>{if(s.split(old).length!==2)throw Error('DAEMON_PATCH_ANCHOR');s=s.replace(old,value)};
+replace('import { KnowledgeAdapter, jsonProcessInFlightCount, type KnowledgeBackend }','import { jsonProcessInFlightCount, type KnowledgeBackend }');
+s='import { assertNoSharedKnowledgeCredentials, IsolatedKnowledgeAdapter, knowledgeWorkerInFlightCount, knowledgeWorkerUnknownCount } from "./companion/knowledge-isolation.js";\n'.replace('\\n','\n')+s;
+replace('export async function startCompanionDaemon(options: CompanionDaemonOptions = {}): Promise<RunningCompanionDaemon> {','export async function startCompanionDaemon(options: CompanionDaemonOptions = {}): Promise<RunningCompanionDaemon> {\n  assertNoSharedKnowledgeCredentials(process.env);'.replace('\\n','\n'));
+const a=s.indexOf('  const knowledge = options.knowledge ?? new KnowledgeAdapter({'),b=s.indexOf('  const iconConfig',a);if(a<0||b<a)throw Error('KNOWLEDGE_CONSTRUCTOR_ANCHOR');
+s=s.slice(0,a)+'  const knowledge = options.knowledge ?? new IsolatedKnowledgeAdapter({\n    ...(process.env.COMPANION_KNOWLEDGE_CREDENTIAL_FILE ? { credentialFile: process.env.COMPANION_KNOWLEDGE_CREDENTIAL_FILE } : {}),\n  });\n'.replaceAll('\\n','\n')+s.slice(b);
+replace('sidecars: jsonProcessInFlightCount()','sidecars: jsonProcessInFlightCount() + knowledgeWorkerInFlightCount()');
+replace('unknown: states.includes("unknown") ? ["BUILD_STATE_UNVERIFIED"] : []','unknown: [...(states.includes("unknown") ? ["BUILD_STATE_UNVERIFIED"] : []), ...(knowledgeWorkerUnknownCount() ? ["KNOWLEDGE_WORKER_EXIT_UNCONFIRMED"] : [])]');
+await writeFile(path,s);
+await mkdir(join(out,'candidate'));await build({...common,entryPoints:['src/companion-daemon.ts'],outfile:join(out,'candidate/companion-daemon.js')});
+await build({...common,entryPoints:['src/knowledge-worker.ts'],outfile:join(out,'candidate/knowledge-worker.js')});
+const nextMap=JSON.parse(await readFile(join(out,'candidate/companion-daemon.js.map'),'utf8'));
+const key=s=>s.includes('/verified-source/')?s.split('/verified-source/')[1]:s;const norm=s=>typeof s==='string'?s.replaceAll('\r',''):s;
+const before=new Map(map.sources.map((p,i)=>[key(p),norm(map.sourcesContent[i])])),after=new Map(nextMap.sources.map((p,i)=>[key(p),norm(nextMap.sourcesContent[i])]));
+const changed=[...after].filter(([p,c])=>before.has(p)&&before.get(p)!==c).map(([p])=>p),added=[...after.keys()].filter(p=>!before.has(p)),removed=[...before.keys()].filter(p=>!after.has(p));
+if(changed.some(p=>!['mcp/src/companion-daemon.ts','mcp/src/companion/knowledge-adapter.ts'].includes(p))||added.some(p=>p!=='mcp/src/companion/knowledge-isolation.ts')||removed.length)throw Error('SOURCE_ALLOWLIST_CHANGED');
+// Keep the existing CLI byte-for-byte after a static pre-import name guard. No new CLI graph.
+const cli=await readFile(live+'/creator-ai.js'),cliMap=JSON.parse(await readFile(live+'/creator-ai.js.map','utf8'));
+if(sha(cli)!=='6085072c7c9c7901b1a77d9392785209f9b80c00334a509afd9947f72cde87b8')throw Error('CLI_BASELINE_CHANGED');
+const guard='if (Object.keys(process.env).some(name => ["WEKNORA_API_KEY", "KNOWLEDGE_SYNC_API_KEY"].includes(name.toUpperCase()))) throw new Error("KNOWLEDGE_SHARED_CREDENTIAL_ENV_REJECTED");\n'.replace('\\n','\n');
+if(cli.toString('utf8').startsWith('#!'))throw Error('UNEXPECTED_CLI_SHEBANG');
+await writeFile(join(out,'candidate/creator-ai.js'),Buffer.concat([Buffer.from(guard),cli]));cliMap.mappings=';'+cliMap.mappings;await writeFile(join(out,'candidate/creator-ai.js.map'),JSON.stringify(cliMap));
+const artifacts={};for(const name of ['companion-daemon.js','companion-daemon.js.map','creator-ai.js','creator-ai.js.map','knowledge-worker.js','knowledge-worker.js.map'])artifacts[name]=sha(await readFile(join(out,'candidate',name)));
+const proof={baselineByteIdentical:true,baselineSha256:sha(original),baselineMapSha256:sha(mapBytes),cliBaselineSha256:sha(cli),cliOriginalSuffixUnchanged:true,cliGuard:guard,changedSources:changed,addedSources:added,removedSources:removed,artifacts,deployed:false,realCredentialConfigured:false};
+await writeFile(join(out,'build-proof.json'),JSON.stringify(proof,null,2)+'\n');console.log(JSON.stringify(proof));

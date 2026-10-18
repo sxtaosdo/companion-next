@@ -1,0 +1,26 @@
+{
+  "baselineByteIdentical": true,
+  "baselineSha256": "148f28ad4989a038de1825beae197c4db9947f3209a8f22cf07ec330047df526",
+  "baselineMapSha256": "993bba5b1fbfa10273a5ab8c7091160f0d3e9a7e510c308468900c4818bacd73",
+  "cliBaselineSha256": "6085072c7c9c7901b1a77d9392785209f9b80c00334a509afd9947f72cde87b8",
+  "cliOriginalSuffixUnchanged": true,
+  "cliGuard": "if (Object.keys(process.env).some(name => [\"WEKNORA_API_KEY\", \"KNOWLEDGE_SYNC_API_KEY\"].includes(name.toUpperCase()))) throw new Error(\"KNOWLEDGE_SHARED_CREDENTIAL_ENV_REJECTED\");\n",
+  "changedSources": [
+    "mcp/src/companion/knowledge-adapter.ts",
+    "mcp/src/companion-daemon.ts"
+  ],
+  "addedSources": [
+    "mcp/src/companion/knowledge-isolation.ts"
+  ],
+  "removedSources": [],
+  "artifacts": {
+    "companion-daemon.js": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "companion-daemon.js.map": "75de51530c772a774303937648fe37c62712f07862c23f91cf887802e00e706e",
+    "creator-ai.js": "bc1e15920a33e388a6d5cdc8347a9bec93fbe7cc719e7208cc8b112feeebca53",
+    "creator-ai.js.map": "ca9a00e3783398749f4949d3630adced8e3d6533e69abd0deeb3c2175d4b44f7",
+    "knowledge-worker.js": "ff0ff14026e3d5790ac48f83c901053ffd58055e5ab6c6be7fbd9dcdb134d699",
+    "knowledge-worker.js.map": "92fafb9d4a03f8f40f16cc8763a9cc08332d8b015b83c14096c8a2753ab76dce"
+  },
+  "deployed": false,
+  "realCredentialConfigured": false
+}
