@@ -1,6 +1,6 @@
 # Companion Next 当前对齐矩阵（2026-10-17）
 
-状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源40d1089/.76，产品页1.3.173，32180/PID9764；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
+状态：Accepted。结论：**尚未全部对齐**。仅开发者Companion，当前部署源5138bbf/.79，产品页1.3.173，32180/PID9764；文档提交版本不等于构建源。旧真实路由及逐项原始证据见[初始25项审计](parity-audit-20261017.md)，其表格明确保留修改前时点。本表区分真实验证、隔离测试与缺失，帮助文字/占位不计成功。
 
 | 功能 | 已实现且验证的范围 | 缺失 / 未验证 | 证据 |
 | --- | --- | --- | --- |
@@ -29,7 +29,7 @@
 | 知识库/文档/原文/切片读取 | 有界读取与原文展示适配/测试 | 真实8081当前未通验，二进制读取无新增 | KnowledgeReadView；knowledge-read |
 | 知识服务/内嵌页面/外开 | 原启停回执、固定8081外开，running且frameable才内嵌；受控验证 | 真实running=false，未启动模型/服务通验iframe | 8aace09/.38；LocalServiceControls |
 | KB问答/停止/新会话 | 原sender与UNKNOWN会话隔离测试 | 真实模型链路暂停，不宣称通过 | KnowledgeConversationPanel |
-| Agent问答/新会话 | Agent列表读取 | **问答/停止/新会话未迁入** | 初始审计 |
+| Agent列表/单会话问答/本地新对话 | .79 已迁移原选择刷新、首问/追问sessionId、等待/停止等待、失败及纯文本JSON；隔离定向测试、六组Edge、六静态HTTP哈希通过 | **真实问答/模型调用/持久Agent会话写入均0**；旧合同没有服务端会话列表、创建/切换/删除或流式接口，未虚构 | [Agent原流程证据](knowledge-agent-parity-20261018.md) |
 | 知识同步演练/执行/逐源选择 | .76 已迁移原折叠区、逐源授权字段、选择、演练、执行排队回执和手动任务/SHA；隔离定向测试、五组Edge及六静态HTTP哈希通过 | **真实演练/执行均0，实际授权、写入和索引结果未验收**；无新增批准源/开writer/任务取消能力 | [本阶段合同与证据](knowledge-sync-parity-20261018.md) |
 | 模型服务 | 只读状态、启停适配/隔离测试 | 原页/可工作iframe缺；用户暂停全部本地模型工作 | 初始审计 |
 | AI图标/变体/资源导入 | 真实96变体PNG/meta/UUID、独立场景重开/Preview/Build/Smoke已通过 | 不覆盖全部图标生成、上传和通用资源流程；真实生成暂停 | variant-ui-import-20261017.md；历史RUNTIME-96证据 |
@@ -70,3 +70,11 @@ Live static40d1089/.76, preceding checkpointb9fbefd/.75. Old source-selection/dr
 Targeted261cases, types/build, six real HTTP hashes and five fully intercepted Edge flows passed. Only3fake syncPOSTs; real dry-run/run/write/model calls all0. User sessions/windows untouched, daemonPID9764/epoch unchanged, old22dirty protected. Evidence: [knowledge sync](knowledge-sync-parity-20261018.md). This supersedes prior remaining-sync-implementation notes above: sync is now an acceptance gap, not a missing Next flow.
 
 Real implementation gaps remain Agent Q&A/session/stop, normal32180 owner-provider/host/session wiring, generic resource inventory/Codex original-byte recovery, and paused model/AI management. Existing real acceptance boundaries for install/client writes/Creator/native chooser/preset persistence/long sessions remain. Whole Companion parity is still incomplete.
+
+## 2026-10-18 Agent original single-session migration (current)
+
+Live static5138bbf/.79, checkpoint5d303ed/.78. Original Agent list/select/ask/returned-session follow-up/local reset/wait/failure/complete JSON now implemented. Cross-Agent/source/project contexts do not carry old session IDs; UNKNOWN/leases survive leave/return and mutually exclude KB/Agent/sync. Old source exposes only agent/list and agent/ask: no persistent-session listing/creation/switch/deletion, stream or remote-cancel endpoint to migrate.
+
+Focused188cases, vue-tsc/build, six actual HTTP hashes and six fully intercepted Edge flows passed. Onefake listPOST/sixfake askPOSTs, actual asks/model calls/persisted Agent-session/credential/client-config writes all0. Original user windows/sessions not touched, daemonPID9764/epoch unchanged,22parallel dirty changes protected. Details: [Agent evidence](knowledge-agent-parity-20261018.md). This supersedes prior Agent implementation-gap notes; real Agent/model conversation acceptance remains unperformed and paused.
+
+Remaining non-model implementation gaps: normal32180 Owner provider/host/session assembly and generic resource inventory/Codex original-byte recovery under their exact existing owner contracts. Installed controls still retain documented real acceptance boundaries (configuration writes, Creator, chooser, presets and long sessions). Models/AI remain paused. Whole Companion parity is not complete.

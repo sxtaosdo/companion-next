@@ -19,3 +19,21 @@ Readonly next_parity_gap confirmed the exact old list/ask/reset surface and unsu
 Initial focused batch:144/147passed; three new adapter test fixtures used paraphrased error text instead of the source-proven original HTTP messages. Corrected only those fixture literals (AUTH_MISSING/SCHEMA_INVALID/BUSY); production code remained strict and conservative. Vue-tsc passed. Related adapter/help checks and deployment evidence follow.
 
 Final focused verification:188distinct affected cases passed (147Agent/KB/sync/read/bootstrap cases after the25-case adapter fixture correction, plus41help/exact-v148 cases). Vue-tsc passed. Only failed fixture cases and changed help were rerun; no unrelated full suite or96asset runtime repeated. Actual ask/model/persisted Agent-session/credential/client-config writes remain0. Current help and changelog distinguish restored original Agent UI from unperformed real conversations.
+
+## Static deployment and actual isolated-browser proof
+
+Code5138bbf5896f4ad98a524cc959bf049b299dbd89 / internal1.3.173.79, checkpoint5d303ed/.78, product1.3.173. Production companion-workspace build passed. Six actual32180 HTTP SHA256 match candidate. Created new hashedJS/CSS then atomic index switch;57prior static files backed up, old hash assets retained. No daemon restart, original-window navigation or refresh.
+
+Independent authenticated headless Edge passed six flows with all business APIs intercepted: inert mount/connect and explicit Agent list; first/continued ask with exact session binding and inert output; local reset without backend call and next first ask omitting old session; selecting another Agent does not carry prior session; CHAT_UNAVAILABLE is UNKNOWN and does not guess model/permission; wrong-Agent reply stays UNKNOWN across leaving/returning. Exactly1fake Agent-listPOST and6fake Agent-askPOSTs were intercepted. Actual Agent asks0, model calls0, persisted Agent-session writes0, knowledge credentials handled0, client configuration writes0. Ordinary Companion UI session bootstrap was used only for static access; no knowledge key or other credential was read/configured. No fake answer is recorded as real conversation acceptance.
+
+DaemonPID9764, startupEpoch a9cefe7d-5810-4426-8c2b-43958f12b1d6 and SHA0b9c2e28... unchanged; phaseOPEN. Final sharedHEAD/status/diff/file-byte check confirms all22parallel dirty paths unchanged. Source Next clean after implementation; no old backend/UI/lifecycle file change. Evidence folder C:/Users/33272/AppData/Local/Temp/companion-next-agent-20261018/: manifest.json, deployment-prepared.json, deployment-result.json, browser-proof.json, isolated-agent-ui.png, final-protection.json. Rollback backup-static/index.html retained; verify current index hash before any restoration and keep all hash assets/shared work.
+
+No known original Agent list/ask/local-reset implementation blocker remains. Actual authorized Agent/model conversation acceptance is UNVERIFIED and paused; no session-list/create/switch/delete/stream/cancel API exists in the old contract, so none was invented or reported as migrated.
+
+## Remaining non-model implementation boundaries
+
+- Normal32180 /next still lacks Owner image-provider/host/session assembly. Independent original-byte/export proof already passed, but the normal branch is not wired. Requires the existing Owner same-origin host/API/session contract and owner-reviewed assembly; cannot use Owner tokens as Companion cookies or change old lifecycle within this Next Agent scope.
+- Generic resource inventory / Codex-session original-byte recovery remains incomplete. Needs the precise existing source/export/receipt ownership contract; metadata, URL lists and prompts cannot stand in for original bytes. No invented backend contract or new recovery capability.
+- Implemented installation/client configuration, Creator/Preview/Profiler, native chooser, preset persistence/concurrency, long-session SSE/history and actual knowledge UI/auth/sync remain real-acceptance boundaries, not missing Agent controls. Do not perform these writes/lifecycle actions merely for this stage.
+
+Model management/AI runtime remains explicitly paused. Whole Companion parity is still incomplete; old Agent single-session UI and sync selection/run UI are now in implemented-but-real-unaccepted category.
