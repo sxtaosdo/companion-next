@@ -1,0 +1,18 @@
+{
+  "parity-remaining-safe-20261018-readiness.json": {
+    "bytes": 1418,
+    "sha256": "8dd80c7e9b3d46124b791e9969f128d892e1155734fee663f809ad1add1a2e92"
+  },
+  "parity-remaining-safe-20261018-register.png": {
+    "bytes": 169032,
+    "sha256": "c5ec67d45e83529b748079ecfb3190fd8063dd9c49555179420b177ceaf116bd"
+  },
+  "parity-remaining-safe-20261018-registration.json": {
+    "bytes": 3525,
+    "sha256": "86c56b2b5b764edbc803fd61fd8f492a1597671c3f7931970e09ececc16774a1"
+  },
+  "parity-remaining-safe-20261018-remove.png": {
+    "bytes": 184562,
+    "sha256": "6f22df0bdafd82b9201a1ff17e529f953b4308196b8d20edd5baf9815be10e23"
+  }
+}

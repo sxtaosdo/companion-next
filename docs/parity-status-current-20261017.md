@@ -1,3 +1,4 @@
+2026-10-18 10:39 UTC 当前剩余项以[续验矩阵](parity-remaining-safe-20261018.md)为准：Preview／Profiler复用已通过证据；本轮真实Next“仅登记201→移除200”通过并恢复登记表原字节。目录窗口、打开目录和聚焦仍未验收。知识服务运行、CLI兼容，但检索auth=missing，同步no_source，不能算正向流程通过。下方历史时点记录保留。
 2026-10-18 已授权Next预览/刷新/Profiler实机验收完成：正式按钮各200，回执留存、实际画布无页面错误；Profiler848样本、0findings/consoleErrors，原证据已冻结。已修复成功后额外Creator状态读清掉回执的缺陷（3815f19/.100，41定向+types/build/review通过并部署）。早期旧profile曾短暂监听7458即被守卫停净；最终复用7456测试并恢复profile原bytes和原工程18252/ready/unsaved=false。旧后台及两工程跟踪文件/既有修改不变。Creator授权待办已解除，其他迁移未验证项仍各自保留，见[本批真实证据](preview-profiler-approved-20261018.md)。
 
 2026-10-18 知识启动503已独立修复：原powershell.exe5.1继承Core模块路径导致Get-FileHash不可用；原启动脚本仅增加进程级PSHOME模块目录，未改全局环境或守卫。Next原启动一次200，weknora20364只绑定127.0.0.1:8081，原登录页只读验证通过。原SAMEORIGIN/self安全头阻止跨端口iframe，Next正确外开回退；问答/同步/认证仍未执行。原数据库state-check元数据前后相等，daemon/Creator/模型保持，Creator切换审批继续等待。见[知识恢复实证](knowledge-start-recovery-20261018.md)。下方503为修复前记录。

@@ -1,0 +1,52 @@
+{
+  "at": "2026-10-18T10:35:06.353Z",
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/knowledge/status",
+      "status": 200,
+      "body": {
+        "schemaVersion": "companion-knowledge-v1",
+        "cli": {
+          "available": true,
+          "compatible": true,
+          "version": "source-v0.8.2"
+        },
+        "retrieval": {
+          "auth": "missing",
+          "keyword": "unverified",
+          "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+          "endpoint": "http://127.0.0.1:8081"
+        },
+        "sync": {
+          "available": true,
+          "error": {
+            "code": "POLICY_DENIED",
+            "message": "同步策略尚未批准或拒绝此操作",
+            "reason": "no_source"
+          },
+          "writerEnabled": false,
+          "schedulerEnabled": false,
+          "sources": []
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge-service/status",
+      "status": 200,
+      "body": {
+        "running": true,
+        "frameable": false
+      }
+    }
+  ],
+  "daemon": {
+    "pid": 20116,
+    "startupEpoch": "613ef7f2-f58f-45c9-b398-8f9f6ec71895",
+    "startedAt": "2026-10-18T04:48:30.247Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "35225eb5ddb4d415457a9cad960c8e22d14c4b4a0de321fb8b8aa51adc4af699",
+    "nodeVersion": "v25.2.1"
+  }
+}
