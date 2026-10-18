@@ -1,3 +1,4 @@
+import { createCompanionOwnerReviewProvider } from './adapters/companion-owner-review'
 import { createKnowledgeAgentProvider } from './adapters/knowledge-agent'
 import { registerKnowledgeAgentProvider } from './knowledge-agent-integration'
 import { createKnowledgeSyncProvider } from './adapters/knowledge-sync'
@@ -57,6 +58,7 @@ if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatH
   // Normal workspace exposes the approved existing capabilities; readonly keeps
   // its passive boundary. Loopback never replaces session or per-action consent.
   if (normalWorkspaceHost) {
+    registerImageReviewProvider(createCompanionOwnerReviewProvider(window.fetch.bind(window)))
     registerKnowledgeAgentProvider(createKnowledgeAgentProvider({fetch:window.fetch.bind(window)}))
     registerKnowledgeSyncProvider(createKnowledgeSyncProvider({fetch:window.fetch.bind(window)}))
     projectConnectionsProvider.value=createProjectConnectionsProvider({fetch:window.fetch.bind(window)})

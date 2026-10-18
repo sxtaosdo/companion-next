@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import AssetInventorySummary from './AssetInventorySummary.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRegisteredProjectStore } from '../stores/registered-project'
 import AiResourceReadView from '../views/AiResourceReadView.vue'
@@ -33,6 +34,7 @@ function chooseStep(index: number) { void router.replace({ path: '/resources', q
       <section v-if="step === 0" class="panel saved-project-spec" data-testid="saved-project-spec">
         <AiResourceReadView embedded/>
       </section>
+      <AssetInventorySummary v-if="step === 1" :project="selection.project" :source="selection.currentSource"/>
       <AiTaskCreationPanel v-if="aiTaskCreationProvider" v-show="step === 1" :active="step === 1" :project="selection.project" :source="selection.currentSource" :config-dirty="configDirty" @created="created"/>
       <section v-else-if="step === 1" class="panel real-resource-empty" data-testid="real-resource-empty"><el-empty :description="emptyTitles[step]" :image-size="90"/><p>当前构建未启用原单图任务准备；工程资源库存没有通用读取接口。</p><p class="form-help">Owner 资产保持保护；没有用草稿或示例代替真实资源。</p></section>
       <AiJobsReadPanel ref="jobsPanel" v-show="step >= 2" :project="selection.project" :source="selection.currentSource" :workflow-step="step + 1"/>

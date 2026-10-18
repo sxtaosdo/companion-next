@@ -38,7 +38,7 @@ export const useImageReviewStore = defineStore('image-review', () => {
   let version = 0
   let controller: AbortController | null = null
   const locked = computed(() => loading.value || mutation.value !== 'none')
-  const canSelect = computed(()=>connected.value && selectionGuardVerified.value && workflowGuardVerified.value && !locked.value && !uncertain.value && !awaitingTask.value && Boolean(snapshot.value.taskId))
+  const canSelect = computed(()=>connected.value && selectionGuardVerified.value && !locked.value && !uncertain.value && !awaitingTask.value && Boolean(snapshot.value.taskId))
   const canSave = computed(() => connected.value && saveGuardVerified.value && !snapshot.value.busy && !locked.value && !uncertain.value && !awaitingTask.value && selectedIds.value.length>0 && Boolean(snapshot.value.taskId))
   function stage(contents: string) {
     if (locked.value) throw new Error('当前操作尚未结束，候选清单未替换')
@@ -121,8 +121,8 @@ export const useImageReviewStore = defineStore('image-review', () => {
     if(accepted||rejected){await refresh();if(rejected)error.value=rejected}
   }
   async function persistSelected(ids:string[]) {
-    const active=requireWorkflow(true), taskId=snapshot.value.taskId
-    if(!canSelect.value||!taskId||active.selectionGuard!=='verified'||!active.persistSelection)throw new Error('选择持久化接口未就绪，未更改服务保留项')
+    const active=provider.value, taskId=snapshot.value.taskId
+    if(!active||!canSelect.value||!taskId||active.selectionGuard!=='verified'||!active.persistSelection)throw new Error('选择持久化接口未就绪，未更改服务保留项')
     if(ids.length>30||new Set(ids).size!==ids.length||ids.some(id=>!snapshot.value.items.some(item=>item.id===id&&item.status==='ready')))throw new Error('只能保留当前任务已下载的图片')
     const frozen=[...ids]
     await runControl('select',()=>active.persistSelection!(taskId,frozen),'保留选择已提交；当前勾选以重新读取的服务选择为准。')

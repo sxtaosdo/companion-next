@@ -29,7 +29,7 @@ document.addEventListener('visibilitychange',visibilityChanged)
 watch([()=>review.provider,()=>review.mutation,()=>pageVisible.value],()=>{stopPolling();schedulePoll()},{immediate:true})
 watch(()=>review.snapshot.taskId,()=>{selectedHistory.value=review.snapshot.taskId??''})
 function cooldownFor(id:string){const item=review.snapshot.items.find(item=>item.id===id);return item?reviewCooldownUntil(item,review.snapshot.cooldowns??[]):0}
-function validPreviewPath(path:string,id:string,variant:'thumb'|'full'){return new RegExp(`^/image/[A-Za-z0-9_-]{16,256}/${id}/${variant}$`).test(path)}
+function validPreviewPath(path:string,id:string,variant:'thumb'|'full'){return path===`/owner-review/image/${id}/${variant}`||new RegExp(`^/image/[A-Za-z0-9_-]{16,256}/${id}/${variant}$`).test(path)}
 async function loadThumbnails(){
  const epoch=++thumbnailEpoch;thumbnailController?.abort();thumbnailController=new AbortController();thumbnails.value={}
  const active=review.provider;if(!active||!review.connected)return
@@ -98,7 +98,7 @@ onBeforeUnmount(()=>{readVersion++;clearPreview();stopPolling();review.cancelPen
         <p v-if="review.manifest.filter_policy" class="form-help">过滤：最小 {{ review.manifest.filter_policy.min_width }} × {{ review.manifest.filter_policy.min_height }}；排除 {{ review.manifest.filter_policy.exclude_formats.join(' / ') || '无' }}。是否符合条件由下载后的实际像素验证。</p>
         <ol class="picker-address-list"><li v-for="(candidate,index) in review.manifest.images" :key="index"><strong>{{ candidate.title || `候选 ${index+1}` }}</strong><span>{{ candidate.image_url }}</span><small>来源：{{ candidate.source_page }}</small></li></ol>
         <el-checkbox v-model="downloadConfirmed" :disabled="review.locked || reading || importText!==stagedText">确认由本机审阅服务访问上述公开图片及来源；不绕过登录或版权限制</el-checkbox>
-        <div class="planner-import-actions"><el-button :loading="review.mutation==='import'" :disabled="!review.connected || review.locked || reading || importText!==stagedText || review.snapshot.busy || review.uncertain || review.awaitingTask || now < review.nextSubmitAt || review.importAccepted || !downloadConfirmed" @click="attempt(()=>review.submitImport(downloadConfirmed))">导入并下载到审阅区</el-button><span>{{ review.importAccepted?'这份清单已受理，不会重复提交；请刷新状态或在原服务重试失败项。':'仅入队不等于下载成功，完成后刷新查看真实结果。' }}</span></div>
+        <div class="planner-import-actions"><el-button :loading="review.mutation==='import'" :disabled="review.provider?.candidateImportEnabled===false || !review.connected || review.locked || reading || importText!==stagedText || review.snapshot.busy || review.uncertain || review.awaitingTask || now < review.nextSubmitAt || review.importAccepted || !downloadConfirmed" @click="attempt(()=>review.submitImport(downloadConfirmed))">导入并下载到审阅区</el-button><span>{{ review.importAccepted?'这份清单已受理，不会重复提交；请刷新状态或在原服务重试失败项。':'仅入队不等于下载成功，完成后刷新查看真实结果。' }}</span></div>
       </template>
       <el-empty v-else description="尚未导入候选图片，不展示示例或假保存记录" :image-size="70"><template #image><el-icon :size="60"><Picture/></el-icon></template></el-empty>
     </section>

@@ -43,6 +43,7 @@ export interface ImageSaveReceipt {
 /** No arbitrary URL/path input, token storage, remote image fetch or permanent deletion. */
 export interface ImageReviewProvider {
   readonly label: string
+  readonly candidateImportEnabled?: boolean
   /** Only a host with atomic expected-task/selection protection may enable directory saving. */
   readonly saveSelectionGuard: 'verified' | 'unverified'
   readonly workflowGuard?: 'verified' | 'unverified'
