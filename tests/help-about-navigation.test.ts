@@ -329,7 +329,11 @@ describe('help, about and visible frontend identity', () => {
     expect(migrationFeatures.find((f) => f.id === 'ai-icons')?.status).toBe('原任务流程源码已接 · 实机待验')
     expect(wrapper!.find('#feature-ai-icons').text()).toContain('并非裁剪')
     expect(wrapper!.find('#feature-image-search').text()).toContain('browser_import')
-    expect(wrapper!.find('#feature-image-search').text()).toContain('实机待验')
+    expect(wrapper!.find('#feature-image-search').text()).toContain('同源预览 / 选择 / 保存已验')
+    expect(wrapper!.find('#feature-image-search').text()).toContain('用户原图片库未切换')
+    expect(wrapper!.find('#feature-image-search').text()).toContain('未开放搜索')
+    expect(wrapper!.find('#feature-resource-flow').text()).toContain('真实733项曾')
+    expect(wrapper!.text()).not.toContain('同宿主保存仍待准确合同')
     expect(wrapper!.text()).not.toContain('正在只读核对')
   })
   it('marks missing old functionality explicitly instead of treating Picker or static help as completed migration', async () => {

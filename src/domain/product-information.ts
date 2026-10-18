@@ -5,6 +5,7 @@ export const frontendIdentity = { name: 'Companion Next', version, releaseDate: 
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；完整业务迁移未完成', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  { version, date: '2026-10-18', title: '更新同源保存与真实库存验收说明', changes: ['按已核证据修正帮助与迁移页：隔离任务的原生保存取消 / 已知失败 / 成功已验，工程只读库存733项曾与原接口及页面一致。用户原图片库仍未切换，完整图片任务动作与Codex自动回收未开放；仅更新文案，不重复业务验收。'] },
   { version, date: '2026-10-18', title: '恢复 Agent 原单会话问答流程', changes: ['恢复旧 Agent 下拉与刷新、提问、返回 sessionId 的追问、本地新对话、等待 / 停止等待和完整 JSON 答复。请求仅为原 agentId / query / 可选 sessionId；跨 Agent / 来源不复用旧会话，未知结果不自动重发，与 KB 问答及同步互斥。旧接口没有持久会话列表、创建 / 切换 / 删除或流式能力，不新增这些。仅用隔离假响应和拦截请求验证，未实际问答、调用模型或写服务端会话。'] },
   { version, date: '2026-10-18', title: '恢复知识同步来源与原执行流程', changes: ['恢复旧折叠同步区、逐源批准 / 启用 / writer 就绪投影、来源选择、同步演练及执行。请求仅发送原 sourceId / channel；回执严格核对排队身份，UNKNOWN 不自动重发。进度沿用手动刷新后的任务和 SHA，不把排队回执当作索引完成。仅通过隔离假数据与拦截请求验证，未执行真实同步、知识库写入或模型调用。'] },
   { version, date: '2026-10-18', title: '帮助与功能入口同步', changes: ['纠正帮助和保留矩阵中已恢复功能仍称未迁移的说明；MCP、工程与预览帮助指向现有工程入口。保留 v148 帮助原文，按旧工具条区分真实业务按钮和构建 / 截图的 CLI 帮助，不新增弹窗；已实现与真实验收分别说明。'] },
@@ -37,8 +38,8 @@ export const frontendChanges = [
 
 export const helpTopics = [
   { id: 'start', group: '新版使用', title: '开始与数据真实性', paragraphs: ['正常工程模式进入工程页时会读取真实登记与 Bridge 状态；读取可能更新后台运行诊断。只读和示例入口保留各自限制，示例资料不会变成真实项目。', '图片素材页拥有独立审阅服务连接。项目数据源与图片审阅连接互不替代；一项已连接不能证明另一项可用。'], destination: '/overview', action: '打开项目概览' },
-  { id: 'resources', group: '新版使用', title: '工程规范与资源流程', paragraphs: ['先在项目概览选择已登记工程，再进入游戏资源。规范摘要读取工程文件；新建、旧版迁移与编辑共用弹窗，每次保存先核对目标工程、原文件 hash 和差异。', '参考图可显式预览或单独确认上传；上传回执进入编辑草稿，仍需另行保存配置。生成、审阅、导入与运行验收分别以真实任务和回执为准。', '没有任务或库存接口时保持未知，不把页面计划、示例数量或 PNG 结构检查当作已存工程资源或视觉批准。'], destination: '/resources?step=1', action: '打开工程规范' },
-  { id: 'picker', group: '新版使用', title: '图片素材审阅与保存', paragraphs: ['当前范围为 Owner 供图、审阅和保存，不继续搜索采集。独立审阅服务与 Companion 工程服务使用不同会话，不能互换连接身份。', '已有独立宿主可读取真实任务、勾选 ready 图片及核对保存回执。当前旧 URL 清单不是本地图片字节导入；正常工作区的供图与保存接线仍待完整合同。', '原生目录保存以逐项回执为准，不等于资源已导入 Creator 或通过运行验收。'], destination: '/image-assets', action: '打开图片素材' },
+  { id: 'resources', group: '新版使用', title: '工程规范与资源流程', paragraphs: ['先在项目概览选择已登记工程，再进入游戏资源。规范摘要读取工程文件；新建、旧版迁移与编辑共用弹窗，每次保存先核对目标工程、原文件 hash 和差异。', '参考图可显式预览或单独确认上传；上传回执进入编辑草稿，仍需另行保存配置。生成、审阅、导入与运行验收分别以真实任务和回执为准。', '资源规划页已接工程绑定的只读 AssetDB 库存汇总；读取失败保持未知，历史733项仅代表已验收工程的那次读取，不把页面计划、示例数量或 PNG 结构检查当作已存工程资源或视觉批准。'], destination: '/resources?step=1', action: '打开工程规范' },
+  { id: 'picker', group: '新版使用', title: '图片素材审阅与保存', paragraphs: ['当前范围为 Owner 供图、审阅和保存，不继续搜索采集。独立审阅服务与 Companion 工程服务使用不同会话，不能互换连接身份。', '正式 Companion 同源宿主已接现有任务的原图 / 缩略图、ready 勾选与原生目录保存；隔离任务的取消、已知失败、成功回执均已实机核验。当前仍使用任务隔离缓存，未切回用户原图片库；旧 URL 清单不等于本地图片字节导入。', '原生目录保存以逐项回执为准，不等于资源已导入 Creator 或通过运行验收。'], destination: '/image-assets', action: '打开图片素材' },
   { id: 'profiler', group: '运行时', title: '性能诊断', paragraphs: ["工程卡片已恢复预览、探测、状态、刷新和 Profiler 采集入口；仅针对已就绪工程按次发送，回执原样展示，真实运行采集未验收。", "旧版构建、截图和调试用法通过帮助文本、提示词及 CLI / MCP 工具提供，原文和复制入口已保留；旧工程工具条没有独立截图或构建弹窗。采集会话、工程和日志必须保持对应，界面测试不能当作游戏性能验收。"], destination: "/projects", action: "从工程卡片打开 Preview / Profiler" },
   { id: 'playtest', group: '运行时', title: '自动试玩与构建', paragraphs: ['旧版区分试玩步骤执行、构建产物冒烟与正式验收结论。步骤成功不自动等于验收通过。', '新前端尚无真实试玩、构建或运行证据。相关旧功能必须在迁移时继续保留，当前请使用已部署旧版。'], destination: '/migration?feature=runtime', action: '查看运行时保留项' },
   { id: 'animation', group: '运行时', title: '动画与输入', paragraphs: ['旧版提供动画和输入相关工具说明；执行依赖真实 Creator / Bridge 与目标工程上下文。', '此页仅恢复帮助目录，尚未接入动画控制或输入执行。'], destination: '/migration?feature=runtime', action: '查看工具保留项' },
@@ -56,7 +57,7 @@ export const helpTopics = [
 
 export const migrationFeatures = [
   { id: 'ai-icons', title: 'AI 图标原六步与任务', status: '原任务流程源码已接 · 实机待验', detail: '正常工作区共用真实工程规范读写与参考图；按已保存规范、HEAD、目标路径准备原单图任务，缺口检查、生成入队或可信来源采用、原任务执行 / 恢复、预览批准、1024 母图窄导入和单尺寸等比留边导出均已接。每项写入单独确认，UNKNOWN不重发；原协议参考图不是模型图像条件；等比contain留边并非裁剪。Studio Python闭包存在，当前运行选中依赖路径/hash、真实GPU、Creator引用和Preview/Build仍待实机验收。', destination: '/ai-icons' },
-  { id: 'image-search', title: '图片素材审阅与保存', status: '独立宿主已接 · 供图接入待验', detail: '当前范围仅 Owner 供图、审阅和保存；旧 search / browser_import 代码保留，不继续搜索采集开发。正常 Companion 与独立图片宿主身份不同，Owner 图片字节导入和同宿主保存仍待准确合同，不能把原 URL 清单当本地图片。真实保存回执仍需实机待验。', destination: '/image-assets' },
+  { id: 'image-search', title: '图片素材审阅与保存', status: '同源预览 / 选择 / 保存已验', detail: '正式 Companion 同源宿主已接现有任务预览、持久选择与原生目录保存；隔离任务的取消、已知失败、成功回执与实际输出一致。当前使用任务隔离缓存，用户原图片库未切换；未开放搜索、历史切换、重试、停止、回收 / 恢复或候选下载。旧 search / browser_import 代码保留，不继续搜索采集开发；URL 清单不是图片字节，目录保存不等于 Creator 导入。', destination: '/image-assets' },
   { id: 'projects', title: '工程列表与管理', status: "工程与安装入口已接 · 实机待验", detail: "独立后台模式已接真实工程登记、状态、搜索 / 筛选、折叠、Dashboard 目录选择、创建 / 初始化、Creator 操作与分项安装。严格安装合同冻结选项、同项复用、异项409；目录打开和移除登记分别确认。真实安装、Creator 启停及系统目录选择仍保留各自实机验收边界。", destination: "/projects" },
   { id: 'creator', title: 'Creator 生命周期与预览', status: "原运行工具条已接", detail: "工程卡片已接 start / focus / stop / restart，以及 ready 工程的 Preview、探针、状态、刷新和 Profiler 原动作。安装与 Codex 配置由安装向导分别确认；UNKNOWN 不自动重发。接口接线和界面回归已验证，真实 Creator 运行、停止结果与 OS 退出安全性仍须实机验收。", destination: "/projects" },
   { id: 'logs', title: '日志中心与诊断导出', status: "日志工具条已接 · 实机待验", detail: "已接日志 GET / SSE、等级 / 来源 / 工程 / 关键字筛选、暂停 / 恢复、清空、导出和诊断；手动刷新保留当前列表与滚动位置。清空和诊断按原接口分别确认，明确区分内存记录与文件日志；真实清空和 Creator 诊断链路尚未验收。", destination: "/projects?tab=logs" },
@@ -68,5 +69,5 @@ export const migrationFeatures = [
   { id: 'tools', title: '工具清单、范围与工程编辑', status: '预设读写源码已接', detail: '工具目录、范围、页面草稿及 JSON 交换保留；正常工作区创建、更新、导入、工程分配与无引用删除逐次确认。旧更新无hash并发保护；不强制删除回退full，UNKNOWN不自动重发。MCP 注册和预设持久写入的真实客户端验收仍待完成。', destination: '/help?topic=tools' },
   { id: 'runtime', title: '性能、试玩与构建', status: "原预览与采集入口已接", detail: "ready 工程的 Preview 与 Profiler 原入口已接，命令与传输经过回归验证，真实运行采集待验。旧构建、截图和调试用法是帮助文本 / CLI / MCP 工具入口，原文及复制已保留；旧工程工具条没有对应独立业务弹窗，不能将其列为缺失弹窗。", destination: "/help?topic=profiler" },
   { id: 'help', title: '帮助、关于与版本入口', status: "已补入口", detail: "已恢复 v148 静态帮助、复制 / 换行、原关于图标 / 二维码和完整更新日志。帮助、CLI和安装完成示例已接复制后固定协议唤起 Cursor / Codex；不会自动运行 CLI、安装 Skill 或提交外部任务，实际应用接收尚待验收。", destination: "/help" },
-  { id: 'resource-flow', title: '游戏资源与图片素材', status: '真实规范 / 原单图流程源码已接', detail: '正式资源六步绑定真实已登记工程，原单图任务跨步骤保留并按阶段开放已核操作；验收显示原回执而非自动通过。Codex会话字节回收、通用资源库存、Owner供图独立审阅宿主装配仍缺；图片目录保存不等于Creator导入。', destination: '/resources' },
+  { id: 'resource-flow', title: '游戏资源与图片素材', status: '真实规范 / 原单图流程源码已接', detail: '正式资源六步绑定真实已登记工程，原单图任务跨步骤保留并按阶段开放已核操作；验收显示原回执而非自动通过。工程绑定的只读 AssetDB 库存汇总已接，colony-flow-food-hunt 的真实733项曾与原接口、聚合器和页面核对一致；这是该次读取证据，不是当前固定计数或逐项资产批准。Owner同源预览 / 选择 / 保存已验，用户原图片库未切换；Codex会话字节自动回收仍未接。图片目录保存不等于Creator导入。', destination: '/resources' },
 ] as const

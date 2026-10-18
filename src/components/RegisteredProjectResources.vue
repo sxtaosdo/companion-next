@@ -36,7 +36,7 @@ function chooseStep(index: number) { void router.replace({ path: '/resources', q
       </section>
       <AssetInventorySummary v-if="step === 1" :project="selection.project" :source="selection.currentSource"/>
       <AiTaskCreationPanel v-if="aiTaskCreationProvider" v-show="step === 1" :active="step === 1" :project="selection.project" :source="selection.currentSource" :config-dirty="configDirty" @created="created"/>
-      <section v-else-if="step === 1" class="panel real-resource-empty" data-testid="real-resource-empty"><el-empty :description="emptyTitles[step]" :image-size="90"/><p>当前构建未启用原单图任务准备；工程资源库存没有通用读取接口。</p><p class="form-help">Owner 资产保持保护；没有用草稿或示例代替真实资源。</p></section>
+      <section v-else-if="step === 1" class="panel real-resource-empty" data-testid="real-resource-empty"><el-empty :description="emptyTitles[step]" :image-size="90"/><p>当前构建未启用原单图任务准备；上方库存汇总独立读取，是否可用以该次接口回执为准。</p><p class="form-help">Owner 资产保持保护；没有用草稿或示例代替真实资源。</p></section>
       <AiJobsReadPanel ref="jobsPanel" v-show="step >= 2" :project="selection.project" :source="selection.currentSource" :workflow-step="step + 1"/>
     </template>
     <section v-else class="panel real-resource-empty"><el-empty :description="selection.directory.projectLoading ? '正在读取登记工程' : selection.requestedId ? '所选工程不可用，请重新选择' : '请先选择已登记工程'" :image-size="90"/><RouterLink to="/overview">前往项目概览</RouterLink></section>
