@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-18T14:06:07.504937+00:00",
+  "document": {
+    "id": "420b32ba-7b7c-4e02-b217-67dae10290a1",
+    "knowledge_base_id": "c5f0a1bd-5748-4716-ab5c-36f08378a3c0",
+    "file_name": "01-amber-lantern.txt",
+    "parse_status": "completed",
+    "pending_subtasks_count": 0,
+    "summary_status": "none"
+  },
+  "chunk": {
+    "id": "c9c6635b-ade9-442a-9c51-00dfe0fdc7ea",
+    "knowledge_id": "420b32ba-7b7c-4e02-b217-67dae10290a1",
+    "knowledge_base_id": "c5f0a1bd-5748-4716-ab5c-36f08378a3c0",
+    "content": "FICTIONAL TEST ONLY. Marker AMBERLANTERN731.\nThe imaginary Amber Lantern depot stores exactly seventeen blue paper kites.\nNo real organization, person, account or location is described.\n",
+    "content_revision": 0,
+    "is_enabled": 1,
+    "index_status": "ready",
+    "chunk_type": "text",
+    "parent_chunk_id": ""
+  },
+  "originalContentSha256": "3f9d4a460761c79d3430bc622a36bc4fe1708ca823ac2d72d50f74e5a10f6da2",
+  "modifiedContent": "FICTIONAL TEST ONLY. Marker AMBEREDIT731ONLY.\nThe imaginary Amber Lantern depot stores exactly nineteen teal paper kites.\nNo real organization, person, account or location is described.\n",
+  "modifiedContentSha256": "5b6423c7cd2f1d90c0116047d6e81e9c94850a3f666b37a1fd76b6fd840776f0",
+  "mutationDispatched": false,
+  "plannedRevision": 1,
+  "scope": "one existing fictional TXT chunk; original file and other two documents unchanged; CAS expected_revision checks; no summary/fanout",
+  "modifiedStoredContent": "FICTIONAL TEST ONLY. Marker AMBEREDIT731ONLY.\nThe imaginary Amber Lantern depot stores exactly nineteen teal paper kites.\nNo real organization, person, account or location is described.",
+  "modifiedStoredContentSha256": "0a4c267eec92c42bf2120f186a0e11c56d184efc343561cc2491fa3c45cfaa4a",
+  "restorationMode": "Normal reparse of this exact document from unchanged original TXT; avoids existing edit API TrimSpace changing trailing newline and restores exact source-derived content. No extra upload.",
+  "nextCheckpoint": "9445216",
+  "serviceSourceCheckpoint": "277acc4fac665a73298373688dd2513e3e8eb93c",
+  "existingRuntimeSha256": "11abf6df9abe6503f3da8bd542cf3cf907ce90f311ad6dd6ad0d97b7d870cbe3",
+  "startupBaselineSha256": "a5a4ff61d8cd96bf97b57e2962a0b2637dd62be572ee9a6ab2d8e0eb7317ee00",
+  "launcherSha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233"
+}

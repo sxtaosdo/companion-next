@@ -1,0 +1,57 @@
+{
+  "checkedAt": "2026-10-18T14:10:40.863616+00:00",
+  "originalSourceUnchanged": true,
+  "protectionFailures": [],
+  "tests": {
+    "red": {
+      "packageResults": {
+        "github.com/Tencent/WeKnora/internal/application/service/retriever": "pass",
+        "github.com/Tencent/WeKnora/internal/application/service": "fail"
+      },
+      "topLevelPass": 0,
+      "topLevelFail": 1,
+      "leafTXTResults": {},
+      "allFailedTestNames": [
+        "TestUpdateDocumentChunkKeywordOnly/bound=false/summary=false",
+        "TestUpdateDocumentChunkKeywordOnly/bound=false/summary=true",
+        "TestUpdateDocumentChunkKeywordOnly/bound=true/summary=false",
+        "TestUpdateDocumentChunkKeywordOnly/bound=true/summary=true",
+        "TestUpdateDocumentChunkKeywordOnly"
+      ]
+    },
+    "focused": {
+      "packageResults": {
+        "github.com/Tencent/WeKnora/internal/application/service/retriever": "pass",
+        "github.com/Tencent/WeKnora/internal/application/service": "pass"
+      },
+      "topLevelPass": 13,
+      "topLevelFail": 0,
+      "leafTXTResults": {
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=false/TXT-1": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=false/TXT-2": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=false/TXT-3": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=true/TXT-1": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=true/TXT-2": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=true/TXT-3": "pass"
+      },
+      "allFailedTestNames": []
+    },
+    "followup": {
+      "packageResults": {
+        "github.com/Tencent/WeKnora/internal/application/service/retriever": "pass",
+        "github.com/Tencent/WeKnora/internal/application/service": "pass"
+      },
+      "topLevelPass": 15,
+      "topLevelFail": 0,
+      "leafTXTResults": {
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=false/TXT-1": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=false/TXT-2": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=false/TXT-3": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=true/TXT-1": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=true/TXT-2": "pass",
+        "TestProcessChunksKeywordOnlyThreeTXTNoInference/store-bound=true/TXT-3": "pass"
+      },
+      "allFailedTestNames": []
+    }
+  }
+}

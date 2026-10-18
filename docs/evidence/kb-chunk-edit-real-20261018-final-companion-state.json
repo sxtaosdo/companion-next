@@ -1,0 +1,20 @@
+{
+  "original": {
+    "state": "ready",
+    "pid": 21004,
+    "sessionId": "b0471fa2-0879-4f30-b27f-7038dd6ef8cc"
+  },
+  "daemon": {
+    "pid": 18036,
+    "startupEpoch": "c9fed611-0eb1-4992-965f-07b1a5433946",
+    "startedAt": "2026-10-18T13:29:09.246Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "148f28ad4989a038de1825beae197c4db9947f3209a8f22cf07ec330047df526",
+    "nodeVersion": "v25.2.1"
+  },
+  "registriesUnchanged": {
+    "projects": true,
+    "bridge-installs": true,
+    "tool-presets": true
+  }
+}

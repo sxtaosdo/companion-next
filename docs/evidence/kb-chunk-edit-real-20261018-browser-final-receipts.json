@@ -1,0 +1,11 @@
+{
+  "markers": [
+    "COMPANION_KB_EDIT:{\"phase\":\"response\",\"submitted\":true,\"receipt\":{\"success\":true,\"id\":\"c9c6635b-ade9-442a-9c51-00dfe0fdc7ea\",\"revision\":1,\"index_status\":\"ready\",\"contentMatches\":true,\"summaryNone\":true},\"ok\":true}",
+    "COMPANION_KB_EDIT_STATUS:{\"phase\":\"response\",\"submitted\":true,\"receipt\":{\"success\":true,\"id\":\"c9c6635b-ade9-442a-9c51-00dfe0fdc7ea\",\"revision\":1,\"index_status\":\"ready\",\"contentMatches\":true,\"summaryNone\":true},\"ok\":true}",
+    "COMPANION_KB_CHUNK_SEARCH:{\"phase\":\"edited\",\"marker\":\"AMBEREDIT731ONLY\",\"expectedCount\":1,\"success\":true,\"count\":1,\"rows\":[{\"id\":\"c9c6635b-ade9-442a-9c51-00dfe0fdc7ea\",\"knowledge_id\":\"420b32ba-7b7c-4e02-b217-67dae10290a1\",\"knowledge_filename\":\"01-amber-lantern.txt\",\"content\":\"FICTIONAL TEST ONLY. Marker AMBEREDIT731ONLY.\\nThe imaginary Amber Lantern depot stores exactly nineteen teal paper kites.\\nNo real organization, person, account or location is described.\"}],\"ok\":true}",
+    "COMPANION_KB_CHUNK_SEARCH:{\"phase\":\"edited\",\"marker\":\"AMBERLANTERN731\",\"expectedCount\":0,\"success\":true,\"count\":0,\"rows\":[],\"ok\":true}",
+    "COMPANION_KB_CHUNK_RESTORE:{\"submitted\":true,\"receipt\":{\"success\":true,\"id\":\"420b32ba-7b7c-4e02-b217-67dae10290a1\",\"status\":\"pending\"},\"ok\":true}",
+    "COMPANION_KB_CHUNK_SEARCH:{\"phase\":\"restored\",\"marker\":\"AMBERLANTERN731\",\"expectedCount\":1,\"success\":true,\"count\":1,\"rows\":[{\"id\":\"c69db71f-6234-49e4-bc69-0b2ca3e55e89\",\"knowledge_id\":\"420b32ba-7b7c-4e02-b217-67dae10290a1\",\"knowledge_filename\":\"01-amber-lantern.txt\",\"content\":\"FICTIONAL TEST ONLY. Marker AMBERLANTERN731.\\nThe imaginary Amber Lantern depot stores exactly seventeen blue paper kites.\\nNo real organization, person, account or location is described.\\n\"}],\"ok\":true}",
+    "COMPANION_KB_CHUNK_SEARCH:{\"phase\":\"restored\",\"marker\":\"AMBEREDIT731ONLY\",\"expectedCount\":0,\"success\":true,\"count\":0,\"rows\":[],\"ok\":true}"
+  ]
+}

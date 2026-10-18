@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-18T14:12:22.736561+00:00",
+  "originalKB": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+  "documents": 1647,
+  "originalMetadataSha256": "400e49c75b77cc45e16cb96cd6d21ecc47bc0b5df144886fce698d400b68efcd",
+  "chunks": 59428,
+  "indexRows": 2269,
+  "vectorMappings": 2264,
+  "testDocuments": [
+    {
+      "id": "420b32ba-7b7c-4e02-b217-67dae10290a1",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "none"
+    },
+    {
+      "id": "597308d8-4b49-49e4-8bc9-910283ad2ec5",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "none"
+    },
+    {
+      "id": "c3f20493-a45a-4ec6-a5ae-2b58ce4645b0",
+      "parse_status": "completed",
+      "pending_subtasks_count": 0,
+      "summary_status": "none"
+    }
+  ],
+  "migration": [
+    {
+      "version": 30,
+      "dirty": 0
+    }
+  ]
+}

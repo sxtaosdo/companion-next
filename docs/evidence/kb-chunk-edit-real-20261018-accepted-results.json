@@ -1,0 +1,26 @@
+{
+  "accepted": true,
+  "checks": {
+    "oneEditResponseReadyRevision1NoSummary": true,
+    "oneNormalSourceRestoreResponse": true,
+    "fourScopedQueriesPassed": true,
+    "editedContentHashCorrect": true,
+    "originalSourceContentHashRestored": true,
+    "restoreCreatedNewSourceChunk": true,
+    "otherTwoDocumentIndexSnapshotsUnchanged": true,
+    "threeCompletedNoPendingNoSummary": true,
+    "allKeywordReadyNoVector": true,
+    "startupBaselineUnchanged": true,
+    "launcherUnchanged": true,
+    "querySource_edited": true,
+    "querySource_restored": true
+  },
+  "editRequests": 1,
+  "restoreReparseRequests": 1,
+  "scopedKeywordQueries": 4,
+  "otherDocumentsWritten": 0,
+  "credentialOrModelConfigurationChanged": false,
+  "nativeFrontendApiOnly": true,
+  "nextIdentityPositiveAcceptance": false,
+  "ideDeliveryExecuted": false
+}

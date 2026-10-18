@@ -1,0 +1,94 @@
+{
+  "kb-chunk-edit-real-20261018-before-edit-plan.json": {
+    "sha256": "ea505021fb72795969ee68e6e6f3c6befd1596e096cdf533a890bfe77e510e28",
+    "bytes": 2366
+  },
+  "kb-chunk-edit-real-20261018-accepted-results.json": {
+    "sha256": "ede24dbf14bb3efdadb4131a2b096fad7ff7e1f22873d403e5331bec38d5527c",
+    "bytes": 841
+  },
+  "kb-chunk-edit-real-20261018-browser-before.json": {
+    "sha256": "0ad8cee2f1c3bd509e235900658f51cc84731cc40790bac1faec11df73a7769f",
+    "bytes": 160
+  },
+  "kb-chunk-edit-real-20261018-browser-final-receipts.json": {
+    "sha256": "dc59b716a8aada5ffc32daabf39fc44a81f145e070c031933b0d506e891eb1b4",
+    "bytes": 2063
+  },
+  "kb-chunk-edit-real-20261018-browser-restored.json": {
+    "sha256": "ccb99e72e64fa58b0756032c94af540be8e0865f50fc9899591ca7880f6464f0",
+    "bytes": 256
+  },
+  "kb-chunk-edit-real-20261018-edited-readback.json": {
+    "sha256": "deedd132f37ab5bfd56840979b4a02755d19bf68114b9cded242ef274815a39a",
+    "bytes": 274
+  },
+  "kb-chunk-edit-real-20261018-index-before-edit.json": {
+    "sha256": "8f87b0f7aa687790df15f98b0dfffd03db29109b281dcfe7a1d14a642bdcd913",
+    "bytes": 2105
+  },
+  "kb-chunk-edit-real-20261018-index-after-edit.json": {
+    "sha256": "966869fffed2860ae81f5732d1cb39ec6583e4b5a486b9ff9d7105bd0721f7bd",
+    "bytes": 2105
+  },
+  "kb-chunk-edit-real-20261018-index-restored.json": {
+    "sha256": "aaac077d20db487296405af17bf1be338bf67e1bc823ef7a2b6f35eb0adc8fa1",
+    "bytes": 2105
+  },
+  "kb-chunk-edit-real-20261018-original-and-test-final.json": {
+    "sha256": "0640d380a9d4636112930249c3394af442e0a0b752c6d9fd7fec06b99a1f47d7",
+    "bytes": 881
+  },
+  "kb-chunk-edit-real-20261018-final-companion-state.json": {
+    "sha256": "30a97ab6ea4bcfadacbdd1023ac29363d783340977855d932c1d372b6b7cad71",
+    "bytes": 585
+  },
+  "kb-chunk-edit-real-20261018-protected-repositories-final.json": {
+    "sha256": "91a04193467a75a0dac6f891b8508434cf23dc342c9254c6d7790e2e6448400b",
+    "bytes": 1380
+  },
+  "kb-chunk-edit-real-20261018-runtime-final.json": {
+    "sha256": "31bf36d7cc43283e5c268332e15322504f69d0dcd5b49dc9b3a7aba1df94773b",
+    "bytes": 695
+  },
+  "kb-chunk-edit-real-20261018-native-restored-content.png": {
+    "sha256": "a3e5f7a1a58ae4257ad709e0001f5604a53f84ed5db17f2f26a77b4fd6c90072",
+    "bytes": 37752
+  },
+  "kb-chunk-edit-real-20261018-deploy-deployment.json": {
+    "sha256": "37d037eb37488a75558508667dc0cc8b309f2eeecf5f5824b55a30bb26269eeb",
+    "bytes": 1221
+  },
+  "kb-chunk-edit-real-20261018-deploy-preflight1.json": {
+    "sha256": "5c325bcab523915633b76452d2f0284e62bb8aecd69b305f08c8948fb30fde07",
+    "bytes": 881
+  },
+  "kb-chunk-edit-real-20261018-deploy-after.json": {
+    "sha256": "c5637a86951c8ef9875f622d03b9223ca5731f521f0e558aab970d90f49ed9ce",
+    "bytes": 881
+  },
+  "kb-chunk-edit-real-20261018-candidate.json": {
+    "sha256": "1262cf01243b1f5c1d62180e499eeef45bfc3e02baf58f816677cafc59e3b095",
+    "bytes": 5613
+  },
+  "kb-chunk-edit-real-20261018-offline-tests.json": {
+    "sha256": "c53808bbc1ce6fef9c1c6b6bdef68a78773356d4769b03614b642472248a774a",
+    "bytes": 2548
+  },
+  "kb-chunk-edit-real-20261018-handoff.md": {
+    "sha256": "223d57b8a2044c9666eda11bbb3dd9b99cbb16c3f6ba897c2aa932014fd4113a",
+    "bytes": 4001
+  },
+  "kb-chunk-edit-real-20261018-next-identity-readonly.md": {
+    "sha256": "05894c46988cce1d799ac48645b8edc02b12bce63239a143f0f7057080a08bb3",
+    "bytes": 3261
+  },
+  "kb-chunk-edit-real-20261018-ide-readonly.md": {
+    "sha256": "b5c67a5efac51e2c5b71fd231204e840dbb7eddd9715b28175576dccde20815e",
+    "bytes": 5305
+  },
+  "kb-chunk-edit-real-20261018-request-config.json": {
+    "sha256": "baed9be8f6aacf8f49b604462703b1ce8c6bd05cf81ac232797733cab1cf54f1",
+    "bytes": 9199
+  }
+}

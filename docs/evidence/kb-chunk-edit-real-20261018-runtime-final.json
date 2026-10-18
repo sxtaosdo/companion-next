@@ -1,0 +1,31 @@
+{
+  "startupBaselineSha256": "a5a4ff61d8cd96bf97b57e2962a0b2637dd62be572ee9a6ab2d8e0eb7317ee00",
+  "listening": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8081,
+      "OwningProcess": 23608
+    }
+  ],
+  "protectedProcesses": [
+    {
+      "Id": 21004,
+      "ProcessName": "CocosCreator"
+    },
+    {
+      "Id": 3260,
+      "ProcessName": "llama-server"
+    },
+    {
+      "Id": 18036,
+      "ProcessName": "node"
+    },
+    {
+      "Id": 7292,
+      "ProcessName": "pythonw"
+    }
+  ],
+  "pid": 23608,
+  "launcherSha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+  "exeSha256": "b05899bc8ccaf299f8d5b5bb7c131cedf81491e51b02906b4321d72c10d6ce64"
+}
