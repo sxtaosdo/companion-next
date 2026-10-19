@@ -23,3 +23,10 @@ daemon构造时仅从COMPANION_KNOWLEDGE_CREDENTIAL_FILE捕获引用（companion
 Temp/companion-client-rollback-fix-20261019保留全部原候选和新增未装载修改；未提交/构建最终包/部署。最初六文件164项通过，后加三项边界测试的一次运行因新增测试段残留字面加号导致解析失败（其余五文件127项通过），尚未修复；不得将其称为最终通过候选。用户撤销后未继续专属锁开发。
 
 本记录及矩阵为事实检查点，不请求重复审批，不把已取消候选或新维护框架当作KB恢复前置。真实阻塞保留待明确安全的原宿主修复路径，所有运行配置与锁保持原样。
+
+## 后续已授权恢复准备
++
++原入口scripts/connect-knowledge-reader.ps1最小修复：同一既有reader路径写入用户级非密钥启动引用；已有不同引用则拒绝替换，仅检查原文件元数据，不读取密钥。增加StartOnly供精确旧进程退出后的正常CLI启动，NoBrowser避免操作用户窗口；默认guarded restart保留。正常重新启动从持久引用恢复，不依赖上一个临时PowerShell会话。
++
++KB专项切换保持实际安装0.3.147全部文件，不装载VSCode候选。预定复用精确进程句柄身份/创建时间校验及授权强杀，冻结后证明无当前实际任务，保留UNKNOWN2；退出后只把已核验pid/writer/hash/inode的已知旧boot锁原字节保留为retired sidecar，原legacy锁和journal/head保持。没有未知锁删除或历史迁移。实际结果以后续回执为准，当前为操作前检查点。
++
