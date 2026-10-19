@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-19",
+  "method": "21 grouped feature areas, equal weight. Complete means real acceptance of the approved main flow within the documented project/session scope, not exhaustive fault/stress coverage. Synthetic tests are never real acceptance.",
+  "total": 21,
+  "counts": {
+    "完整验收通过": 6,
+    "部分完成": 12,
+    "未完成或阻塞": 3
+  },
+  "completeItemPercent": 28.6,
+  "notWorkloadProgress": true,
+  "rows": [
+    {
+      "id": 1,
+      "name": "帮助、关于、版本、历史",
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "主流程已实机；原矩阵帮助/版本证据",
+      "remainingKind": "验收完成"
+    },
+    {
+      "id": 2,
+      "name": "概览默认首个真实工程",
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "7工程列表下默认/明确/无效参数实机，移除保护隔离回归",
+      "remainingKind": "验收完成"
+    },
+    {
+      "id": 3,
+      "name": "工程列表、状态同步、筛选、折叠",
+      "status": "部分完成",
+      "evidenceAndRemaining": "基础真页/状态已验，全部状态与时序未全覆盖",
+      "remainingKind": "实机"
+    },
+    {
+      "id": 4,
+      "name": "添加、导入、登记、脚手架",
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "隔离真实工程登记/移除与原生目录、脚手架主流程已验；权限失败边界未全验",
+      "remainingKind": "验收完成"
+    },
+    {
+      "id": 5,
+      "name": "五步安装与完成用法",
+      "status": "部分完成",
+      "evidenceAndRemaining": "00/10真实通过，01/11仅隔离合同，真实客户端配置未验",
+      "remainingKind": "实机/真实写入范围"
+    },
+    {
+      "id": 6,
+      "name": "Creator启动、聚焦、停止、重启",
+      "status": "部分完成",
+      "evidenceAndRemaining": "聚焦等主链已验，全生命周期和异常分支未全验；当前不启Creator",
+      "remainingKind": "实机/暂停约束"
+    },
+    {
+      "id": 7,
+      "name": "打开目录、移除登记",
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "限定真实只读导航及隔离工程移除已验",
+      "remainingKind": "验收完成"
+    },
+    {
+      "id": 8,
+      "name": "Preview、刷新、Profiler",
+      "status": "部分完成",
+      "evidenceAndRemaining": "已有真实主链，失败状态/运行工程全部刷新分支未全验",
+      "remainingKind": "实机/暂停约束"
+    },
+    {
+      "id": 9,
+      "name": "日志筛选、暂停、滚到底",
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "真实日志及4次有限SSE/恢复/来源筛选/停止主流程通过，长时压力未验",
+      "remainingKind": "验收完成"
+    },
+    {
+      "id": 10,
+      "name": "清空、导出、诊断",
+      "status": "部分完成",
+      "evidenceAndRemaining": "导出诊断已验，清空DELETE未执行",
+      "remainingKind": "用户确认可清数据范围/实机"
+    },
+    {
+      "id": 11,
+      "name": "调用记录、筛选、详情、分页",
+      "status": "部分完成",
+      "evidenceAndRemaining": "真实空态通过，132条非空与66失败分页/详情/503恢复仅模拟；129项不等于生产历史通过",
+      "remainingKind": "实机"
+    },
+    {
+      "id": 12,
+      "name": "局部实时更新、跨页恢复",
+      "status": "部分完成",
+      "evidenceAndRemaining": "日志有限SSE恢复/停止已验，调用等全部分支未全实机",
+      "remainingKind": "实机"
+    },
+    {
+      "id": 13,
+      "name": "CLI使用、IDE交接",
+      "status": "部分完成",
+      "evidenceAndRemaining": "原CLI只读inflight与交接预览已验，真实外部客户端接收/执行未验",
+      "remainingKind": "实机"
+    },
+    {
+      "id": 14,
+      "name": "五客户端MCP登记",
+      "status": "部分完成",
+      "evidenceAndRemaining": "运行包回滚93项隔离通过；VSCode格式候选dacb89b/0.3.148修复、114项通过并构建，尚未部署/连接",
+      "remainingKind": "部署/实机/真实写入范围"
+    },
+    {
+      "id": 15,
+      "name": "工具目录、范围、预设及导入导出",
+      "status": "部分完成",
+      "evidenceAndRemaining": "基本真实摘要/导出与隔离CRUD合同，覆盖/导入冲突及全客户端生效未全验",
+      "remainingKind": "实机"
+    },
+    {
+      "id": 16,
+      "name": "AI资源生成、编辑、变体、导入",
+      "status": "部分完成",
+      "evidenceAndRemaining": "96变体PNG/meta/UUID及场景重开/Preview/Build/Smoke已完成不重做；其余模型链暂停",
+      "remainingKind": "暂停约束/实机"
+    },
+    {
+      "id": 17,
+      "name": "真实工程资源库存",
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "限定工程733条接口/聚合/UI对应已验，不把733当全局常量",
+      "remainingKind": "验收完成"
+    },
+    {
+      "id": 18,
+      "name": "图片Owner完整旧功能",
+      "status": "未完成或阻塞",
+      "evidenceAndRemaining": "当前窄入口已验，批量/合并/删除/历史/回收等未迁入",
+      "remainingKind": "代码缺口；扩大交互先明确方案"
+    },
+    {
+      "id": 19,
+      "name": "知识库、文档、分片、原文、搜索",
+      "status": "部分完成",
+      "evidenceAndRemaining": "元数据与真实关键词命中3/空0/越权403已验，全部文档/分片实机链未全验",
+      "remainingKind": "实机"
+    },
+    {
+      "id": 20,
+      "name": "Agent、会话、问答、同步",
+      "status": "未完成或阻塞",
+      "evidenceAndRemaining": "源接入/注入回归已做，真实执行、来源写入和队列未验",
+      "remainingKind": "模型/写入暂停约束"
+    },
+    {
+      "id": 21,
+      "name": "知识服务、模型启停与切换",
+      "status": "未完成或阻塞",
+      "evidenceAndRemaining": "WeKnora恢复已有证据，模型启停/切换/GPU推理暂停未验",
+      "remainingKind": "模型暂停约束"
+    }
+  ]
+}

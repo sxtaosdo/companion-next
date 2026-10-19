@@ -1,0 +1,131 @@
+{
+  "scope": "isolated VS Code .vscode/mcp.json servers format fix; no runtime deployment",
+  "sourceRoot": "C:/Users/33272/AppData/Local/Temp/companion-client-rollback-fix-20261019",
+  "baseline": "9b8f9798b07a56898f409a6bbc2b6d37fbd00df9",
+  "version": "0.3.148",
+  "implementationAndTests": [
+    {
+      "file": "mcp/src/companion/cursor-configurator.ts",
+      "sha256": "2c713f7d23857db175e8d6a1a521ef8f1996908fcb5504caafe5dedf417d2bca"
+    },
+    {
+      "file": "mcp/src/companion/vscode-configurator.ts",
+      "sha256": "137e67067e2c981b50f92bbc3ea3393cfdde0f2a1502c6a31aa4e1d55200ff7f"
+    },
+    {
+      "file": "mcp/src/companion/json-mcp-configurator.ts",
+      "sha256": "f99e4bdab5f055e629565d83111bfe053c5dddbc9647c6bf3216c78b80d11cbd"
+    },
+    {
+      "file": "mcp/tests/cursor-configurator.test.ts",
+      "sha256": "5fe3b3c98e00dfb6bd6325821b123a2350c2aa3371063308b79a724dc6191277"
+    },
+    {
+      "file": "mcp/tests/vscode-configurator.test.ts",
+      "sha256": "83d980ffa7c5b139c35e51430b072d64a6348f2f1fff7fbf602d227e1bfc620e"
+    }
+  ],
+  "unchangedCore": [
+    {
+      "file": "mcp/src/companion/atomic-config-write.ts",
+      "sha256": "4e8b1ac1a6f9c8269a9c982ce9d157169e55943e8b84bbbcc262ff29f0fe096e"
+    },
+    {
+      "file": "mcp/src/companion/config-file-security.ts",
+      "sha256": "37bdfd68ac2d61f195f75b5e542745eab5f95bb4958a2d74b0e5cd308910ec8d"
+    },
+    {
+      "file": "mcp/src/companion/codex-configurator.ts",
+      "sha256": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498"
+    },
+    {
+      "file": "mcp/src/companion/trae-configurator.ts",
+      "sha256": "85c5ce19838d74a66c90ba1958a56ec12c7301345f7a8f8295ffc775d8eec178"
+    },
+    {
+      "file": "mcp/src/companion/kiro-configurator.ts",
+      "sha256": "69978e84a1205e5d256bf75d7517d342aa0c309b39ea88e66eb4326b891c162c"
+    }
+  ],
+  "rootOwnedVersionAndDocs": [
+    {
+      "file": "README.md",
+      "sha256": "5770f49afc47e6244d5bb71e11318c6056b39aeb08ca1bfdb3032d8195c97a1b"
+    },
+    {
+      "file": "creator-extension/package.json",
+      "sha256": "9292e943797342561b4d21513da8e5baf460c17192b8381c0847844af7c88ffc"
+    },
+    {
+      "file": "mcp/package-lock.json",
+      "sha256": "08b4edba3dc6c9259f06afa30da37121ec6e172934d616aacd992564efbdeb01"
+    },
+    {
+      "file": "mcp/package.json",
+      "sha256": "a384cb5571a2c44eff95da29d54b1eb575deec7e3808c2b4150a3b3eff1e2d98"
+    },
+    {
+      "file": "mcp/src/companion-mcp.ts",
+      "sha256": "a59eb4d23c5e242540eb0eb82b016da94eea959965319d4b2ee42a1af2dc2ea4"
+    },
+    {
+      "file": "mcp/src/mcp-server.ts",
+      "sha256": "5193bc939a5700e6796c7adeb801835be8254cde496797521423d4f9ece64ba5"
+    },
+    {
+      "file": "mcp/src/mcp-smoke.ts",
+      "sha256": "53b9c61349c87cc9e207a90030b533f26c3cc41506105ceda66cc6c138fe8212"
+    },
+    {
+      "file": "web/package-lock.json",
+      "sha256": "2935fbab67f96d1205c47dea3d23d92241b71beaba26b8ee889bb55cab98ef90"
+    },
+    {
+      "file": "web/package.json",
+      "sha256": "a3d29f1aabdff2a6ffb5e529fd176adb78f39a98cce4c5b8906f86c410708ca3"
+    },
+    {
+      "file": "web/src/changelog.ts",
+      "sha256": "c8ac318bfe95b4c01931399d91f05a7ab08395e9e692f1e4e880051f5b820eab"
+    },
+    {
+      "file": "docs/vscode-mcp-format-isolated-20261019.md",
+      "sha256": "cd98484e5db5c2c2b73d9ae3d2a48c137f5b44467d1eaa143f5709dcc8cb192d"
+    }
+  ],
+  "tests": {
+    "files": 5,
+    "passed": 114,
+    "failed": 0,
+    "pending": 0,
+    "vscodeCases": 26,
+    "resultSha256": "5644e0cb9d19bd0ab04b5073da9a859c5f8072293f9932734ad88f419b6b11be",
+    "stdoutSha256": "85f4d18591d871f65e3823cc5af26c657e162cb1420e8827baa4eaedc57971a8",
+    "typecheck": {
+      "command": "node node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "format": {
+    "vscode": "servers",
+    "cursor": "mcpServers",
+    "trae": "mcpServers",
+    "kiro": "mcpServers"
+  },
+  "preserved": [
+    "existing servers",
+    "inputs",
+    "unknown root fields",
+    "historical mcpServers",
+    "atomic write/recovery layer",
+    "receipt contract"
+  ],
+  "limitations": [
+    "The home/.vscode/mcp.json fallback is unchanged and is not VS Code user-profile discovery.",
+    "No historical mcpServers migration or deletion; strict JSON parser remains unchanged, JSONC unsupported.",
+    "No real VS Code connection or live installed runtime behavior was exercised.",
+    "All JSON filesystem targets were synthetic Temp fixtures; Codex CLI remained fake-injected in tests.",
+    "Custom paired readText/writeText injection owns commit semantics; default production path uses reviewed atomic layer."
+  ]
+}

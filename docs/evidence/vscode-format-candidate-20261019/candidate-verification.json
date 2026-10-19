@@ -1,0 +1,36 @@
+{
+  "atUtc": "2026-10-19T12:45:30.021515+00:00",
+  "sourceCommit": "dacb89b67c2fa197a357b049510b996f3cccdc3c",
+  "candidateVersion": "0.3.148",
+  "configTests": {
+    "passed": 114,
+    "failed": 0,
+    "skipped": 0
+  },
+  "changelogTestsPassed": 3,
+  "mcpTypecheckExitCode": 0,
+  "webTypecheckExitCode": 0,
+  "webTypecheckCommand": "node ../mcp/node_modules/typescript/bin/tsc --noEmit (cwd:web)",
+  "initialWebCompilerPathAttempt": "web/node_modules/typescript absent; reused existing MCP compiler, no install",
+  "builtArtifactsVerified": 4,
+  "bundleSyntaxCheckedWithoutExecution": true,
+  "embeddedSourceBindings": {
+    "companion-daemon.js": {
+      "mcp/src/companion/cursor-configurator.ts": "2c713f7d23857db175e8d6a1a521ef8f1996908fcb5504caafe5dedf417d2bca",
+      "mcp/src/companion/vscode-configurator.ts": "137e67067e2c981b50f92bbc3ea3393cfdde0f2a1502c6a31aa4e1d55200ff7f",
+      "mcp/src/companion/json-mcp-configurator.ts": "f99e4bdab5f055e629565d83111bfe053c5dddbc9647c6bf3216c78b80d11cbd"
+    },
+    "creator-ai.js": {
+      "mcp/src/companion/cursor-configurator.ts": "not embedded in CLI; daemon owns registration",
+      "mcp/src/companion/vscode-configurator.ts": "not embedded in CLI; daemon owns registration",
+      "mcp/src/companion/json-mcp-configurator.ts": "not embedded in CLI; daemon owns registration"
+    }
+  },
+  "sourceBindingsSha256": "5fae83a3cf425049947544fe6f6642297ddc7ea93b87948d323cf051bd38dd7f",
+  "offlineBuildManifestSha256": "250a447c2dc92655e8442ce748a6f59e72541651056c7847675c7ae33868644b",
+  "review": "independent host_architecture read-only review: no P1/P2",
+  "deployed": false,
+  "candidateExecuted": false,
+  "realClientConfigurationWritten": false,
+  "realClientConnectionVerified": false
+}
