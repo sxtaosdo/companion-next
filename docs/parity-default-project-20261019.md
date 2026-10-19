@@ -2,6 +2,8 @@
 
 仅开发者 Companion Next 与旧 cocos-mcp/web；不涉及运营后台。**尚未全部真实验收对齐**。实现、离线验证、历史实机证据分别记录，不把占位当完成。
 
+2026-10-19 10:04 UTC续核：默认真实首工程已随 `c44d847 / 1.3.173.129` 部署并通过真实7工程页面验收；帮助过时状态已修。日志/SSE和知识只读并行回归及仍未验边界见[三模块最终交付](parallel-delivery-20261019.md)。本文下方“未部署”为原检查点时点；当前结论以本段及最终交付为准。
+
 基线：Next a6b0f25 / 1.3.173.127，工作树干净；修复前创建 checkpoint/companion-next-parity-default-20261019-a6b0f25。旧源码只读，无服务、Creator、模型或浏览器控制操作。PID4092/Node25为交接历史值，本轮未冒用为当前探测。现存21项矩阵已有dc9a7c3提交，本轮续核不重复旧资产或事务验收。
 
 明确发现：registered-project.ts 的 resolveSelection 对空 requestedId 直接返回；Overview 的调用未提供默认首项行为。这与用户已批准的默认首个真实工程要求不符，故不沿用旧矩阵“没有新确认缺陷”的结论。
@@ -10,8 +12,8 @@
 
 | 旧入口 / 操作 | 新实现 / 原合同 | 状态与证据 | 精确剩余 |
 | --- | --- | --- | --- |
-| 帮助、关于、版本、历史 | `/help`、`/about`、`/changelog`；HelpView/AboutView、legacy-v148-help/changelog，product-information | 已实现；既有help-about-navigation回归，原文、复制、图标/二维码与版本单一来源保留 | 当前页面文案仍有过期“待验”，本片修正；不以页面版本代替daemon/Creator版本 |
-| 概览默认入口与真实工程 | `/`→`/overview`，RegisteredProjectOverview、registered-project store；原GET projects/status | 已实现；registered-project-views及历史页面验收 | 本轮发现默认首项缺陷并已源码修复、离线验证，未部署；未读取字段显示未知，不用示例充库存 |
+| 帮助、关于、版本、历史 | `/help`、`/about`、`/changelog`；HelpView/AboutView、legacy-v148-help/changelog，product-information | 已实现；原文、复制、图标/二维码与版本单一来源保留；c44d847已部署并通过帮助/矩阵/历史/关于真实页面核验 | 过期状态已按限定专项修正；不以页面版本代替daemon/Creator版本，不外推全部业务通过 |
+| 概览默认入口与真实工程 | `/`→`/overview`，RegisteredProjectOverview、registered-project store；原GET projects/status | 已修复并部署c44d847；真实7工程默认首项、明确第二项、未知/空/重复参数和资源页明确上下文已验 | 未读取字段显示未知，不用示例充库存；原检查点47f310e的“未部署”已由本次交付接续 |
 | 工程列表、搜索、筛选、折叠 | `/projects`、CompanionBrowserView；原列表/状态接口 | 已实现；工程UI/状态/空列表回归，正式状态API→UI曾验，见[只读批量](readonly-live-navigation-acceptance-20261018.md) | 未逐个覆盖全部异常状态；旧停止折叠/ready展开与手动偏好不能由一个成功状态泛化 |
 | 添加已有、Dashboard、创建、初始化 | ProjectSetupWizard、project-scaffold/setup；pick-directory、dashboard/projects、projects/scaffold | 已实现；[仅登记/移除](parity-remaining-safe-20261018.md)、[原生窗口](native-ui-receipt-20261018.md)、scaffold隔离工程实证 | 任意目录树导航及所有创建失败分支未完整实测 |
 | 安装五步、选项、旧配色、完成用法 | ProjectSetupWizard、SetupCompletionUsage、project-setup-theme；原setup及严格options-v1 | 已实现且部分实机已验：[00](bridge-only-real-20261018.md)、[10](creator-only-real-20261018.md)，异项进行中409 | 01/11（configureCodex=true）、真实客户端持久配置未验；00/10不扩成四组合通过 |
@@ -28,7 +30,7 @@
 | AI六步、参考图、采用/生成、审阅、导入、尺寸变体 | `/ai-icons`和RegisteredProjectResources；ai-resource/ai-task/ai-job同名adapter | 已实现且部分已验；复用用户指定3074d37、c80b890及[历史读取](history-read-regression-20261017.md)：96PNG/meta/UUID、场景保存重开、Preview/Build/Smoke | 当前GPU生成、所选Python/CLI/Pillow依赖及所有失败恢复未全验；productionVerified不因历史证据自动变true |
 | 真实工程库存 | asset-inventory、AssetInventorySummary，原只读AssetDB聚合 | 已实现；[733项接口/聚合/页面对应](owner-host-acceptance-20261018.md) | 733仅当次工程/会话读取；不是当前库存常量、逐项批准或概览中未知字段已读 |
 | 图片预览、持久选择、原生保存 | `/image-assets`、同源Owner窄宿主 | 已实现且限定实机已验，见[Owner验收](owner-host-acceptance-20261018.md) | 原图片库未切换；搜索/下载/历史切换/重试/停止/回收恢复未在本窄宿主开放，见[收口分类](migration-closeout-classification-20261018.md)，不伪装完成 |
-| 知识库/文档/切片/原文/检索 | `/knowledge`、knowledge-read；原knowledge各查询 | 已实现；[受限reader元数据200](reader-precision-codex-receipt-20261019.md)，原生关键词和切片编辑见独立专项 | 元数据成功不等于Next所有正文/关键词/问答已验；当前keyword仍未验证，不读取凭据或自动问答 |
+| 知识库/文档/切片/原文/检索 | `/knowledge`、knowledge-read；原knowledge各查询 | 已实现；[受限reader元数据200](reader-precision-codex-receipt-20261019.md)，本轮115项定向回归（新增6项）见[模块记录](knowledge-read-parallel-20261019.md) | 元数据不等于正文/关键词/问答已验；keyword未验证状态不禁用入口，不能保证检索不触发向量/推理，本轮真实知识请求0 |
 | Agent单会话问答、KB问答、同步 | KnowledgeAgent/Conversation/SyncPanel；原ask/chat/dry-run/run | 源码已接、隔离回归通过，见[Agent](knowledge-agent-parity-20261018.md)、[同步](knowledge-sync-parity-20261018.md) | 真实Agent/KB问答、来源写入/索引和模型调用未验，本轮继续暂停；queued不是索引完成 |
 | 知识服务、模型启动器及原管理页 | `/knowledge`与tab=models，local-service-operations；原status/start/stop及固定iframe | 入口已接；[知识服务恢复](knowledge-service-restored-20261019.md)、[模型管理只读证据](model-service-parity-20261018.md) | 当前运行状态未重新探测；模型启停/切换及生成继续暂停，不把running当GPU就绪 |
 

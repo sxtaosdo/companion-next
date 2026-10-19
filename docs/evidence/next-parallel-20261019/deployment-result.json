@@ -1,0 +1,67 @@
+{
+  "atUtc": "2026-10-19T10:01:32.437077+00:00",
+  "source": "c44d847494e89bffca2040c13874d260572a2983",
+  "version": "1.3.173.129",
+  "productVersion": "1.3.173",
+  "files": {
+    "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+    "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+    "assets/index-BnFY6Zbl.css": "ada8e8367ea0493931a847e7566f9c0d76dbfc4c6bf3afdd7359120e6b58d198",
+    "assets/index-wrX1ymo6.js": "cb7d8fb3809ef98532402ed27cdde4b20033be5e2df8875d42de34f443b9ddc2",
+    "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+    "index.html": "3b35be499e04f773456ea35728de11bfe98e87f4a33d8ac32aa5d5893ad23dea"
+  },
+  "writes": [
+    "assets/index-wrX1ymo6.js",
+    "index.html"
+  ],
+  "oldHashAssetsPreserved": true,
+  "runtime": {
+    "identity": {
+      "pid": 7832,
+      "startupEpoch": "e5c5924c-a392-4421-9827-37432bd5f47d",
+      "startedAt": "2026-10-19T09:45:11.157Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "103ea371f13b784d7ec0263ae4714906a8ea67ebc4ddc7e0ac9c7cc5439b801c",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "nativeEpochUnproven": 2,
+      "ownerStarting": 0,
+      "ownerRequests": 0,
+      "ownerHandlers": 0,
+      "ownerBusy": 0,
+      "ownerWorker": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0,
+      "maintenanceVerifications": 0
+    },
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "protection": {
+    "sharedHead": "6ff44f5574ed2f1b81741e86c3ca1210c6c0085a",
+    "shared22StatusDiffIndexUnchanged": true,
+    "protectedSourceFiles": 21,
+    "daemonCliWorkerOldUiUnchanged": true,
+    "unknownJournalUnchanged": true
+  },
+  "businessUnchanged": true,
+  "daemonRestarted": false,
+  "rollback": "Verify current index matches this receipt; atomically restore backup-static/index.html only. Keep all hash assets and daemon unchanged."
+}

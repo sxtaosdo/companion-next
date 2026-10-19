@@ -1,0 +1,52 @@
+{
+  "files": [
+    {
+      "path": "next/assets/about-icon-BaVeClOr.svg",
+      "size": 230,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "next/assets/donation-qr-D7kdLLAm.png",
+      "size": 106967,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "next/assets/index-BnFY6Zbl.css",
+      "size": 430581,
+      "sha256": "ada8e8367ea0493931a847e7566f9c0d76dbfc4c6bf3afdd7359120e6b58d198"
+    },
+    {
+      "path": "next/assets/index-wrX1ymo6.js",
+      "size": 1897638,
+      "sha256": "cb7d8fb3809ef98532402ed27cdde4b20033be5e2df8875d42de34f443b9ddc2"
+    },
+    {
+      "path": "next/favicon.svg",
+      "size": 245,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "next/index.html",
+      "size": 573,
+      "sha256": "3b35be499e04f773456ea35728de11bfe98e87f4a33d8ac32aa5d5893ad23dea"
+    }
+  ],
+  "references": [
+    {
+      "from": "next/assets/index-wrX1ymo6.js",
+      "to": "next/assets/about-icon-BaVeClOr.svg"
+    },
+    {
+      "from": "next/assets/index-wrX1ymo6.js",
+      "to": "next/assets/donation-qr-D7kdLLAm.png"
+    },
+    {
+      "from": "next/index.html",
+      "to": "next/assets/index-BnFY6Zbl.css"
+    },
+    {
+      "from": "next/index.html",
+      "to": "next/assets/index-wrX1ymo6.js"
+    }
+  ]
+}
