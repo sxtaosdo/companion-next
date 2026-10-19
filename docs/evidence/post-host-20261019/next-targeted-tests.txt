@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 D:/code/shidai3/P8000/companion-next
+
+
+ Test Files  3 passed (3)
+      Tests  77 passed | 5 expected fail (82)
+   Start at  20:24:14
+   Duration  4.81s (transform 2.38s, setup 0ms, import 4.06s, tests 873ms, environment 3.75s)
+

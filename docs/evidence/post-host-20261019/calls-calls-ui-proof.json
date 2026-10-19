@@ -1,0 +1,180 @@
+{
+  "atUtc": "2026-10-19T12:25:36.215Z",
+  "daemonIdentity": {
+    "pid": 10820,
+    "startupEpoch": "7601ac9d-a500-46d8-8db0-9a0f28e7569c",
+    "startedAt": "2026-10-19T12:14:03.575Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+    "nodeVersion": "v25.2.1"
+  },
+  "target": {
+    "id": "a79f4915296f4091",
+    "name": "task-owned-variant-acceptance",
+    "pathSha256": "a79f4915296f409154d65b70a8a5fe017c7273af6a9ea4ced1c0885893b36d7c",
+    "nonP1060": true
+  },
+  "counts": {
+    "sessionIdSha256": "007e8606ffe8ed8ed9d9401b1e256ae787476aa93f24fce8f2a04d577f4abc5a",
+    "targetCount": null,
+    "latestPresent": false,
+    "unchanged": true,
+    "absentCountMeansUnknownNotZero": true
+  },
+  "all": {
+    "sessionIdSha256": "007e8606ffe8ed8ed9d9401b1e256ae787476aa93f24fce8f2a04d577f4abc5a",
+    "total": 0,
+    "retained": 0,
+    "recordCount": 0,
+    "nextBefore": null,
+    "summaryMatches": true,
+    "emptyMatches": true
+  },
+  "failed": {
+    "sessionIdSha256": "007e8606ffe8ed8ed9d9401b1e256ae787476aa93f24fce8f2a04d577f4abc5a",
+    "total": 0,
+    "retained": 0,
+    "recordCount": 0,
+    "nextBefore": null,
+    "summaryMatches": true,
+    "emptyMatches": true
+  },
+  "refresh": {
+    "sessionIdSha256": "007e8606ffe8ed8ed9d9401b1e256ae787476aa93f24fce8f2a04d577f4abc5a",
+    "total": 0,
+    "retained": 0,
+    "recordCount": 0,
+    "nextBefore": null,
+    "summaryMatches": true,
+    "emptyMatches": true
+  },
+  "error": {
+    "ownContextHistoryGetAborted": 1,
+    "staleRows": 0,
+    "summaryUnknown": true,
+    "serverErrorSimulated": false
+  },
+  "restored": {
+    "sessionIdSha256": "007e8606ffe8ed8ed9d9401b1e256ae787476aa93f24fce8f2a04d577f4abc5a",
+    "total": 0,
+    "retained": 0,
+    "recordCount": 0,
+    "nextBefore": null,
+    "summaryMatches": true,
+    "emptyMatches": true
+  },
+  "backToAll": {
+    "sessionIdSha256": "007e8606ffe8ed8ed9d9401b1e256ae787476aa93f24fce8f2a04d577f4abc5a",
+    "total": 0,
+    "retained": 0,
+    "recordCount": 0,
+    "nextBefore": null,
+    "summaryMatches": true,
+    "emptyMatches": true
+  },
+  "paginationVerified": false,
+  "nonemptyDetailSummaryVerified": false,
+  "boundary": "Actual current-session records were not manufactured. Empty response total0 is verified only for the selected query/session. One own-context GET was aborted for the failure UI; no fake server response.",
+  "reads": [
+    {
+      "method": "GET",
+      "path": "/next/index.html",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-CRVreJhY.js",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-gwbq_QMl.css",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50&status=failed"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50&status=failed"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50&status=failed"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50&status=failed"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "loginSessionPostsInSuccessfulRun": 1,
+  "priorSelectorOnlyRuns": 5,
+  "totalLoginSessionPostsAcrossAttempts": 6,
+  "businessWrites": 0,
+  "creatorActions": 0,
+  "modelActions": 0,
+  "userBrowserUntouched": true,
+  "ownedBrowserClosed": true
+}

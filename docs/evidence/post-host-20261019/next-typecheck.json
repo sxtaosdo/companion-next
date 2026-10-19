@@ -1,0 +1,8 @@
+{
+  "command": "node node_modules/vue-tsc/bin/vue-tsc.js --noEmit",
+  "cwd": "D:\\code\\shidai3\\P8000\\companion-next",
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "",
+  "scope": "Next typecheck only; no build/deploy/listener"
+}

@@ -1,0 +1,103 @@
+
+ RUN  v4.1.10 C:/Users/33272/AppData/Local/Temp/companion-loaded-client-regression-20261019/mcp
+
+ 鉁?tests/codex-configurator.test.ts > Codex configurator > creates a stable safe MCP name 2ms
+ 鉁?tests/codex-configurator.test.ts > Codex configurator > uses the platform command locator when Codex is not found in configured paths 4ms
+ 鉁?tests/codex-configurator.test.ts > Codex configurator > finds the Codex Desktop CLI without relying on PATH 5ms
+ 鉁?tests/codex-configurator.test.ts > Codex configurator > uses argument arrays, adds once, then verifies by get 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex configurator > is idempotent and does not remove unrelated entries 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex configurator > verifies JSON output containing an escaped Windows command path 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex configurator > migrates only a legacy direct entry for the same project 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > restores legacy after target add reports failure before mutation 2ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > restores legacy after target add reports failure after mutation 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > reads back a failed legacy remove before mutation 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > reads back a failed legacy remove after mutation 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > recovers an unreadable verification only after a later exact owned entry read 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > records restore failure and never includes secret CLI errors 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > accepts actual restored state even if the restore CLI reports failure after writing 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > reads back rollback removal failure before mutation before restoring 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > reads back rollback removal failure after mutation before restoring 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > preserves a foreign/modified entry observed after target add failure: {"transport":{"command":"/external/owner","args":["external"]}} 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > preserves a foreign/modified entry observed after target add failure: {"transport":{"command":"/opt/creator-ai","args":["mcp","--project","abcdef123456"],"env":{"PRIVATE":"secret-value"}}} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > preserves UNKNOWN after persistent read failure instead of deleting by name 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > rejects initial CLI failure instead of treating it as absence 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > rejects non-roundtrippable legacy settings before mutation: {"env":{"SECRET":"not-printed"}} 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > rejects non-roundtrippable legacy settings before mutation: {"cwd":"/private/work"} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > rejects non-roundtrippable legacy settings before mutation: {"env_vars":["SECRET"]} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > rejects non-roundtrippable legacy settings before mutation: {"additional_setting":true} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > preserves non-default legacy policy metadata before migration: {"enabled_tools":[]} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > preserves non-default legacy policy metadata before migration: {"enabled_tools":["private-tool"]} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > preserves non-default legacy policy metadata before migration: {"disabled_tools":["private-tool"]} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > preserves non-default legacy policy metadata before migration: {"startup_timeout_sec":20} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > does not recover or remove an externally changed preflight entry before any own mutation 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > new-entry failed add before mutation returns to confirmed absence 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > new-entry failed add after mutation returns to confirmed absence 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > does not delete a foreign replacement of a new entry 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex CLI guarded recovery with controlled execution only > refuses restoration when another entry appears in the just-removed slot 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex recovery mutation ownership > never removes a same-target external entry appearing before a new add is attempted 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex recovery mutation ownership > never removes a same-target external entry after legacy remove but before target add is attempted 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex success receipts preserve full configuration meaning > rejects policy changes observed during final verification without removing them: {"enabled":false} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex success receipts preserve full configuration meaning > rejects policy changes observed during final verification without removing them: {"enabled_tools":[]} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex success receipts preserve full configuration meaning > rejects policy changes observed during final verification without removing them: {"disabled_tools":["restricted-tool"]} 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex success receipts preserve full configuration meaning > does not report idempotent success over non-default managed policy: {"enabled":false} 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex success receipts preserve full configuration meaning > does not report idempotent success over non-default managed policy: {"enabled_tools":[]} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex success receipts preserve full configuration meaning > does not report idempotent success over non-default managed policy: {"disabled_tools":["restricted-tool"]} 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex success receipts preserve full configuration meaning > does not infer default policy from legacy human-readable transport text 1ms
+ 鉁?tests/codex-configurator.test.ts > Codex missing-entry evidence is target-specific > retains UNKNOWN for a non-specific or unverified missing diagnostic 0 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex missing-entry evidence is target-specific > retains UNKNOWN for a non-specific or unverified missing diagnostic 1 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex missing-entry evidence is target-specific > retains UNKNOWN for a non-specific or unverified missing diagnostic 2 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex missing-entry evidence is target-specific > retains UNKNOWN for a non-specific or unverified missing diagnostic 3 0ms
+ 鉁?tests/codex-configurator.test.ts > Codex missing-entry evidence is target-specific > retains UNKNOWN for a non-specific or unverified missing diagnostic 4 0ms
+ 鉁?tests/vscode-configurator.test.ts > VS Code configurator > prefers project .vscode/mcp.json when projectPath is provided 2ms
+ 鉁?tests/vscode-configurator.test.ts > VS Code configurator > falls back to user .vscode/mcp.json without projectPath 0ms
+ 鉁?tests/vscode-configurator.test.ts > VS Code configurator > creates mcpServers entry in the project config 2ms
+ 鉁?tests/vscode-configurator.test.ts > VS Code configurator > is idempotent when the managed entry already matches 2ms
+ 鉁?tests/vscode-configurator.test.ts > VS Code configurator > refuses to overwrite an unrelated same-name entry 1ms
+ 鉁?tests/kiro-configurator.test.ts > Kiro configurator > resolves the global Kiro settings mcp.json path 2ms
+ 鉁?tests/kiro-configurator.test.ts > Kiro configurator > creates mcpServers entry for a project 2ms
+ 鉁?tests/kiro-configurator.test.ts > Kiro configurator > is idempotent when the managed entry already matches 2ms
+ 鉁?tests/kiro-configurator.test.ts > Kiro configurator > refuses to overwrite an unrelated same-name entry 1ms
+ 鉁?tests/trae-configurator.test.ts > Trae configurator > resolves the global Trae mcp.json path 2ms
+ 鉁?tests/trae-configurator.test.ts > Trae configurator > creates mcpServers entry for a project 2ms
+ 鉁?tests/trae-configurator.test.ts > Trae configurator > is idempotent when the managed entry already matches 2ms
+ 鉁?tests/trae-configurator.test.ts > Trae configurator > refuses to overwrite an unrelated same-name entry 1ms
+ 鉁?tests/cursor-configurator.test.ts > Cursor configurator > resolves the global Cursor mcp.json path 2ms
+ 鉁?tests/cursor-configurator.test.ts > Cursor configurator > creates mcpServers entry for a project 2ms
+ 鉁?tests/cursor-configurator.test.ts > Cursor configurator > is idempotent when the managed entry already matches 3ms
+ 鉁?tests/cursor-configurator.test.ts > Cursor configurator > refuses to overwrite an unrelated same-name entry 1ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > cursor default fs commit preserves unrelated fields and remains idempotent 1923ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > trae default fs commit preserves unrelated fields and remains idempotent 1795ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > kiro default fs commit preserves unrelated fields and remains idempotent 1800ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > vscode default fs commit preserves unrelated fields and remains idempotent 1780ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > cursor partial stage write + EIO leaves the real original bytes intact 892ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > trae partial stage write + EIO leaves the real original bytes intact 896ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > kiro partial stage write + EIO leaves the real original bytes intact 892ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > vscode partial stage write + EIO leaves the real original bytes intact 897ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > cursor publish failure restores original bytes through no-clobber recovery 1769ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > trae publish failure restores original bytes through no-clobber recovery 1804ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > kiro publish failure restores original bytes through no-clobber recovery 1780ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > vscode publish failure restores original bytes through no-clobber recovery 1784ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > rejects incomplete staging without moving the current configuration 893ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > preserves a concurrent update detected before capture 889ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > restores the actual newer version captured in a racing rename, not the stale snapshot 1339ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > preserves a new destination after capture and retains the displaced original for recovery 1776ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > retains recovery evidence when restoration itself fails 1776ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > observes a move that took effect before an injected error and restores its bytes 1340ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > keeps the primary write failure and retained stage path when stage cleanup fails 889ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > refuses to replace a concurrently created first configuration 18ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > serializes cooperating writers without deleting another writer's lock 1767ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > rejects mixed virtual/real I/O before reading or writing anything 4ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > preserves real Temp default Owner/Group/DACL or POSIX ownership/mode without exposing the descriptor 2810ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > commits a real Temp Chinese and spaced path with ASCII JSON ACL pipes 2731ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > refuses non-single-hardlink targets before writing any staged body 7ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > refuses symbolic link targets when the OS permits a Temp symbolic-link fixture 9ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > fails before stage body write if security preparation cannot preserve source attributes 443ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > preserves the source inode on a before-capture metadata mismatch 913ms
+ 鉁?tests/cursor-configurator.test.ts > JSON client configuration staged filesystem commit (Temp only) > preserves the source inode on a after-capture metadata mismatch 1356ms
+
+ Test Files  5 passed (5)
+      Tests  93 passed (93)
+   Start at  20:24:30
+   Duration  37.42s (transform 281ms, setup 0ms, import 504ms, tests 37.05s, environment 1ms)
+
+JSON report written to C:/Users/33272/AppData/Local/Temp/companion-loaded-client-regression-20261019/vitest-result.json

@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "installed-daemon-client-source-regression-v1",
+  "capturedAt": "2026-10-19T12:24:02.635Z",
+  "installedDaemonSha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+  "installedMapSha256": "30b0df9b2fcd099fff717252c865f38f6b2166e5f861c6c3744e63b4228b93e4",
+  "reviewedRollbackCommit": "09c048e96a7a43937c03fea0e107d917a637bf78",
+  "reviewedBaselineManifestSha256": "88c1a0c005911f0faa074c60fad87b81cec3aa26fab9d51cb4fd1de6752b9046",
+  "testSourceCommit": "9b8f9798b07a56898f409a6bbc2b6d37fbd00df9",
+  "modules": [
+    {
+      "relativePath": "src/companion/codex-configurator.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/codex-configurator.ts",
+      "bytes": 12840,
+      "sha256": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+      "reviewed09cBaselineSha256": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498"
+    },
+    {
+      "relativePath": "src/companion/cursor-configurator.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/cursor-configurator.ts",
+      "bytes": 4955,
+      "sha256": "27cc842a4894948333d21f9f25924c849711cac3775857dc381d97389697cd62",
+      "reviewed09cBaselineSha256": "27cc842a4894948333d21f9f25924c849711cac3775857dc381d97389697cd62"
+    },
+    {
+      "relativePath": "src/companion/atomic-config-write.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/atomic-config-write.ts",
+      "bytes": 5998,
+      "sha256": "4e8b1ac1a6f9c8269a9c982ce9d157169e55943e8b84bbbcc262ff29f0fe096e",
+      "reviewed09cBaselineSha256": "4e8b1ac1a6f9c8269a9c982ce9d157169e55943e8b84bbbcc262ff29f0fe096e"
+    },
+    {
+      "relativePath": "src/companion/config-file-security.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/config-file-security.ts",
+      "bytes": 6023,
+      "sha256": "37bdfd68ac2d61f195f75b5e542745eab5f95bb4958a2d74b0e5cd308910ec8d",
+      "reviewed09cBaselineSha256": "37bdfd68ac2d61f195f75b5e542745eab5f95bb4958a2d74b0e5cd308910ec8d"
+    },
+    {
+      "relativePath": "src/companion/trae-configurator.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/trae-configurator.ts",
+      "bytes": 737,
+      "sha256": "85c5ce19838d74a66c90ba1958a56ec12c7301345f7a8f8295ffc775d8eec178",
+      "reviewed09cBaselineSha256": "85c5ce19838d74a66c90ba1958a56ec12c7301345f7a8f8295ffc775d8eec178"
+    },
+    {
+      "relativePath": "src/companion/kiro-configurator.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/kiro-configurator.ts",
+      "bytes": 770,
+      "sha256": "69978e84a1205e5d256bf75d7517d342aa0c309b39ea88e66eb4326b891c162c",
+      "reviewed09cBaselineSha256": "69978e84a1205e5d256bf75d7517d342aa0c309b39ea88e66eb4326b891c162c"
+    },
+    {
+      "relativePath": "src/companion/vscode-configurator.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/vscode-configurator.ts",
+      "bytes": 1006,
+      "sha256": "251ccf873751d71ebec4ca92c0138ccd9db46d61348d8913f196b9cec7f4d66c",
+      "reviewed09cBaselineSha256": "251ccf873751d71ebec4ca92c0138ccd9db46d61348d8913f196b9cec7f4d66c"
+    }
+  ],
+  "tests": [
+    {
+      "relativePath": "mcp/tests/codex-configurator.test.ts",
+      "bytes": 17818,
+      "sha256": "5b4cc975cc8efbe1dda38c2418382f3ae16065a827f43bf1546d076a8e63f9b3",
+      "sourceCommit": "9b8f9798b07a56898f409a6bbc2b6d37fbd00df9",
+      "gitBlobSha256": "5b4cc975cc8efbe1dda38c2418382f3ae16065a827f43bf1546d076a8e63f9b3",
+      "canonicalLfMatchesCommit": true,
+      "canonicalLfMatches09c": true
+    },
+    {
+      "relativePath": "mcp/tests/cursor-configurator.test.ts",
+      "bytes": 17587,
+      "sha256": "41edac755b45947bfd11de80d933eec110c5925186c286b7218ed73359e9016a",
+      "sourceCommit": "9b8f9798b07a56898f409a6bbc2b6d37fbd00df9",
+      "gitBlobSha256": "42ae1c65e6e38c365eda17f8e979f982fc1cc16fb551122887c96998a2e3a303",
+      "canonicalLfMatchesCommit": true,
+      "canonicalLfMatches09c": true
+    },
+    {
+      "relativePath": "mcp/tests/trae-configurator.test.ts",
+      "bytes": 3066,
+      "sha256": "10ce176cca75f3a5e99a24e0dd5fd8770633d4f1db8fc4379f101d1c425a4f48",
+      "sourceCommit": "9b8f9798b07a56898f409a6bbc2b6d37fbd00df9",
+      "gitBlobSha256": "c34cba0d33a80132aa06c99c0a001918a28ba31334a2090e73b193600bab6286",
+      "canonicalLfMatchesCommit": true,
+      "canonicalLfMatches09c": true
+    },
+    {
+      "relativePath": "mcp/tests/kiro-configurator.test.ts",
+      "bytes": 3087,
+      "sha256": "3bee56bcf12b5faf364f961093668360908bec35c54e37bffe34004387d2bd65",
+      "sourceCommit": "9b8f9798b07a56898f409a6bbc2b6d37fbd00df9",
+      "gitBlobSha256": "7759ac68e2eb825b0cd6820be064820306d1672b8d5727e670438c13e625bc90",
+      "canonicalLfMatchesCommit": true,
+      "canonicalLfMatches09c": true
+    },
+    {
+      "relativePath": "mcp/tests/vscode-configurator.test.ts",
+      "bytes": 3578,
+      "sha256": "02810d55c03c022c265cc40c401a81522ee3fb316c72885ac4964b96c71a4f55",
+      "sourceCommit": "9b8f9798b07a56898f409a6bbc2b6d37fbd00df9",
+      "gitBlobSha256": "77c1a854dd33846b0c9284ad7441dd68315d2271ec02bfa0e3a94aae7eecad5f",
+      "canonicalLfMatchesCommit": true,
+      "canonicalLfMatches09c": true
+    }
+  ],
+  "sourceOrigin": "actual installed companion-daemon.js.map sourcesContent; no worktree source imported",
+  "syntheticJsonTargetsOnly": true,
+  "codexRealCliExecuted": false,
+  "codexBoundary": "original tests use injected fake exec only",
+  "runtimeProcessIdentityVerified": false,
+  "runtimeIdentityBindingOwner": "root session",
+  "noApi": true,
+  "noListener": true,
+  "noProcessControl": true
+}

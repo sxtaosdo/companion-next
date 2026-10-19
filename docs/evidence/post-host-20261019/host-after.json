@@ -1,0 +1,89 @@
+{
+  "atUtc": "2026-10-19T12:28:47.961397+00:00",
+  "identity": {
+    "pid": 10820,
+    "startupEpoch": "7601ac9d-a500-46d8-8db0-9a0f28e7569c",
+    "startedAt": "2026-10-19T12:14:03.575Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+    "nodeVersion": "v25.2.1"
+  },
+  "phase": "OPEN",
+  "counts": {
+    "http": 1,
+    "mcp": 0,
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "maintenanceObservations": 0,
+    "projectActions": 0,
+    "globalActions": 0,
+    "recovery": 0,
+    "setup": 0,
+    "builds": 0,
+    "observedBuilds": 0,
+    "sidecars": 0,
+    "nativeEpochUnproven": 2,
+    "ownerStarting": 0,
+    "ownerRequests": 0,
+    "ownerHandlers": 0,
+    "ownerBusy": 0,
+    "ownerWorker": 0,
+    "setupPolls": 0,
+    "setupTimers": 0,
+    "icons": 0,
+    "maintenanceVerifications": 0
+  },
+  "unknown": [
+    "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+  ],
+  "setupOptions": {
+    "optionsContractVersion": 1,
+    "strictOptions": true,
+    "reusePolicy": "same-effective-options"
+  },
+  "historicalUnknown": 2,
+  "quiescenceEvidence": 0,
+  "clientMetadataOnly": {
+    "cursor-home": {
+      "present": true,
+      "bytes": 2567,
+      "sha256": "904a8a96c98e30537baf7a4bf19831fd476a7e3834a2f33008a8c2c3a393babb"
+    },
+    "trae-home": {
+      "present": false
+    },
+    "kiro-home": {
+      "present": false
+    },
+    "vscode-home": {
+      "present": false
+    },
+    "vscode-proposed-project": {
+      "present": false
+    }
+  },
+  "codexRealConfigurationInspected": false,
+  "businessUnchanged": true,
+  "businessTables": 9,
+  "shared22ChangesUnchanged": true,
+  "other308RuntimeFilesUnchanged": true,
+  "proposedVsCodeProject": {
+    "path": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-closeout-safe-20261018\\next-registration-only-fixture",
+    "exists": true,
+    "registered": false,
+    "id": null,
+    "configurationPath": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-closeout-safe-20261018\\next-registration-only-fixture\\.vscode\\mcp.json",
+    "configurationPresent": false,
+    "configurationDirectoryPresent": false
+  },
+  "requests": [
+    "GET /v1/daemon/inflight",
+    "GET /v1/setup/options-v1",
+    "GET /v1/daemon/native-history",
+    "GET /v1/projects"
+  ],
+  "writeRequests": 0,
+  "daemonStopped": false,
+  "modelsOrCreatorStarted": false,
+  "realClientFilesUnchanged": true
+}

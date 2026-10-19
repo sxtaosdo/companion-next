@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "installed-daemon-client-regression-result-v1",
+  "completedAt": "2026-10-19T12:26:04.607Z",
+  "ok": true,
+  "filesPassed": 5,
+  "totalTests": 93,
+  "passed": 93,
+  "failed": 0,
+  "skipped": 0,
+  "todo": 0,
+  "expectedFailures": 0,
+  "sourceBindingsSha256": "b078d853cd4be05d95f835524b87add78e7d357b312b452a813b68381c439e15",
+  "vitestResultSha256": "8e9416a8fef2bd279d6e115106c6390b9ebcf8fa078c7e1258237699632a272c",
+  "installedDaemonSha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+  "installedMapSha256": "30b0df9b2fcd099fff717252c865f38f6b2166e5f861c6c3744e63b4228b93e4",
+  "extractedModuleCount": 7,
+  "reviewedRollbackCommit": "09c048e96a7a43937c03fea0e107d917a637bf78",
+  "copiedTestsUnchanged": true,
+  "extractedSourcesUnchanged": true,
+  "installedFilesUnchanged": true,
+  "originalFiveRollbackFixes": [
+    {
+      "target": "codex",
+      "execution": "injected controlled fake exec; no actual Codex CLI/config parser",
+      "cases": [
+        {
+          "name": "Codex CLI guarded recovery with controlled execution only restores legacy after target add reports failure before mutation",
+          "status": "passed"
+        },
+        {
+          "name": "Codex CLI guarded recovery with controlled execution only restores legacy after target add reports failure after mutation",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "target": "cursor",
+      "execution": "real extracted parser/default atomic filesystem path; synthetic Temp config; injected stage EIO only",
+      "cases": [
+        {
+          "name": "JSON client configuration staged filesystem commit (Temp only) cursor partial stage write + EIO leaves the real original bytes intact",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "target": "trae",
+      "execution": "real extracted parser/default atomic filesystem path; synthetic Temp config; injected stage EIO only",
+      "cases": [
+        {
+          "name": "JSON client configuration staged filesystem commit (Temp only) trae partial stage write + EIO leaves the real original bytes intact",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "target": "kiro",
+      "execution": "real extracted parser/default atomic filesystem path; synthetic Temp config; injected stage EIO only",
+      "cases": [
+        {
+          "name": "JSON client configuration staged filesystem commit (Temp only) kiro partial stage write + EIO leaves the real original bytes intact",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "target": "vscode",
+      "execution": "real extracted parser/default atomic filesystem path; synthetic Temp config; injected stage EIO only",
+      "cases": [
+        {
+          "name": "JSON client configuration staged filesystem commit (Temp only) vscode partial stage write + EIO leaves the real original bytes intact",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "boundaries": {
+    "syntheticJsonTargetsOnly": true,
+    "codexRealCliExecuted": false,
+    "runtimeProcessIdentityVerified": false,
+    "runtimeIdentityBindingOwner": "root session",
+    "noApi": true,
+    "noListener": true,
+    "noProcessControl": true,
+    "noRealClientConfiguration": true
+  }
+}

@@ -11,7 +11,10 @@ import { createProjectConnectionsProvider } from '../src/adapters/project-connec
 // This suite never invokes a client executable, home discovery, HTTP, or a listener.
 // Four JSON writers run their real default fs parser/writer against explicit Temp paths.
 // Codex uses a fictional execFile ledger: it tests adapter control flow, NOT the CLI parser.
-const hostDirectory = resolve('..', 'cocos-mcp', 'mcp', 'dist', 'companion');
+// Historical ccc1341 defect reproduction. The active host was upgraded to 0.3.147.
+// Keep the five expected failures pinned to the byte-verified pre-upgrade archive;
+// this suite is not acceptance of the current host (see post-host evidence).
+const hostDirectory = resolve('C:/Users/33272/Documents/Codex/2026-10-17/task/companion-process-restart-20261019/runtime-before');
 const bundlePath = join(hostDirectory, 'companion-daemon.js');
 const mapPath = bundlePath + '.map';
 const expectedBundleSha = '103ea371f13b784d7ec0263ae4714906a8ea67ebc4ddc7e0ac9c7cc5439b801c';
@@ -48,11 +51,11 @@ async function fixture(target) {
 }
 const seed = () => ({ fictionalPreference: { keep: true }, mcpServers: { unrelated: { command: 'fictional-other', args: ['keep'] } } });
 const seedText = () => JSON.stringify(seed(), null, 2) + '\n';
-describe.skipIf(!existsSync(bundlePath) || !existsSync(mapPath))('installed client registration: isolated fs, no real client execution', () => {
+describe.skipIf(!existsSync(bundlePath) || !existsSync(mapPath))('archived ccc1341 client registration: historical defects, isolated fs', () => {
     beforeAll(async () => {
-        expect(sha(await readFile(bundlePath)), 'installed daemon changed; re-review before rebinding').toBe(expectedBundleSha);
+        expect(sha(await readFile(bundlePath)), 'historical daemon archive changed; do not rebind to the active host').toBe(expectedBundleSha);
         const rawMap = await readFile(mapPath);
-        expect(sha(rawMap), 'installed source map changed; re-review before rebinding').toBe(expectedMapSha);
+        expect(sha(rawMap), 'historical source map archive changed; retain the original evidence pin').toBe(expectedMapSha);
         const map = JSON.parse(rawMap.toString('utf8'));
         await mkdir(artifactRoot, { recursive: true });
         fixtureRoot = await mkdtemp(join(artifactRoot, 'fixture-'));
