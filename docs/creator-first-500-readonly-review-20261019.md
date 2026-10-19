@@ -57,3 +57,5 @@
 完整迁移矩阵仍13通过/6部分/2暂停，不因本次只读追溯改变。后续模型、真实客户端配置、日志清空、历史搬迁等原暂停/禁止范围保持。
 
 证据：[首轮时间窗、差异及版本事实](evidence/creator-process-tree-20261019/first-500-readonly-audit.json)、[首次请求/失败](evidence/creator-process-tree-20261019/first-failed-journal.json)、[首次状态摘要](evidence/creator-process-tree-20261019/first-failure-status.json)、[后续连续通过](evidence/creator-process-tree-20261019/continuous-proof.json)。
+
+后续已落实防复发窄修2994d14：安全阶段/整数码进入lastError、生产Stop延迟退出直接回归，22条通过并最小部署。上表“当前”为本只读审查时点1984698c，最新实际部署及已落地/建议区分见[诊断落地报告](creator-exit-diagnostics-closeout-20261019.md)。

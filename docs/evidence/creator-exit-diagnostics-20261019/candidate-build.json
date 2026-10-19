@@ -1,0 +1,1526 @@
+{
+  "builtAtUtc": "2026-10-19T17:29:27.997Z",
+  "originalHash": "1984698ce8b2ec524d1e9e2b0d4d8733075ea4783bfa0f0e9d72b8dad8b6ce94",
+  "baseline": {
+    "out": "C:/Users/33272/AppData/Local/Temp/companion-creator-tree-fix-20261019/baseline",
+    "jsSha256": "1984698ce8b2ec524d1e9e2b0d4d8733075ea4783bfa0f0e9d72b8dad8b6ce94",
+    "mapSha256": "91e9c88026f959285cfb0761f046314351f7350961e30cae587bd04a3f90b68f",
+    "owned": [
+      {
+        "path": "src/companion/edge-browser.ts",
+        "sha256": "eaf22fbd29f5d218a3761a5bb48e99f1880ee462b422bc366639ffc860431f45",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/paths.ts",
+        "sha256": "33da6f2487b3f24d24aa320f99c4802cd64bf0d4feed973130d1f81ec2978b09",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/edge-session.ts",
+        "sha256": "53c6477b2ce24c36b8dc92341a1080eae8aea6a1139449046905615cfeeb473e",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/codex-configurator.ts",
+        "sha256": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/config-file-security.ts",
+        "sha256": "37bdfd68ac2d61f195f75b5e542745eab5f95bb4958a2d74b0e5cd308910ec8d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/atomic-config-write.ts",
+        "sha256": "4e8b1ac1a6f9c8269a9c982ce9d157169e55943e8b84bbbcc262ff29f0fe096e",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/cursor-configurator.ts",
+        "sha256": "27cc842a4894948333d21f9f25924c849711cac3775857dc381d97389697cd62",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/trae-configurator.ts",
+        "sha256": "85c5ce19838d74a66c90ba1958a56ec12c7301345f7a8f8295ffc775d8eec178",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/kiro-configurator.ts",
+        "sha256": "69978e84a1205e5d256bf75d7517d342aa0c309b39ea88e66eb4326b891c162c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/vscode-configurator.ts",
+        "sha256": "251ccf873751d71ebec4ca92c0138ccd9db46d61348d8913f196b9cec7f4d66c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/build-runner.ts",
+        "sha256": "d56b5aef8cceaac75d2bf6aedc18f4a7039907720a54b179e76cd7b8cea2da74",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/console-buffer.ts",
+        "sha256": "740b1b38d66fdcdcbf1b270e8f7bcfdc54041504b9ea71e5e0bd5fdad802454d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/preview-console.ts",
+        "sha256": "68f33964b8bb24bf03fc392f307067aa256290119717a38426808a28803e22f6",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/screenshot.ts",
+        "sha256": "8cf10a6a9dcdb848f233f4086a492164836147c1287fd069518c2bdd08a21ba3",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/profiler-runner.ts",
+        "sha256": "e34aabbc809cdb59adc7a1340acf848a9ab9ddb8c372da588989e371fe9dbd13",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/playtest-runner.ts",
+        "sha256": "fb2053a4cf982f608f17149d78aa532725db5d1a80d0ae53e5164a5d20b0e3bc",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/build-smoke-runner.ts",
+        "sha256": "40deacf57e2fcc0ecff5d39600f4f37fe4c9f4c60a245079e1652fcd43b37f24",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/operation-receipt.ts",
+        "sha256": "3a016fc4b5eee1c1e9e91e488f54caca702d20bd1d0bef7043227eaa19af465e",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/scene-snapshot.ts",
+        "sha256": "15dcc94d8ea21780aac0af094af625f7f3f40fd64def1889e3d8ce6db7fbd175",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/knowledge-isolation.ts",
+        "sha256": "7de79d71b4b708ee8a63df244660da728abdad07d9d7875c5b9274afb7ccc75f",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/knowledge-adapter.ts",
+        "sha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/owner-review-host.ts",
+        "sha256": "04dff64ea106d8cc0bac19b0d88d62b8753bcd2a89620d8eb3742bf025ce9edc",
+        "overlay": false
+      },
+      {
+        "path": "src/companion-daemon.ts",
+        "sha256": "0cfb7cf74ba4d80d3eb6b1c2d68d2f6b4debb1aff90c57a450696650b08d9664",
+        "overlay": false
+      },
+      {
+        "path": "src/bridge-client.ts",
+        "sha256": "445c40bd52cdff3fe375f13d1e502e8c67fcd5f9c3b2a203d64e2c82921b8804",
+        "overlay": false
+      },
+      {
+        "path": "src/protocol.ts",
+        "sha256": "7c7d3b63091a7479797c49d8552d45e93cd42e49d33aebe2bcabe215eb317115",
+        "overlay": false
+      },
+      {
+        "path": "src/errors.ts",
+        "sha256": "b52ba34aca1f87398beddec9343c8a31ce6279ad0f15f673e9c620255e19815c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/lifecycle-native.ts",
+        "sha256": "2a045f8cb6a3c970473ae83f4629cb7d1d0777b79138f7d93b8427d93c6fcde8",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-observations.ts",
+        "sha256": "0b8a69b3ddc9b255cdf9669614bd4f8c7ebdeaa6f01876f69152626ac2cecdca",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-maintenance.ts",
+        "sha256": "e89a64f712c1a6d82a57454d5057a9fc0550f8866bff990b93971e3a16f70cd0",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/lifecycle-drain.ts",
+        "sha256": "935242a4e5d5b7cec31b0c6a8c6efa5f2c1a99b15dac13f5d22f22be83abdb16",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-epoch-journal.ts",
+        "sha256": "e59247143b6db063bef56c6d391b32707c8469caa0bf26123fcac509b8f3f091",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-boot-authority.ts",
+        "sha256": "ac678fabb29777d5c5b6de02db1b2251f35aac553edb2a5abcb7b8fdcce59ed0",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/windows-boot-session.ts",
+        "sha256": "5ebbe8c80e7fddee0d2e8e196c76e7de51dbeddd2c421236cdb2149162d24e67",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-boot-anchor.json",
+        "sha256": "4fa331e34835c3ad51bc52e846f13e7f978fbf2c4f6f82f32021935d8f186b3b",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/windows-daemon-owner.ts",
+        "sha256": "0bc74bed47765e17412d59065786b6ac34e4b3100c20c4d9982268bef430fc30",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/bridge-error-log.ts",
+        "sha256": "56132a235f6857a7b85888e4adb3adedbbb6c62496064736ed092f985c945164",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/p1060-historical-decision.ts",
+        "sha256": "84bdbc550979175b7b85d0b318659b7955d7dacc9c8291edb0eb7ad0a9ec1a58",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/coordination-store.ts",
+        "sha256": "aed7dab25107f7d0d68487fa93d21b5a637f7ed73753c8a8e2d651ff31cdb244",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/authorized-dispatch-adoption.ts",
+        "sha256": "627d8d8224ba33bf0f42a813fdd700be496e578fad83e38b725ec695d6ab7454",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/authorized-dispatch-abandonment.ts",
+        "sha256": "e9af8109986b96b0f7665a19e51c20e1a9db04dbd69ff22308e1707ac336954c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/terminated-session-observation.ts",
+        "sha256": "813f3cc163d997de1dc7fa62c1e6d4c2709c2b138e8a8c43e4257faf1f21dc04",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/boot-session-observation.ts",
+        "sha256": "d9fc24e5b0120b7d61854042e30278db0ff9f2d75edfa9cd31aa45e315c6a1dc",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/acceptance-store.ts",
+        "sha256": "d14ffe50506b3a201190ce911a47388943d78686c611af6a887576d72ab39e7a",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/bridge-router.ts",
+        "sha256": "9d53f3ef3af1d557e1247e6632a02d63020a13341c85d58a338d1bae1ad0dead",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/bridge-installer.ts",
+        "sha256": "a58a32e6d49f1d2af5c4752f8f21819fdc465b78de33b5c0851289f55b447b7e",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/index.ts",
+        "sha256": "d7d335928f24013a3b0bf4c766f04527b793442b6d23d09cf73cf168d927d0dd",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/creator-discovery.ts",
+        "sha256": "6e96c798e974b9ccfcf41e94191627c36be15db73410f23082cee709500c43a6",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/creator-process-stop.ts",
+        "sha256": "6292b1b7ee427ed8a7b42e49d9fca2f917cff0547b2a2d1f22714ada8bdab992",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/windows-focus.ts",
+        "sha256": "9b1e9352ee41da0d5c75e258bb84f6dd84ad7e899e4acaaaec926346e0b2d2d5",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/platform.ts",
+        "sha256": "c23643ecf190147600625ed4ca1f22a848c7f301eb2ce54e90b20746f2e8d757",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/creator-lifecycle.ts",
+        "sha256": "d0c81b115d116bbc73e16f50afae53a3184b4468314f6a624f218a95d795e6ac",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/dashboard-errors.ts",
+        "sha256": "c192df6018393bcbfe8f0c33c9e41d54c6f0080d83141136380f122412fba356",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/dashboard-launcher.ts",
+        "sha256": "cd25266d4515446a1f2f72bc16467fa93ad4ed8eba371f7d6c732f410cfa16af",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/dashboard-projects.ts",
+        "sha256": "b53b13a28c03dc6348d959953cc66813a01bf92d80f69465fe68aec0ed0427d1",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/daemon-port.ts",
+        "sha256": "326571cf29b48ead0a7998737520c5c9c3ab4239c9d90f49fbc9b1736e479331",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/asset-inventory.ts",
+        "sha256": "73ba1ab13460de6ee3c7568ca9ee00d6571a5835285c97d092a536fe03b5091d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/browser-inventory.ts",
+        "sha256": "1d2325c20693f7e98bc6a128a8046e324f45743ad2295a1020c3ab462219422c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/setup-service.ts",
+        "sha256": "20710dfaed6d66f4650d1091d7a654bfd401a6e625189d1f4e775d47d1e99e20",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/http-server.ts",
+        "sha256": "70e73fe0328d7670291d49cf35087324674584ae8beaf7848fcb518ed6efde32",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/tool-preset-store.ts",
+        "sha256": "5b34ed4c3f4bf8ac947eea723649a0c7bd20ac64f93dd7fb9d1b32e72f8ec402",
+        "overlay": false
+      },
+      {
+        "path": "src/companion-api-client.ts",
+        "sha256": "eefdecf781f653f36087099b95a6a6fa81ee186df36b7879779e30e76922a703",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/call-history.ts",
+        "sha256": "2464e1f8a1769b4fab98b24c224a71e5e5f8a0f9ad6fc3f2c4ad974a4cc43e81",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/tool-names.ts",
+        "sha256": "505688fd1584e779d1f8ed735aeb74dd4ebc592937fd068303e438b090adb602",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/task-policy.ts",
+        "sha256": "c7f6a33338b29bc6dceec6cb4f7ca936019a323ca4dbbb1e9670781636a88c47",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/tool-execution.ts",
+        "sha256": "286fb774e402a9a24fc4fc4ae00d066e486bebd198c0800139127d3ba1befe33",
+        "overlay": false
+      },
+      {
+        "path": "src/bridge-service.ts",
+        "sha256": "fca871f7998f1bd3521744664d613d6c706683a9d95223b24eff1776d6f2878c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/tool-specs.ts",
+        "sha256": "0cdf6d4d4ea3790f3a910d0488d9907ed2fd4374d9dd132fcc4565a6a73bbc06",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/ecosystem-tool-specs.ts",
+        "sha256": "e567858f50f15dbaba02b6ff013cc3107d20c9cd69704c25a72235e49cd01fad",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/ai-launcher-client.ts",
+        "sha256": "1df48dcbaa6b26d4bf9b154441a6d9239520ec6e9a88ae4fd9857e1aaaecda94",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/local-process.ts",
+        "sha256": "02c4829b24bce7ea3790e1eb20a13b75dae21e7d151c0f0fd4d3fde473f635b6",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/knowledge-service-client.ts",
+        "sha256": "991127c8b5e4306f3b148eb799ccc32be8ab8776efc1db3ca04ec6e6eb5727e0",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-adapter.ts",
+        "sha256": "c9b9ed44870d98ecb501e68a43faef754f2a4d7f43ae33b3c515396aa2dbb922",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-acceptance.ts",
+        "sha256": "d60c31fe74273c8d6db136ba38d4c5898f5489bcf3ca59cb38baa01400df11a3",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-resource-config.ts",
+        "sha256": "1912f7a6c35fbf55c936546a5147680b334aee0b42fc0b46bd84d4c045a0c525",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-image-assets.ts",
+        "sha256": "1c0119242129650806801a06a5164279291a83a3075d6b369fcac8745358664d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-handoff.ts",
+        "sha256": "35da7b391cf7018bf8d6069497c93a43af310fa989e4507a43d86551c38fb5df",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/resource-plan.ts",
+        "sha256": "3e886df3ea8a2f495605848626aee1cae55270e6b567ab089d7b6c825a757db7",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/log-store.ts",
+        "sha256": "64e30327d0108366563ca56d5aa7c04a555885439ea28090a47f1b2f72d7502d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/project-registry.ts",
+        "sha256": "1ffbb881498c754f5ec4a7dde690957af407b1268104d82d54dcf9d11b96e943",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/project-scaffold.ts",
+        "sha256": "696fc5a61de5c23f39f58fb8025bc45abab1d04416208df617f0f3a8af8fccb9",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/lsp-service.ts",
+        "sha256": "85491c242e8e8d976718b2becd70b774b973f59ec302771fb90e32797d1b2053",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/legacy-recovery.ts",
+        "sha256": "ec46b9c6c9e0c9a7a8cb33212fdd71c2ad224134cb3a62730b1d607ca77a2f46",
+        "overlay": false
+      }
+    ],
+    "inputs": [
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/core.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/util.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/errors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/parse.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/regexes.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/checks.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/doc.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/versions.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/schemas.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ar.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/az.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/be.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/bg.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ca.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/cs.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/da.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/de.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/el.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/en.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/eo.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/es.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/fa.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/fi.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/fr.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/fr-CA.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/he.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/hr.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/hu.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/hy.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/id.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/is.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/it.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ja.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ka.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/km.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/kh.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ko.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/lt.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/mk.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ms.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/nl.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/no.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ota.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ps.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/pl.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/pt.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ro.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ru.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/sl.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/sv.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ta.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/th.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/tr.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/uk.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ua.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ur.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/uz.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/vi.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/zh-CN.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/zh-TW.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/yo.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/registries.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/api.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/to-json-schema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/json-schema-processors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/json-schema-generator.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/json-schema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/checks.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/iso.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/errors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/parse.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/schemas.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/compat.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/from-json-schema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/coerce.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/external.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/index.js",
+      "src/companion/knowledge-adapter.ts",
+      "src/companion/knowledge-isolation.ts",
+      "src/companion/owner-review-host.ts",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/constants.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/buffer-util.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/limiter.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/permessage-deflate.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/validation.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/receiver.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/sender.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/event-target.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/extension.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/websocket.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/stream.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/subprotocol.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/websocket-server.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/wrapper.mjs",
+      "src/protocol.ts",
+      "src/errors.ts",
+      "src/companion/native-observations.ts",
+      "src/companion/lifecycle-native.ts",
+      "src/bridge-client.ts",
+      "src/companion/lifecycle-drain.ts",
+      "src/companion/native-epoch-journal.ts",
+      "src/companion/windows-boot-session.ts",
+      "src/companion/native-boot-anchor.json",
+      "src/companion/windows-daemon-owner.ts",
+      "src/companion/native-boot-authority.ts",
+      "src/companion/native-maintenance.ts",
+      "src/companion/bridge-error-log.ts",
+      "src/companion/p1060-historical-decision.ts",
+      "src/companion/authorized-dispatch-adoption.ts",
+      "src/companion/authorized-dispatch-abandonment.ts",
+      "src/companion/terminated-session-observation.ts",
+      "src/companion/boot-session-observation.ts",
+      "src/companion/coordination-store.ts",
+      "src/companion/acceptance-store.ts",
+      "src/companion/edge-browser.ts",
+      "src/companion/paths.ts",
+      "src/companion/edge-session.ts",
+      "src/companion/bridge-router.ts",
+      "src/companion/bridge-installer.ts",
+      "src/companion/codex-configurator.ts",
+      "src/companion/config-file-security.ts",
+      "src/companion/atomic-config-write.ts",
+      "src/companion/cursor-configurator.ts",
+      "src/companion/creator-discovery.ts",
+      "src/companion/windows-focus.ts",
+      "src/companion/platform.ts",
+      "src/companion/creator-process-stop.ts",
+      "src/companion/dashboard-errors.ts",
+      "src/companion/dashboard-projects.ts",
+      "src/companion/dashboard-launcher.ts",
+      "src/companion/creator-lifecycle.ts",
+      "src/companion/daemon-port.ts",
+      "src/companion/asset-inventory.ts",
+      "src/companion/browser-inventory.ts",
+      "src/companion/setup-service.ts",
+      "src/companion/tool-preset-store.ts",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/helpers/util.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/ZodError.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/locales/en.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/errors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/helpers/parseUtil.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/helpers/typeAliases.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/helpers/errorUtil.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/types.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/external.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/parse.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/schemas.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/checks.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/iso.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/coerce.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/external.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4-mini/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/zod-compat.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/types.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/interfaces.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/Options.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/Refs.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/errorMessages.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/getRelativePath.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/any.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/array.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/bigint.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/boolean.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/branded.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/catch.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/date.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/default.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/effects.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/enum.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/intersection.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/literal.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/string.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/record.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/map.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/nativeEnum.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/never.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/null.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/union.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/nullable.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/number.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/object.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/optional.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/pipeline.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/promise.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/set.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/tuple.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/undefined.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/unknown.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/readonly.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/selectParser.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parseDef.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parseTypes.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/zodToJsonSchema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/zod-json-schema-compat.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/protocol.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/codegen/code.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/codegen/scope.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/codegen/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/util.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/names.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/errors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/boolSchema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/rules.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/applicability.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/dataType.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/defaults.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/code.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/keyword.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/subschema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/fast-deep-equal/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/json-schema-traverse/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/resolve.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/runtime/validation_error.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/ref_error.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/refs/data.json",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/fast-uri/lib/utils.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/fast-uri/lib/schemes.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/fast-uri/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/runtime/uri.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/core.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/core/id.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/core/ref.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/core/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/limitNumber.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/multipleOf.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/runtime/ucs2length.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/limitLength.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/pattern.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/limitProperties.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/required.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/limitItems.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/runtime/equal.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/uniqueItems.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/const.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/enum.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/additionalItems.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/items.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/prefixItems.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/items2020.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/contains.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/dependencies.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/propertyNames.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/properties.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/patternProperties.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/not.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/anyOf.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/oneOf.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/allOf.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/if.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/thenElse.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/format/format.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/format/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/metadata.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/draft7.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/discriminator/types.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/discriminator/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/refs/json-schema-draft-07.json",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/ajv.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv-formats/dist/formats.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv-formats/dist/limit.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv-formats/dist/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/validation/ajv-provider.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/server.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/helpers.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/completable.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/uriTemplate.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/toolNameValidation.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/mcp-server.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/stdio.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/stdio.js",
+      "src/companion/tool-names.ts",
+      "src/companion/call-history.ts",
+      "src/companion-api-client.ts",
+      "src/companion/prompts.ts",
+      "src/companion/knowledge/components.json",
+      "src/companion/knowledge/ui-layout.json",
+      "src/companion/knowledge/coordinates.json",
+      "src/companion/knowledge/fonts.json",
+      "src/companion/knowledge/ui-templates.json",
+      "src/companion/knowledge-resources.ts",
+      "src/companion/resources.ts",
+      "src/companion/mcp-daemon-client.ts",
+      "src/companion/task-policy.ts",
+      "src/document-service.ts",
+      "src/bridge-service.ts",
+      "src/companion/batch-execute.ts",
+      "src/companion/intent-ops.ts",
+      "src/companion/auto-bind.ts",
+      "src/companion/auto-bind-run.ts",
+      "src/companion/tool-profiles.ts",
+      "src/companion/tool-execution.ts",
+      "src/companion/ecosystem-tool-specs.ts",
+      "src/companion/tool-specs.ts",
+      "src/companion-mcp.ts",
+      "src/companion/local-process.ts",
+      "src/companion/ai-launcher-client.ts",
+      "src/companion/knowledge-service-client.ts",
+      "src/companion/icon-acceptance.ts",
+      "src/companion/icon-resource-config.ts",
+      "src/companion/icon-handoff.ts",
+      "src/companion/icon-image-assets.ts",
+      "src/companion/resource-plan.ts",
+      "src/companion/icon-adapter.ts",
+      "src/companion/http-server.ts",
+      "src/companion/log-store.ts",
+      "src/companion/project-registry.ts",
+      "src/companion/project-scaffold.ts",
+      "src/companion/types.ts",
+      "src/companion/index.ts",
+      "src/companion/lsp-service.ts",
+      "src/companion/legacy-recovery.ts",
+      "src/companion/trae-configurator.ts",
+      "src/companion/kiro-configurator.ts",
+      "src/companion/vscode-configurator.ts",
+      "src/companion/build-runner.ts",
+      "src/companion/console-buffer.ts",
+      "src/companion/preview-console.ts",
+      "src/companion/screenshot.ts",
+      "src/companion/profiler-runner.ts",
+      "src/companion/playtest-runner.ts",
+      "src/companion/build-smoke-runner.ts",
+      "src/companion/operation-receipt.ts",
+      "src/companion/scene-snapshot.ts",
+      "src/companion-daemon.ts"
+    ]
+  },
+  "candidate": {
+    "out": "C:/Users/33272/AppData/Local/Temp/companion-creator-tree-fix-20261019/candidate",
+    "jsSha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
+    "mapSha256": "212ba55f65e4216c11fd896433ac275c764061ae26de2cb6b62687b47d4e19ea",
+    "owned": [
+      {
+        "path": "src/companion/edge-browser.ts",
+        "sha256": "eaf22fbd29f5d218a3761a5bb48e99f1880ee462b422bc366639ffc860431f45",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/paths.ts",
+        "sha256": "33da6f2487b3f24d24aa320f99c4802cd64bf0d4feed973130d1f81ec2978b09",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/edge-session.ts",
+        "sha256": "53c6477b2ce24c36b8dc92341a1080eae8aea6a1139449046905615cfeeb473e",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/codex-configurator.ts",
+        "sha256": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/config-file-security.ts",
+        "sha256": "37bdfd68ac2d61f195f75b5e542745eab5f95bb4958a2d74b0e5cd308910ec8d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/atomic-config-write.ts",
+        "sha256": "4e8b1ac1a6f9c8269a9c982ce9d157169e55943e8b84bbbcc262ff29f0fe096e",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/cursor-configurator.ts",
+        "sha256": "27cc842a4894948333d21f9f25924c849711cac3775857dc381d97389697cd62",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/trae-configurator.ts",
+        "sha256": "85c5ce19838d74a66c90ba1958a56ec12c7301345f7a8f8295ffc775d8eec178",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/kiro-configurator.ts",
+        "sha256": "69978e84a1205e5d256bf75d7517d342aa0c309b39ea88e66eb4326b891c162c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/vscode-configurator.ts",
+        "sha256": "251ccf873751d71ebec4ca92c0138ccd9db46d61348d8913f196b9cec7f4d66c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/build-runner.ts",
+        "sha256": "d56b5aef8cceaac75d2bf6aedc18f4a7039907720a54b179e76cd7b8cea2da74",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/console-buffer.ts",
+        "sha256": "740b1b38d66fdcdcbf1b270e8f7bcfdc54041504b9ea71e5e0bd5fdad802454d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/preview-console.ts",
+        "sha256": "68f33964b8bb24bf03fc392f307067aa256290119717a38426808a28803e22f6",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/screenshot.ts",
+        "sha256": "8cf10a6a9dcdb848f233f4086a492164836147c1287fd069518c2bdd08a21ba3",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/profiler-runner.ts",
+        "sha256": "e34aabbc809cdb59adc7a1340acf848a9ab9ddb8c372da588989e371fe9dbd13",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/playtest-runner.ts",
+        "sha256": "fb2053a4cf982f608f17149d78aa532725db5d1a80d0ae53e5164a5d20b0e3bc",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/build-smoke-runner.ts",
+        "sha256": "40deacf57e2fcc0ecff5d39600f4f37fe4c9f4c60a245079e1652fcd43b37f24",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/operation-receipt.ts",
+        "sha256": "3a016fc4b5eee1c1e9e91e488f54caca702d20bd1d0bef7043227eaa19af465e",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/scene-snapshot.ts",
+        "sha256": "15dcc94d8ea21780aac0af094af625f7f3f40fd64def1889e3d8ce6db7fbd175",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/knowledge-isolation.ts",
+        "sha256": "7de79d71b4b708ee8a63df244660da728abdad07d9d7875c5b9274afb7ccc75f",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/knowledge-adapter.ts",
+        "sha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/owner-review-host.ts",
+        "sha256": "04dff64ea106d8cc0bac19b0d88d62b8753bcd2a89620d8eb3742bf025ce9edc",
+        "overlay": false
+      },
+      {
+        "path": "src/companion-daemon.ts",
+        "sha256": "0cfb7cf74ba4d80d3eb6b1c2d68d2f6b4debb1aff90c57a450696650b08d9664",
+        "overlay": true
+      },
+      {
+        "path": "src/bridge-client.ts",
+        "sha256": "445c40bd52cdff3fe375f13d1e502e8c67fcd5f9c3b2a203d64e2c82921b8804",
+        "overlay": false
+      },
+      {
+        "path": "src/protocol.ts",
+        "sha256": "7c7d3b63091a7479797c49d8552d45e93cd42e49d33aebe2bcabe215eb317115",
+        "overlay": false
+      },
+      {
+        "path": "src/errors.ts",
+        "sha256": "b52ba34aca1f87398beddec9343c8a31ce6279ad0f15f673e9c620255e19815c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/lifecycle-native.ts",
+        "sha256": "2a045f8cb6a3c970473ae83f4629cb7d1d0777b79138f7d93b8427d93c6fcde8",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-observations.ts",
+        "sha256": "0b8a69b3ddc9b255cdf9669614bd4f8c7ebdeaa6f01876f69152626ac2cecdca",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-maintenance.ts",
+        "sha256": "e89a64f712c1a6d82a57454d5057a9fc0550f8866bff990b93971e3a16f70cd0",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/lifecycle-drain.ts",
+        "sha256": "935242a4e5d5b7cec31b0c6a8c6efa5f2c1a99b15dac13f5d22f22be83abdb16",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-epoch-journal.ts",
+        "sha256": "e59247143b6db063bef56c6d391b32707c8469caa0bf26123fcac509b8f3f091",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-boot-authority.ts",
+        "sha256": "ac678fabb29777d5c5b6de02db1b2251f35aac553edb2a5abcb7b8fdcce59ed0",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/windows-boot-session.ts",
+        "sha256": "5ebbe8c80e7fddee0d2e8e196c76e7de51dbeddd2c421236cdb2149162d24e67",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/native-boot-anchor.json",
+        "sha256": "4fa331e34835c3ad51bc52e846f13e7f978fbf2c4f6f82f32021935d8f186b3b",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/windows-daemon-owner.ts",
+        "sha256": "0bc74bed47765e17412d59065786b6ac34e4b3100c20c4d9982268bef430fc30",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/bridge-error-log.ts",
+        "sha256": "56132a235f6857a7b85888e4adb3adedbbb6c62496064736ed092f985c945164",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/p1060-historical-decision.ts",
+        "sha256": "84bdbc550979175b7b85d0b318659b7955d7dacc9c8291edb0eb7ad0a9ec1a58",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/coordination-store.ts",
+        "sha256": "aed7dab25107f7d0d68487fa93d21b5a637f7ed73753c8a8e2d651ff31cdb244",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/authorized-dispatch-adoption.ts",
+        "sha256": "627d8d8224ba33bf0f42a813fdd700be496e578fad83e38b725ec695d6ab7454",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/authorized-dispatch-abandonment.ts",
+        "sha256": "e9af8109986b96b0f7665a19e51c20e1a9db04dbd69ff22308e1707ac336954c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/terminated-session-observation.ts",
+        "sha256": "813f3cc163d997de1dc7fa62c1e6d4c2709c2b138e8a8c43e4257faf1f21dc04",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/boot-session-observation.ts",
+        "sha256": "d9fc24e5b0120b7d61854042e30278db0ff9f2d75edfa9cd31aa45e315c6a1dc",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/acceptance-store.ts",
+        "sha256": "d14ffe50506b3a201190ce911a47388943d78686c611af6a887576d72ab39e7a",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/bridge-router.ts",
+        "sha256": "9d53f3ef3af1d557e1247e6632a02d63020a13341c85d58a338d1bae1ad0dead",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/bridge-installer.ts",
+        "sha256": "a58a32e6d49f1d2af5c4752f8f21819fdc465b78de33b5c0851289f55b447b7e",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/index.ts",
+        "sha256": "d7d335928f24013a3b0bf4c766f04527b793442b6d23d09cf73cf168d927d0dd",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/creator-discovery.ts",
+        "sha256": "6e96c798e974b9ccfcf41e94191627c36be15db73410f23082cee709500c43a6",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/creator-process-stop.ts",
+        "sha256": "21bc39fbeef6db7d44b9080f82be6aeb38337c4b4d692bee85670c8de1bc22a0",
+        "overlay": true
+      },
+      {
+        "path": "src/companion/windows-focus.ts",
+        "sha256": "9b1e9352ee41da0d5c75e258bb84f6dd84ad7e899e4acaaaec926346e0b2d2d5",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/platform.ts",
+        "sha256": "c23643ecf190147600625ed4ca1f22a848c7f301eb2ce54e90b20746f2e8d757",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/creator-lifecycle.ts",
+        "sha256": "d0c81b115d116bbc73e16f50afae53a3184b4468314f6a624f218a95d795e6ac",
+        "overlay": true
+      },
+      {
+        "path": "src/companion/dashboard-errors.ts",
+        "sha256": "c192df6018393bcbfe8f0c33c9e41d54c6f0080d83141136380f122412fba356",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/dashboard-launcher.ts",
+        "sha256": "cd25266d4515446a1f2f72bc16467fa93ad4ed8eba371f7d6c732f410cfa16af",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/dashboard-projects.ts",
+        "sha256": "b53b13a28c03dc6348d959953cc66813a01bf92d80f69465fe68aec0ed0427d1",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/daemon-port.ts",
+        "sha256": "326571cf29b48ead0a7998737520c5c9c3ab4239c9d90f49fbc9b1736e479331",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/asset-inventory.ts",
+        "sha256": "73ba1ab13460de6ee3c7568ca9ee00d6571a5835285c97d092a536fe03b5091d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/browser-inventory.ts",
+        "sha256": "1d2325c20693f7e98bc6a128a8046e324f45743ad2295a1020c3ab462219422c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/setup-service.ts",
+        "sha256": "20710dfaed6d66f4650d1091d7a654bfd401a6e625189d1f4e775d47d1e99e20",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/http-server.ts",
+        "sha256": "70e73fe0328d7670291d49cf35087324674584ae8beaf7848fcb518ed6efde32",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/tool-preset-store.ts",
+        "sha256": "5b34ed4c3f4bf8ac947eea723649a0c7bd20ac64f93dd7fb9d1b32e72f8ec402",
+        "overlay": false
+      },
+      {
+        "path": "src/companion-api-client.ts",
+        "sha256": "eefdecf781f653f36087099b95a6a6fa81ee186df36b7879779e30e76922a703",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/call-history.ts",
+        "sha256": "2464e1f8a1769b4fab98b24c224a71e5e5f8a0f9ad6fc3f2c4ad974a4cc43e81",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/tool-names.ts",
+        "sha256": "505688fd1584e779d1f8ed735aeb74dd4ebc592937fd068303e438b090adb602",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/task-policy.ts",
+        "sha256": "c7f6a33338b29bc6dceec6cb4f7ca936019a323ca4dbbb1e9670781636a88c47",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/tool-execution.ts",
+        "sha256": "286fb774e402a9a24fc4fc4ae00d066e486bebd198c0800139127d3ba1befe33",
+        "overlay": false
+      },
+      {
+        "path": "src/bridge-service.ts",
+        "sha256": "fca871f7998f1bd3521744664d613d6c706683a9d95223b24eff1776d6f2878c",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/tool-specs.ts",
+        "sha256": "0cdf6d4d4ea3790f3a910d0488d9907ed2fd4374d9dd132fcc4565a6a73bbc06",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/ecosystem-tool-specs.ts",
+        "sha256": "e567858f50f15dbaba02b6ff013cc3107d20c9cd69704c25a72235e49cd01fad",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/ai-launcher-client.ts",
+        "sha256": "1df48dcbaa6b26d4bf9b154441a6d9239520ec6e9a88ae4fd9857e1aaaecda94",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/local-process.ts",
+        "sha256": "02c4829b24bce7ea3790e1eb20a13b75dae21e7d151c0f0fd4d3fde473f635b6",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/knowledge-service-client.ts",
+        "sha256": "991127c8b5e4306f3b148eb799ccc32be8ab8776efc1db3ca04ec6e6eb5727e0",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-adapter.ts",
+        "sha256": "c9b9ed44870d98ecb501e68a43faef754f2a4d7f43ae33b3c515396aa2dbb922",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-acceptance.ts",
+        "sha256": "d60c31fe74273c8d6db136ba38d4c5898f5489bcf3ca59cb38baa01400df11a3",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-resource-config.ts",
+        "sha256": "1912f7a6c35fbf55c936546a5147680b334aee0b42fc0b46bd84d4c045a0c525",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-image-assets.ts",
+        "sha256": "1c0119242129650806801a06a5164279291a83a3075d6b369fcac8745358664d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/icon-handoff.ts",
+        "sha256": "35da7b391cf7018bf8d6069497c93a43af310fa989e4507a43d86551c38fb5df",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/resource-plan.ts",
+        "sha256": "3e886df3ea8a2f495605848626aee1cae55270e6b567ab089d7b6c825a757db7",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/log-store.ts",
+        "sha256": "64e30327d0108366563ca56d5aa7c04a555885439ea28090a47f1b2f72d7502d",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/project-registry.ts",
+        "sha256": "1ffbb881498c754f5ec4a7dde690957af407b1268104d82d54dcf9d11b96e943",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/project-scaffold.ts",
+        "sha256": "696fc5a61de5c23f39f58fb8025bc45abab1d04416208df617f0f3a8af8fccb9",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/lsp-service.ts",
+        "sha256": "85491c242e8e8d976718b2becd70b774b973f59ec302771fb90e32797d1b2053",
+        "overlay": false
+      },
+      {
+        "path": "src/companion/legacy-recovery.ts",
+        "sha256": "ec46b9c6c9e0c9a7a8cb33212fdd71c2ad224134cb3a62730b1d607ca77a2f46",
+        "overlay": false
+      }
+    ],
+    "inputs": [
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/core.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/util.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/errors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/parse.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/regexes.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/checks.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/doc.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/versions.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/schemas.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ar.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/az.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/be.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/bg.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ca.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/cs.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/da.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/de.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/el.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/en.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/eo.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/es.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/fa.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/fi.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/fr.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/fr-CA.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/he.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/hr.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/hu.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/hy.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/id.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/is.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/it.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ja.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ka.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/km.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/kh.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ko.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/lt.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/mk.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ms.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/nl.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/no.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ota.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ps.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/pl.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/pt.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ro.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ru.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/sl.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/sv.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ta.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/th.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/tr.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/uk.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ua.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/ur.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/uz.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/vi.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/zh-CN.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/zh-TW.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/yo.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/locales/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/registries.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/api.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/to-json-schema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/json-schema-processors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/json-schema-generator.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/json-schema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/core/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/checks.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/iso.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/errors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/parse.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/schemas.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/compat.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/from-json-schema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/coerce.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/external.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/index.js",
+      "src/companion/knowledge-adapter.ts",
+      "src/companion/knowledge-isolation.ts",
+      "src/companion/owner-review-host.ts",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/constants.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/buffer-util.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/limiter.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/permessage-deflate.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/validation.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/receiver.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/sender.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/event-target.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/extension.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/websocket.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/stream.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/subprotocol.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/lib/websocket-server.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ws/wrapper.mjs",
+      "src/protocol.ts",
+      "src/errors.ts",
+      "src/companion/native-observations.ts",
+      "src/companion/lifecycle-native.ts",
+      "src/bridge-client.ts",
+      "src/companion/lifecycle-drain.ts",
+      "src/companion/native-epoch-journal.ts",
+      "src/companion/windows-boot-session.ts",
+      "src/companion/native-boot-anchor.json",
+      "src/companion/windows-daemon-owner.ts",
+      "src/companion/native-boot-authority.ts",
+      "src/companion/native-maintenance.ts",
+      "src/companion/bridge-error-log.ts",
+      "src/companion/p1060-historical-decision.ts",
+      "src/companion/authorized-dispatch-adoption.ts",
+      "src/companion/authorized-dispatch-abandonment.ts",
+      "src/companion/terminated-session-observation.ts",
+      "src/companion/boot-session-observation.ts",
+      "src/companion/coordination-store.ts",
+      "src/companion/acceptance-store.ts",
+      "src/companion/edge-browser.ts",
+      "src/companion/paths.ts",
+      "src/companion/edge-session.ts",
+      "src/companion/bridge-router.ts",
+      "src/companion/bridge-installer.ts",
+      "src/companion/codex-configurator.ts",
+      "src/companion/config-file-security.ts",
+      "src/companion/atomic-config-write.ts",
+      "src/companion/cursor-configurator.ts",
+      "src/companion/creator-discovery.ts",
+      "src/companion/windows-focus.ts",
+      "src/companion/platform.ts",
+      "src/companion/creator-process-stop.ts",
+      "src/companion/dashboard-errors.ts",
+      "src/companion/dashboard-projects.ts",
+      "src/companion/dashboard-launcher.ts",
+      "src/companion/creator-lifecycle.ts",
+      "src/companion/daemon-port.ts",
+      "src/companion/asset-inventory.ts",
+      "src/companion/browser-inventory.ts",
+      "src/companion/setup-service.ts",
+      "src/companion/tool-preset-store.ts",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/helpers/util.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/ZodError.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/locales/en.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/errors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/helpers/parseUtil.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/helpers/typeAliases.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/helpers/errorUtil.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/types.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/external.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v3/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/parse.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/schemas.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/checks.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/iso.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/coerce.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/mini/external.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4-mini/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/zod-compat.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/classic/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod/v4/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/types.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/interfaces.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/Options.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/Refs.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/errorMessages.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/getRelativePath.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/any.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/array.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/bigint.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/boolean.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/branded.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/catch.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/date.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/default.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/effects.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/enum.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/intersection.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/literal.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/string.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/record.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/map.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/nativeEnum.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/never.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/null.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/union.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/nullable.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/number.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/object.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/optional.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/pipeline.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/promise.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/set.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/tuple.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/undefined.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/unknown.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parsers/readonly.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/selectParser.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parseDef.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/parseTypes.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/zodToJsonSchema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/zod-to-json-schema/dist/esm/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/zod-json-schema-compat.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/protocol.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/codegen/code.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/codegen/scope.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/codegen/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/util.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/names.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/errors.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/boolSchema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/rules.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/applicability.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/dataType.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/defaults.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/code.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/keyword.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/subschema.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/fast-deep-equal/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/json-schema-traverse/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/resolve.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/validate/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/runtime/validation_error.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/ref_error.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/compile/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/refs/data.json",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/fast-uri/lib/utils.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/fast-uri/lib/schemes.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/fast-uri/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/runtime/uri.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/core.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/core/id.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/core/ref.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/core/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/limitNumber.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/multipleOf.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/runtime/ucs2length.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/limitLength.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/pattern.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/limitProperties.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/required.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/limitItems.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/runtime/equal.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/uniqueItems.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/const.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/enum.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/validation/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/additionalItems.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/items.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/prefixItems.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/items2020.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/contains.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/dependencies.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/propertyNames.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/properties.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/patternProperties.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/not.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/anyOf.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/oneOf.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/allOf.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/if.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/thenElse.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/applicator/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/format/format.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/format/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/metadata.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/draft7.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/discriminator/types.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/vocabularies/discriminator/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/refs/json-schema-draft-07.json",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv/dist/ajv.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv-formats/dist/formats.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv-formats/dist/limit.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/ajv-formats/dist/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/validation/ajv-provider.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/server.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/helpers.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/index.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/completable.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/uriTemplate.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/toolNameValidation.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/experimental/tasks/mcp-server.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/mcp.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/shared/stdio.js",
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@modelcontextprotocol/sdk/dist/esm/server/stdio.js",
+      "src/companion/tool-names.ts",
+      "src/companion/call-history.ts",
+      "src/companion-api-client.ts",
+      "src/companion/prompts.ts",
+      "src/companion/knowledge/components.json",
+      "src/companion/knowledge/ui-layout.json",
+      "src/companion/knowledge/coordinates.json",
+      "src/companion/knowledge/fonts.json",
+      "src/companion/knowledge/ui-templates.json",
+      "src/companion/knowledge-resources.ts",
+      "src/companion/resources.ts",
+      "src/companion/mcp-daemon-client.ts",
+      "src/companion/task-policy.ts",
+      "src/document-service.ts",
+      "src/bridge-service.ts",
+      "src/companion/batch-execute.ts",
+      "src/companion/intent-ops.ts",
+      "src/companion/auto-bind.ts",
+      "src/companion/auto-bind-run.ts",
+      "src/companion/tool-profiles.ts",
+      "src/companion/tool-execution.ts",
+      "src/companion/ecosystem-tool-specs.ts",
+      "src/companion/tool-specs.ts",
+      "src/companion-mcp.ts",
+      "src/companion/local-process.ts",
+      "src/companion/ai-launcher-client.ts",
+      "src/companion/knowledge-service-client.ts",
+      "src/companion/icon-acceptance.ts",
+      "src/companion/icon-resource-config.ts",
+      "src/companion/icon-handoff.ts",
+      "src/companion/icon-image-assets.ts",
+      "src/companion/resource-plan.ts",
+      "src/companion/icon-adapter.ts",
+      "src/companion/http-server.ts",
+      "src/companion/log-store.ts",
+      "src/companion/project-registry.ts",
+      "src/companion/project-scaffold.ts",
+      "src/companion/types.ts",
+      "src/companion/index.ts",
+      "src/companion/lsp-service.ts",
+      "src/companion/legacy-recovery.ts",
+      "src/companion/trae-configurator.ts",
+      "src/companion/kiro-configurator.ts",
+      "src/companion/vscode-configurator.ts",
+      "src/companion/build-runner.ts",
+      "src/companion/console-buffer.ts",
+      "src/companion/preview-console.ts",
+      "src/companion/screenshot.ts",
+      "src/companion/profiler-runner.ts",
+      "src/companion/playtest-runner.ts",
+      "src/companion/build-smoke-runner.ts",
+      "src/companion/operation-receipt.ts",
+      "src/companion/scene-snapshot.ts",
+      "src/companion-daemon.ts"
+    ]
+  },
+  "baselineByteIdentical": true,
+  "overlays": [
+    "src/companion-daemon.ts",
+    "src/companion/creator-lifecycle.ts",
+    "src/companion/creator-process-stop.ts"
+  ],
+  "sharedSourceModified": false,
+  "cliOrStaticBuilt": false,
+  "credentialsAndNativeSourcesPreserved": true,
+  "vscodeCandidateLoaded": false
+}

@@ -1,0 +1,9 @@
+{
+  "candidate-build.json": "7c75e9378b6d22a626d403164f1e5a9e907fef91d2090ac2e0e63abf4a3882b9",
+  "installed.json": "b1fe037688da73ca0f58fbb617d1b015242ed5b75f16d2d6df6e089744431d69",
+  "minimal-health.json": "1d2db399e098920a5bc5f061621f8eb05e4e3abf22eceaea0e351c4538060dc2",
+  "preservation-final.json": "de2fd38811b239173cceca85788e31f152e7738bd212ff555ed25704066be878",
+  "safe-diagnostics.patch": "cbb4174656782ebd4194c04337a46958914cbfbd603a237c5862221ff9a5234c",
+  "targeted-tests.json": "01ab5031f764fc28df5c1fe57dd48db6cf098abd0a89edf4f1a91ee27d8436ca",
+  "unchanged-exit-algorithm.json": "4126634b23019f6ca7344ea0e8c940c67c3caf292adee813ac771a847f6b3761"
+}

@@ -1,0 +1,110 @@
+diff --git a/mcp/src/companion/creator-process-stop.ts b/mcp/src/companion/creator-process-stop.ts
+index 52d1b2b..e101713 100644
+--- a/mcp/src/companion/creator-process-stop.ts
++++ b/mcp/src/companion/creator-process-stop.ts
+@@ -5,7 +5,9 @@ import { isPidAlive } from "./platform.js";
+ /** A failed ownership/exit check is not permission to retry with another PID. */
+ export class CreatorStopFault extends Error {
+   readonly code = "CREATOR_STOP_UNCONFIRMED";
+-  constructor(readonly stage = "unknown", readonly nativeCode?: number) { super(`Creator 所属进程退出未能确认（${stage}）；保留原进程身份，未自动重试`); }
++  constructor(readonly stage = "unknown", readonly nativeCode?: number) {
++    super(`Creator 所属进程退出未能确认（${stage}${Number.isSafeInteger(nativeCode) ? `; Win32=${nativeCode}` : ""}）；保留原进程身份，未自动重试`);
++  }
+ }
+ 
+ export interface CreatorStopReceipt { pid: number; exitedPids: number[]; exitConfirmed: true }
+@@ -34,11 +36,12 @@ export async function stopCreatorProcess(pid: number, projectPath: string): Prom
+           return reject(new CreatorStopFault(failure.failureStage, typeof failure.nativeCode === "number" && Number.isSafeInteger(failure.nativeCode) ? failure.nativeCode : undefined));
+         }
+       } catch { /* Raw stderr/commands never cross the platform boundary. */ }
+-      reject(new CreatorStopFault());
++      reject(new CreatorStopFault("subprocess"));
+     }));
+-    const value = JSON.parse(output) as CreatorStopReceipt;
+-    if (value.pid !== pid || value.exitConfirmed !== true || !Array.isArray(value.exitedPids) || !value.exitedPids.includes(pid)
+-      || value.exitedPids.some(id => !Number.isSafeInteger(id) || id <= 0)) throw new CreatorStopFault();
++    let value: CreatorStopReceipt;
++    try { value = JSON.parse(output) as CreatorStopReceipt; } catch { throw new CreatorStopFault("receipt"); }
++    if (!value || typeof value !== "object" || value.pid !== pid || value.exitConfirmed !== true || !Array.isArray(value.exitedPids) || !value.exitedPids.includes(pid)
++      || value.exitedPids.some(id => !Number.isSafeInteger(id) || id <= 0)) throw new CreatorStopFault("receipt");
+     return value;
+   } catch (error) { throw error instanceof CreatorStopFault ? error : new CreatorStopFault(); }
+ }
+diff --git a/mcp/tests/creator-process-stop.test.ts b/mcp/tests/creator-process-stop.test.ts
+index e37909d..3b4044b 100644
+--- a/mcp/tests/creator-process-stop.test.ts
++++ b/mcp/tests/creator-process-stop.test.ts
+@@ -1,7 +1,16 @@
+-import { execFileSync } from "node:child_process";
++import { execFile, execFileSync } from "node:child_process";
+ import { describe, expect, it, vi } from "vitest";
+ import { CreatorLifecycle, type CreatorLifecycleAdapter } from "../src/companion/creator-lifecycle.js";
+-import { CreatorStopFault, WINDOWS_CREATOR_STOP } from "../src/companion/creator-process-stop.js";
++import { CreatorStopFault, stopCreatorProcess, WINDOWS_CREATOR_STOP } from "../src/companion/creator-process-stop.js";
++
++vi.mock("node:child_process", async importOriginal => ({ ...await importOriginal<typeof import("node:child_process")>(), execFile: vi.fn() }));
++
++function childReply(error: Error | null, stdout: string) {
++  vi.mocked(execFile).mockImplementation(((...args: unknown[]) => {
++    (args.at(-1) as (error: Error | null, stdout: string, stderr: string) => void)(error, stdout, "SENSITIVE_STDERR_COMMAND_ENV");
++    return {} as ReturnType<typeof execFile>;
++  }) as typeof execFile);
++}
+ 
+ const project = { id: "p1", name: "owned", path: "C:/owned/game", connectionPath: "C:/owned/game/temp/connection.json" };
+ function adapter(stop: NonNullable<CreatorLifecycleAdapter["stop"]>): CreatorLifecycleAdapter {
+@@ -64,6 +73,34 @@ describe("owned Creator stop completion", () => {
+   });
+ });
+ 
++describe.skipIf(process.platform !== "win32")("sanitized Creator stop diagnostics", () => {
++  it("retains the whitelisted stage and integer Win32 code in the lifecycle lastError", async () => {
++    childReply(new Error("SENSITIVE_EXEC_COMMAND_ENV"), JSON.stringify({ failureStage: "descendant-terminate", nativeCode: 5, raw: "SENSITIVE_PAYLOAD" }));
++    const lifecycle = new CreatorLifecycle(adapter(stopCreatorProcess)); await lifecycle.start(project);
++    await expect(lifecycle.stop(project.id)).rejects.toMatchObject({ stage: "descendant-terminate", nativeCode: 5 });
++    expect(lifecycle.status(project.id).lastError).toContain("descendant-terminate; Win32=5");
++    expect(lifecycle.status(project.id).lastError).not.toMatch(/SENSITIVE|owned\/game|EncodedCommand/);
++  });
++  it("rejects untrusted failure stages and noninteger codes without leaking raw child diagnostics", async () => {
++    childReply(new Error("SENSITIVE_EXEC_COMMAND_ENV"), JSON.stringify({ failureStage: "SENSITIVE_STAGE_ENV", nativeCode: "SENSITIVE_CODE_ENV" }));
++    const failure = await stopCreatorProcess(101, project.path).catch(error => error);
++    expect(failure).toMatchObject({ code: "CREATOR_STOP_UNCONFIRMED", stage: "subprocess", nativeCode: undefined });
++    expect(failure.message).not.toMatch(/SENSITIVE|Win32|owned\/game|EncodedCommand/);
++    childReply(new Error("SENSITIVE_EXEC_COMMAND_ENV"), JSON.stringify({ failureStage: "root-open", nativeCode: 1.5 }));
++    const noninteger = await stopCreatorProcess(101, project.path).catch(error => error);
++    expect(noninteger).toMatchObject({ stage: "root-open", nativeCode: undefined });
++    expect(noninteger.message).not.toMatch(/SENSITIVE|Win32/);
++  });
++  it("labels malformed or invalid success receipts without persisting their content", async () => {
++    for (const stdout of ["SENSITIVE_NOT_JSON", "null", "7", JSON.stringify({ pid: 102, exitedPids: [102], exitConfirmed: true, raw: "SENSITIVE_PAYLOAD" })]) {
++      childReply(null, stdout);
++      const failure = await stopCreatorProcess(101, project.path).catch(error => error);
++      expect(failure).toMatchObject({ stage: "receipt", nativeCode: undefined });
++      expect(failure.message).not.toMatch(/SENSITIVE|Win32|EncodedCommand/);
++    }
++  });
++});
++
+ // The actual PowerShell ownership/discovery loop runs against in-memory OS
+ // handles. Fake Stop only changes this process's fixture objects, never real PIDs.
+ const fakeType = String.raw`
+@@ -101,6 +138,19 @@ function runFixture(setup = "") {
+   return JSON.parse(ps(wrapped));
+ }
+ describe.skipIf(process.platform !== "win32")("Windows ownership loop with fake handles", () => {
++  it("requests termination once while the real native Stop method waits for delayed exit", () => {
++    const original = WINDOWS_CREATOR_STOP.match(/Add-Type -TypeDefinition @'[\s\S]*?'@/)![0];
++    const terminate = '[DllImport("kernel32.dll", SetLastError=true)] static extern bool TerminateProcess(IntPtr h, uint code);';
++    const wait = '[DllImport("kernel32.dll", SetLastError=true)] static extern uint WaitForSingleObject(IntPtr h, uint timeout);';
++    expect(original).toContain(terminate); expect(original).toContain(wait);
++    // Only the two OS calls are shims. Execute the production C# Stop method;
++    // no real process handle is opened and no OS termination call can occur.
++    const shim = original.replace(terminate, 'public static int Requests; public static bool SimulatedGone; static bool TerminateProcess(IntPtr h, uint code) { Requests++; if(Requests>1)throw new InvalidOperationException("duplicate termination"); return true; }')
++      .replace(wait, 'static uint WaitForSingleObject(IntPtr h, uint timeout) { return SimulatedGone ? 0u : 258u; }');
++    expect(shim).not.toContain(terminate); expect(shim).not.toContain(wait);
++    const result = JSON.parse(ps(shim + '\n$h=New-Object OwnedCreatorHandle;1..5|ForEach-Object{$h.Stop()};$waiting=!$h.Gone;[OwnedCreatorHandle]::SimulatedGone=$true;$h.Stop();@{requests=[OwnedCreatorHandle]::Requests;wasWaiting=$waiting;gone=$h.Gone}|ConvertTo-Json -Compress'));
++    expect(result).toEqual({ requests: 1, wasWaiting: true, gone: true });
++  }, 15_000);
+   it("compiles the actual native boundary and parses the original PS script without executing it", () => {
+     const native = WINDOWS_CREATOR_STOP.match(/Add-Type -TypeDefinition @'[\s\S]*?'@/)![0];
+     expect(ps(native + "\nWrite-Output 'NATIVE_COMPILED'")).toBe("NATIVE_COMPILED");

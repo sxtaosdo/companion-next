@@ -1,0 +1,8 @@
+{
+  "baseCommit": "55256cb",
+  "currentCommit": "2994d14",
+  "powershellAndNativeStopSourceUnchanged": true,
+  "sourceSha256": "a94de6f8e67353e216d8cb1f15e9094235ad7fd6ebc07484063d7971b3d35ece",
+  "lifecycleRetestedLive": false,
+  "liveEvidenceReused": "creator-process-tree-20261019/continuous-proof.json"
+}

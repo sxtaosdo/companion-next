@@ -1,0 +1,16 @@
+{
+  "installed": true,
+  "patchCommit": "2994d14",
+  "preciseOverlay": [
+    "src/companion-daemon.ts",
+    "src/companion/creator-lifecycle.ts",
+    "src/companion/creator-process-stop.ts"
+  ],
+  "daemonSha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
+  "mapSha256": "212ba55f65e4216c11fd896433ac275c764061ae26de2cb6b62687b47d4e19ea",
+  "otherInstalledFilesUnchanged": 310,
+  "cliUnchanged": true,
+  "nextStaticUnchanged": true,
+  "vscodeCandidateLoaded": false,
+  "rollbackDirectory": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-creator-tree-deploy-20261019\\switch3\\daemon-backup"
+}

@@ -1,0 +1,96 @@
+{
+  "numTotalTests": 22,
+  "numPassedTests": 22,
+  "numFailedTests": 0,
+  "success": true,
+  "cases": [
+    {
+      "name": "owned Creator stop completion rejects stop while a Bridge wait can still complete the original start",
+      "status": "passed"
+    },
+    {
+      "name": "owned Creator stop completion rejects start during the unsaved-document check before stopping state is published",
+      "status": "passed"
+    },
+    {
+      "name": "owned Creator stop completion waits for exit proof and coalesces a second stop, not merely a kill acknowledgement",
+      "status": "passed"
+    },
+    {
+      "name": "owned Creator stop completion keeps a failed tree identity across Bridge disconnect and blocks another launch",
+      "status": "passed"
+    },
+    {
+      "name": "owned Creator stop completion has a distinct missing-PID recovery signal and requires a registered path",
+      "status": "passed"
+    },
+    {
+      "name": "owned Creator stop completion serially awaits three complete instance exits before subsequent launches",
+      "status": "passed"
+    },
+    {
+      "name": "sanitized Creator stop diagnostics retains the whitelisted stage and integer Win32 code in the lifecycle lastError",
+      "status": "passed"
+    },
+    {
+      "name": "sanitized Creator stop diagnostics rejects untrusted failure stages and noninteger codes without leaking raw child diagnostics",
+      "status": "passed"
+    },
+    {
+      "name": "sanitized Creator stop diagnostics labels malformed or invalid success receipts without persisting their content",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles requests termination once while the real native Stop method waits for delayed exit",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles compiles the actual native boundary and parses the original PS script without executing it",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles stops root and proven child but never the other project",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles rescans a late child born before its verified parent exit",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles keeps an observed intermediate identity after exit to find its live grandchild",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles refuses success if an observed intermediate disappears before acquiring its identity",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles rejects root other project before terminating any process",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles rejects child other project before terminating any process",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles rejects root executable before terminating any process",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles rejects creation identity mismatch before terminating any process",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles rejects missing original root before terminating any process",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles does not report exit confirmation after a child termination failure",
+      "status": "passed"
+    },
+    {
+      "name": "Windows ownership loop with fake handles does not adopt a row born after the held parent's lifetime",
+      "status": "passed"
+    }
+  ]
+}

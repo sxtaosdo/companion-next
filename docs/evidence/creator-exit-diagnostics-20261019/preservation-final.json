@@ -1,0 +1,22 @@
+{
+  "shared22Preserved": true,
+  "protectedSources": 21,
+  "otherInstalledRuntimeFilesUnchanged": 310,
+  "immutableConfigAndUnknownJournalUnchanged": true,
+  "businessTablesUnchanged": 9,
+  "fixtureTrackedSettingsProfileUnchanged": true,
+  "CreatorProcesses": 0,
+  "unknownRetained": 2,
+  "newIdentity": {
+    "pid": 3860,
+    "startupEpoch": "2d198c64-75c0-4e6b-b3b5-2eac2015bf78",
+    "startedAt": "2026-10-19T17:31:10.011Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
+    "nodeVersion": "v25.2.1"
+  },
+  "actualMapSha256": "212ba55f65e4216c11fd896433ac275c764061ae26de2cb6b62687b47d4e19ea",
+  "newLifecycleCalls": 0,
+  "modelsStarted": 0,
+  "newListeners": 0
+}
