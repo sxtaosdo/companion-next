@@ -1,0 +1,48 @@
+{
+  "presets": [
+    {
+      "id": "core",
+      "name": "核心工具",
+      "baseProfile": "core",
+      "enabled": [],
+      "disabled": [],
+      "builtIn": true,
+      "updatedAt": "1970-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "full",
+      "name": "全部工具",
+      "baseProfile": "full",
+      "enabled": [],
+      "disabled": [],
+      "builtIn": true,
+      "updatedAt": "1970-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "next-presets-20261019-4f2cc13a-a",
+      "name": "Next1019-4f2cc13a-core",
+      "baseProfile": "core",
+      "enabled": [
+        "scene_create"
+      ],
+      "disabled": [
+        "project_write_lease"
+      ],
+      "builtIn": false,
+      "updatedAt": "2026-10-19T15:22:49.760Z"
+    },
+    {
+      "id": "next-presets-20261019-4f2cc13a-b",
+      "name": "Next1019-4f2cc13a-full",
+      "baseProfile": "full",
+      "enabled": [],
+      "disabled": [
+        "operation_get",
+        "viewport_get_reference_image"
+      ],
+      "builtIn": false,
+      "updatedAt": "2026-10-19T15:22:49.760Z"
+    }
+  ],
+  "selectedPresetId": "full"
+}

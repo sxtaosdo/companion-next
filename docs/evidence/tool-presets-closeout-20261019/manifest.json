@@ -1,0 +1,62 @@
+[
+  {
+    "file": "proof.json",
+    "bytes": 9451,
+    "sha256": "e19ca5402bba2e4cea1d64c2e12514005468f366be972f181cb02266eff19b97"
+  },
+  {
+    "file": "mcp-readonly-preflight.json",
+    "bytes": 3399,
+    "sha256": "d5a92fe2c47868c06606af779e72300293a5fb2da8380b39fa14cc6cb499f213"
+  },
+  {
+    "file": "built-in-export.json",
+    "bytes": 293,
+    "sha256": "5c004d876c0b57376342c642a9c252acf93f4d8609741de61fe61294e03d58c9"
+  },
+  {
+    "file": "custom-export.json",
+    "bytes": 354,
+    "sha256": "a07608421e0682cb32971a5970328c3006d0b9caea890507f771363e83897fc0"
+  },
+  {
+    "file": "import-readback.json",
+    "bytes": 1084,
+    "sha256": "edf9ff09420255820f9ebd3e26cd33b8fe60bb46adbd0f6649437eff155ed97b"
+  },
+  {
+    "file": "protection-after.json",
+    "bytes": 380,
+    "sha256": "f78579ce2623cf60a1a57b0c026c83fb2f48ce2e925a3dae3deb9e3679074bc7"
+  },
+  {
+    "file": "runtime-after.json",
+    "bytes": 990,
+    "sha256": "2beb63e5aa06382f707ecbe7fb0c1fbcdbaef22c877bf97f46d432ba4f8f52e9"
+  },
+  {
+    "file": "assigned-scope.png",
+    "bytes": 144612,
+    "sha256": "e4383c68163bd9791d1ef7929067a389169b7898f21e60dae2c1c42ce99d3780"
+  },
+  {
+    "file": "restored.png",
+    "bytes": 146852,
+    "sha256": "a051fe57d5a888a4044dabb3fce126beb8534ba2e6d14a0b5bc1fe5d6a28f5bc"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\preset-closeout-20261019.mjs",
+    "bytes": 11559,
+    "sha256": "bedc6af2f53849bf1767967e3736057bb414602dda4fc031e9f749d348736123"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\preset-closeout-protection.py",
+    "bytes": 3650,
+    "sha256": "223c85cba3f084210a9156645bd3c125f62a231301e14cb11863293853bcc9b1"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\preset-closeout-final-state.mjs",
+    "bytes": 782,
+    "sha256": "4173293edaedd989d86a13c48ff15cacbfae8e4328eaea398483dd1043e4af8c"
+  }
+]

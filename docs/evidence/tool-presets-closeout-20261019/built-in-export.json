@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "presets": [
+    {
+      "id": "preset-d7b05d08-7e80-4e6e-93e7-90ef7f7170c4",
+      "name": "核心工具 copy",
+      "baseProfile": "core",
+      "enabled": [],
+      "disabled": [],
+      "builtIn": false,
+      "updatedAt": "2026-10-19T15:22:49.314Z"
+    }
+  ]
+}
