@@ -49,6 +49,27 @@ describe('registered project overview and resource context', () => {
       await router.push(path); await flushPromises(); expect(router.currentRoute.value.fullPath).toBe(path)
     }
   })
+  it('selects the first real overview project after the entry read, preserves it on reorder and invalidates removal', async () => {
+    let finish!: (value: ProjectRead) => void
+    const api = source(); api.loadProjects = vi.fn(() => new Promise<ProjectRead>(resolve => finish = resolve))
+    const { selection, directory, router } = await setup('/overview', { source: api, connect: false, automatic: true })
+    expect(selection.project).toBeNull()
+    finish(result()); await flushPromises()
+    expect(selection.project?.id).toBe(id)
+    expect(wrapper!.find('[data-testid="registered-project-overview"]').text()).toContain(projects[0]!.name)
+    expect(router.currentRoute.value.query.project).toBeUndefined()
+    directory.projects = [projects[1]!, projects[0]!]; await flushPromises()
+    expect(selection.project?.id).toBe(id)
+    directory.projects = [projects[1]!]; await flushPromises()
+    expect(selection.project).toBeNull()
+    expect(fetch).not.toHaveBeenCalled()
+  })
+  it('does not substitute a default for an explicit unknown or empty overview project', async () => {
+    const { selection, router } = await setup('/overview?project=not-registered')
+    expect(selection.project).toBeNull()
+    await router.push('/overview?project='); await flushPromises()
+    expect(selection.project).toBeNull()
+  })
   it('lists every real registration and opens a selected overview without starting Creator or showing discovered/sample projects', async () => {
     const { router, selection, operations } = await setup('/overview', { demo: true })
     const actions: string[] = []; const stop = operations.$onAction(({ name }) => actions.push(name))

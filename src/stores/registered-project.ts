@@ -18,7 +18,9 @@ export const useRegisteredProjectStore = defineStore('registered-project', () =>
   })
   const status = computed(() => project.value ? directory.statuses.find(item => item.projectId === project.value!.id) : undefined)
 
-  function restoreRouteProject(value: unknown) {
+  let defaultFirst = false
+  function restoreRouteProject(value: unknown, selectFirst = false) {
+    defaultFirst = selectFirst && value === undefined
     requestedId.value = typeof value === 'string' && value.length <= 128 ? value : ''
     boundSource.value = companionBrowserProvider.value
     boundPath.value = null
@@ -26,7 +28,12 @@ export const useRegisteredProjectStore = defineStore('registered-project', () =>
     resolveSelection()
   }
   function resolveSelection() {
-    if (!requestedId.value || invalidated.value || !currentSource.value || boundSource.value !== currentSource.value) return
+    if (invalidated.value || !currentSource.value || boundSource.value !== currentSource.value) return
+    if (!requestedId.value && defaultFirst && projects.value.length) {
+      requestedId.value = projects.value[0]!.id
+      defaultFirst = false
+    }
+    if (!requestedId.value) return
     const target = projects.value.find(item => item.id === requestedId.value)
     // A new deep link may precede its entry read: absence from an older
     // snapshot is not proof that the requested registration does not exist.
