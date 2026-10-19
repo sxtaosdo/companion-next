@@ -1,0 +1,10 @@
+{
+  "suite": "tests/project-setup-options.test.ts",
+  "tests": 21,
+  "passed": 21,
+  "failed": 0,
+  "durationMs": 882,
+  "sessionId": 5695,
+  "exitCode": 0,
+  "scope": "controlled transport/provider only"
+}

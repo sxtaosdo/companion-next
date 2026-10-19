@@ -1,0 +1,38 @@
+{
+  "clientWriterFinal": {
+    "tests": 24,
+    "passed": 19,
+    "expectedFailures": 5,
+    "failed": 0,
+    "durationMs": 853,
+    "meaning": "5 expected failures reproduce unresolved host rollback gaps; not acceptance",
+    "ordinaryAfterAllRequiresAllFiveGapReceipts": true
+  },
+  "setupDeployedSourceIntegration": {
+    "tests": 8,
+    "passed": 8,
+    "controlled": [
+      "Creator",
+      "Codex",
+      "verify"
+    ],
+    "inertBridgeFixture": true
+  },
+  "nextSetupOptions": {
+    "tests": 21,
+    "passed": 21,
+    "controlledTransport": true
+  },
+  "typecheck": {
+    "command": "vue-tsc --noEmit",
+    "exitCode": 0
+  },
+  "noNewProductBehavior": true,
+  "staticDeployedSourceUnchanged": "ecabe7e628967b6f0c44532aa876137e175f9d6e",
+  "daemonUnchanged": true,
+  "productionRegisterPosts": 0,
+  "productionSetupPosts": 0,
+  "modelStarts": 0,
+  "creatorStarts": 0,
+  "realClientConfigurationWrites": 0
+}

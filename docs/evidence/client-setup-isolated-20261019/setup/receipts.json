@@ -1,0 +1,115 @@
+{
+  "scope": "isolated deployed-source orchestration; Creator and Codex callbacks controlled; not production installation",
+  "receipts": [
+    {
+      "scenario": "01-success",
+      "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-BgcHNL",
+      "stage": "complete",
+      "options": {
+        "startCreator": false,
+        "configureCodex": true,
+        "codexPath": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-BgcHNL\\fake-home\\never-executed-codex"
+      },
+      "calls": [
+        "register",
+        "bridge",
+        "controlled-codex"
+      ]
+    },
+    {
+      "scenario": "01-reuse-conflict",
+      "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-gNHDDW",
+      "calls": [
+        "register",
+        "bridge",
+        "controlled-codex"
+      ]
+    },
+    {
+      "scenario": "11-success",
+      "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-45J6Se",
+      "stage": "complete",
+      "options": {
+        "startCreator": true,
+        "configureCodex": true,
+        "codexPath": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-45J6Se\\fake-home\\never-executed-codex"
+      },
+      "calls": [
+        "register",
+        "bridge",
+        "controlled-creator",
+        "controlled-codex",
+        "controlled-verify"
+      ]
+    },
+    {
+      "scenario": "11-reuse-conflict",
+      "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-yLyvir",
+      "calls": [
+        "register",
+        "bridge",
+        "controlled-creator",
+        "controlled-codex",
+        "controlled-verify"
+      ]
+    },
+    {
+      "scenario": "failure-bridge",
+      "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-99hcFq",
+      "stage": "failed",
+      "earlierEffectsRetained": true,
+      "explicitNewRequestStage": "failed",
+      "calls": [
+        "register",
+        "bridge",
+        "register",
+        "bridge"
+      ]
+    },
+    {
+      "scenario": "failure-creator",
+      "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-eKpIck",
+      "stage": "failed",
+      "earlierEffectsRetained": true,
+      "explicitNewRequestStage": "complete",
+      "calls": [
+        "register",
+        "bridge",
+        "controlled-creator",
+        "register",
+        "bridge"
+      ]
+    },
+    {
+      "scenario": "failure-codex",
+      "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-NHEG4l",
+      "stage": "failed",
+      "earlierEffectsRetained": true,
+      "explicitNewRequestStage": "complete",
+      "calls": [
+        "register",
+        "bridge",
+        "controlled-creator",
+        "controlled-codex",
+        "register",
+        "bridge"
+      ]
+    },
+    {
+      "scenario": "failure-verify",
+      "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup01-11-chGcAV",
+      "stage": "failed",
+      "earlierEffectsRetained": true,
+      "explicitNewRequestStage": "complete",
+      "calls": [
+        "register",
+        "bridge",
+        "controlled-creator",
+        "controlled-codex",
+        "controlled-verify",
+        "register",
+        "bridge"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "atUtc": "2026-10-19T10:46:15.719659+00:00",
+  "protection": {
+    "sharedHead": "6ff44f5574ed2f1b81741e86c3ca1210c6c0085a",
+    "shared22StatusDiffIndexUnchanged": true,
+    "protectedSourceFiles": 21,
+    "daemonCliWorkerOldUiUnchanged": true,
+    "unknownJournalUnchanged": true
+  },
+  "runtime": {
+    "identity": {
+      "pid": 7832,
+      "startupEpoch": "e5c5924c-a392-4421-9827-37432bd5f47d",
+      "startedAt": "2026-10-19T09:45:11.157Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "103ea371f13b784d7ec0263ae4714906a8ea67ebc4ddc7e0ac9c7cc5439b801c",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "nativeEpochUnproven": 2,
+      "ownerStarting": 0,
+      "ownerRequests": 0,
+      "ownerHandlers": 0,
+      "ownerBusy": 0,
+      "ownerWorker": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0,
+      "maintenanceVerifications": 0
+    },
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "business": {
+    "authorized_dispatch_abandonments": {
+      "count": 1,
+      "sha256": "f403e182ba7384b321fd7d4abd518a1c24ebd48306ac407004b7277ac3143f71"
+    },
+    "authorized_dispatch_adoptions": {
+      "count": 1,
+      "sha256": "3380bfaf2f26cce6e282381b3de784fc760939e5fb65f42ba18500165e68bb29"
+    },
+    "authorized_fixture_abandonments": {
+      "count": 1,
+      "sha256": "28473fb700aa296c9ce1074adf814d853802f7db5b4a9f4d5d84a4cf856d79dd"
+    },
+    "authorized_p1060_playtest_abandonments": {
+      "count": 1,
+      "sha256": "be71d6567c6754674d6b6bb36652446b2edc0f91fbb8573ced7631370ac41f6f"
+    },
+    "lease_generations": {
+      "count": 4,
+      "sha256": "e8753b0f4ba4d4906869e9b0ce88b587529ac545db6e558df177597d34969042"
+    },
+    "operation_dispatches": {
+      "count": 338,
+      "sha256": "5f2bb4b964b7f8de521577448dee301e37cd3b092c707b8441f5183440cb3db8"
+    },
+    "operation_resolutions": {
+      "count": 2,
+      "sha256": "1d9a34ffd7b95825b2d5448200830b0edf6ae0036610dc038d0a8dc0b6b0633b"
+    },
+    "operations": {
+      "count": 705,
+      "sha256": "3925692a83cf1e44bbe71dbde2d48850891e6a44336059bc87e6a99f1219089c"
+    },
+    "project_write_leases": {
+      "count": 4,
+      "sha256": "09201362c3e4b940c080b107dddb0d03ab08010584d0624ba48606081fd1a67b"
+    }
+  },
+  "setupCapabilities": {
+    "optionsContractVersion": 1,
+    "strictOptions": true,
+    "reusePolicy": "same-effective-options"
+  },
+  "businessUnchanged": true
+}

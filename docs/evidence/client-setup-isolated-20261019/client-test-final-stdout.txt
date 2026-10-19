@@ -1,0 +1,31 @@
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > uses only explicit synthetic path algorithms; a status-only HTTP API is not present 2ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > cursor: real JSON fs write preserves unrelated data and is idempotent 14ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > trae: real JSON fs write preserves unrelated data and is idempotent 11ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > kiro: real JSON fs write preserves unrelated data and is idempotent 11ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > vscode: real JSON fs write preserves unrelated data and is idempotent 12ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > cursor: real conflicting config rejects without changing any bytes 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > trae: real conflicting config rejects without changing any bytes 3ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > kiro: real conflicting config rejects without changing any bytes 3ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > vscode: real conflicting config rejects without changing any bytes 3ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > cursor: invalid JSON and pre-write filesystem failure preserve original bytes 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > trae: invalid JSON and pre-write filesystem failure preserve original bytes 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > kiro: invalid JSON and pre-write filesystem failure preserve original bytes 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > vscode: invalid JSON and pre-write filesystem failure preserve original bytes 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > cursor: real installed writer receipt is accepted by Next via injected transport only 23ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > trae: real installed writer receipt is accepted by Next via injected transport only 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > kiro: real installed writer receipt is accepted by Next via injected transport only 3ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > vscode: real installed writer receipt is accepted by Next via injected transport only 3ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > KNOWN HOST GAP cursor: partial write failure would restore the original bytes 7ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > KNOWN HOST GAP trae: partial write failure would restore the original bytes 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > KNOWN HOST GAP kiro: partial write failure would restore the original bytes 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > KNOWN HOST GAP vscode: partial write failure would restore the original bytes 4ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > Codex: injected CLI control flow supports new/no-op and rejects foreign conflicts 3ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > Codex: verification failure restores legacy transport with injected CLI control flow 2ms
+ ✓ tests/client-registration-isolated-20261019.test.mjs > installed client registration: isolated fs, no real client execution > KNOWN HOST GAP Codex: add rejection after legacy remove would restore the old transport 4ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed | 5 expected fail (24)
+   Start at  18:50:54
+   Duration  853ms (transform 141ms, setup 0ms, import 396ms, tests 283ms, environment 0ms)
+
+

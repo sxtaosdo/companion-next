@@ -1,0 +1,178 @@
+{
+  "schema": "isolated-client-registration-20261019",
+  "bundleSha256": "103ea371f13b784d7ec0263ae4714906a8ea67ebc4ddc7e0ac9c7cc5439b801c",
+  "mapSha256": "64828d458dd0f327bfc65cf607f1271966258fc50da51c41a4bba28a19d92b0e",
+  "sourceSha256": {
+    "codex": "ca451af9431f0cda32fa762946fa4094289233b44bdd203b51a42a37859cf648",
+    "cursor": "db8edad6e720179ffce119180d60e6f096118ae5ed9daf748421701be0e6aeb5",
+    "trae": "85c5ce19838d74a66c90ba1958a56ec12c7301345f7a8f8295ffc775d8eec178",
+    "kiro": "69978e84a1205e5d256bf75d7517d342aa0c309b39ea88e66eb4326b891c162c",
+    "vscode": "251ccf873751d71ebec4ca92c0138ccd9db46d61348d8913f196b9cec7f4d66c"
+  },
+  "jsonIo": "real parser/default fs writer at explicit synthetic Temp paths",
+  "codexIo": "injected fictional exec ledger only; real CLI/config parser NOT exercised",
+  "faultInjection": "writeText writes a partial synthetic file then throws EIO; no real filesystem/device fault",
+  "knownHostGaps": [
+    "JSON write has no rollback after partial I/O",
+    "Codex legacy remove followed by add rejection has no rollback"
+  ],
+  "noNetwork": true,
+  "noListener": true,
+  "noRealClientConfig": true,
+  "cases": [
+    {
+      "target": "cursor",
+      "case": "real-write-and-idempotence",
+      "preserved": true,
+      "changed": [
+        true,
+        false
+      ],
+      "fileSha256": "9ae3d88989d8d77ffab4494d50546a71bc71b61bd2fa3f01dff2a4e9d06ea157"
+    },
+    {
+      "target": "trae",
+      "case": "real-write-and-idempotence",
+      "preserved": true,
+      "changed": [
+        true,
+        false
+      ],
+      "fileSha256": "d9e84b6dbb28d9bf830cafdf0afe2735807dd962fb124b8c99f5c76216d79581"
+    },
+    {
+      "target": "kiro",
+      "case": "real-write-and-idempotence",
+      "preserved": true,
+      "changed": [
+        true,
+        false
+      ],
+      "fileSha256": "0d4dde45f800025f04adb195693a93aabe279c4705d86e0973de04659fe3f30e"
+    },
+    {
+      "target": "vscode",
+      "case": "real-write-and-idempotence",
+      "preserved": true,
+      "changed": [
+        true,
+        false
+      ],
+      "fileSha256": "0a98d3553c7108d70a023af5852b93e7a82cdb75e95b04ec7f04fa44b4a9f800"
+    },
+    {
+      "target": "cursor",
+      "case": "conflict",
+      "unchanged": true,
+      "fileSha256": "071030864e0732ebf0c1cfb140ba6c43facbf87972e1bc190b5c4d414d5ffa55"
+    },
+    {
+      "target": "trae",
+      "case": "conflict",
+      "unchanged": true,
+      "fileSha256": "071030864e0732ebf0c1cfb140ba6c43facbf87972e1bc190b5c4d414d5ffa55"
+    },
+    {
+      "target": "kiro",
+      "case": "conflict",
+      "unchanged": true,
+      "fileSha256": "071030864e0732ebf0c1cfb140ba6c43facbf87972e1bc190b5c4d414d5ffa55"
+    },
+    {
+      "target": "vscode",
+      "case": "conflict",
+      "unchanged": true,
+      "fileSha256": "071030864e0732ebf0c1cfb140ba6c43facbf87972e1bc190b5c4d414d5ffa55"
+    },
+    {
+      "target": "cursor",
+      "case": "invalid-and-before-write-failure",
+      "unchanged": true
+    },
+    {
+      "target": "trae",
+      "case": "invalid-and-before-write-failure",
+      "unchanged": true
+    },
+    {
+      "target": "kiro",
+      "case": "invalid-and-before-write-failure",
+      "unchanged": true
+    },
+    {
+      "target": "vscode",
+      "case": "invalid-and-before-write-failure",
+      "unchanged": true
+    },
+    {
+      "target": "cursor",
+      "case": "Next-receipt-contract",
+      "transport": "injected; zero HTTP",
+      "accepted": true
+    },
+    {
+      "target": "trae",
+      "case": "Next-receipt-contract",
+      "transport": "injected; zero HTTP",
+      "accepted": true
+    },
+    {
+      "target": "kiro",
+      "case": "Next-receipt-contract",
+      "transport": "injected; zero HTTP",
+      "accepted": true
+    },
+    {
+      "target": "vscode",
+      "case": "Next-receipt-contract",
+      "transport": "injected; zero HTTP",
+      "accepted": true
+    },
+    {
+      "target": "cursor",
+      "case": "partial-write-injected-EIO",
+      "originalRestored": false,
+      "beforeSha256": "1b5db448669fed4a3783a4687069a5b2113d232820836ad90f00f92ba89f8266",
+      "afterSha256": "fbe18ab85dc82553ff27d46e3dfb617c555dcfeb35a2d9ae6b0cba3702e97e7f"
+    },
+    {
+      "target": "trae",
+      "case": "partial-write-injected-EIO",
+      "originalRestored": false,
+      "beforeSha256": "1b5db448669fed4a3783a4687069a5b2113d232820836ad90f00f92ba89f8266",
+      "afterSha256": "fbe18ab85dc82553ff27d46e3dfb617c555dcfeb35a2d9ae6b0cba3702e97e7f"
+    },
+    {
+      "target": "kiro",
+      "case": "partial-write-injected-EIO",
+      "originalRestored": false,
+      "beforeSha256": "1b5db448669fed4a3783a4687069a5b2113d232820836ad90f00f92ba89f8266",
+      "afterSha256": "fbe18ab85dc82553ff27d46e3dfb617c555dcfeb35a2d9ae6b0cba3702e97e7f"
+    },
+    {
+      "target": "vscode",
+      "case": "partial-write-injected-EIO",
+      "originalRestored": false,
+      "beforeSha256": "1b5db448669fed4a3783a4687069a5b2113d232820836ad90f00f92ba89f8266",
+      "afterSha256": "fbe18ab85dc82553ff27d46e3dfb617c555dcfeb35a2d9ae6b0cba3702e97e7f"
+    },
+    {
+      "target": "codex",
+      "case": "new-noop-conflict",
+      "cli": "fictional exec only",
+      "preserved": true
+    },
+    {
+      "target": "codex",
+      "case": "verify-fail-rollback",
+      "cli": "fictional exec only",
+      "originalTransportRestored": true
+    },
+    {
+      "target": "codex",
+      "case": "add-fail-after-remove",
+      "cli": "fictional exec only",
+      "originalTransportRestored": false
+    }
+  ]
+}

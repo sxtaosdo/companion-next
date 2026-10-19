@@ -1,0 +1,24 @@
+{
+  "atUtc": "2026-10-19T10:43:06.930822+00:00",
+  "metadataOnly": true,
+  "configurationFieldsParsed": false,
+  "connectionStatusProven": false,
+  "codexPathUnresolvedNoRead": true,
+  "projectVscodeNotInspected": true,
+  "targets": {
+    "cursor-home": {
+      "present": true,
+      "bytes": 2567,
+      "sha256": "904a8a96c98e30537baf7a4bf19831fd476a7e3834a2f33008a8c2c3a393babb"
+    },
+    "trae-home": {
+      "present": false
+    },
+    "kiro-home": {
+      "present": false
+    },
+    "vscode-home-only": {
+      "present": false
+    }
+  }
+}

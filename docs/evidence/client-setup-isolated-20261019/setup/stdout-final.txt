@@ -1,0 +1,16 @@
+鉁?deployed setup 01: real temporary registry/bridge, frozen options, controlled Codex callback (46.5989ms)
+鉁?deployed setup 01: same-option reuse and opposite-option conflict reserve before external side effects (27.229ms)
+鉁?deployed setup 11: real temporary registry/bridge, frozen options, controlled Codex callback (32.8542ms)
+鉁?deployed setup 11: same-option reuse and opposite-option conflict reserve before external side effects (28.4317ms)
+鉁?failure bridge: terminal releases admission but does not promise rollback of earlier effects (30.4904ms)
+鉁?failure creator: terminal releases admission but does not promise rollback of earlier effects (47.2907ms)
+鉁?failure codex: terminal releases admission but does not promise rollback of earlier effects (47.6963ms)
+鉁?failure verify: terminal releases admission but does not promise rollback of earlier effects (46.7123ms)
+鈩?tests 8
+鈩?suites 0
+鈩?pass 8
+鈩?fail 0
+鈩?cancelled 0
+鈩?skipped 0
+鈩?todo 0
+鈩?duration_ms 403.1754

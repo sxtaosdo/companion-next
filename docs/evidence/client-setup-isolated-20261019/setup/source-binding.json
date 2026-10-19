@@ -1,0 +1,31 @@
+{
+  "mapSha256": "64828d458dd0f327bfc65cf607f1271966258fc50da51c41a4bba28a19d92b0e",
+  "daemonSha256": "103ea371f13b784d7ec0263ae4714906a8ea67ebc4ddc7e0ac9c7cc5439b801c",
+  "sources": [
+    {
+      "source": "../../../../../../companion-native-epoch-recovery-20261019/mcp/src/companion/codex-configurator.ts",
+      "file": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup-options-isolated-20261019\\source\\codex-configurator.ts",
+      "sha256": "ca451af9431f0cda32fa762946fa4094289233b44bdd203b51a42a37859cf648"
+    },
+    {
+      "source": "../../../../../../companion-native-epoch-recovery-20261019/mcp/src/companion/bridge-installer.ts",
+      "file": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup-options-isolated-20261019\\source\\bridge-installer.ts",
+      "sha256": "a58a32e6d49f1d2af5c4752f8f21819fdc465b78de33b5c0851289f55b447b7e"
+    },
+    {
+      "source": "../../../../../../companion-native-epoch-recovery-20261019/mcp/src/companion/dashboard-errors.ts",
+      "file": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup-options-isolated-20261019\\source\\dashboard-errors.ts",
+      "sha256": "c192df6018393bcbfe8f0c33c9e41d54c6f0080d83141136380f122412fba356"
+    },
+    {
+      "source": "../../../../../../companion-native-epoch-recovery-20261019/mcp/src/companion/setup-service.ts",
+      "file": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup-options-isolated-20261019\\source\\setup-service.ts",
+      "sha256": "20710dfaed6d66f4650d1091d7a654bfd401a6e625189d1f4e775d47d1e99e20"
+    },
+    {
+      "source": "../../../../../../companion-native-epoch-recovery-20261019/mcp/src/companion/project-registry.ts",
+      "file": "C:\\Users\\33272\\AppData\\Local\\Temp\\next-setup-options-isolated-20261019\\source\\project-registry.ts",
+      "sha256": "1ffbb881498c754f5ec4a7dde690957af407b1268104d82d54dcf9d11b96e943"
+    }
+  ]
+}

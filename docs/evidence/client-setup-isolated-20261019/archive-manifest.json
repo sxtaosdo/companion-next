@@ -1,0 +1,89 @@
+{
+  "files": [
+    {
+      "path": "client-metadata-after.json",
+      "sha256": "ddb5c1bccde3734452f91fa5c2c570ba621e11f09520d57857767e8b1270489e"
+    },
+    {
+      "path": "client-metadata-before.json",
+      "sha256": "29e819356ec73e72e1b3860d28fc85c7ed22d68de3d952cea1dca65eca3c4e85"
+    },
+    {
+      "path": "client-test-final-stdout.txt",
+      "sha256": "4a3d0790a4bcb105cf657c8cdaed625db5478dc0f8bd77eaf1b4148e891435ab"
+    },
+    {
+      "path": "client-writer-evidence.json",
+      "sha256": "461ca0c611d97441ab1853289361a97138f30dfa2327ce242e1079431b2ba2d1"
+    },
+    {
+      "path": "protection-after.json",
+      "sha256": "62a957913e741a2dffa2087cf75e757e3194fc983171b85e74352083876fb943"
+    },
+    {
+      "path": "protection-before.json",
+      "sha256": "47a6cab25ea056c7a86c8c138b5e5000cce4cd60bc9aa418e16b968057b2d466"
+    },
+    {
+      "path": "setup/frontend-validation.json",
+      "sha256": "320ebe5b2c060ba9599fe05db741f7088d9ded430cefd18886223ec179cebf46"
+    },
+    {
+      "path": "setup/manifest.json",
+      "sha256": "59f6dc606d5a20e366b4996546ff9506d30e9c92b4130356da9cf88d61f3f0a1"
+    },
+    {
+      "path": "setup/receipts.json",
+      "sha256": "97b5a9b4ac2c0d71072ec303f9f929149b1c7b2a33b79a7b8c087e1d4f3d262d"
+    },
+    {
+      "path": "setup/runtime.mjs",
+      "sha256": "7c95cde633e50353936dda116e7e0c2f7e38daf14e5e831e145bbc824444de97"
+    },
+    {
+      "path": "setup/setup-options-isolated.test.mjs",
+      "sha256": "1d4959f6adc11b606e2e391a14d13802e2ade9979da65cb82a1d1f70fed2a156"
+    },
+    {
+      "path": "setup/source/bridge-installer.ts",
+      "sha256": "a58a32e6d49f1d2af5c4752f8f21819fdc465b78de33b5c0851289f55b447b7e"
+    },
+    {
+      "path": "setup/source/codex-configurator.ts",
+      "sha256": "ca451af9431f0cda32fa762946fa4094289233b44bdd203b51a42a37859cf648"
+    },
+    {
+      "path": "setup/source/dashboard-errors.ts",
+      "sha256": "c192df6018393bcbfe8f0c33c9e41d54c6f0080d83141136380f122412fba356"
+    },
+    {
+      "path": "setup/source/entry.ts",
+      "sha256": "c72aea21a1d4be0da12003f4b0e29dcc752a614ed205f23f7414be1938eeb257"
+    },
+    {
+      "path": "setup/source/project-registry.ts",
+      "sha256": "1ffbb881498c754f5ec4a7dde690957af407b1268104d82d54dcf9d11b96e943"
+    },
+    {
+      "path": "setup/source/setup-service.ts",
+      "sha256": "20710dfaed6d66f4650d1091d7a654bfd401a6e625189d1f4e775d47d1e99e20"
+    },
+    {
+      "path": "setup/source-binding.json",
+      "sha256": "87eb5e3be69f290b137b3efe0f676bf4bcdee9f674bf3a8050aefc9e813555e7"
+    },
+    {
+      "path": "setup/stdout-final.txt",
+      "sha256": "aeccf50bb4c2c604a9d86457d59fe5f51d1112102b8c4a32011e3ebd70bea5f0"
+    },
+    {
+      "path": "setup/SUMMARY.md",
+      "sha256": "10fb5efaab8d9c7867019bfa13b3a8b302723be96f58162d013c23218d934ded"
+    },
+    {
+      "path": "validation-summary.json",
+      "sha256": "0e02618029f314bb0c5bdbafb70b18c3009412267aa9aa55a2a3e7be785cd729"
+    }
+  ],
+  "clientTestSha256": "cfa47e061237b88e2f719584e08014b3073484bfd3425e81a5f7bd3c6805e375"
+}
