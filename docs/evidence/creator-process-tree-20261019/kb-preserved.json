@@ -1,0 +1,21 @@
+{
+  "daemonIdentity": {
+    "pid": 20332,
+    "startupEpoch": "eced9fac-c162-4b9d-8f6e-e2756c40e2db",
+    "startedAt": "2026-10-19T17:12:43.632Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "1984698ce8b2ec524d1e9e2b0d4d8733075ea4783bfa0f0e9d72b8dad8b6ce94",
+    "nodeVersion": "v25.2.1"
+  },
+  "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+  "statusHttp": 200,
+  "metadataHttp": 200,
+  "idMatch": true,
+  "readerMissing": false,
+  "metadataReads": 1,
+  "searchReads": 0,
+  "documentReads": 0,
+  "modelActions": 0,
+  "rawContentArchived": false,
+  "userBrowserUntouched": true
+}

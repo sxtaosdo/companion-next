@@ -1,0 +1,27 @@
+{
+  "fixtureStatus": {
+    "projectId": "a79f4915296f4091",
+    "state": "error",
+    "instanceId": "08c2a4cd-d903-42c0-83b4-f92efbc4ba13",
+    "pid": 468,
+    "launchSource": "dashboard",
+    "dashboardVersion": "2.2.2",
+    "dashboardProgress": "open",
+    "creatorVersion": "3.8.8",
+    "sessionId": "c18a91f7-cb5c-4132-877a-78300e3355a7",
+    "lastError": "Creator 所属进程退出未能确认；保留原进程身份，未自动重试"
+  },
+  "calls": [
+    {
+      "operation": "creator.restart",
+      "status": "failed",
+      "errorSummary": "\"Creator 所属进程退出未能确认；保留原进程身份，未自动重试\""
+    },
+    {
+      "operation": "creator.start",
+      "status": "success",
+      "errorSummary": null
+    }
+  ],
+  "mutationRequests": 0
+}

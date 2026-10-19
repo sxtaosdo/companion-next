@@ -3,11 +3,11 @@
   "method": "21 grouped feature areas, equal weight. Complete means real acceptance of the approved main flow within the documented project/session scope, not exhaustive fault/stress coverage. Synthetic tests are never real acceptance.",
   "total": 21,
   "counts": {
-    "完整验收通过": 12,
-    "部分完成": 7,
+    "完整验收通过": 13,
+    "部分完成": 6,
     "未完成或阻塞": 2
   },
-  "completeItemPercent": 57.1,
+  "completeItemPercent": 61.9,
   "notWorkloadProgress": true,
   "rows": [
     {
@@ -48,9 +48,9 @@
     {
       "id": 6,
       "name": "Creator启动、聚焦、停止、重启",
-      "status": "部分完成",
-      "evidenceAndRemaining": "真实Next启动/重启/停止主流程已验；正常stop后的限定中性展示已部署a8e88ac/.146并单次start→stop实机通过，raw error保留。当前Creator0；旧宿主restart子进程清理缺陷未修，精确文件范围已报告",
-      "remainingKind": "旧宿主生命周期修改边界；Next停止展示已修复验收"
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "获准旧宿主窄修55256cb，精确3项overlay部署1984698c；自有fixture真实Next启动→restart→restart→stop均200，每次旧树退出、最终Creator0，保留首候选500失败。raw Bridge error保留，Next中性停止展示复用.146",
+      "remainingKind": "验收完成（限定所属可观测进程树主流程），不覆盖历史失去父身份的孤儿"
     },
     {
       "id": 7,
@@ -84,8 +84,8 @@
       "id": 11,
       "name": "调用记录、筛选、详情、分页",
       "status": "部分完成",
-      "evidenceAndRemaining": "当前真实fixture6条success，列表顺序/累计保留6、成功详情摘要、失败筛选0、切回及刷新与API一致，调用数不变。6<50且无游标，真实分页/失败详情缺数据未验；132/66仍仅模拟",
-      "remainingKind": "数据不足；自然出现足量/失败记录后独立只读补验"
+      "evidenceAndRemaining": "此前只读验收时真实fixture6条success，列表顺序/累计保留6、成功详情摘要、失败筛选0、切回及刷新与API一致，调用数不变。6<50且无游标，真实分页/失败详情缺数据未验；132/66仍仅模拟；本轮Creator验收新产生成功/失败记录，尚未用于补验失败详情/分页",
+      "remainingKind": "真实分页仍缺自然足量数据；本轮已有自然失败记录可另做只读详情补验"
     },
     {
       "id": 12,
@@ -161,7 +161,7 @@
   "scopeCorrection": "Old Companion web has no evidenced image-task history entry. The independent public-image-review utility was incorrectly included in item18. Keep item18 as the approved narrow Owner preview/select/export surface; no old-data migration is required. The count change is a scope correction, not new implementation progress.",
   "progressUpdate": "Item19 approved retrieve-only main flow closes after same147 application recovery and two real7-endpoint UI/API chains, including normal startup after clearing temporary Process reference. UNKNOWN2 and all310 installed files remain. VSCode candidate remains excluded and unloaded.",
   "latestScopeCorrection": "User does not use VS Code: deployment and its dedicated successor-lock development cancelled before any freeze/termination/install/start. Preserved isolated source without deployment. This candidate is not a current migration acceptance blocker. Knowledge recovery was subsequently accepted by item19; see progressUpdate.",
-  "creatorLifecycleUpdate": "Real deployed Next start/restart/stop main flow completed once each. Item6 remains partial because original host left two owned child processes after restart, cleaned explicitly rather than counted as product stop. No feature source changed.",
+  "creatorLifecycleUpdate": "Item6 closes after scoped owned-process fix55256cb, actual3-source runtime overlay1984698c, continuous real Next start/restart/restart/stop200 and OS old-tree exit proof, finalCreator0. First006f restart500 remains failed with unproven exact cause. Raw Bridge error retained. Counts13/6/2.",
   "toolPresetUpdate": "Item15 closes after real page override edit/save PATCH200 and three no-dispatch name/ID-conflict rejections, reusing prior batch/export/fixture/MCP snapshot evidence. Preset hash restored, no real IDE configuration or business tools called. Counts12/7/2.",
   "countChangeEvidence": {
     "10to11": {
@@ -176,6 +176,13 @@
       "evidence": "tool-presets-page-acceptance-20261019.md",
       "countsBefore": "11/8/2",
       "countsAfter": "12/7/2"
+    },
+    "12to13": {
+      "item": 6,
+      "patchCommit": "55256cb",
+      "evidence": "creator-process-tree-closeout-20261019.md",
+      "countsBefore": "12/7/2",
+      "countsAfter": "13/6/2"
     }
   },
   "callsReadonlyUpdate": "Six real existing success records: UI list/order, success detail hashes, zero-result failed filter, reset and explicit refresh exact; count remains6. No cursor under50, real pagination/failure detail unverified. Reused actual583B diagnostic without new POST/download. Counts12/7/2 unchanged."

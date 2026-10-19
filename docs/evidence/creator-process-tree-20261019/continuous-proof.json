@@ -1,0 +1,519 @@
+{
+  "atUtc": "2026-10-19T17:14:23.761Z",
+  "mode": "REAL_DEPLOYED_NEXT_CONTINUOUS_RESTART_RESTART_STOP",
+  "fixtureId": "a79f4915296f4091",
+  "fixturePathSha256": "42d8339980f605b5b2ea0b8313066f2103592525a40ab5ed857d60ec1c7e2c0c",
+  "before": {
+    "identity": {
+      "pid": 20332,
+      "startupEpoch": "eced9fac-c162-4b9d-8f6e-e2756c40e2db",
+      "startedAt": "2026-10-19T17:12:43.632Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "1984698ce8b2ec524d1e9e2b0d4d8733075ea4783bfa0f0e9d72b8dad8b6ce94",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "nativeEpochUnproven": 2,
+      "ownerStarting": 0,
+      "ownerRequests": 0,
+      "ownerHandlers": 0,
+      "ownerBusy": 0,
+      "ownerWorker": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0,
+      "maintenanceVerifications": 0
+    },
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "after": {
+    "identity": {
+      "pid": 20332,
+      "startupEpoch": "eced9fac-c162-4b9d-8f6e-e2756c40e2db",
+      "startedAt": "2026-10-19T17:12:43.632Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "1984698ce8b2ec524d1e9e2b0d4d8733075ea4783bfa0f0e9d72b8dad8b6ce94",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "nativeEpochUnproven": 2,
+      "ownerStarting": 0,
+      "ownerRequests": 0,
+      "ownerHandlers": 0,
+      "ownerBusy": 0,
+      "ownerWorker": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0,
+      "maintenanceVerifications": 0
+    },
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "actions": [
+    {
+      "action": "start",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 17924,
+        "sessionId": "733e1ff6-459d-4006-8a69-a593d2fdb616",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T17:13:17.818Z",
+      "os": [
+        {
+          "pid": 17924,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T17:13:03.2286100Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ]
+    },
+    {
+      "action": "restart",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 23452,
+        "sessionId": "af85fd05-4883-4af3-864a-f64e04d56ee9",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T17:13:41.251Z",
+      "os": [
+        {
+          "pid": 23452,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T17:13:26.9408790Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ],
+      "exactOldPidExited": true,
+      "priorTree": [
+        {
+          "ProcessId": 17924,
+          "ParentProcessId": 3924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 14100,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 15208,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 18108,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 10020,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 18912,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 20196,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 17628,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 13856,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 3272,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 2880,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 18628,
+          "ParentProcessId": 17924,
+          "Name": "CocosCreator.exe"
+        }
+      ],
+      "receiptText": "后台已返回重启请求回执；这不等于最终就绪，也不证明操作系统进程退出已获确认，请刷新真实状态和日志核对。"
+    },
+    {
+      "action": "restart",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 22820,
+        "sessionId": "b7643ead-8857-4033-b40a-e283ea4833e8",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T17:14:07.289Z",
+      "os": [
+        {
+          "pid": 22820,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T17:13:52.7787050Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ],
+      "exactOldPidExited": true,
+      "priorTree": [
+        {
+          "ProcessId": 23452,
+          "ParentProcessId": 3924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 22228,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 21088,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 16968,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 21940,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 14516,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 11404,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 18916,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 5284,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 20904,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 23056,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 23160,
+          "ParentProcessId": 23452,
+          "Name": "CocosCreator.exe"
+        }
+      ],
+      "receiptText": "后台已返回重启请求回执；这不等于最终就绪，也不证明操作系统进程退出已获确认，请刷新真实状态和日志核对。"
+    },
+    {
+      "action": "stop",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "stopped",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T17:14:16.742Z",
+      "exactOldPidExited": true,
+      "remainingCreatorProcesses": [],
+      "priorTree": [
+        {
+          "ProcessId": 22820,
+          "ParentProcessId": 3924,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 20520,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 20864,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 4560,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 16472,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 9544,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 23200,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 23020,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 14612,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 21824,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 3124,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 21764,
+          "ParentProcessId": 22820,
+          "Name": "CocosCreator.exe"
+        }
+      ],
+      "receiptText": "后台已返回 stopped 回执；这不证明操作系统进程已退出，请刷新真实状态和日志核对。"
+    }
+  ],
+  "finalUiState": "error",
+  "statuses": [
+    {
+      "atUtc": "2026-10-19T17:13:00.593Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    },
+    {
+      "atUtc": "2026-10-19T17:13:18.342Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 17924,
+      "sessionId": "733e1ff6-459d-4006-8a69-a593d2fdb616",
+      "creatorVersion": "3.8.8"
+    },
+    {
+      "atUtc": "2026-10-19T17:13:47.533Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 23452,
+      "sessionId": "af85fd05-4883-4af3-864a-f64e04d56ee9",
+      "creatorVersion": "3.8.8"
+    },
+    {
+      "atUtc": "2026-10-19T17:14:13.611Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 22820,
+      "sessionId": "b7643ead-8857-4033-b40a-e283ea4833e8",
+      "creatorVersion": "3.8.8"
+    },
+    {
+      "atUtc": "2026-10-19T17:14:22.505Z",
+      "projectId": "a79f4915296f4091",
+      "state": "stopped"
+    },
+    {
+      "atUtc": "2026-10-19T17:14:22.998Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    }
+  ],
+  "staticHashes": [
+    {
+      "path": "/next/index.html",
+      "sha256": "31a4f48cef4ec0711741330a1b5bc31c7760c9bd0ebc1d5436829b7d478c5d65",
+      "status": 200
+    },
+    {
+      "path": "/next/assets/index-CReVohLD.css",
+      "sha256": "e44b42194289bc35b3bc3726c19d6aba3d1307744cf2ae812f01bb288611087c",
+      "status": 200
+    },
+    {
+      "path": "/next/assets/index-Dx563SKg.js",
+      "sha256": "b2b29887dbc1e62e9f25fd1856afac8dc49dc0d6232de12346b2e00e90b5eda9",
+      "status": 200
+    }
+  ],
+  "dispatched": {
+    "start": 1,
+    "restart": 2,
+    "stop": 1
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/next/index.html"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-Dx563SKg.js"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-CReVohLD.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/start"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/restart"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/restart"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/stop"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "initialCreatorProcesses": 0,
+  "finalCreatorProcesses": 0,
+  "newClientPermissions": 0,
+  "VSCodeCandidateLoaded": false,
+  "modelActions": 0,
+  "p1060Actions": 0,
+  "KBTestsRepeated": 0,
+  "userBrowserUntouched": true,
+  "ownedEdgeClosed": true,
+  "noSimulatedResponses": true,
+  "sessionPosts": 1
+}

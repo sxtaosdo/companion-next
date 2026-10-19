@@ -1,0 +1,484 @@
+diff --git a/mcp/src/companion-daemon.ts b/mcp/src/companion-daemon.ts
+index 72ecf99..fca95ed 100644
+--- a/mcp/src/companion-daemon.ts
++++ b/mcp/src/companion-daemon.ts
+@@ -337,18 +337,16 @@ function createActions(context: {
+       }
+     },
+     stop: async (projectId) => {
++      const project = await requireProject(registry, projectId);
+       try {
+-        return await lifecycle.stop(projectId);
++        return await lifecycle.stop(projectId, { projectPath: project.path });
+       } catch (error) {
+-        // Daemon 重启后可能丢失子进程句柄，但 Bridge 仍连着外部 Creator。
+-        if (errorMessage(error).includes("未保存")) throw error;
+-        try {
+-          const bridge = await router.refresh(projectId);
+-          if (bridge.creatorPid) return await lifecycle.stop(projectId, { pid: bridge.creatorPid });
+-        } catch (fallbackError) {
+-          if (errorMessage(fallbackError).includes("未保存")) throw fallbackError;
+-        }
+-        throw error;
++        // Recover only a missing PID after daemon startup. Identity/exit failures
++        // must never be retried with a different Bridge PID.
++        if ((error as { code?: unknown })?.code !== "CREATOR_PID_UNAVAILABLE") throw error;
++        const bridge = await router.refresh(projectId);
++        if (!bridge.creatorPid) throw error;
++        return await lifecycle.stop(projectId, { pid: bridge.creatorPid, projectPath: project.path });
+       }
+     },
+     restart: async (projectId) => {
+diff --git a/mcp/src/companion/creator-lifecycle.ts b/mcp/src/companion/creator-lifecycle.ts
+index 403c5e1..6fb6174 100644
+--- a/mcp/src/companion/creator-lifecycle.ts
++++ b/mcp/src/companion/creator-lifecycle.ts
+@@ -1,3 +1,4 @@
++import { CreatorStopFault, stopCreatorProcess } from "./creator-process-stop.js";
+ import { randomUUID } from "node:crypto";
+ import { EventEmitter } from "node:events";
+ import { resolve } from "node:path";
+@@ -14,6 +15,7 @@ export interface CreatorLifecycleAdapter {
+     onProgress?: (progress: "opening-dashboard" | "waiting-dashboard" | "manual-dashboard") => void,
+   ): Promise<DashboardLaunchResult>;
+   focus(pid: number): Promise<void>;
++  stop?(pid: number, projectPath: string): Promise<unknown>;
+   isPidAlive?(pid: number): boolean;
+   waitForBridge(projectId: string, timeoutMs: number): Promise<{ creatorVersion: string; sessionId: string }>;
+   hasUnsavedChanges(projectId: string): Promise<boolean>;
+@@ -65,6 +67,9 @@ export function createDefaultCreatorLifecycleAdapter(
+ export class CreatorLifecycle extends EventEmitter {
+   private readonly states = new Map<string, ProjectRuntimeStatus>();
+   private readonly starts = new Map<string, Promise<ProjectRuntimeStatus>>();
++  private readonly projectPaths = new Map<string, string>();
++  private readonly stops = new Map<string, Promise<ProjectRuntimeStatus>>();
++  private readonly unconfirmedStops = new Set<string>();
+ 
+   constructor(private readonly adapter: CreatorLifecycleAdapter) {
+     super();
+@@ -76,6 +81,9 @@ export class CreatorLifecycle extends EventEmitter {
+ 
+   /** Start once per canonical project path, reusing Dashboard and Bridge state. */
+   start(project: ProjectRecord, timeoutMs = 30_000): Promise<ProjectRuntimeStatus> {
++    if (this.stops.has(project.id)) return Promise.reject(new Error("Creator is busy: stopping"));
++    if (this.unconfirmedStops.has(project.id)) return Promise.reject(new CreatorStopFault());
++    this.projectPaths.set(project.id, project.path);
+     const key = normalizedPathKey(project.path);
+     const active = this.starts.get(key);
+     if (active) return active;
+@@ -149,6 +157,7 @@ export class CreatorLifecycle extends EventEmitter {
+     reason = "Creator Bridge 不可达；当前文档和进程状态未确认",
+     lastKnown: Pick<ProjectRuntimeStatus, "pid" | "creatorVersion" | "sessionId"> = {},
+   ): ProjectRuntimeStatus {
++    if (this.unconfirmedStops.has(projectId)) return this.status(projectId);
+     const current = { ...this.status(projectId), ...lastKnown };
+     if (
+       current.state === "launching"
+@@ -190,19 +199,37 @@ export class CreatorLifecycle extends EventEmitter {
+   }
+ 
+   /** Stop only after Bridge confirms there are no unsaved Scene/Prefab changes. */
+-  async stop(projectId: string, options: { pid?: number } = {}): Promise<ProjectRuntimeStatus> {
++  stop(projectId: string, options: { pid?: number; projectPath?: string } = {}): Promise<ProjectRuntimeStatus> {
++    const active = this.stops.get(projectId);
++    if (active) return active;
++    const path = options.projectPath ?? this.projectPaths.get(projectId);
++    if ((path && this.starts.has(normalizedPathKey(path))) || ["launching", "bridge-wait"].includes(this.status(projectId).state)) {
++      return Promise.reject(new Error("Creator is busy: starting"));
++    }
++    const pending = this.stopOnce(projectId, options).finally(() => this.stops.delete(projectId));
++    this.stops.set(projectId, pending);
++    return pending;
++  }
++
++  private async stopOnce(projectId: string, options: { pid?: number; projectPath?: string }): Promise<ProjectRuntimeStatus> {
+     const current = this.status(projectId);
+     const pid = current.pid ?? options.pid;
+-    if (!pid) throw new Error("Creator 已停止，或 Dashboard/Bridge 未提供进程 PID");
++    if (!pid) throw Object.assign(new Error("Creator 已停止，或 Dashboard/Bridge 未提供进程 PID"), { code: "CREATOR_PID_UNAVAILABLE" });
++    const projectPath = options.projectPath ?? this.projectPaths.get(projectId);
++    if (!projectPath) throw new CreatorStopFault();
+     if (await this.adapter.hasUnsavedChanges(projectId)) {
+       throw new Error("Creator 有未保存的 Scene 或 Prefab，已取消停止");
+     }
+     this.update({ ...current, state: "stopping", pid });
+     try {
+-      process.kill(pid, "SIGTERM");
++      if (this.adapter.stop) await this.adapter.stop(pid, projectPath);
++      else await stopCreatorProcess(pid, projectPath);
+     } catch (error) {
+-      if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
++      this.unconfirmedStops.add(projectId);
++      this.update({ ...current, projectId, state: "error", pid, lastError: errorMessage(error) });
++      throw error;
+     }
++    this.unconfirmedStops.delete(projectId);
+     const stopped = { projectId, state: "stopped" as const, launchSource: "dashboard" as const };
+     this.update(stopped);
+     return stopped;
+diff --git a/mcp/src/companion/creator-process-stop.ts b/mcp/src/companion/creator-process-stop.ts
+new file mode 100644
+index 0000000..52d1b2b
+--- /dev/null
++++ b/mcp/src/companion/creator-process-stop.ts
+@@ -0,0 +1,172 @@
++import { execFile } from "node:child_process";
++import { isAbsolute, resolve } from "node:path";
++import { isPidAlive } from "./platform.js";
++
++/** A failed ownership/exit check is not permission to retry with another PID. */
++export class CreatorStopFault extends Error {
++  readonly code = "CREATOR_STOP_UNCONFIRMED";
++  constructor(readonly stage = "unknown", readonly nativeCode?: number) { super(`Creator 所属进程退出未能确认（${stage}）；保留原进程身份，未自动重试`); }
++}
++
++export interface CreatorStopReceipt { pid: number; exitedPids: number[]; exitConfirmed: true }
++
++/** Stop one Windows Creator instance using fixed OS handles, never taskkill /T or a name-wide kill. */
++export async function stopCreatorProcess(pid: number, projectPath: string): Promise<CreatorStopReceipt> {
++  if (!Number.isSafeInteger(pid) || pid <= 0 || !isAbsolute(projectPath)) throw new CreatorStopFault();
++  if (process.platform !== "win32") {
++    try { process.kill(pid, "SIGTERM"); } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw new CreatorStopFault(); }
++    const deadline = Date.now() + 10_000;
++    while (isPidAlive(pid)) { if (Date.now() >= deadline) throw new CreatorStopFault(); await new Promise(resolve => setTimeout(resolve, 50)); }
++    return { pid, exitedPids: [pid], exitConfirmed: true };
++  }
++  const payload = Buffer.from(JSON.stringify({ pid, projectPath: resolve(projectPath) }), "utf8").toString("base64");
++  const script = WINDOWS_CREATOR_STOP.replace("__PAYLOAD__", payload);
++  const encoded = Buffer.from(script, "utf16le").toString("base64");
++  let output: string;
++  try {
++    output = await new Promise<string>((accept, reject) => execFile("powershell.exe", ["-NoProfile", "-NonInteractive", "-OutputFormat", "Text", "-EncodedCommand", encoded], {
++      windowsHide: true, timeout: 30_000, maxBuffer: 128 * 1024, encoding: "utf8",
++    }, (error, stdout) => {
++      if (!error) return accept(String(stdout).replace(/^\uFEFF/, "").trim());
++      try {
++        const failure = JSON.parse(String(stdout).replace(/^\uFEFF/, "").trim()) as { failureStage?: unknown; nativeCode?: unknown };
++        if (typeof failure.failureStage === "string" && /^(?:root-open|root-query|root-project|discover|root-terminate|descendant-terminate|wait-rescan|receipt)$/.test(failure.failureStage)) {
++          return reject(new CreatorStopFault(failure.failureStage, typeof failure.nativeCode === "number" && Number.isSafeInteger(failure.nativeCode) ? failure.nativeCode : undefined));
++        }
++      } catch { /* Raw stderr/commands never cross the platform boundary. */ }
++      reject(new CreatorStopFault());
++    }));
++    const value = JSON.parse(output) as CreatorStopReceipt;
++    if (value.pid !== pid || value.exitConfirmed !== true || !Array.isArray(value.exitedPids) || !value.exitedPids.includes(pid)
++      || value.exitedPids.some(id => !Number.isSafeInteger(id) || id <= 0)) throw new CreatorStopFault();
++    return value;
++  } catch (error) { throw error instanceof CreatorStopFault ? error : new CreatorStopFault(); }
++}
++
++/** Exported only for syntax/identity boundary regression; payload is base64 data, not shell code. */
++export const WINDOWS_CREATOR_STOP = String.raw`
++$ErrorActionPreference = 'Stop'
++$env:PSModulePath = $PSHOME + '\Modules'
++[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false
++$inputData = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('__PAYLOAD__')) | ConvertFrom-Json
++Add-Type -TypeDefinition @'
++using System;
++using System.ComponentModel;
++using System.Runtime.InteropServices;
++using System.Text;
++public sealed class OwnedCreatorHandle : IDisposable {
++  [DllImport("kernel32.dll", SetLastError=true)] static extern IntPtr OpenProcess(uint access, bool inherit, int pid);
++  [DllImport("kernel32.dll", SetLastError=true)] static extern bool CloseHandle(IntPtr h);
++  [DllImport("kernel32.dll", SetLastError=true)] static extern bool GetProcessTimes(IntPtr h, out long c, out long e, out long k, out long u);
++  [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)] static extern bool QueryFullProcessImageName(IntPtr h, uint flags, StringBuilder text, ref int size);
++  [DllImport("kernel32.dll", SetLastError=true)] static extern bool TerminateProcess(IntPtr h, uint code);
++  [DllImport("kernel32.dll", SetLastError=true)] static extern uint WaitForSingleObject(IntPtr h, uint timeout);
++  [DllImport("shell32.dll", CharSet=CharSet.Unicode, SetLastError=true)] static extern IntPtr CommandLineToArgvW(string cmd, out int count);
++  [DllImport("kernel32.dll")] static extern IntPtr LocalFree(IntPtr h);
++  IntPtr handle;
++  bool terminationRequested;
++  public int Pid { get; private set; }
++  public string Image { get; private set; }
++  public DateTime Created { get; private set; }
++  public DateTime? Exited { get { long c,e,k,u; if(!GetProcessTimes(handle,out c,out e,out k,out u)) throw new Win32Exception(); return e==0 ? (DateTime?)null : DateTime.FromFileTimeUtc(e); } }
++  public bool Gone { get { uint s=WaitForSingleObject(handle,0); if(s==0) return true; if(s==258) return false; throw new Win32Exception(); } }
++  public static OwnedCreatorHandle Hold(int pid) {
++    IntPtr h=OpenProcess(0x00101001,false,pid);
++    if(h==IntPtr.Zero) { if(Marshal.GetLastWin32Error()==87) return null; throw new Win32Exception(); }
++    try { long c,e,k,u; if(!GetProcessTimes(h,out c,out e,out k,out u)) throw new Win32Exception();
++      var text=new StringBuilder(32768);int size=text.Capacity; if(!QueryFullProcessImageName(h,0,text,ref size)) throw new Win32Exception();
++      return new OwnedCreatorHandle {handle=h,Pid=pid,Image=text.ToString(),Created=DateTime.FromFileTimeUtc(c)};
++    } catch { bool gone=WaitForSingleObject(h,0)==0;CloseHandle(h);if(gone)return null;throw; }
++  }
++  public void Stop() { if(Gone || terminationRequested) return; if(!TerminateProcess(handle,0)) { int error=Marshal.GetLastWin32Error(); if(!Gone) throw new Win32Exception(error); } terminationRequested=true; }
++  public static string[] Arguments(string cmd) {
++    int count;IntPtr argv=CommandLineToArgvW(cmd,out count);if(argv==IntPtr.Zero) throw new Win32Exception();
++    try { var result=new string[count]; for(int i=0;i<count;i++) result[i]=Marshal.PtrToStringUni(Marshal.ReadIntPtr(argv,i*IntPtr.Size));return result; }
++    finally { LocalFree(argv); }
++  }
++  public void Dispose() { if(handle!=IntPtr.Zero) { CloseHandle(handle);handle=IntPtr.Zero; } }
++}
++'@
++function PathKey([string]$value) { return [IO.Path]::GetFullPath($value).TrimEnd('\','/').ToUpperInvariant() }
++function ProjectMatch([string]$command, [bool]$required) {
++  if ([string]::IsNullOrWhiteSpace($command)) { throw 'CREATOR_COMMAND_UNVERIFIED' }
++  $arguments = [OwnedCreatorHandle]::Arguments($command)
++  $found = 0
++  for ($i=1; $i -lt $arguments.Length; $i++) {
++    if ($arguments[$i] -in @('--path','--project')) {
++      if ($i+1 -ge $arguments.Length -or (PathKey $arguments[$i+1]) -ne $projectKey) { throw 'CREATOR_OTHER_PROJECT' }
++      $found++; $i++
++    } elseif ($arguments[$i] -match '^--(?:path|project)=') {
++      if ((PathKey ($arguments[$i] -replace '^--(?:path|project)=','')) -ne $projectKey) { throw 'CREATOR_OTHER_PROJECT' }
++      $found++
++    }
++  }
++  if ($required -and $found -ne 1) { throw 'CREATOR_PROJECT_UNVERIFIED' }
++  if ($required -and @($arguments | Where-Object { $_ -match '^--type(?:=|$)' }).Count) { throw 'CREATOR_ROOT_UNVERIFIED' }
++}
++$held = @{}
++$projectKey = PathKey ([string]$inputData.projectPath)
++$deadline = [DateTime]::UtcNow.AddSeconds(20)
++$phase = 'root-open'
++try {
++  $root = [OwnedCreatorHandle]::Hold([int]$inputData.pid)
++  if ($null -eq $root) { throw 'CREATOR_ROOT_ABSENT_UNVERIFIED' }
++  $held[$root.Pid] = $root
++  if ([IO.Path]::GetFileName($root.Image) -ine 'CocosCreator.exe') { throw 'CREATOR_EXE_UNVERIFIED' }
++  $imageKey = PathKey $root.Image
++  $phase = 'root-query'
++  $row = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $root.Pid)
++  if ($null -eq $row -or (PathKey $row.ExecutablePath) -ne $imageKey -or [Math]::Abs(($row.CreationDate.ToUniversalTime()-$root.Created).TotalMilliseconds) -gt 1) { throw 'CREATOR_ROOT_IDENTITY_UNVERIFIED' }
++  $phase = 'root-project'
++  ProjectMatch ([string]$row.CommandLine) $true
++  function Discover {
++    $rows = @(Get-CimInstance Win32_Process -Filter "Name='CocosCreator.exe'")
++    $count = 0
++    do {
++      $added = 0
++      foreach ($candidate in $rows) {
++        $id = [int]$candidate.ProcessId
++        if ($held.ContainsKey($id) -or !$held.ContainsKey([int]$candidate.ParentProcessId)) { continue }
++        $parent = $held[[int]$candidate.ParentProcessId]
++        $created = $candidate.CreationDate.ToUniversalTime()
++        $exited = $parent.Exited
++        if ($created -lt $parent.Created -or ($null -ne $exited -and $created -gt $exited)) { continue }
++        $child = [OwnedCreatorHandle]::Hold($id)
++        if ($null -eq $child) { throw 'CREATOR_OBSERVED_CHILD_IDENTITY_LOST' }
++        try {
++          if ((PathKey $child.Image) -ne $imageKey -or (PathKey $candidate.ExecutablePath) -ne $imageKey -or [Math]::Abs(($created-$child.Created).TotalMilliseconds) -gt 1) { throw 'CREATOR_CHILD_IDENTITY_UNVERIFIED' }
++          ProjectMatch ([string]$candidate.CommandLine) $false
++          $held[$id] = $child; $child = $null; $added++; $count++
++        } finally { if ($null -ne $child) { $child.Dispose() } }
++      }
++    } while ($added -gt 0)
++    return $count
++  }
++  # Validate the initial tree before the first termination. Keep every OS handle
++  # until all bounded rescans finish, so an exited parent's PID cannot be reused.
++  $phase = 'discover'
++  $null = Discover
++  if ([DateTime]::UtcNow -gt $deadline) { throw 'CREATOR_TREE_EXIT_TIMEOUT' }
++  $phase = 'root-terminate'
++  $root.Stop()
++  $settled = 0
++  do {
++    $phase = 'descendant-terminate'
++    foreach ($entry in @($held.Values)) { $entry.Stop() }
++    $phase = 'wait-rescan'
++    $new = Discover
++    $active = @($held.Values | Where-Object { !$_.Gone })
++    if (!$active.Count -and !$new) { $settled++ } else { $settled=0 }
++    if ([DateTime]::UtcNow -gt $deadline) { throw 'CREATOR_TREE_EXIT_TIMEOUT' }
++    if ($settled -ge 2) { break }
++    Start-Sleep -Milliseconds 100
++  } while ($true)
++  $phase = 'receipt'
++  @{ pid=[int]$inputData.pid; exitedPids=@($held.Keys | Sort-Object); exitConfirmed=$true } | ConvertTo-Json -Compress
++} catch {
++  $native = 0
++  if ($_.Exception.InnerException -is [ComponentModel.Win32Exception]) { $native=$_.Exception.InnerException.NativeErrorCode }
++  @{ failureStage=$phase; nativeCode=$native } | ConvertTo-Json -Compress
++  throw 'CREATOR_STOP_UNCONFIRMED'
++} finally { foreach ($entry in @($held.Values)) { $entry.Dispose() } }
++`;
+diff --git a/mcp/tests/companion-core.test.ts b/mcp/tests/companion-core.test.ts
+index bf49475..ad007b4 100644
+--- a/mcp/tests/companion-core.test.ts
++++ b/mcp/tests/companion-core.test.ts
+@@ -110,6 +110,7 @@ describe("Companion bridge and runtime isolation", () => {
+     const adapter: CreatorLifecycleAdapter = {
+       launch: vi.fn(async () => ({ pid: 321, reused: false, dashboardVersion: "2.2.1", dashboardProgress: "open" })),
+       focus: vi.fn(async () => undefined),
++      stop: vi.fn(async () => undefined),
+       waitForBridge: vi.fn(async () => ({ creatorVersion: "3.8.8", sessionId: "session" })),
+       hasUnsavedChanges: vi.fn(async () => false),
+       waitForStopped: vi.fn(async () => undefined),
+@@ -122,7 +123,7 @@ describe("Companion bridge and runtime isolation", () => {
+       expect((await lifecycle.start(project, 100)).state).toBe("ready");
+       expect(states).toEqual(["launching", "bridge-wait", "ready"]);
+       expect((await lifecycle.stop("p1")).state).toBe("stopped");
+-      expect(killSpy).toHaveBeenCalledWith(321, "SIGTERM");
++      expect(adapter.stop).toHaveBeenCalledWith(321, project.path);
+     } finally {
+       killSpy.mockRestore();
+     }
+@@ -225,14 +226,15 @@ describe("Companion bridge and runtime isolation", () => {
+           throw new Error("should not launch");
+         },
+         focus: async () => undefined,
++        stop: vi.fn(async () => undefined),
+         waitForBridge: async () => ({ creatorVersion: "3.8.8", sessionId: "session" }),
+         hasUnsavedChanges: vi.fn(async () => false),
+         waitForStopped: async () => undefined,
+       };
+       const lifecycle = new CreatorLifecycle(adapter);
+-      expect((await lifecycle.stop("p1", { pid: 654321 })).state).toBe("stopped");
++      expect((await lifecycle.stop("p1", { pid: 654321, projectPath: "/tmp/game" })).state).toBe("stopped");
+       expect(adapter.hasUnsavedChanges).toHaveBeenCalledWith("p1");
+-      expect(killSpy).toHaveBeenCalledWith(654321, "SIGTERM");
++      expect(adapter.stop).toHaveBeenCalledWith(654321, "/tmp/game");
+     } finally {
+       killSpy.mockRestore();
+     }
+diff --git a/mcp/tests/creator-process-stop.test.ts b/mcp/tests/creator-process-stop.test.ts
+new file mode 100644
+index 0000000..e37909d
+--- /dev/null
++++ b/mcp/tests/creator-process-stop.test.ts
+@@ -0,0 +1,143 @@
++import { execFileSync } from "node:child_process";
++import { describe, expect, it, vi } from "vitest";
++import { CreatorLifecycle, type CreatorLifecycleAdapter } from "../src/companion/creator-lifecycle.js";
++import { CreatorStopFault, WINDOWS_CREATOR_STOP } from "../src/companion/creator-process-stop.js";
++
++const project = { id: "p1", name: "owned", path: "C:/owned/game", connectionPath: "C:/owned/game/temp/connection.json" };
++function adapter(stop: NonNullable<CreatorLifecycleAdapter["stop"]>): CreatorLifecycleAdapter {
++  let pid = 100;
++  return { launch: vi.fn(async () => ({ pid: ++pid, reused: false })), focus: async () => {}, isPidAlive: () => true,
++    waitForBridge: async () => ({ creatorVersion: "3.8.8", sessionId: `s${pid}` }), hasUnsavedChanges: async () => false,
++    waitForStopped: async () => {}, stop };
++}
++describe("owned Creator stop completion", () => {
++  it("rejects stop while a Bridge wait can still complete the original start", async () => {
++    let release!: () => void; const boundary = adapter(vi.fn(async () => {}));
++    boundary.waitForBridge = () => new Promise(resolve => { release = () => resolve({ creatorVersion: "3.8.8", sessionId: "start-only" }); });
++    const lifecycle = new CreatorLifecycle(boundary), start = lifecycle.start(project);
++    await Promise.resolve();
++    await expect(lifecycle.stop(project.id)).rejects.toThrow("busy: starting");
++    expect(boundary.stop).not.toHaveBeenCalled();
++    release(); await expect(start).resolves.toMatchObject({ state: "ready", sessionId: "start-only" });
++  });
++  it("rejects start during the unsaved-document check before stopping state is published", async () => {
++    let release!: () => void; const boundary = adapter(async () => {}), lifecycle = new CreatorLifecycle(boundary);
++    await lifecycle.start(project);
++    boundary.hasUnsavedChanges = () => new Promise(resolve => { release = () => resolve(false); });
++    const stop = lifecycle.stop(project.id);
++    expect(lifecycle.status(project.id).state).toBe("ready");
++    await expect(lifecycle.start(project)).rejects.toThrow("busy: stopping");
++    release(); await expect(stop).resolves.toMatchObject({ state: "stopped" });
++  });
++  it("waits for exit proof and coalesces a second stop, not merely a kill acknowledgement", async () => {
++    let release!: () => void; const stop = vi.fn(() => new Promise<void>(resolve => { release = resolve; }));
++    const lifecycle = new CreatorLifecycle(adapter(stop)); await lifecycle.start(project);
++    const first = lifecycle.stop(project.id), second = lifecycle.stop(project.id);
++    await Promise.resolve(); expect(first).toBe(second); expect(lifecycle.status(project.id)).toMatchObject({ state: "stopping", pid: 101 });
++    await expect(lifecycle.start(project)).rejects.toThrow("busy");
++    release(); await expect(first).resolves.toMatchObject({ state: "stopped" });
++    expect(stop).toHaveBeenCalledExactlyOnceWith(101, project.path);
++  });
++  it("keeps a failed tree identity across Bridge disconnect and blocks another launch", async () => {
++    const boundary = adapter(async () => { throw new CreatorStopFault(); });
++    boundary.isPidAlive = () => false;
++    const lifecycle = new CreatorLifecycle(boundary); await lifecycle.start(project);
++    await expect(lifecycle.stop(project.id)).rejects.toMatchObject({ code: "CREATOR_STOP_UNCONFIRMED" });
++    expect(lifecycle.markDisconnected(project.id)).toMatchObject({ state: "error", pid: 101, sessionId: "s101" });
++    await expect(lifecycle.start(project)).rejects.toMatchObject({ code: "CREATOR_STOP_UNCONFIRMED" });
++    expect(boundary.launch).toHaveBeenCalledTimes(1);
++  });
++  it("has a distinct missing-PID recovery signal and requires a registered path", async () => {
++    const stop = vi.fn(async () => {}), lifecycle = new CreatorLifecycle(adapter(stop));
++    await expect(lifecycle.stop(project.id)).rejects.toMatchObject({ code: "CREATOR_PID_UNAVAILABLE" });
++    await expect(lifecycle.stop(project.id, { pid: 101 })).rejects.toMatchObject({ code: "CREATOR_STOP_UNCONFIRMED" });
++    expect(stop).not.toHaveBeenCalled();
++    await lifecycle.stop(project.id, { pid: 101, projectPath: project.path });
++    expect(stop).toHaveBeenCalledExactlyOnceWith(101, project.path);
++  });
++  it("serially awaits three complete instance exits before subsequent launches", async () => {
++    const exits: number[] = [], lifecycle = new CreatorLifecycle(adapter(async pid => { exits.push(pid); }));
++    const identities = [];
++    for (let i = 0; i < 3; i++) { identities.push(await lifecycle.start(project)); await lifecycle.stop(project.id); }
++    expect(identities.map(x => x.pid)).toEqual([101, 102, 103]);
++    expect(exits).toEqual([101, 102, 103]); expect(lifecycle.status(project.id).state).toBe("stopped");
++  });
++});
++
++// The actual PowerShell ownership/discovery loop runs against in-memory OS
++// handles. Fake Stop only changes this process's fixture objects, never real PIDs.
++const fakeType = String.raw`
++Add-Type -TypeDefinition @'
++using System;using System.Collections.Generic;using System.Runtime.InteropServices;
++public class OwnedCreatorHandle {
++ public static Dictionary<int,OwnedCreatorHandle> Pool=new Dictionary<int,OwnedCreatorHandle>();
++ public static List<int> Stops=new List<int>(); public static bool Late=false, Refuse=false, AfterExitBirth=false, IntermediateExits=false, IntermediateLost=false;
++ public int Pid;public int Parent;public string Image,Command;public DateTime Created;public bool Gone=false;public DateTime? Exited=null;
++ public static OwnedCreatorHandle Hold(int id) { if(!Pool.ContainsKey(id)||Pool[id].Gone)return null;var p=Pool[id];if(IntermediateExits&&id==4){p.Gone=true;p.Exited=DateTime.Parse("2026-01-01T00:00:10Z").ToUniversalTime();if(IntermediateLost)return null;}return p; }
++ public void Stop() { if(Gone)return;Stops.Add(Pid);if(Refuse&&Pid==2)throw new Exception("fixture refusal");Gone=true;Exited=DateTime.Parse("2026-01-01T00:01:00Z").ToUniversalTime();if(Late&&Pid==1&&!Pool.ContainsKey(4)){Add(4,1,"C:/Creator/CocosCreator.exe","C:/Creator/CocosCreator.exe --type=renderer",AfterExitBirth?120:2);if(IntermediateExits)Add(5,4,"C:/Creator/CocosCreator.exe","C:/Creator/CocosCreator.exe --type=renderer",3);} }
++ public void Dispose(){} public static void Add(int id,int parent,string image,string cmd,int seconds) {Pool[id]=new OwnedCreatorHandle {Pid=id,Parent=parent,Image=image,Command=cmd,Created=DateTime.Parse("2026-01-01T00:00:00Z").ToUniversalTime().AddSeconds(seconds)};}
++ [DllImport("shell32.dll",CharSet=CharSet.Unicode)]static extern IntPtr CommandLineToArgvW(string s,out int c);
++ [DllImport("kernel32.dll")]static extern IntPtr LocalFree(IntPtr p);
++ public static string[] Arguments(string s){int c;IntPtr p=CommandLineToArgvW(s,out c);try{string[] a=new string[c];for(int i=0;i<c;i++)a[i]=Marshal.PtrToStringUni(Marshal.ReadIntPtr(p,i*IntPtr.Size));return a;}finally{LocalFree(p);}}
++}
++'@
++[OwnedCreatorHandle]::Add(1,99,'C:/Creator/CocosCreator.exe','C:/Creator/CocosCreator.exe --path C:/owned/game',0)
++[OwnedCreatorHandle]::Add(2,1,'C:/Creator/CocosCreator.exe','C:/Creator/CocosCreator.exe --type=renderer',1)
++[OwnedCreatorHandle]::Add(3,99,'C:/Creator/CocosCreator.exe','C:/Creator/CocosCreator.exe --path C:/other/game',0)
++function Get-CimInstance($ClassName,$Filter) {
++ $items=@([OwnedCreatorHandle]::Pool.Values | Where-Object {!$_.Gone})
++ if($Filter -match '^ProcessId=(\d+)$'){$wanted=[int]$Matches[1];$items=@($items | Where-Object {$_.Pid -eq $wanted})}
++ foreach($p in $items){$created=$p.Created;if($script:WrongTime -and $p.Pid -eq 1){$created=$created.AddSeconds(5)}
++ [pscustomobject]@{ProcessId=$p.Pid;ParentProcessId=$p.Parent;ExecutablePath=$p.Image;CommandLine=$p.Command;CreationDate=$created}}
++}
++`;
++function ps(script: string) {
++  return execFileSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-OutputFormat", "Text", "-EncodedCommand", Buffer.from(script, "utf16le").toString("base64")], { encoding: "utf8", windowsHide: true, timeout: 15_000 }).trim().replace(/^\uFEFF/, "");
++}
++function runFixture(setup = "") {
++  const payload = Buffer.from(JSON.stringify({ pid: 1, projectPath: "C:/owned/game" })).toString("base64");
++  const core = WINDOWS_CREATOR_STOP.replace(/Add-Type -TypeDefinition @'[\s\S]*?'@/, "").replace("__PAYLOAD__", payload);
++  const wrapped = `$ErrorActionPreference='Stop'\n${fakeType}\n${setup}\n$accepted=$false;$failure='';$receipt=$null\ntry {$lines=@(& {${core}});$receipt=($lines -join '')|ConvertFrom-Json;$accepted=$true} catch {$failure=$_.Exception.Message}\n@{accepted=$accepted;failure=$failure;receipt=$receipt;stops=@([OwnedCreatorHandle]::Stops);otherAlive=![OwnedCreatorHandle]::Pool[3].Gone}|ConvertTo-Json -Depth 6 -Compress`;
++  return JSON.parse(ps(wrapped));
++}
++describe.skipIf(process.platform !== "win32")("Windows ownership loop with fake handles", () => {
++  it("compiles the actual native boundary and parses the original PS script without executing it", () => {
++    const native = WINDOWS_CREATOR_STOP.match(/Add-Type -TypeDefinition @'[\s\S]*?'@/)![0];
++    expect(ps(native + "\nWrite-Output 'NATIVE_COMPILED'")).toBe("NATIVE_COMPILED");
++    const text = Buffer.from(WINDOWS_CREATOR_STOP).toString("base64");
++    expect(ps(`$t=$null;$e=$null;$s=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${text}'));$null=[Management.Automation.Language.Parser]::ParseInput($s,[ref]$t,[ref]$e);if($e.Count){throw 'parse error'};'PARSED'`)).toBe("PARSED");
++  }, 15_000);
++  it("stops root and proven child but never the other project", () => {
++    const r = runFixture(); expect(r.accepted).toBe(true); expect(r.stops.sort()).toEqual([1, 2]); expect(r.otherAlive).toBe(true);
++  }, 15_000);
++  it("rescans a late child born before its verified parent exit", () => {
++    const r = runFixture("[OwnedCreatorHandle]::Late=$true"); expect(r.accepted).toBe(true); expect(r.stops.sort()).toEqual([1, 2, 4]); expect(r.otherAlive).toBe(true);
++  }, 15_000);
++  it("keeps an observed intermediate identity after exit to find its live grandchild", () => {
++    const r = runFixture("[OwnedCreatorHandle]::Late=$true;[OwnedCreatorHandle]::IntermediateExits=$true");
++    expect(r.accepted).toBe(true); expect(r.stops.sort()).toEqual([1, 2, 5]);
++    expect(r.receipt.exitedPids.sort()).toEqual([1, 2, 4, 5]); expect(r.otherAlive).toBe(true);
++  }, 15_000);
++  it("refuses success if an observed intermediate disappears before acquiring its identity", () => {
++    const r = runFixture("[OwnedCreatorHandle]::Late=$true;[OwnedCreatorHandle]::IntermediateExits=$true;[OwnedCreatorHandle]::IntermediateLost=$true");
++    expect(r.accepted).toBe(false); expect(r.receipt).toBeNull();
++    expect(r.stops).not.toContain(5); expect(r.otherAlive).toBe(true);
++  }, 15_000);
++  it.each([
++    ["root other project", "[OwnedCreatorHandle]::Pool[1].Command='C:/Creator/CocosCreator.exe --path C:/owned/game-other'"],
++    ["child other project", "[OwnedCreatorHandle]::Pool[2].Command='C:/Creator/CocosCreator.exe --path C:/other/game'"],
++    ["root executable", "[OwnedCreatorHandle]::Pool[1].Image='C:/Creator/other.exe'"],
++    ["creation identity mismatch", "$script:WrongTime=$true"],
++    ["missing original root", "[OwnedCreatorHandle]::Pool[1].Gone=$true"],
++  ])("rejects %s before terminating any process", (_label, setup) => {
++    const r = runFixture(setup); expect(r.accepted).toBe(false); expect(r.stops).toEqual([]); expect(r.otherAlive).toBe(true);
++  }, 15_000);
++  it("does not report exit confirmation after a child termination failure", () => {
++    const r = runFixture("[OwnedCreatorHandle]::Refuse=$true"); expect(r.accepted).toBe(false); expect(r.receipt).toBeNull(); expect(r.otherAlive).toBe(true);
++  }, 15_000);
++  it("does not adopt a row born after the held parent's lifetime", () => {
++    const r = runFixture("[OwnedCreatorHandle]::Late=$true;[OwnedCreatorHandle]::AfterExitBirth=$true");
++    // This fixture models an impossible/reused parent correlation; do not kill it.
++    expect(r.accepted).toBe(true); expect(r.stops).not.toContain(4); expect(r.otherAlive).toBe(true);
++  }, 15_000);
++});

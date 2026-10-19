@@ -1,0 +1,118 @@
+{
+  "atUtc": "2026-10-19T17:03:00.033Z",
+  "stage": "ui-2-restart",
+  "journal": [
+    {
+      "event": "real-ui-dispatch",
+      "action": "start",
+      "atUtc": "2026-10-19T17:02:35.862Z"
+    },
+    {
+      "event": "real-ui-dispatch",
+      "action": "restart",
+      "atUtc": "2026-10-19T17:02:54.145Z"
+    },
+    {
+      "event": "failure",
+      "stage": "ui-2-restart",
+      "reason": "REAL_RESTART_HTTP_500_UNSTRUCTURED"
+    }
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/next/index.html"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-Dx563SKg.js"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-CReVohLD.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/start"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/restart"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "actions": [
+    {
+      "action": "start",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 468,
+        "sessionId": "c18a91f7-cb5c-4132-877a-78300e3355a7",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T17:02:51.957Z",
+      "os": [
+        {
+          "pid": 468,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T17:02:37.4070040Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ]
+    },
+    {
+      "action": "restart",
+      "http": 500,
+      "runtime": {},
+      "code": null,
+      "atUtc": "2026-10-19T17:03:00.031Z"
+    }
+  ],
+  "statuses": [
+    {
+      "atUtc": "2026-10-19T17:02:34.530Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    },
+    {
+      "atUtc": "2026-10-19T17:02:52.472Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 468,
+      "sessionId": "c18a91f7-cb5c-4132-877a-78300e3355a7",
+      "creatorVersion": "3.8.8"
+    }
+  ],
+  "dispatched": {
+    "start": 1,
+    "restart": 1,
+    "stop": 0
+  }
+}

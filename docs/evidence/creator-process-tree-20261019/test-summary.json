@@ -1,0 +1,14 @@
+{
+  "tests-second-candidate.json": {
+    "numTotalTests": 37,
+    "numPassedTests": 37,
+    "numFailedTests": 0,
+    "success": true
+  },
+  "stop-tests-fourth.json": {
+    "numTotalTests": 18,
+    "numPassedTests": 18,
+    "numFailedTests": 0,
+    "success": true
+  }
+}

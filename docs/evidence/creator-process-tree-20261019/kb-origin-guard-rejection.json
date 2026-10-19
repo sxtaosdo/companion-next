@@ -1,0 +1,10 @@
+{
+  "statusHttp": 200,
+  "metadataHttp": 403,
+  "code": null,
+  "keys": [
+    "error"
+  ],
+  "idMatch": false,
+  "readerMissing": false
+}

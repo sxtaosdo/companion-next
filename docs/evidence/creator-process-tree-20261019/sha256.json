@@ -1,0 +1,18 @@
+{
+  "2-restart-receipt.png": "c143cff849d304c034b824375aa016b4d13b8b7f7b10c4069f5e027712b985d4",
+  "3-restart-receipt.png": "6358ddf89976448d7f21dde2dd2da88d770280945f11b838daf87d977d2154e0",
+  "4-stop-receipt.png": "8f400845a61d41621dc17a428f3fbd70a684d62a0646f78f7628b34f0c2c0f6a",
+  "continuous-proof.json": "818228f3fc2b708cbc481a6b4d034c9c7934f336e4358556ca6bcd543e92349b",
+  "continuous-protection-after.json": "f78579ce2623cf60a1a57b0c026c83fb2f48ce2e925a3dae3deb9e3679074bc7",
+  "creator-lifecycle-local.patch": "820bc342f3c0dbdf4e401146f3e347998cc49e062b579f3ad62189f2a1118968",
+  "final.png": "aff9be16768ee4e5bbe41b26c963d9f927d42f41ecd7dd03abd3f94382a0adb9",
+  "first-build.json": "914409334f964c29f4c6fc61766f2546c1d32ec43f26d6f15ec9036868de9468",
+  "first-failed-journal.json": "43ac53d8294acda4a0fa1d4e20f1db08a9c363201b6a840eb4297cd6191af744",
+  "first-failure-status.json": "dd78701da5b37f792ff18b1aeb932ab17d6712c7741b8870e9fe7c002f39f4b8",
+  "first-protection-after.json": "f78579ce2623cf60a1a57b0c026c83fb2f48ce2e925a3dae3deb9e3679074bc7",
+  "installed.json": "618391b25324ce5e524501ddd6caf015ce5f6db92bc9ad040d1536b11718daad",
+  "kb-origin-guard-rejection.json": "e321be93644ad7613f07677a576c5d38247b8e72f98b160d10bba349678f8fcf",
+  "kb-preserved.json": "a72b9073d386984d2d4647106f8f5017d50197ec85a99a7642f88aa8fe402be8",
+  "second-build.json": "9491acb3651ffc84118724b195a5850f4cbc5d54f176f2f695d075c56c702a10",
+  "test-summary.json": "4834690de8fb33e58e81becc9c47750b07dc59859d3604a5a7912acc0de9890c"
+}
