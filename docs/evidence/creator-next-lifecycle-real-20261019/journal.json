@@ -1,0 +1,213 @@
+{
+  "atUtc": "2026-10-19T14:56:32.141Z",
+  "stage": "final-readback",
+  "journal": [
+    {
+      "event": "real-ui-dispatch",
+      "action": "start",
+      "atUtc": "2026-10-19T14:55:33.882Z"
+    },
+    {
+      "event": "real-ui-dispatch",
+      "action": "restart",
+      "atUtc": "2026-10-19T14:55:59.298Z"
+    },
+    {
+      "event": "real-ui-dispatch",
+      "action": "stop",
+      "atUtc": "2026-10-19T14:56:27.461Z"
+    },
+    {
+      "event": "failure",
+      "stage": "final-readback",
+      "reason": "FIXTURE_CHILDREN_REMAIN"
+    }
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/next/index.html"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-CRVreJhY.js"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-gwbq_QMl.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/start"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/restart"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/stop"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "actions": [
+    {
+      "action": "start",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 14128,
+        "sessionId": "d480dc31-3e7e-4369-bd22-0eb1860a0227",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T14:55:57.725Z",
+      "os": [
+        {
+          "pid": 14128,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T14:55:39.0185960Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ]
+    },
+    {
+      "action": "restart",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 15124,
+        "sessionId": "262ed76a-8db5-4a8e-930a-06c140a9bcf6",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T14:56:25.328Z",
+      "os": [
+        {
+          "pid": 15124,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T14:56:10.2731150Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ],
+      "exactOldPidExited": true,
+      "receiptText": "后台已返回重启请求回执；这不等于最终就绪，也不证明操作系统进程退出已获确认，请刷新真实状态和日志核对。"
+    },
+    {
+      "action": "stop",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "stopped",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T14:56:30.218Z",
+      "exactOldPidExited": true,
+      "remainingCreatorProcesses": [
+        {
+          "ProcessId": 17876,
+          "ParentProcessId": 14128,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 22228,
+          "ParentProcessId": 14128,
+          "Name": "CocosCreator.exe"
+        }
+      ],
+      "receiptText": "后台已返回 stopped 回执；这不证明操作系统进程已退出，请刷新真实状态和日志核对。"
+    }
+  ],
+  "statuses": [
+    {
+      "atUtc": "2026-10-19T14:55:33.222Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    },
+    {
+      "atUtc": "2026-10-19T14:55:58.224Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 14128,
+      "sessionId": "d480dc31-3e7e-4369-bd22-0eb1860a0227",
+      "creatorVersion": "3.8.8"
+    },
+    {
+      "atUtc": "2026-10-19T14:56:26.274Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 15124,
+      "sessionId": "262ed76a-8db5-4a8e-930a-06c140a9bcf6",
+      "creatorVersion": "3.8.8"
+    },
+    {
+      "atUtc": "2026-10-19T14:56:31.163Z",
+      "projectId": "a79f4915296f4091",
+      "state": "stopped"
+    },
+    {
+      "atUtc": "2026-10-19T14:56:31.615Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    }
+  ],
+  "dispatched": {
+    "start": 1,
+    "restart": 1,
+    "stop": 1
+  }
+}

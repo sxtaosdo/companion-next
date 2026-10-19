@@ -49,8 +49,8 @@
       "id": 6,
       "name": "Creator启动、聚焦、停止、重启",
       "status": "部分完成",
-      "evidenceAndRemaining": "既有Next聚焦200与OS前台PID/session真实通过；setup/恢复脚本启动与停止不能代证Next主按钮。最小剩余为自有fixture的Next启动→重启→停止；本批不执行Creator生命周期",
-      "remainingKind": "Next按钮实机；非P1060只读查询阻塞"
+      "evidenceAndRemaining": "真实Next启动→重启→停止各一次200，主PID/session变化和旧/新主进程退出、确认框/回执已验；原宿主重启残留2个fixture子进程，已精确人工清理但不计产品全树停止通过；原共享生命周期未改",
+      "remainingKind": "原宿主全树清理限制；限定UI主流程已真实通过"
     },
     {
       "id": 7,
@@ -160,5 +160,6 @@
   ],
   "scopeCorrection": "Old Companion web has no evidenced image-task history entry. The independent public-image-review utility was incorrectly included in item18. Keep item18 as the approved narrow Owner preview/select/export surface; no old-data migration is required. The count change is a scope correction, not new implementation progress.",
   "progressUpdate": "Item19 approved retrieve-only main flow closes after same147 application recovery and two real7-endpoint UI/API chains, including normal startup after clearing temporary Process reference. UNKNOWN2 and all310 installed files remain. VSCode candidate remains excluded and unloaded.",
-  "latestScopeCorrection": "User does not use VS Code: deployment and its dedicated successor-lock development cancelled before any freeze/termination/install/start. Preserved isolated source without deployment. This candidate is not a current migration acceptance blocker. Knowledge authentication recovery remains open."
+  "latestScopeCorrection": "User does not use VS Code: deployment and its dedicated successor-lock development cancelled before any freeze/termination/install/start. Preserved isolated source without deployment. This candidate is not a current migration acceptance blocker. Knowledge authentication recovery remains open.",
+  "creatorLifecycleUpdate": "Real deployed Next start/restart/stop main flow completed once each. Item6 remains partial because original host left two owned child processes after restart, cleaned explicitly rather than counted as product stop. No feature source changed."
 }

@@ -1,0 +1,257 @@
+{
+  "atUtc": "2026-10-19T14:59:59.715Z",
+  "mode": "BOUNDED_REAL_NEXT_UI_START_RESTART_STOP",
+  "mainUiFlowPassed": true,
+  "fullProcessTreeExitByProduct": false,
+  "fixtureId": "a79f4915296f4091",
+  "actions": [
+    {
+      "action": "start",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 14128,
+        "sessionId": "d480dc31-3e7e-4369-bd22-0eb1860a0227",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T14:55:57.725Z",
+      "os": [
+        {
+          "pid": 14128,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T14:55:39.0185960Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ]
+    },
+    {
+      "action": "restart",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 15124,
+        "sessionId": "262ed76a-8db5-4a8e-930a-06c140a9bcf6",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T14:56:25.328Z",
+      "os": [
+        {
+          "pid": 15124,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T14:56:10.2731150Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ],
+      "exactOldPidExited": true,
+      "receiptText": "\u540e\u53f0\u5df2\u8fd4\u56de\u91cd\u542f\u8bf7\u6c42\u56de\u6267\uff1b\u8fd9\u4e0d\u7b49\u4e8e\u6700\u7ec8\u5c31\u7eea\uff0c\u4e5f\u4e0d\u8bc1\u660e\u64cd\u4f5c\u7cfb\u7edf\u8fdb\u7a0b\u9000\u51fa\u5df2\u83b7\u786e\u8ba4\uff0c\u8bf7\u5237\u65b0\u771f\u5b9e\u72b6\u6001\u548c\u65e5\u5fd7\u6838\u5bf9\u3002"
+    },
+    {
+      "action": "stop",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "stopped",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T14:56:30.218Z",
+      "exactOldPidExited": true,
+      "remainingCreatorProcesses": [
+        {
+          "ProcessId": 17876,
+          "ParentProcessId": 14128,
+          "Name": "CocosCreator.exe"
+        },
+        {
+          "ProcessId": 22228,
+          "ParentProcessId": 14128,
+          "Name": "CocosCreator.exe"
+        }
+      ],
+      "receiptText": "\u540e\u53f0\u5df2\u8fd4\u56de stopped \u56de\u6267\uff1b\u8fd9\u4e0d\u8bc1\u660e\u64cd\u4f5c\u7cfb\u7edf\u8fdb\u7a0b\u5df2\u9000\u51fa\uff0c\u8bf7\u5237\u65b0\u771f\u5b9e\u72b6\u6001\u548c\u65e5\u5fd7\u6838\u5bf9\u3002"
+    }
+  ],
+  "dispatched": {
+    "start": 1,
+    "restart": 1,
+    "stop": 1
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/next/index.html"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-CRVreJhY.js"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-gwbq_QMl.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/start"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/restart"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/stop"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    }
+  ],
+  "statuses": [
+    {
+      "atUtc": "2026-10-19T14:55:33.222Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    },
+    {
+      "atUtc": "2026-10-19T14:55:58.224Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 14128,
+      "sessionId": "d480dc31-3e7e-4369-bd22-0eb1860a0227",
+      "creatorVersion": "3.8.8"
+    },
+    {
+      "atUtc": "2026-10-19T14:56:26.274Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 15124,
+      "sessionId": "262ed76a-8db5-4a8e-930a-06c140a9bcf6",
+      "creatorVersion": "3.8.8"
+    },
+    {
+      "atUtc": "2026-10-19T14:56:31.163Z",
+      "projectId": "a79f4915296f4091",
+      "state": "stopped"
+    },
+    {
+      "atUtc": "2026-10-19T14:56:31.615Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    }
+  ],
+  "finalUiObservedState": "error",
+  "finalUiStateMeaning": "error is the actual unreachable-Bridge observation after stopped response; not rewritten to stopped",
+  "blocked": [],
+  "pageErrors": [],
+  "initialCreatorProcesses": 0,
+  "finalCreatorProcessesAfterExplicitOwnChildCleanup": 0,
+  "mainOldPidsExitedBeforeCleanup": [
+    14128,
+    15124
+  ],
+  "manualOwnChildCleanupPids": [
+    17876,
+    22228
+  ],
+  "cleanupNotProductStopProof": true,
+  "firstHarnessFailure": "FIXTURE_CHILDREN_REMAIN after all three actual200 UI actions and final screenshot; no lifecycle requests replayed",
+  "cleanupScriptFirstRefusal": "PowerShell JSON DateTime was reparsed as local time; no cleanup issued until DateTimeOffset corrected UTC identity window",
+  "newClientPermissions": 0,
+  "p1060Actions": 0,
+  "modelActions": 0,
+  "KBTestsRepeated": 0,
+  "candidateLoaded": false,
+  "fixtureUsesExistingCreator388BridgeAndDashboardProfile": true,
+  "actualResponseAndOsIdentityVerified": true,
+  "sessionPosts": 1,
+  "userBrowserUntouched": true,
+  "ownedEdgeClosedInFinally": true,
+  "finalService": {
+    "identity": {
+      "pid": 4264,
+      "startupEpoch": "b4ad0920-0c1a-4add-889e-cde005e96e6f",
+      "startedAt": "2026-10-19T13:44:52.971Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "nativeEpochUnproven": 2,
+      "ownerStarting": 0,
+      "ownerRequests": 0,
+      "ownerHandlers": 0,
+      "ownerBusy": 0,
+      "ownerWorker": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0,
+      "maintenanceVerifications": 0
+    },
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  }
+}
