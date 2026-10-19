@@ -1,0 +1,62 @@
+[
+  {
+    "label": "新聊天",
+    "enabled": true,
+    "offscreen": false,
+    "rectangle": [
+      1109.0,
+      699.0,
+      272.0,
+      30.0
+    ],
+    "invokable": true
+  },
+  {
+    "label": "新聊天",
+    "enabled": true,
+    "offscreen": false,
+    "rectangle": [
+      1109.0,
+      917.0,
+      262.0,
+      30.0
+    ],
+    "invokable": true
+  },
+  {
+    "label": "新聊天",
+    "enabled": true,
+    "offscreen": true,
+    "rectangle": [
+      1421.0,
+      1378.0,
+      24.0,
+      24.0
+    ],
+    "invokable": true
+  },
+  {
+    "label": "新聊天",
+    "enabled": true,
+    "offscreen": true,
+    "rectangle": [
+      1109.0,
+      1440.0,
+      262.0,
+      30.0
+    ],
+    "invokable": true
+  },
+  {
+    "label": "新建标签页",
+    "enabled": true,
+    "offscreen": false,
+    "rectangle": [
+      2494.0,
+      659.0,
+      28.0,
+      28.0
+    ],
+    "invokable": true
+  }
+]

@@ -8,24 +8,17 @@
 
 ## 本人接入步骤
 
-1. 在本机 PowerShell 中执行下方命令。**此接入块仅供本人执行，代理未执行。** 命令只清除当前窗口的明文密钥变量，并传入现有 DPAPI 文件路径。四项 Owner 路径用于保留当前可用配置，新窗口通常没有这些变量。
-2. guarded restart 成功后，通过最后一条 `ui` 命令重新授权浏览器会话，再打开 `http://127.0.0.1:32180/next/index.html#/knowledge`。
+1. 在本机 PowerShell 中执行下面这一条命令。**仅供本人执行，代理未执行。** 脚本封装原已审查命令：清除当前进程的明文密钥变量，传入固定 DPAPI 文件路径，保留四项 Owner 路径并补齐 WindowsPowerShell PATH；不会读取或解密凭据。
+2. 脚本仅在 guarded restart 成功后调用原 `ui` 命令。重新授权浏览器会话，再打开 `http://127.0.0.1:32180/next/index.html#/knowledge`。
 3. 点击现有“读取知识库列表”，核对唯一允许的知识库 ID：`da1051a5-3fff-4198-ba55-017ea79df9c3`。如需继续，文档列表最多读取 3 项。
 
 ```powershell
-Remove-Item Env:WEKNORA_API_KEY, Env:KNOWLEDGE_SYNC_API_KEY -ErrorAction SilentlyContinue
-$env:COMPANION_KNOWLEDGE_CREDENTIAL_FILE = 'D:/services/weknora/cli/private/pilot-recovery-reader.dpapi'
-$env:PATH = "$env:SystemRoot\System32\WindowsPowerShell\v1.0;$env:PATH"
-$env:CREATOR_AI_OWNER_PYTHON = 'C:/Users/33272/miniconda3/python.exe'
-$env:CREATOR_AI_OWNER_BRIDGE_ROOT = 'D:/code/shidai3/P8000/companion-next'
-$env:CREATOR_AI_OWNER_REVIEW_ROOT = 'D:/code/shidai3/P8000/public-image-review'
-$env:CREATOR_AI_OWNER_CACHE = 'C:/Users/33272/AppData/Local/Temp/companion-owner-host-implementation-20261018/directed-acceptance-cache'
-& 'C:/Program Files/nodejs/node.exe' 'D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js' daemon start --restart --json
-if ($LASTEXITCODE -ne 0) { throw 'Guarded Companion restart did not succeed; stop here.' }
-& 'C:/Program Files/nodejs/node.exe' 'D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js' ui
+& 'D:/code/shidai3/P8000/companion-next/scripts/connect-knowledge-reader.ps1'
 ```
 
 ## 预期结果与错误处理
+
+脚本只完成静态解析和原命令对齐检查，尚未由代理运行；不修改 `ExecutionPolicy`。若本机策略阻止脚本，请保留原报错并停止，不使用绕过参数。
 
 - 重启会等待当前工作结束；遇到 busy/unknown 可能拒绝。命令返回失败就停在该处，不强制终止，也不重复启动。它会更换 Companion 身份，原 SSE/MCP/浏览器连接可能重连，需要重新授权 UI。
 - 该命令不重启 8081、Creator 或模型，不修改系统环境，也不写入明文 API key。不要使用旧 `Enter-PilotCli.ps1` 搜索辅助脚本。

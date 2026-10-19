@@ -1,0 +1,24 @@
+{
+  "knowledgeWrapperExecuted": false,
+  "realCredentialAccess": false,
+  "clipboardClearAttempt": {
+    "executed": false,
+    "rejectedByAutomaticApproval": true,
+    "reason": "Reviewer did not accept the generic user request as specific authorization to irreversibly delete existing clipboard content."
+  },
+  "codex": {
+    "actualUiProcess": "ChatGPT.exe from OpenAI.Codex package",
+    "pid": 14200,
+    "window": 132096,
+    "newChatControlInvoked": true,
+    "newWithoutPromptUriInvoked": true,
+    "inputEmptyVerified": false,
+    "accessibleCharacterUnits": 100,
+    "draftContentRead": false,
+    "draftChangedByAgent": false,
+    "testMarkerInjected": false,
+    "sendOrSubmit": false,
+    "otherTasksClosed": false
+  },
+  "remaining": "Need explicit clipboard-clear approval and a provably empty independent target; do not override existing draft."
+}

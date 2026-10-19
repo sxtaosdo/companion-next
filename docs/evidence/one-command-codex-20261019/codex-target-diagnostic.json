@@ -1,0 +1,24 @@
+﻿{
+    "atUtc":  "2026-10-19T03:21:31.7650589Z",
+    "contentRead":  false,
+    "mutations":  0,
+    "windows":  [
+                    {
+                        "pid":  14200,
+                        "handle":  132096,
+                        "className":  "Chrome_WidgetWin_1",
+                        "newTaskButtons":  [
+
+                                           ],
+                        "editControls":  [
+                                             {
+                                                 "className":  "ProseMirror ProseMirror-focused",
+                                                 "automationId":  "",
+                                                 "enabled":  true,
+                                                 "canVerifyEmpty":  true,
+                                                 "empty":  false
+                                             }
+                                         ]
+                    }
+                ]
+}

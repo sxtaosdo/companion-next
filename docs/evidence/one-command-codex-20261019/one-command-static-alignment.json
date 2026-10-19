@@ -1,0 +1,12 @@
+{
+  "script": "scripts\\connect-knowledge-reader.ps1",
+  "document": "docs\\knowledge-service-restored-20261019.md",
+  "script_body_equals_previous_reviewed_command_block": true,
+  "reviewed_body_sha256": "cc10744117c7a0f935cc1fc9cc34f86899c1bd2c676a3fac12cf5ec7983a4bd7",
+  "executed": false,
+  "credential_access": false,
+  "new_keys_or_permissions": false,
+  "preamble": "$ErrorActionPreference = 'Stop'",
+  "preamble_purpose": "Stop on a missing executable or other PowerShell command failure before ui; original reviewed command body remains unchanged.",
+  "final_body_sha256": "cc10744117c7a0f935cc1fc9cc34f86899c1bd2c676a3fac12cf5ec7983a4bd7"
+}

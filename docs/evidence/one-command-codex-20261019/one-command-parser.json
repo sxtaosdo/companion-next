@@ -1,0 +1,8 @@
+{
+  "script": "scripts/connect-knowledge-reader.ps1",
+  "check": "PowerShell Parser.ParseFile only",
+  "parseErrorCount": 0,
+  "statementCount": 11,
+  "executed": false,
+  "credentialAccess": false
+}
