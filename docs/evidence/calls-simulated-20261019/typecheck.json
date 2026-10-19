@@ -1,0 +1,5 @@
+{
+  "command": "node node_modules/vue-tsc/bin/vue-tsc.js --noEmit",
+  "exitCode": 0,
+  "scope": "Next including four new synthetic pagination integration cases; no build or deploy"
+}
