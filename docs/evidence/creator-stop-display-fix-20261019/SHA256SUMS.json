@@ -1,0 +1,12 @@
+{
+  "deployment-result.json": "5352f3b36f9e76739792c29e4bba7fab223d51be3ef68d026792d04cd59425be",
+  "final-service-state.json": "93d7b9177755c18dafc949d3edabe85c11509abb888235efecc2794269ea9534",
+  "final.png": "1dafe95bbbc307e1b1eed19f3e7ddb9c2fd9394729d80a4cea84f5048f746598",
+  "journal.json": "12ed5b52db95fb018c9cfe026be8759dcae046e8f83c10f3e96c7c3ac44b65da",
+  "proof.json": "c0a672dc4a611cd0f29501ad3a7c21b0aa1b579b0f5f654228da471dfe7c2801",
+  "protection-after.json": "f78579ce2623cf60a1a57b0c026c83fb2f48ce2e925a3dae3deb9e3679074bc7",
+  "start-card.png": "7bab1c02fa5d2cd21775e56e2275e5c9f424031435293999ccb7dea7227820cc",
+  "stop-confirm.png": "df49bd532b79b7652d2fec1928f8eb1d248bdc357bbd5ced154a7cf562c77ea9",
+  "stop-receipt.png": "7eef9cfb6438172aefa3df74e498ac528d6d6cc70b370f6c65106c83820b992f",
+  "targeted-tests.txt": "54525d07520de3d37f22c5e7c92d73a68d28b013db5096a4b062998eb8ed1583"
+}

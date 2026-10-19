@@ -1,0 +1,246 @@
+{
+  "atUtc": "2026-10-19T15:12:03.736Z",
+  "mode": "REAL_DEPLOYED_NEXT_START_STOP_CONTEXTUAL_DISPLAY",
+  "fixtureId": "a79f4915296f4091",
+  "fixturePathSha256": "42d8339980f605b5b2ea0b8313066f2103592525a40ab5ed857d60ec1c7e2c0c",
+  "before": {
+    "identity": {
+      "pid": 4264,
+      "startupEpoch": "b4ad0920-0c1a-4add-889e-cde005e96e6f",
+      "startedAt": "2026-10-19T13:44:52.971Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "nativeEpochUnproven": 2,
+      "ownerStarting": 0,
+      "ownerRequests": 0,
+      "ownerHandlers": 0,
+      "ownerBusy": 0,
+      "ownerWorker": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0,
+      "maintenanceVerifications": 0
+    },
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "after": {
+    "identity": {
+      "pid": 4264,
+      "startupEpoch": "b4ad0920-0c1a-4add-889e-cde005e96e6f",
+      "startedAt": "2026-10-19T13:44:52.971Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "nativeEpochUnproven": 2,
+      "ownerStarting": 0,
+      "ownerRequests": 0,
+      "ownerHandlers": 0,
+      "ownerBusy": 0,
+      "ownerWorker": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0,
+      "maintenanceVerifications": 0
+    },
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "actions": [
+    {
+      "action": "start",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "ready",
+        "pid": 452,
+        "sessionId": "b7491890-8b2a-496d-a0fa-81f39f7a28a2",
+        "creatorVersion": "3.8.8",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T15:11:56.997Z",
+      "os": [
+        {
+          "pid": 452,
+          "parentPid": 3924,
+          "name": "CocosCreator.exe",
+          "createdAt": "2026-10-19T15:11:43.8599720Z",
+          "fixtureCommandMatch": true,
+          "commandLineSha256": "15f9f3a8fbde3ffa4928ff3e7b1b7565f97f03a16960432c9b0354ecd001735c"
+        }
+      ]
+    },
+    {
+      "action": "stop",
+      "http": 200,
+      "runtime": {
+        "projectId": "a79f4915296f4091",
+        "state": "stopped",
+        "launchSource": "dashboard"
+      },
+      "code": null,
+      "atUtc": "2026-10-19T15:12:01.693Z",
+      "exactOldPidExited": true,
+      "remainingCreatorProcesses": [],
+      "receiptText": "后台已返回 stopped 回执；这不证明操作系统进程已退出，请刷新真实状态和日志核对。"
+    }
+  ],
+  "finalUiState": "error",
+  "statuses": [
+    {
+      "atUtc": "2026-10-19T15:11:41.792Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    },
+    {
+      "atUtc": "2026-10-19T15:11:57.492Z",
+      "projectId": "a79f4915296f4091",
+      "state": "ready",
+      "pid": 452,
+      "sessionId": "b7491890-8b2a-496d-a0fa-81f39f7a28a2",
+      "creatorVersion": "3.8.8"
+    },
+    {
+      "atUtc": "2026-10-19T15:12:02.531Z",
+      "projectId": "a79f4915296f4091",
+      "state": "stopped"
+    },
+    {
+      "atUtc": "2026-10-19T15:12:03.041Z",
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    }
+  ],
+  "staticHashes": [
+    {
+      "path": "/next/index.html",
+      "sha256": "31a4f48cef4ec0711741330a1b5bc31c7760c9bd0ebc1d5436829b7d478c5d65",
+      "status": 200
+    },
+    {
+      "path": "/next/assets/index-CReVohLD.css",
+      "sha256": "e44b42194289bc35b3bc3726c19d6aba3d1307744cf2ae812f01bb288611087c",
+      "status": 200
+    },
+    {
+      "path": "/next/assets/index-Dx563SKg.js",
+      "sha256": "b2b29887dbc1e62e9f25fd1856afac8dc49dc0d6232de12346b2e00e90b5eda9",
+      "status": 200
+    }
+  ],
+  "dispatched": {
+    "start": 1,
+    "restart": 0,
+    "stop": 1
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/next/index.html"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-Dx563SKg.js"
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-CReVohLD.css"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/start"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "POST",
+      "path": "/api/projects/a79f4915296f4091/stop"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "initialCreatorProcesses": 0,
+  "remainingCreatorProcesses": [],
+  "displayedTag": "已请求停止",
+  "rawBackendErrorRetained": true,
+  "stopCaptionDoesNotClaimProcessExit": true,
+  "deployedSource": "a8e88ac75fc1701169835c055299169410bfce96",
+  "internalVersion": "1.3.173.146",
+  "newClientPermissions": 0,
+  "VSCodeCandidateLoaded": false,
+  "modelActions": 0,
+  "p1060Actions": 0,
+  "KBTestsRepeated": 0,
+  "userBrowserUntouched": true,
+  "ownedEdgeClosed": true,
+  "noSimulatedResponses": true,
+  "sessionPosts": 1
+}

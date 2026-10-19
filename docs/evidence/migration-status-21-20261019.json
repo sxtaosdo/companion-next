@@ -49,8 +49,8 @@
       "id": 6,
       "name": "Creator启动、聚焦、停止、重启",
       "status": "部分完成",
-      "evidenceAndRemaining": "真实Next启动→重启→停止各一次200，主PID/session变化和旧/新主进程退出、确认框/回执已验；原宿主重启残留2个fixture子进程，已精确人工清理但不计产品全树停止通过；原共享生命周期未改",
-      "remainingKind": "原宿主全树清理限制；限定UI主流程已真实通过"
+      "evidenceAndRemaining": "真实Next启动/重启/停止主流程已验；正常stop后的限定中性展示已部署a8e88ac/.146并单次start→stop实机通过，raw error保留。当前Creator0；旧宿主restart子进程清理缺陷未修，精确文件范围已报告",
+      "remainingKind": "旧宿主生命周期修改边界；Next停止展示已修复验收"
     },
     {
       "id": 7,
