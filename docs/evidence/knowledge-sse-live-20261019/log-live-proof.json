@@ -1,0 +1,369 @@
+{
+  "assertions": [
+    "three-existing-markers-reused",
+    "unregistered-fourth-target",
+    "original-session",
+    "snapshot-read",
+    "all-four-retained",
+    "real-fourth-catchup-proof-reused",
+    "recovery-stop-enabled",
+    "stop-no-further-reads-or-streams",
+    "stopped-state"
+  ],
+  "events": [],
+  "blocked": [],
+  "prior": {
+    "source": "ecabe7e628967b6f0c44532aa876137e175f9d6e",
+    "markers": [
+      {
+        "phase": "online",
+        "method": "creator.ping",
+        "status": 500,
+        "id": "7c5170b9-078c-40c5-9500-29c600ea74ee",
+        "source": "bridge",
+        "level": "error",
+        "operationId": "e4087c9583e5766c",
+        "time": "2026-10-19T10:31:38.393Z"
+      },
+      {
+        "phase": "offline",
+        "method": "script.getErrors",
+        "status": 500,
+        "id": "d9ed9fa0-e97f-43a2-801d-4f1417bb0254",
+        "source": "compile",
+        "level": "error",
+        "operationId": "8a6d6b85123c1ad3",
+        "time": "2026-10-19T10:31:38.794Z"
+      },
+      {
+        "phase": "recovered",
+        "method": "creator.projectInfo",
+        "status": 500,
+        "id": "be8e974d-0d88-40dc-b255-46f8fe2160c4",
+        "source": "bridge",
+        "level": "error",
+        "operationId": "e932b4806a1f2d85",
+        "time": "2026-10-19T10:31:44.850Z"
+      }
+    ],
+    "events": [
+      {
+        "id": "7c5170b9-078c-40c5-9500-29c600ea74ee",
+        "source": "bridge",
+        "level": "error",
+        "operationId": "e4087c9583e5766c",
+        "eventName": "message"
+      },
+      {
+        "id": "d9ed9fa0-e97f-43a2-801d-4f1417bb0254",
+        "source": "compile",
+        "level": "error",
+        "operationId": "8a6d6b85123c1ad3",
+        "eventName": "message"
+      },
+      {
+        "id": "be8e974d-0d88-40dc-b255-46f8fe2160c4",
+        "source": "bridge",
+        "level": "error",
+        "operationId": "e932b4806a1f2d85",
+        "eventName": "message"
+      }
+    ],
+    "blocked": [],
+    "assertions": [
+      "original-daemon",
+      "project-preflight",
+      "unregistered-diagnostic-target",
+      "original-session",
+      "snapshot-read",
+      "empty-marker-baseline",
+      "snapshot-read",
+      "expected-unknown-project-online",
+      "snapshot-read",
+      "exactly-one-marker-online",
+      "marker-shape-online",
+      "snapshot-read",
+      "expected-unknown-project-offline",
+      "snapshot-read",
+      "exactly-one-marker-offline",
+      "marker-shape-offline",
+      "offline-clears-stale-keeps-stop",
+      "snapshot-read",
+      "expected-unknown-project-recovered",
+      "snapshot-read",
+      "exactly-one-marker-recovered",
+      "marker-shape-recovered",
+      "snapshot-read",
+      "snapshot-three-unique",
+      "ui-three-literal-markers",
+      "online-and-recovered-events-once"
+    ],
+    "diagnosticProjectId": "e70dde175f84cde8",
+    "offline": {
+      "ms": 4200,
+      "state": "事件流冷却重连中",
+      "stopEnabled": true,
+      "staleRows": 0
+    },
+    "catchupBeforeThird": true,
+    "completed": false,
+    "failedStage": "marker-recovered",
+    "failure": "offline-marker-caught-by-snapshot"
+  },
+  "additionalTarget": "e70dde175f8458d0",
+  "recovery": {
+    "assertions": [
+      "three-existing-markers-reused",
+      "unregistered-fourth-target",
+      "original-session",
+      "snapshot-read",
+      "prior-three-retained",
+      "confirmed-disconnection-clears-data",
+      "confirmed-recovery-state",
+      "fourth-expected-unknown-project",
+      "snapshot-read",
+      "exactly-one-additional-marker",
+      "fourth-not-streamed-offline",
+      "fourth-caught-by-fresh-snapshot",
+      "snapshot-read",
+      "four-unique-retained-ids"
+    ],
+    "events": [],
+    "blocked": [],
+    "prior": {
+      "source": "ecabe7e628967b6f0c44532aa876137e175f9d6e",
+      "markers": [
+        {
+          "phase": "online",
+          "method": "creator.ping",
+          "status": 500,
+          "id": "7c5170b9-078c-40c5-9500-29c600ea74ee",
+          "source": "bridge",
+          "level": "error",
+          "operationId": "e4087c9583e5766c",
+          "time": "2026-10-19T10:31:38.393Z"
+        },
+        {
+          "phase": "offline",
+          "method": "script.getErrors",
+          "status": 500,
+          "id": "d9ed9fa0-e97f-43a2-801d-4f1417bb0254",
+          "source": "compile",
+          "level": "error",
+          "operationId": "8a6d6b85123c1ad3",
+          "time": "2026-10-19T10:31:38.794Z"
+        },
+        {
+          "phase": "recovered",
+          "method": "creator.projectInfo",
+          "status": 500,
+          "id": "be8e974d-0d88-40dc-b255-46f8fe2160c4",
+          "source": "bridge",
+          "level": "error",
+          "operationId": "e932b4806a1f2d85",
+          "time": "2026-10-19T10:31:44.850Z"
+        }
+      ],
+      "events": [
+        {
+          "id": "7c5170b9-078c-40c5-9500-29c600ea74ee",
+          "source": "bridge",
+          "level": "error",
+          "operationId": "e4087c9583e5766c",
+          "eventName": "message"
+        },
+        {
+          "id": "d9ed9fa0-e97f-43a2-801d-4f1417bb0254",
+          "source": "compile",
+          "level": "error",
+          "operationId": "8a6d6b85123c1ad3",
+          "eventName": "message"
+        },
+        {
+          "id": "be8e974d-0d88-40dc-b255-46f8fe2160c4",
+          "source": "bridge",
+          "level": "error",
+          "operationId": "e932b4806a1f2d85",
+          "eventName": "message"
+        }
+      ],
+      "blocked": [],
+      "assertions": [
+        "original-daemon",
+        "project-preflight",
+        "unregistered-diagnostic-target",
+        "original-session",
+        "snapshot-read",
+        "empty-marker-baseline",
+        "snapshot-read",
+        "expected-unknown-project-online",
+        "snapshot-read",
+        "exactly-one-marker-online",
+        "marker-shape-online",
+        "snapshot-read",
+        "expected-unknown-project-offline",
+        "snapshot-read",
+        "exactly-one-marker-offline",
+        "marker-shape-offline",
+        "offline-clears-stale-keeps-stop",
+        "snapshot-read",
+        "expected-unknown-project-recovered",
+        "snapshot-read",
+        "exactly-one-marker-recovered",
+        "marker-shape-recovered",
+        "snapshot-read",
+        "snapshot-three-unique",
+        "ui-three-literal-markers",
+        "online-and-recovered-events-once"
+      ],
+      "diagnosticProjectId": "e70dde175f84cde8",
+      "offline": {
+        "ms": 4200,
+        "state": "事件流冷却重连中",
+        "stopEnabled": true,
+        "staleRows": 0
+      },
+      "catchupBeforeThird": true,
+      "completed": false,
+      "failedStage": "marker-recovered",
+      "failure": "offline-marker-caught-by-snapshot"
+    },
+    "additionalTarget": "e70dde175f844b90",
+    "fourth": {
+      "id": "dfe8a859-da74-4fb3-bcf1-364aebcc8a23",
+      "source": "bridge",
+      "level": "error",
+      "operationId": "b35d17cdfc030166",
+      "time": "2026-10-19T10:32:55.872Z",
+      "method": "creator.ping",
+      "httpStatus": 500
+    },
+    "completed": false,
+    "failedStage": "filters",
+    "failure": "locator.click: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('combobox', { name: '日志来源筛选' })\u001b[22m\n\u001b[2m    - locator resolved to <input readonly type=\"text\" tabindex=\"0\" role=\"combobox\" autocomplete=\"off\" spellcheck=\"false\" id=\"el-id-7209-31\" aria-label=\"日志来源筛选\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"el-select__input\" aria-activedescendant=\"\" aria-autocomplete=\"none\" aria-controls=\"el-id-7209-11\"/>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <span>全部来源（不选）</span> from <div class=\"el-select__selected-item el-select__placeholder is-transparent\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <span>全部来源（不选）</span> from <div class=\"el-select__selected-item el-select__placeholder is-transparent\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    23 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <span>全部来源（不选）</span> from <div class=\"el-select__selected-item el-select__placeholder is-transparent\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n"
+  },
+  "fourth": {
+    "id": "dfe8a859-da74-4fb3-bcf1-364aebcc8a23",
+    "source": "bridge",
+    "level": "error",
+    "operationId": "b35d17cdfc030166",
+    "time": "2026-10-19T10:32:55.872Z",
+    "method": "creator.ping",
+    "httpStatus": 500
+  },
+  "selectDebug": [
+    {
+      "label": "日志来源筛选",
+      "value": "bridge",
+      "expanded": "true",
+      "options": [
+        "launcher",
+        "creator",
+        "bridge",
+        "compile",
+        "preview",
+        "scene-console",
+        "preview-console"
+      ]
+    },
+    {
+      "label": "日志来源筛选",
+      "value": "compile",
+      "expanded": "true",
+      "options": [
+        "launcher",
+        "creator",
+        "bridge",
+        "compile",
+        "preview",
+        "scene-console",
+        "preview-console"
+      ]
+    },
+    {
+      "label": "日志来源筛选",
+      "value": "bridge",
+      "expanded": "true",
+      "options": [
+        "launcher",
+        "creator",
+        "bridge",
+        "compile",
+        "preview",
+        "scene-console",
+        "preview-console"
+      ]
+    },
+    {
+      "label": "日志级别筛选",
+      "value": "error",
+      "expanded": "true",
+      "options": [
+        "debug",
+        "info",
+        "warning",
+        "error"
+      ]
+    },
+    {
+      "label": "日志来源筛选",
+      "value": "compile",
+      "expanded": "true",
+      "options": [
+        "launcher",
+        "creator",
+        "bridge",
+        "compile",
+        "preview",
+        "scene-console",
+        "preview-console"
+      ]
+    }
+  ],
+  "filters": {
+    "bridge": 3,
+    "bridgeOrCompile": 4,
+    "compile": 1,
+    "error": 4,
+    "literalNonmatch": 0
+  },
+  "sseRequests": 1,
+  "httpAssets": [
+    {
+      "path": "next/assets/about-icon-BaVeClOr.svg",
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "next/assets/donation-qr-D7kdLLAm.png",
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "next/assets/index-CRVreJhY.js",
+      "sha256": "0c53dfe075f66f5aa4faa6a2657c2136c4f6f7ddb7b04f3aab9015310875a010"
+    },
+    {
+      "path": "next/assets/index-gwbq_QMl.css",
+      "sha256": "0731082f61d115956d105d687cd742bdab49124a49112f773fefaa57877467db"
+    },
+    {
+      "path": "next/favicon.svg",
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "next/index.html",
+      "sha256": "1bb7f3edb912cc64010ed37d152921a78b717a160f0bf8dd8960f8010f37d6d1"
+    }
+  ],
+  "completed": true,
+  "uiRunCompletion": "All filter/stop assertions passed; initial asset verifier used unauthenticated fetch and was corrected with original UI session without rerunning UI",
+  "expectedFailureDiagnosticPostsTotal": 4,
+  "markerLogsRetained": true,
+  "businessWrites": 0,
+  "creatorStarted": false,
+  "modelStarted": false,
+  "boundedScenarioOnly": true,
+  "replayGuaranteed": false,
+  "userBrowserUntouched": true,
+  "ownedBrowserClosed": true,
+  "blockedUnexpectedUiWrites": 0
+}

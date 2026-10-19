@@ -1,0 +1,61 @@
+{
+  "physicalIndexTables": {
+    "embed_channels": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "schemaSha256": "06aac2fe6027f12b090c410401dc50c8232378b9af9e4a9c94285b7a9924aa73"
+    },
+    "lite_embeddings": {
+      "count": 2272,
+      "sha256": "6b08d98d7e9917551ee79212c34c323799f66d5d8dfaaf230702ab0213cf69a5",
+      "schemaSha256": "8fc622ac7a8bfad9f3ec3c0e59ce214a71f892317e0df8a4d74de3ea7a0afd38"
+    },
+    "lite_embeddings_fts_config": {
+      "count": 1,
+      "sha256": "9c45e1e8ed477066dd6f3064ac0b99e2223742dcca2ebdfc27a6ecc29318cf11",
+      "schemaSha256": "5310c4215a94a2aec6b182f3f32b3b0a48329cff8af56b6c3808a38de2ed774e"
+    },
+    "lite_embeddings_fts_data": {
+      "count": 417,
+      "sha256": "171344ece8bc9d2cf67f1490d52256f190012150e0b401bee662d6473edaa3ba",
+      "schemaSha256": "282ea08b41cd8b24aa35c79117cf72eef5c1efab694eafb9c62e75d0cee50557"
+    },
+    "lite_embeddings_fts_docsize": {
+      "count": 2272,
+      "sha256": "de9b0dabf2b5307e4f227814440fb98e47774e5fb2a47817c8e5ded70938ab15",
+      "schemaSha256": "335c341c99e80d78ebf93a9101466a4453c65a50d1881afe7fbe5a75af0755b2"
+    },
+    "lite_embeddings_fts_idx": {
+      "count": 406,
+      "sha256": "4bec64480981d24ef941d3451569628ed71800701ccd581489eeba477947b207",
+      "schemaSha256": "6e892176a9fa1b772278c72a15b8fabb33ee5189d183fc41e84581f5d4fff0e9"
+    },
+    "vec_embeddings_1024_chunks": {
+      "count": 22,
+      "sha256": "6ffa12267b5aadf8dd9ec9d74b2aa2d184f887fe7c7e16ba2f1e309f5ff59501",
+      "schemaSha256": "460555ae1aef916dd69e517e9d3f0789ed1be4187fb0b14c26756063d51e4bec"
+    },
+    "vec_embeddings_1024_info": {
+      "count": 4,
+      "sha256": "4aa33e8db76805e813a39016af79838b7de07dbdd6b816804b73c5e2e04b93ae",
+      "schemaSha256": "854c685c7c4c03bea5ff4594e32e3ae661c811488fe20276b501fce5a9fe428d"
+    },
+    "vec_embeddings_1024_rowids": {
+      "count": 2264,
+      "sha256": "601b243c1ee2382ee807e1d302ca46710931abb99be08120b32bae43e3dfe497",
+      "schemaSha256": "9fc1e5be481a4330c89ee889085be247104500dd59512a703095413851875658"
+    },
+    "vec_embeddings_1024_vector_chunks00": {
+      "count": 22,
+      "sha256": "3ddf234e265d8d48d4e32e1da8e41aacebe8a50353b911f6029acbab9ddbb282",
+      "schemaSha256": "88f51cad04d35d1a9c00052026250dfff023bf67424d6dfc77eea7e299dde8c9"
+    }
+  },
+  "virtualTablesCoveredByShadowStorage": [
+    "lite_embeddings_fts",
+    "vec_embeddings_1024"
+  ],
+  "tableDigest": "54dbda5a757dd03f438588890ad1ab2d9092d1c3e5ae3517322347474fce9d8d",
+  "scope": "all physical lite_embeddings / FTS shadow / vec shadow / embed_channels, no raw contents emitted",
+  "readOnly": true
+}

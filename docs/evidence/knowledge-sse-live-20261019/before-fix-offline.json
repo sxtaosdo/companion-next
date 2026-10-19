@@ -1,0 +1,14 @@
+{
+  "source": "c44d847494e89bffca2040c13874d260572a2983",
+  "offlineMs": 4200,
+  "recoveryObservationMs": 4200,
+  "before": "事件流已连接",
+  "after": "实时更新未启用",
+  "enableButtonDisabled": true,
+  "sseRequestCount": 1,
+  "projectReads": 3,
+  "blocked": [],
+  "businessWrites": 0,
+  "userBrowserUntouched": true,
+  "ownedBrowserClosed": true
+}

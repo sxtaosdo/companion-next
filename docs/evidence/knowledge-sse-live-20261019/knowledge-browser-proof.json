@@ -1,0 +1,45 @@
+{
+  "atUtc": "2026-10-19T10:23:22.799Z",
+  "daemonIdentity": {
+    "pid": 7832,
+    "startupEpoch": "e5c5924c-a392-4421-9827-37432bd5f47d",
+    "startedAt": "2026-10-19T09:45:11.157Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "103ea371f13b784d7ec0263ae4714906a8ea67ebc4ddc7e0ac9c7cc5439b801c",
+    "nodeVersion": "v25.2.1"
+  },
+  "httpStatus": 403,
+  "topLevelCode": "AUTH_DENIED",
+  "errorFieldType": "string",
+  "searchRequestsThisRun": 1,
+  "previousRunSearchRequests": 3,
+  "totalSearchRequests": 4,
+  "readerScopeChanged": false,
+  "rawResponseArchived": false,
+  "blocked": [],
+  "ok": true,
+  "positive": {
+    "query": "shidai3",
+    "limit": 3,
+    "count": 3,
+    "apiUiIdAndContentHashAssertionsPassed": true,
+    "proof": "original knowledge-browser.mjs reached scope-denied after positive API/DOM and zero-result assertions; masked positive screenshot reviewed",
+    "screenshotSha256": "5c055fa696e414d38d9acefdff92b78c6a2e94cb58c1c9e5b84da9646d68cd0d",
+    "titleOrContentArchived": false
+  },
+  "empty": {
+    "query": "COMPANIONNEXTNOHIT20261019K7Q9",
+    "count": 0,
+    "staleResultRows": 0,
+    "proof": "original completed assertions before scope-denied"
+  },
+  "deniedUiVisible": true,
+  "deniedResultRows": 0,
+  "firstRunFailure": "test expected error.code; deployed contract is top-level code/error; unchanged product",
+  "askOrChatRequests": 0,
+  "syncOrIndexRequests": 0,
+  "modelStarts": 0,
+  "credentialChanges": 0,
+  "userBrowserUntouched": true,
+  "ownedBrowserClosed": true
+}

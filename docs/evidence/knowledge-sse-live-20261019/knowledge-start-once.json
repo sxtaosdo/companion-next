@@ -1,0 +1,27 @@
+{
+  "atUtc": "2026-10-19T10:18:07.638Z",
+  "daemonIdentity": {
+    "pid": 7832,
+    "startupEpoch": "e5c5924c-a392-4421-9827-37432bd5f47d",
+    "startedAt": "2026-10-19T09:45:11.157Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "103ea371f13b784d7ec0263ae4714906a8ea67ebc4ddc7e0ac9c7cc5439b801c",
+    "nodeVersion": "v25.2.1"
+  },
+  "before": {
+    "running": false,
+    "frameable": false
+  },
+  "originalStartScriptSha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+  "startAttemptRecorded": true,
+  "credentialContentsRead": false,
+  "modelsStarted": false,
+  "doNotRetryUnknown": true,
+  "state": "ORIGINAL_KNOWLEDGE_SERVICE_STARTED",
+  "httpStatus": 200,
+  "result": {
+    "running": true,
+    "frameable": false
+  },
+  "completedAt": "2026-10-19T10:18:12.637Z"
+}

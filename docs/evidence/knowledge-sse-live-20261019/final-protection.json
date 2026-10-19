@@ -1,0 +1,65 @@
+{
+  "atUtc": "2026-10-19T10:33:59.474719+00:00",
+  "source": "ecabe7e628967b6f0c44532aa876137e175f9d6e",
+  "runtime": {
+    "identity": {
+      "pid": 7832,
+      "startupEpoch": "e5c5924c-a392-4421-9827-37432bd5f47d",
+      "startedAt": "2026-10-19T09:45:11.157Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "103ea371f13b784d7ec0263ae4714906a8ea67ebc4ddc7e0ac9c7cc5439b801c",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "counts": {
+      "http": 0,
+      "mcp": 0,
+      "nativeAwaiting": 0,
+      "nativeUncertain": 0,
+      "maintenanceObservations": 0,
+      "projectActions": 0,
+      "globalActions": 0,
+      "recovery": 0,
+      "setup": 0,
+      "builds": 0,
+      "observedBuilds": 0,
+      "sidecars": 0,
+      "nativeEpochUnproven": 2,
+      "ownerStarting": 0,
+      "ownerRequests": 0,
+      "ownerHandlers": 0,
+      "ownerBusy": 0,
+      "ownerWorker": 0,
+      "setupPolls": 0,
+      "setupTimers": 0,
+      "icons": 0,
+      "maintenanceVerifications": 0
+    },
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "protection": {
+    "sharedHead": "6ff44f5574ed2f1b81741e86c3ca1210c6c0085a",
+    "shared22StatusDiffIndexUnchanged": true,
+    "protectedSourceFiles": 21,
+    "daemonCliWorkerOldUiUnchanged": true,
+    "unknownJournalUnchanged": true
+  },
+  "oldHashAssetsPreserved": true,
+  "deployedFilesMatch": true,
+  "businessUnchanged": true,
+  "businessTableCounts": {
+    "authorized_dispatch_abandonments": 1,
+    "authorized_dispatch_adoptions": 1,
+    "authorized_fixture_abandonments": 1,
+    "authorized_p1060_playtest_abandonments": 1,
+    "lease_generations": 4,
+    "operation_dispatches": 338,
+    "operation_resolutions": 2,
+    "operations": 705,
+    "project_write_leases": 4
+  },
+  "sourceInputsUnchanged": true,
+  "daemonRestarted": false
+}
