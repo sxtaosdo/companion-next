@@ -45,3 +45,16 @@ describe('original clipboard writes share the handoff lease',()=>{
   wrappers.push(w);await flushPromises();await button(w,label).trigger('click');w.unmount();const next=controls();await button(next,'发送到 Codex').trigger('click');expect(p.writeText).not.toHaveBeenCalled();expect(agentHandoffBusy.value).toBe(true);finish();await flushPromises();expect(agentHandoffBusy.value).toBe(false);Reflect.deleteProperty(navigator,'clipboard')
  })
 })
+
+
+describe('CLI help matches the existing explicit handoff buttons',()=>{
+ it('describes text-only copy and separately explains the explicit application handoff',async()=>{
+  const p=api();agentHandoffProvider.value=p;
+  const w=mount(CliUseDialog,{props:{modelValue:true,project:{id:'0123456789abcdef',name:'Fixture',path:'D:/Fixture'},source:{label:'fixture'} as CompanionBrowserProvider},global:{plugins:[ElementPlus]}});wrappers.push(w);await flushPromises();
+  const explanation=w.find('p.form-help').text();
+  expect(explanation).not.toContain('也不打开外部协议');
+  expect(explanation).toContain('“发送到 Cursor / Codex”');
+  expect(explanation).toContain('复制后尝试打开对应本机应用');
+  expect(p.writeText).not.toHaveBeenCalled();expect(p.open).not.toHaveBeenCalled();
+ });
+});

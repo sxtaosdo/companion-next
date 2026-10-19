@@ -1,3 +1,4 @@
+import { reactive } from 'vue'
 import { afterEach,describe,expect,it,vi } from 'vitest'
 import { createPinia } from 'pinia'
 import { createMemoryHistory,createRouter } from 'vue-router'
@@ -87,7 +88,7 @@ describe('existing project registration and explicit full setup UI',()=>{
  it('closing only pauses; explicit resume queries the known ID without reposting',async()=>{vi.useFakeTimers();const {api,store,lane}=await setup();await startFull();await click('关闭向导');expect(store.setupReceipt?.phase).toBe('paused');expect(lane.locked).toBe(true);expect(button('继续读取此任务').attributes('disabled')).toBeUndefined();const tip=button('登记与接入状态详情');expect(tip.attributes('aria-describedby')).toBeUndefined();await tip.trigger('focus');await flushPromises();const details=document.getElementById(tip.attributes('aria-describedby')!)?.textContent;for(const value of [operationId,id,path,store.setupReceipt!.message,'原请求回执','接口未提供来源标签'])expect(details).toContain(value);await tip.trigger('keydown',{key:'Escape'});expect(tip.attributes('aria-describedby')).toBeUndefined();await vi.advanceTimersByTimeAsync(5000);expect(api.status).not.toHaveBeenCalled();await click('继续读取此任务');expect(api.status).toHaveBeenCalledWith(operationId,expect.any(AbortSignal));expect(api.start).toHaveBeenCalledTimes(1)})
  it('unknown acceptance without task ID cannot resume or resend and keeps honest receipt',async()=>{const {api,lane,store}=await setup();vi.mocked(api.start).mockRejectedValue(new ProjectSetupError('timeout'));await startFull();expect(store.setupReceipt?.phase).toBe('unknown');expect(lane.locked).toBe(true);expect(button('继续读取此任务').attributes('disabled')).toBeDefined();expect(api.status).not.toHaveBeenCalled();expect(body().get('[data-testid="setup-receipt"]').text()).toContain('没有可核实的任务标识')})
  it('keeps a short unknown warning and original disabled resume control after closing',async()=>{const {api,lane}=await setup();vi.mocked(api.start).mockRejectedValue(new ProjectSetupError('timeout'));await startFull();expect(body().get('[data-testid="setup-receipt"]').text()).toContain('没有可核实的任务标识');expect(body().get('[data-testid="setup-receipt"]').text()).toContain('不会重发');await click('关闭向导');expect(lane.locked).toBe(true);expect(button('添加已有工程').attributes('disabled')).toBeDefined();const toolbar=wrapper!.get('[data-testid="project-setup-panel"]');expect(toolbar.get('[data-testid="project-setup-status"]').text()).toContain('接入结果未知，请到原宿主核对');expect(toolbar.findAll('button').map(item=>item.text()||item.attributes('aria-label'))).toEqual(['添加已有工程','登记与接入状态详情','继续读取此任务']);expect(button('继续读取此任务').attributes('disabled')).toBeDefined();expect(toolbar.find('article,p,.el-alert').exists()).toBe(false);const tip=button('登记与接入状态详情'),dialogCount=body().findAll('[role="dialog"]').length;await tip.trigger('focus');await flushPromises();const details=document.getElementById(tip.attributes('aria-describedby')!)?.textContent;for(const value of [id,path,'尚未取得可核实的任务标识','没有可核实的任务标识','不会重发','原请求回执'])expect(details).toContain(value);expect(body().findAll('[role="dialog"]')).toHaveLength(dialogCount);await tip.trigger('keydown',{key:'Escape'});expect(tip.attributes('aria-describedby')).toBeUndefined();expect(api.start).toHaveBeenCalledTimes(1);expect(api.status).not.toHaveBeenCalled()})
- it('registers only the confirmed exact path then shows canonical reply; never auto setups',async()=>{const {api,setList,reader,store}=await setup();const canonical={id:'abcdef0123456789',name:'规范工程',path:'D:\\Canonical\\Game'};vi.mocked(api.register).mockResolvedValue(canonical);await click('添加已有工程');await body().get('input[aria-label="已有工程绝对路径"]').setValue('D:\\Alias\\Game');await click('核对仅登记');expect(api.register).not.toHaveBeenCalled();setList([target,canonical]);await click('确认仅登记此路径');expect(api.register).toHaveBeenCalledWith('D:\\Alias\\Game',expect.any(AbortSignal));expect(reader.loadProjects).toHaveBeenCalledTimes(2);expect(store.registrationReceipt?.phase).toBe('acknowledged');expect(body().get('[data-testid="registration-receipt"]').text()).toContain(canonical.path);expect(api.start).not.toHaveBeenCalled();for(const input of body().findAll('.setup-consents input'))expect((input.element as HTMLInputElement).checked).toBe(false)})
+ it('registers only the confirmed exact path then shows canonical reply; never auto setups',async()=>{const {api,setList,reader,store}=await setup();const canonical={id:'abcdef0123456789',name:'规范工程',path:'D:\\Canonical\\Game'};vi.mocked(api.register).mockResolvedValue(canonical);await click('添加已有工程');await body().get('input[aria-label="已有工程绝对路径"]').setValue('D:\\Alias\\Game');await click('核对仅登记');expect(api.register).not.toHaveBeenCalled();setList([target,canonical]);await click('确认仅登记此路径');expect(api.register).toHaveBeenCalledWith('D:\\Alias\\Game',expect.any(AbortSignal));expect(reader.loadProjects).toHaveBeenCalledTimes(2);expect(store.registrationReceipt?.phase).toBe('acknowledged');expect(body().get('[data-testid="registration-receipt"]').text()).toContain(canonical.path);expect(wrapper!.findComponent({name:'ProjectSetupWizard'}).findComponent({name:'ElSelect'}).props('modelValue')).toBe(canonical.id);expect(api.start).not.toHaveBeenCalled();for(const input of body().findAll('.setup-consents input'))expect((input.element as HTMLInputElement).checked).toBe(false)})
  it('editing registration path invalidates old confirmation',async()=>{const {api,store}=await setup();await click('添加已有工程');const input=body().get('input[aria-label="已有工程绝对路径"]');await input.setValue(path);await click('核对仅登记');expect(store.preparedRegistration).not.toBeNull();await input.setValue('D:\\Other');await flushPromises();expect(store.preparedRegistration).toBeNull();expect(api.register).not.toHaveBeenCalled()})
  it('registration UNKNOWN is not displayed as registered and causes no auto refresh or setup',async()=>{const {api,reader}=await setup();vi.mocked(api.register).mockRejectedValue(new ProjectSetupError('network-error'));await click('添加已有工程');await body().get('input[aria-label="已有工程绝对路径"]').setValue(path);await click('核对仅登记');await click('确认仅登记此路径');expect(body().get('[data-testid="registration-receipt"]').text()).toContain('登记结果未知');await click('关闭向导');const tip=button('登记与接入状态详情');await tip.trigger('focus');await flushPromises();const details=document.getElementById(tip.attributes('aria-describedby')!)?.textContent;expect(details).toContain(path);expect(details).toContain('必须先重新读取原来源的工程登记');expect(details).toContain('不会自动重发');expect(reader.loadProjects).toHaveBeenCalledTimes(1);expect(api.register).toHaveBeenCalledTimes(1);expect(api.start).not.toHaveBeenCalled()})
  it('keeps scheduled project reads paused across Creator-to-setup dialog switch',async()=>{vi.useFakeTimers();const {projects,reader,creator}=await setup();projects.startLive({label:'fake events',subscribe:()=>()=>{}});await vi.advanceTimersByTimeAsync(0);await flushPromises();await click('停止 Creator');expect(creator.dialogOpen).toBe(true);await openFull();expect(creator.dialogOpen).toBe(false);const count=vi.mocked(reader.loadProjects).mock.calls.length;await vi.advanceTimersByTimeAsync(4000);expect(reader.loadProjects).toHaveBeenCalledTimes(count);await click('关闭向导');await vi.advanceTimersByTimeAsync(3000);expect(reader.loadProjects).toHaveBeenCalledTimes(count+1)})
@@ -163,5 +164,48 @@ describe('strict setup selection confirmation',()=>{
   const checks=body().findAll('.setup-consents input[type="checkbox"]');for(const index of [0,3,4])await checks[index]!.setValue(true);await checks[1]!.setValue(startCreator);await checks[2]!.setValue(configureCodex);await flushPromises();await click('核对所选安装步骤')
   const confirmation=body().get('[data-testid="full-setup-confirm"]').text();expect(confirmation).toContain(startCreator?'Creator 启动及验证':'Creator 不启动');expect(confirmation).toContain(configureCodex?'Codex 配置':'Codex 不配置');expect(store.preparedSetup?.effectiveOptions).toEqual(effectiveOptions);expect(body().text()).toContain('仅复用相同有效选项');expect(body().text()).not.toContain('原选项 / 实际步骤无法核验')
   await click('确认执行所选安装步骤');expect(startStrict).toHaveBeenCalledWith(id,effectiveOptions,expect.any(AbortSignal));expect(api.start).not.toHaveBeenCalled();await vi.advanceTimersByTimeAsync(1000);await flushPromises();expect(store.setupReceipt?.phase).toBe('complete');expect(body().find('[data-testid="setup-completion-usage"]').exists()).toBe(configureCodex);expect(body().text()).toContain('已核实选项');expect(body().text()).not.toContain('接口不返回原始选项')
+ })
+})
+
+
+describe('registration readback form ownership',()=>{
+ it.each(['path','path-aba','project-aba','writer','writer-aba','label-aba'])('does not select the old registration after %s changes during readback',async change=>{
+  const {api,reader,lane}=await setup()
+  if(change==='label-aba')registerProjectSetupProvider(reactive(api))
+  await click('添加已有工程')
+  const input=body().get('.setup-path-row input')
+  await input.setValue(path)
+  await click('核对仅登记')
+  let resolveRead!:(value:Awaited<ReturnType<CompanionBrowserProvider['loadProjects']>>)=>void
+  vi.mocked(reader.loadProjects).mockImplementationOnce(()=>new Promise(done=>{resolveRead=done}))
+  await click('确认仅登记此路径')
+  expect(api.register).toHaveBeenCalledTimes(1)
+  expect(lane.locked).toBe(false)
+  expect(input.attributes('disabled')).toBeUndefined()
+  const wizard=wrapper!.findComponent({name:'ProjectSetupWizard'}),selection=wizard.findComponent({name:'ElSelect'})
+  if(change==='writer')registerProjectSetupProvider({...api,label:'replacement setup'})
+  else if(change==='writer-aba'){
+   registerProjectSetupProvider({...api,label:'replacement setup'})
+   registerProjectSetupProvider(api)
+  }else if(change==='label-aba'){
+   const previous=projectSetupProvider.value!.label
+   Reflect.set(projectSetupProvider.value!, 'label', 'temporary label')
+   await flushPromises()
+   Reflect.set(projectSetupProvider.value!, 'label', previous)
+   await flushPromises()
+  }
+  else if(change==='project-aba'){
+   selection.vm.$emit('update:modelValue',id);await flushPromises()
+   selection.vm.$emit('update:modelValue','');await flushPromises()
+  }else{
+   await input.setValue('D:\\Other\\Project')
+   if(change==='path-aba')await input.setValue(path)
+  }
+  expect(selection.props('modelValue')).toBe('')
+  resolveRead({projects:[target],statuses:[],dashboard:[],warnings:[]})
+  await flushPromises()
+  expect(input.element).toHaveProperty('value',change==='path'?'D:\\Other\\Project':path)
+  expect(wizard.findComponent({name:'ElSelect'}).props('modelValue')).toBe('')
+  expect(api.start).not.toHaveBeenCalled()
  })
 })

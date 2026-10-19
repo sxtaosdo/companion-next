@@ -1,0 +1,10 @@
+{
+  "document": "docs/knowledge-service-restored-20261019.md",
+  "change": "Chinese concise user instructions; command block unchanged byte-for-byte",
+  "powershell_block_count": 1,
+  "before_sha256": "288c243202cf19a9d1b2f89fc87d794490a2e19ccce2108a05457fa6b3e7cd92",
+  "after_sha256": "288c243202cf19a9d1b2f89fc87d794490a2e19ccce2108a05457fa6b3e7cd92",
+  "bytes_equal": true,
+  "commands_executed": false,
+  "credentials_read": false
+}

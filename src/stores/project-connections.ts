@@ -7,6 +7,13 @@ import { companionBrowserProvider } from '../companion-browser-integration'
 import { projectConnectionsProvider } from '../project-connections-integration'
 import { normalizeConnectionRequest,ProjectConnectionError,type ConnectionRequest,type ClientTarget,CLIENT_TARGETS } from '../domain/project-connections'
 import type { ToolPreset } from '../domain/tool-presets-read'
+const MCP_REFRESH_HINTS: Partial<Record<ClientTarget, string>> = {
+  cursor: "若未出现请在 Settings → MCP 刷新或重开 Agent 会话。",
+  trae: "若未出现请在 Trae MCP 设置中刷新或重开 Agent 会话。",
+  kiro: "若未出现请在 Kiro MCP 设置中刷新或重开 Agent 会话。",
+  vscode: "若未出现请在 VS Code MCP 面板刷新或重开 Copilot 会话。",
+};
+
 type Prepared={readonly owner:symbol;readonly project:{readonly id:string;readonly name:string;readonly path:string};readonly requests:readonly ConnectionRequest[];readonly source:object;readonly api:object;readonly identity:string}
 export const useProjectConnectionsStore=defineStore('project-connections',()=>{
  const browser=useCompanionBrowserStore(),setup=useProjectSetupStore(),lane=useProjectOperationLaneStore()
@@ -55,7 +62,8 @@ export const useProjectConnectionsStore=defineStore('project-connections',()=>{
      if(reply.key!==JSON.stringify(request)||typeof reply.text!=='string')throw new ProjectConnectionError('invalid-shape')
      op.awaiting=false
      if(op.cancelled||!current(p)){block(request);all=false;break}
-     receipts.value=[...receipts.value,{owner,text:reply.text}]
+     const hint=request.kind==='client'?MCP_REFRESH_HINTS[request.target]:undefined
+     receipts.value=[...receipts.value,{owner,text:hint?`${reply.text}\n${hint}`:reply.text}]
     }catch(error){
      all=false;const unknown=!(error instanceof ProjectConnectionError)||error.outcome==='unknown';if(unknown)block(request)
      if(!op.cancelled&&current(p))message.value={owner,text:unknown?'该项结果未知，后续客户端未发送；请核对原配置，本页不重发此项。':'原接口未完成该项；后续客户端未发送。请核对已显示的先前回执。'}

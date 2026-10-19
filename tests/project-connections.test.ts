@@ -59,3 +59,38 @@ describe('wizard skip belongs to a completed task',()=>{
   const next='22345678-1234-4234-8234-123456789abc';projectSetupProvider.value!.start=async()=>({operationId:next});projectSetupProvider.value!.status=async()=>({id:next,projectId:id,projectPath:'D:/Fixture',stage:'complete',startedAt:'2026-10-18T00:00:00.000Z',updatedAt:'2026-10-18T00:00:01.000Z'});const store=useProjectSetupStore(pinia);vi.useFakeTimers();const preview=store.prepareSetup(id,{installBridge:true,startCreator:true,configureCodex:true,acknowledgeReuse:true,acknowledgeToolScope:true});await store.sendSetup(preview,true);await vi.advanceTimersByTimeAsync(1000);vi.useRealTimers();await flushPromises();expect(w.find('[data-testid="agent-registration-panel"]').exists()).toBe(true);expect(w.text()).not.toContain('已跳过本步 Agent 注册')
  })
 })
+
+
+describe('legacy client refresh guidance',()=>{
+ it.each([
+  ['cursor','若未出现请在 Settings → MCP 刷新或重开 Agent 会话。'],
+  ['trae','若未出现请在 Trae MCP 设置中刷新或重开 Agent 会话。'],
+  ['kiro','若未出现请在 Kiro MCP 设置中刷新或重开 Agent 会话。'],
+  ['vscode','若未出现请在 VS Code MCP 面板刷新或重开 Copilot 会话。'],
+ ] as const)('retains the original %s success guidance after an acknowledged registration',async(target,hint)=>{
+  const {store}=await setup();store.prepareClients(owner,id,[target]);expect(await store.send(owner,true)).toBe(true);
+  expect(store.receipts[0]?.text).toContain(hint);
+ });
+ it('does not attach success guidance to an unknown registration',async()=>{
+  const api=fixture();api.run=vi.fn(async()=>{throw new ProjectConnectionError('network-error')});
+  const {store}=await setup(api);store.prepareClients(owner,id,['cursor']);expect(await store.send(owner,true)).toBe(false);
+  expect(store.receipts).toHaveLength(0);expect(store.message?.text).not.toContain('Settings');
+ });
+});
+
+
+describe('client guidance follows only confirmed batch receipts',()=>{
+ it.each(['failure','unknown','mismatched-key','cancel'] as const)('retains the first confirmed client hint after later %s and stops the batch',async mode=>{
+  let finish!:(reply:{key:string;text:string})=>void;const api=fixture();
+  api.run=vi.fn(async request=>{
+   if(request.kind==='client'&&request.target==='cursor')return {key:JSON.stringify(request),text:'first acknowledged'};
+   if(mode==='cancel')return new Promise<{key:string;text:string}>(resolve=>{finish=resolve});
+   if(mode==='mismatched-key')return {key:'other',text:'wrong receipt'};
+   throw new ProjectConnectionError('network-error',mode==='failure'?'rejected':'unknown');
+  });
+  const {store}=await setup(api);store.prepareClients(owner,id,['cursor','vscode','kiro']);const pending=store.send(owner,true);
+  if(mode==='cancel'){await flushPromises();store.cancel(owner);finish({key:JSON.stringify(vi.mocked(api.run).mock.calls[1]![0]),text:'late acknowledged'})}
+  expect(await pending).toBe(false);expect(api.run).toHaveBeenCalledTimes(2);expect(store.receipts).toHaveLength(1);
+  expect(store.receipts[0]?.text).toContain('Settings → MCP');expect(store.receipts[0]?.text).not.toContain('VS Code');
+ });
+});

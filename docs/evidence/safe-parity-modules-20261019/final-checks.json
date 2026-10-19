@@ -1,0 +1,21 @@
+{
+  "affectedTests": {
+    "files": 3,
+    "passed": 102
+  },
+  "addedNormalSelectionAssertion": {
+    "file": "project-setup-ui.test.ts",
+    "passed": 42
+  },
+  "typecheckExit": 0,
+  "workspaceBuildExit": 0,
+  "review": {
+    "initialP2": "provider ABA during registration readback",
+    "closed": true,
+    "remainingP1P2": 0
+  },
+  "realReaderLoaded": false,
+  "realClientRegistration": false,
+  "realIdePrefill": false,
+  "codexBlocked": "clipboard nonempty; target input not observable"
+}

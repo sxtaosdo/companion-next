@@ -1,22 +1,16 @@
-# Knowledge service restored and manual reader setup — 2026-10-19
+# 知识库服务恢复与本机只读接入（2026-10-19）
 
-8081 is restored. At 00:14 UTC the existing WeKnora PID16812 listens only on 127.0.0.1:8081 and GET /health returns status=ok. Companion PID8844 listens only on 127.0.0.1:32180. This final check reused both processes, with zero start requests. See [socket and health receipt](evidence/knowledge-service-restored-20261019/port-bindings.json).
+## 当前结果
 
-The earlier real Edge check reached /login, HTTP200, title WeKnora, with a password input; no credentials were submitted. Companion reported auth=missing, keyword=unverified, writerEnabled=false and schedulerEnabled=false. No real reader was loaded or its credential-file path configured. See [bounded verification](evidence/knowledge-service-restored-20261019/restore-result-r3.json) and [blank login](evidence/knowledge-service-restored-20261019/login-blank.png).
+2026-10-19 00:14 UTC 已确认 8081 恢复：WeKnora PID16812 仅监听 `127.0.0.1:8081`，`GET /health` 返回 `status=ok`。Companion PID8844 仅监听 `127.0.0.1:32180`。最后检查直接复用两个进程，启动请求为 0，见[端口与健康证据](evidence/knowledge-service-restored-20261019/port-bindings.json)。这些 PID 是当时记录。
 
-## Recovery and preserved failures
+原生 `/login` 页面返回 HTTP200，标题为 WeKnora，密码输入框可见；没有提交登录。Companion 仍为 `auth=missing`、`keyword=unverified`、`writerEnabled=false`、`schedulerEnabled=false`。未装载真实 reader，也未配置其凭据路径。见[验证回执](evidence/knowledge-service-restored-20261019/restore-result-r3.json)和[空白登录页](evidence/knowledge-service-restored-20261019/login-blank.png)。
 
-The first original API start returned503: the preceding deployment's child PATH omitted WindowsPowerShell/v1.0, so powershell.exe failed ENOENT before the original startup script ran. This was our deployment environment omission. After two idle snapshots (all counters zero, no unknown work), the original guarded CLI restarted Companion2772 to8844 with the same daemon SHA9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5. Only the child PATH was corrected; there was no global environment or product source change and no forced kill. All four existing Owner environment paths were retained.
+## 本人接入步骤
 
-The next original API start returned200 and launched WeKnora once. Its following verification failed because our native-fetch script used h.status() instead of h.status. The corrected verifier detected the running instance and made zero start requests. The [503 receipt](evidence/knowledge-service-restored-20261019/restore-result.json), [guarded restart](evidence/knowledge-service-restored-20261019/companion-path-restart.json), and [200 followed by verifier error](evidence/knowledge-service-restored-20261019/restore-result-r2.json) remain archived.
-
-Recovery used the existing D:/services/weknora/Start-PilotAccess.ps1 (SHA d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233) and original binary (SHA b05899bc8ccaf299f8d5b5bb7c131cedf81491e51b02906b4321d72c10d6ce64). Its guarded child configuration keeps AUTO_MIGRATE=false, AUTO_RECOVER_DIRTY=false and WEKNORA_HOUSEKEEPING_ENABLED=false. Normal startup reads its own database/JWT configuration; the agent did not extract or print secret values. No historical recovery, migration, indexing, Creator or model operation was requested.
-
-The first cold original readonly state-check timed out at30s; its guard was not bypassed. The same original inspect_database routine then passed with a100s diagnostic budget in10.55s, using SQLite mode=ro/query_only/BEGIN. The post-check passed in0.38s. [Before](evidence/knowledge-service-restored-20261019/metadata-before.json) and [after](evidence/knowledge-service-restored-20261019/metadata-after.json) selected snapshots are deeply equal: schema30/dirty0, quick_check=ok, guarded trigger counts0, knowledges1650/chunks59433/lite_embeddings2272/auth_tokens38/users2/tenants2; selected knowledge-state SHA2bdae1ba12dad8adb3ce61a25fa57366081821e40af1abb4a236277fa2c7e2b5. This proves only the sampled fields and counts, not every document's metadata/body or database bytes. [Preservation](evidence/knowledge-service-restored-20261019/preservation.json) confirms original registries byte-equal and shared cocos-mcp HEAD/status/diff unchanged.
-
-## User-local PowerShell commands — prepared, NOT executed by the agent
-
-Run this block yourself in a local PowerShell window. It clears plaintext-key variables only in this shell and passes the existing DPAPI file path without reading its contents. The four Owner values preserve the current working Owner configuration during daemon replacement; a fresh shell otherwise lacks them.
+1. 在本机 PowerShell 中执行下方命令。**此接入块仅供本人执行，代理未执行。** 命令只清除当前窗口的明文密钥变量，并传入现有 DPAPI 文件路径。四项 Owner 路径用于保留当前可用配置，新窗口通常没有这些变量。
+2. guarded restart 成功后，通过最后一条 `ui` 命令重新授权浏览器会话，再打开 `http://127.0.0.1:32180/next/index.html#/knowledge`。
+3. 点击现有“读取知识库列表”，核对唯一允许的知识库 ID：`da1051a5-3fff-4198-ba55-017ea79df9c3`。如需继续，文档列表最多读取 3 项。
 
 ```powershell
 Remove-Item Env:WEKNORA_API_KEY, Env:KNOWLEDGE_SYNC_API_KEY -ErrorAction SilentlyContinue
@@ -31,12 +25,23 @@ if ($LASTEXITCODE -ne 0) { throw 'Guarded Companion restart did not succeed; sto
 & 'C:/Program Files/nodejs/node.exe' 'D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js' ui
 ```
 
-The guarded restart drains work and may refuse busy/unknown activity; it changes daemon identity and requires fresh UI authorization. Existing SSE/MCP/browser sessions may reconnect. It does not restart8081, Creator or models, change system environment, or write a plaintext API key. Do not use the old Enter-PilotCli.ps1 search helper. In the newly authorized browser session, open http://127.0.0.1:32180/next/index.html#/knowledge. Merely configuring the path is not proof of successful authentication: the private worker decrypts only upon a reader operation.
+## 预期结果与错误处理
 
-Choose the existing knowledge-list read action and confirm the sole allowed library ID da1051a5-3fff-4198-ba55-017ea79df9c3; optionally read at most3 document-list entries. The existing reader is keyID3, tenant1, retrieve-only, full_access=false, expiring2026-11-08T01:25:46Z. No key creation/renewal or permission expansion is included. This reader is an API identity, not a native Web-login JWT. Permitted reads include scoped library/document/chunk/original data and keyword search with --no-vector; no chat/Agent/inference/write/sync writer/ingestion/recovery is enabled.
+- 重启会等待当前工作结束；遇到 busy/unknown 可能拒绝。命令返回失败就停在该处，不强制终止，也不重复启动。它会更换 Companion 身份，原 SSE/MCP/浏览器连接可能重连，需要重新授权 UI。
+- 该命令不重启 8081、Creator 或模型，不修改系统环境，也不写入明文 API key。不要使用旧 `Enter-PilotCli.ps1` 搜索辅助脚本。
+- 仅设置路径不能证明认证成功；私有 worker 只在发起 reader 操作时解密。列表读取失败或仍显示 `auth=missing` 时，保留错误状态和回执，停止后续读取；不要把 DPAPI 内容或密钥粘贴到聊天。
+- 当前 reader 为 `keyID3`、`tenant1`、`retrieve-only`、`full_access=false`，到期时间 `2026-11-08T01:25:46Z`。只允许上述知识库内的库、文档、分块、原文读取和 `--no-vector` 关键词检索；不包含新建/续期密钥、扩大权限、chat/Agent/推理、写入、同步写入、入库或历史恢复。它是 API 身份，不是原生 Web 登录 JWT。
 
-Successful list/metadata reads would establish only that bounded integration. Keyword relevance, exact source reading, Agent/answers, sync and full legacy feature alignment need separate acceptance. The agent has not performed any real-reader positive read in this task.
+列表或元数据读取成功，只能证明这一段接入。关键词相关性、原文准确性、Agent/问答、同步及新旧后台完整对齐仍需分别验收。本任务没有执行真实 reader 正向读取。
 
-## Review and limits
+## 恢复过程与保留证据
 
-Independent reviewer found no P1/P2 in the restore receipts or manual plan, confirmed selected-snapshot equality and fresh-UI-authorization requirement. The final socket receipt closes its evidence-format concern. No preset/SSE/Creator suites were repeated; previous passes remain bounded to their recorded scope. No source patch, upload, push, new listening service, software install or security-permission change was made in this stage.
+首次原 API 启动返回 503：上一次部署遗漏子进程 PATH 中的 `WindowsPowerShell/v1.0`，导致 `powershell.exe` 报 ENOENT，原启动脚本尚未执行。这是代理部署环境遗漏。确认两次空闲快照（计数全 0、无 unknown）后，使用原 guarded CLI 将 Companion2772 重启为 8844，daemon SHA 保持 `9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5`。只修正子进程 PATH，并保留四项 Owner 路径；未改全局环境或产品源码，未强杀。
+
+第二次原 API 启动返回 200，WeKnora 实际启动一次；随后代理验证脚本误用 `h.status()` 而非 `h.status` 报错。修正后的验证器检测到已有实例，没有再次启动。[503 回执](evidence/knowledge-service-restored-20261019/restore-result.json)、[guarded restart 回执](evidence/knowledge-service-restored-20261019/companion-path-restart.json)和[启动成功后验证器报错回执](evidence/knowledge-service-restored-20261019/restore-result-r2.json)均保留。
+
+恢复沿用原 `D:/services/weknora/Start-PilotAccess.ps1`（SHA `d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233`）及原二进制（SHA `b05899bc8ccaf299f8d5b5bb7c131cedf81491e51b02906b4321d72c10d6ce64`）。`AUTO_MIGRATE=false`、`AUTO_RECOVER_DIRTY=false`、`WEKNORA_HOUSEKEEPING_ENABLED=false` 保持关闭。服务正常读取自身数据库/JWT 配置，代理未提取或打印密钥；未执行历史恢复、迁移、索引、Creator 或模型操作。
+
+首次冷启动只读检查在 30 秒超时，未绕过原 guard；随后以 100 秒诊断预算调用相同 `inspect_database`，使用 SQLite `mode=ro/query_only/BEGIN`，10.55 秒通过；事后检查 0.38 秒通过。[前快照](evidence/knowledge-service-restored-20261019/metadata-before.json)与[后快照](evidence/knowledge-service-restored-20261019/metadata-after.json)所采字段和计数深度一致：schema30/dirty0、quick_check=ok、guarded trigger counts0、knowledges1650/chunks59433/lite_embeddings2272/auth_tokens38/users2/tenants2；knowledge-state SHA 为 `2bdae1ba12dad8adb3ce61a25fa57366081821e40af1abb4a236277fa2c7e2b5`。这不证明全部文档元数据、正文或数据库字节相同。[保护检查](evidence/knowledge-service-restored-20261019/preservation.json)确认原登记文件字节一致，共享 cocos-mcp HEAD/status/diff 未变。
+
+独立审查未发现 P1/P2，确认上述快照比较及重新授权要求；最后的端口回执补齐了证据格式。未重跑预设/SSE/Creator 套件，原验收范围不变。本阶段没有源码补丁、上传、推送、新监听服务、安装软件或修改安全权限。

@@ -1,0 +1,55 @@
+{
+  "scope": "project registration readback form ownership; offline fake-provider Vue UI only",
+  "node": "C:/Program Files/nodejs/node.exe (existing Node25)",
+  "pre_fix": {
+    "command": "node node_modules/vitest/vitest.mjs run tests/project-setup-ui.test.ts -t \"registration readback form ownership\"",
+    "exit_code": 1,
+    "result": "1 failed | 36 skipped",
+    "failure": "expected 0123456789abcdef to be empty string after changing path while registration readback was pending",
+    "location": "tests/project-setup-ui.test.ts:189",
+    "run_time": "11:01:46",
+    "duration": "2.84s"
+  },
+  "post_fix": {
+    "command": "node node_modules/vitest/vitest.mjs run tests/project-setup-ui.test.ts",
+    "exit_code": 0,
+    "result": "Test Files 1 passed (1); Tests 40 passed (40)",
+    "run_time": "11:02:15",
+    "duration": "7.22s"
+  },
+  "cases": [
+    "path edit during readback",
+    "path ABA during readback",
+    "selected project ABA during readback",
+    "writer replacement during readback",
+    "existing normal canonical registration selection regression"
+  ],
+  "prior_harness_issues": [
+    "First restricted test command failed writing Vite temp cache, rerun using approved escalation",
+    "First added test used wrong existing toolbar label and was corrected before true red regression"
+  ],
+  "services_or_credentials_accessed": false,
+  "files_changed": [
+    "src/components/ProjectSetupWizard.vue",
+    "tests/project-setup-ui.test.ts"
+  ],
+  "notes": "Captured exact summarized tool stdout and command receipts; not a raw terminal session log. No service or UI operations outside jsdom, no Git writes.",
+  "review_followup": {
+    "pre_fix": {
+      "exit_code": 1,
+      "result": "2 failed | 4 passed | 36 skipped (42)",
+      "failure": "writer-aba and label-aba expected empty projectId but received 0123456789abcdef",
+      "run_time": "11:04:04",
+      "duration": "4.65s"
+    },
+    "post_fix": {
+      "command": "node node_modules/vitest/vitest.mjs run tests/project-setup-ui.test.ts",
+      "exit_code": 0,
+      "result": "42 passed (42)",
+      "run_time": "11:04:34",
+      "duration": "8.64s"
+    },
+    "implementation": "Independent bindingEpoch watches reader/writer/connected and their labels flush:sync, excluding project snapshots. currentForm captures binding epoch.",
+    "caveat": "Providers are shallowRef. Final label ABA test uses reactive(api), so intermediate label changes are observable. Direct mutation of a raw provider label A->B->A with no reactive notification cannot be observed by Vue watch; no shared integration API was changed."
+  }
+}

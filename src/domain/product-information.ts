@@ -5,6 +5,7 @@ export const frontendIdentity = { name: 'Companion Next', version, releaseDate: 
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；完整业务迁移未完成', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  { version, date: '2026-10-19', title: '保护登记回读与客户端接入提示', changes: ['登记成功后的工程列表回读不再覆盖等待期间已更改的路径、工程或向导上下文；恢复旧 MCP 各客户端的刷新 / 重开提示，仅随对应成功回执显示。CLI 复制说明与现有明确点击的外部交接按钮分别说明，不改变注册、安装或投递行为。'] },
   { version, date: '2026-10-18', title: '修复预设回读与切工程刷新竞态', changes: ['预设回读某项先失败时，等待其余读取实际结束再解除读取锁，离页也不提前放开；刷新工具目录后若工程或来源已变化、或页面已卸载，旧回调不再继续读取预设。原确认、UNKNOWN 和写入结果语义保持。'] },
   { version, date: '2026-10-18', title: '核对 Windows 原生聚焦结果', changes: ['Windows 原生聚焦核对目标窗口和实际前台 PID；未确认到前台或临时线程输入队列未清理时返回失败。仅恢复最小化窗口；检测到用户切窗时停止重试，不修改系统前台策略或权限。'] },
   { version, date: '2026-10-18', title: '明确安装步骤的独立选择', changes: ['严格安装模式说明与校验提示同步实际合同：Bridge、任务复用和工具范围须明确同意，Creator 与 Codex 可独立选择；保留旧完整接入模式的五项同意要求，不改变安装选项或执行行为。'] },

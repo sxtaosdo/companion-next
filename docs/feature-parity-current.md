@@ -1,3 +1,5 @@
+2026-10-19: 并行补齐工程登记慢回读上下文保护、旧MCP各客户端成功刷新提示，并纠正CLI交接说明。根受影响102项、类型与workspace构建通过；真实密钥、持久客户端配置和投递均未执行，整体仍未全部验收对齐。源码候选与部署状态见[本轮模块及精确剩余项](safe-parity-modules-20261019.md)。
+
 2026-10-19 00:14 UTC: 8081 restored and reused (WeKnora16812 / health ok); Companion8844 remains missing-auth with keyword unverified and writer/scheduler disabled. Both bind127.0.0.1. Startup migration/recovery/housekeeping flags remain false; sampled metadata unchanged. Real reader not loaded. See [restoration evidence and user-local manual commands](knowledge-service-restored-20261019.md). Earlier stopped-service entries below describe their original timestamps.
 
 2026-10-18 23:58 UTC: reviewed preset fixes and credential isolation are now deployed on loopback32180 (daemon2772 / SHA9d2d0174). Real Edge passed preset5 and bounded SSE7 checks; all task fixtures deleted200, original projects/presets bytes restored, pageErrors0. Missing-auth status and401 verified; real reader hookup remains untested and8081 stays stopped. Candidate baselineTS7016 resolved with declarations/full typecheck exit0. See [actual deployment and precise acceptance](credential-deployment-real-20261018.md).

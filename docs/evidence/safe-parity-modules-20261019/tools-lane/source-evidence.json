@@ -1,0 +1,57 @@
+[
+  {
+    "path": "src/stores/project-connections.ts",
+    "line": 10,
+    "text": "const MCP_REFRESH_HINTS: Partial<Record<ClientTarget, string>> = {"
+  },
+  {
+    "path": "src/stores/project-connections.ts",
+    "line": 62,
+    "text": "     if(reply.key!==JSON.stringify(request)||typeof reply.text!=='string')throw new ProjectConnectionError('invalid-shape')"
+  },
+  {
+    "path": "src/stores/project-connections.ts",
+    "line": 64,
+    "text": "     if(op.cancelled||!current(p)){block(request);all=false;break}"
+  },
+  {
+    "path": "src/stores/project-connections.ts",
+    "line": 65,
+    "text": "     const hint=request.kind==='client'?MCP_REFRESH_HINTS[request.target]:undefined"
+  },
+  {
+    "path": "src/stores/project-connections.ts",
+    "line": 66,
+    "text": "     receipts.value=[...receipts.value,{owner,text:hint?`${reply.text}\\n${hint}`:reply.text}]"
+  },
+  {
+    "path": "src/components/CliUseDialog.vue",
+    "line": 48,
+    "text": "   <p class=\"form-help\">原 v148 弹板实际提供两段文本。检查命令只绑定完整 ID，名称和路径仅供核对。不会读取或混入 Cookie、token、端口及运行配置；仅点击复制按钮不会打开应用；点击“发送到 Cursor / Codex”才会复制后尝试打开对应本机应用，由你确认使用。剪贴板请求发出后无法撤销，切工程后粘贴请再次核对。</p>"
+  },
+  {
+    "path": "tests/project-connections.test.ts",
+    "line": 64,
+    "text": "describe('legacy client refresh guidance',()=>{"
+  },
+  {
+    "path": "tests/project-connections.test.ts",
+    "line": 82,
+    "text": "describe('client guidance follows only confirmed batch receipts',()=>{"
+  },
+  {
+    "path": "tests/agent-handoff.test.ts",
+    "line": 50,
+    "text": "describe('CLI help matches the existing explicit handoff buttons',()=>{"
+  },
+  {
+    "path": "../cocos-mcp/web/src/app.ts",
+    "line": 142,
+    "text": "const MCP_REFRESH_HINTS: Partial<Record<AgentTarget, string>> = {"
+  },
+  {
+    "path": "../cocos-mcp/web/src/app.ts",
+    "line": 2478,
+    "text": "      MCP_REFRESH_HINTS[target],"
+  }
+]

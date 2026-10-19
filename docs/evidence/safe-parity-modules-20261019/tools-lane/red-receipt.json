@@ -1,0 +1,22 @@
+{
+  "kind": "transcribed-execution-receipt",
+  "raw_log_file": null,
+  "tool_chunk_id": "0b3fbb",
+  "command": "node node_modules/vitest/vitest.mjs run tests/project-connections.test.ts tests/agent-handoff.test.ts -t 'legacy client refresh guidance|CLI help matches'",
+  "exit_code": 1,
+  "test_files": {
+    "failed": 2
+  },
+  "tests": {
+    "failed": 5,
+    "passed": 1,
+    "skipped": 50
+  },
+  "duration_seconds": 11.0,
+  "started_at_host": "11:01:20",
+  "failures": [
+    "four original client refresh hints absent from successful receipts",
+    "CLI explanation lacked explicit handoff-button distinction"
+  ],
+  "note": "Original raw output exists in task tool transcript only; this file records its observed summary. Test expectation wording for exact legacy hint strings was subsequently aligned to the source before green."
+}

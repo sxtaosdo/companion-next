@@ -1,0 +1,23 @@
+{
+  "kind": "transcribed-execution-receipt",
+  "raw_log_file": null,
+  "tool_chunk_id": "463a0f",
+  "command": "node node_modules/vitest/vitest.mjs run tests/project-connections.test.ts tests/agent-handoff.test.ts -t 'legacy client refresh guidance|CLI help matches|client guidance follows'",
+  "exit_code": 0,
+  "test_files": {
+    "passed": 2
+  },
+  "tests": {
+    "passed": 10,
+    "skipped": 50
+  },
+  "duration_seconds": 2.48,
+  "started_at_host": "11:02:05",
+  "cases": [
+    "four exact legacy client success hints",
+    "unknown registration does not add success guidance",
+    "later rejected/unknown/mismatched-key/cancel preserves first acknowledged receipt and stops subsequent dispatch",
+    "CLI copy/handoff distinction, no provider calls on render"
+  ],
+  "note": "No rerun performed to produce this receipt. Original raw output exists in task tool transcript only."
+}

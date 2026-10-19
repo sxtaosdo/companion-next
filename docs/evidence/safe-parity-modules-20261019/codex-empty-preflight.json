@@ -1,0 +1,15 @@
+﻿{
+    "atUtc":  "2026-10-19T03:08:09.5084091Z",
+    "clipboardEmpty":  false,
+    "clipboardContentRead":  false,
+    "inputContentRead":  false,
+    "inputCandidates":  [
+
+                        ],
+    "mutations":  0,
+    "blocked":  [
+                    "CLIPBOARD_NO_LONGER_EMPTY",
+                    "TARGET_INPUT_NOT_UNIQUE"
+                ],
+    "windowCount":  0
+}

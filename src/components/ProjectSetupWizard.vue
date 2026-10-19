@@ -79,7 +79,8 @@ const statusDetails=computed(()=>{
  details.push('以上为原请求回执，接口未提供来源标签；请核对原宿主，不能据此判断当前连接状态。')
  return details.join('；')
 })
-let mounted=true,contextEpoch=0,dialogEpoch=0,formEpoch=0
+let mounted=true,contextEpoch=0,bindingEpoch=0,dialogEpoch=0,formEpoch=0
+watch(()=>[projects.provider,projectSetupProvider.value,projects.connected,projects.provider?.label,projectSetupProvider.value?.label],()=>{bindingEpoch++},{flush:'sync'})
 watch(()=>[projects.provider,projectSetupProvider.value,projects.connected,JSON.stringify(projects.projects)],()=>{contextEpoch++;store.clearPrepared();scaffold.clearPrepared()},{flush:'sync'})
 watch([path,projectId,sourceMode,parentPath,projectName,()=>JSON.stringify(consents.value)],()=>{formEpoch++;store.clearPrepared();scaffold.clearPrepared()},{flush:'sync'})
 watch(open,value=>emit('dialog-visibility',value),{flush:'sync',immediate:true})
@@ -128,12 +129,16 @@ async function submitScaffold(){
 }
 async function register(){
  const preview=store.preparedRegistration;if(!preview)return
- const source=projects.provider,epoch=contextEpoch,dialog=dialogEpoch
+ const source=projects.provider,api=projectSetupProvider.value,epoch=contextEpoch,binding=bindingEpoch,dialog=dialogEpoch,form=formEpoch,readLabel=source?.label,writeLabel=api?.label
+ // The normal readback changes the project snapshot/context epoch itself.
+ // Keep form ownership separate so edits (including ABA) revoke only selection.
+ const currentForm=()=>mounted&&open.value&&binding===bindingEpoch&&dialog===dialogEpoch&&form===formEpoch&&projects.connected&&source===projects.provider&&api===projectSetupProvider.value&&source?.label===readLabel&&api?.label===writeLabel
  const acknowledged=await store.sendRegistration(preview,true)
- if(acknowledged&&mounted&&open.value&&dialog===dialogEpoch&&projects.connected&&source===projects.provider&&contextEpoch===epoch){
+ const receipt=store.registrationReceipt
+ if(acknowledged&&currentForm()&&contextEpoch===epoch&&receipt?.phase==='acknowledged'&&receipt.project){
+  const returned=receipt.project
   await projects.refreshProjects()
-  if(mounted&&open.value&&dialog===dialogEpoch&&source===projects.provider&&projects.connected&&store.registrationReceipt?.project){
-   const returned=store.registrationReceipt.project
+  if(currentForm()&&store.registrationReceipt===receipt){
    const found=projects.projects.find(p=>p.id===returned.id&&p.path===returned.path&&p.name===returned.name)
    if(found)projectId.value=found.id
   }

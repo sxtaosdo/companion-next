@@ -45,7 +45,7 @@ async function copy(kind: 'agent' | 'skill') {
   <section data-testid="cli-use-dialog">
    <p v-if="project"><strong>{{ project.name }}</strong><br>完整 projectId：<code>{{ project.id }}</code></p><pre v-if="project" class="cli-project-path">{{ project.path }}</pre>
    <el-alert title="本页只展示和复制文本" type="info" :closable="false" description="文本含工程名称、ID 和完整路径。复制不会运行 CLI 或创建文件；Skill 提示词要求的写入仅会在你后续交给 Agent 执行时发生，请先确认目标和权限。"/>
-   <p class="form-help">原 v148 弹板实际提供两段文本。检查命令只绑定完整 ID，名称和路径仅供核对。不会读取或混入 Cookie、token、端口及运行配置；复制也不打开外部协议。剪贴板请求发出后无法撤销，切工程后粘贴请再次核对。</p>
+   <p class="form-help">原 v148 弹板实际提供两段文本。检查命令只绑定完整 ID，名称和路径仅供核对。不会读取或混入 Cookie、token、端口及运行配置；仅点击复制按钮不会打开应用；点击“发送到 Cursor / Codex”才会复制后尝试打开对应本机应用，由你确认使用。剪贴板请求发出后无法撤销，切工程后粘贴请再次核对。</p>
    <el-alert v-if="generated.error" :title="generated.error" type="warning" :closable="false"/>
    <section v-for="block in blocks" :key="block.id" class="help-code-block"><h3>{{ block.title }}</h3><div class="help-code-toolbar"><button :aria-pressed="wrap[block.id]" @click="wrap[block.id]=!wrap[block.id]">{{ wrap[block.id]?'自动换行':'不换行' }}</button><button v-if="block.text.split('\n').length>5" :aria-expanded="expanded[block.id]" @click="expanded[block.id]=!expanded[block.id]">{{ expanded[block.id]?'收起':'展开全文' }}</button><button :disabled="copying||agentHandoffBusy" @click="copy(block.id)">{{ copying?'等待剪贴板':'复制完整文本' }}</button><AgentHandoffButtons :text="block.text" :context-key="`${context}:${block.id}`" :disabled="copying||!modelValue||!source"/></div><pre :data-testid="`cli-${block.id}-text`" :class="{ 'cli-no-wrap':!wrap[block.id], 'cli-folded':!expanded[block.id] }">{{ block.text }}</pre></section>
    <p v-if="notice" role="status">{{ notice }}</p>
