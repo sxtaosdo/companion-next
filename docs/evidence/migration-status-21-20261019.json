@@ -77,15 +77,15 @@
       "id": 10,
       "name": "清空、导出、诊断",
       "status": "部分完成",
-      "evidenceAndRemaining": "导出诊断已验，清空DELETE未执行",
-      "remainingKind": "用户确认可清数据范围/实机"
+      "evidenceAndRemaining": "真实导出诊断及本机583B文件已复核复用；本轮不重复诊断、不外发、DELETE0。清空仅原隔离语义/模拟UI通过，没有真实API清除回执；本轮明确禁止清空真实日志/业务记录，不要求删除用户真实日志",
+      "remainingKind": "本轮清空禁止；诊断导出已真实验收"
     },
     {
       "id": 11,
       "name": "调用记录、筛选、详情、分页",
       "status": "部分完成",
-      "evidenceAndRemaining": "真实空态通过，132条非空与66失败分页/详情/503恢复仅模拟；129项不等于生产历史通过",
-      "remainingKind": "实机"
+      "evidenceAndRemaining": "当前真实fixture6条success，列表顺序/累计保留6、成功详情摘要、失败筛选0、切回及刷新与API一致，调用数不变。6<50且无游标，真实分页/失败详情缺数据未验；132/66仍仅模拟",
+      "remainingKind": "数据不足；自然出现足量/失败记录后独立只读补验"
     },
     {
       "id": 12,
@@ -177,5 +177,6 @@
       "countsBefore": "11/8/2",
       "countsAfter": "12/7/2"
     }
-  }
+  },
+  "callsReadonlyUpdate": "Six real existing success records: UI list/order, success detail hashes, zero-result failed filter, reset and explicit refresh exact; count remains6. No cursor under50, real pagination/failure detail unverified. Reused actual583B diagnostic without new POST/download. Counts12/7/2 unchanged."
 }

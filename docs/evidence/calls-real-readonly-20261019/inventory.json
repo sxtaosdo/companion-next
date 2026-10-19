@@ -1,0 +1,105 @@
+{
+  "atUtc": "2026-10-19T15:33:35.755Z",
+  "mode": "REAL_EXISTING_RECORDS_READONLY_NO_CALLS_OR_INJECTION",
+  "sessionId": "c5369676-22aa-44fd-ba59-6d90df0b47b0",
+  "registeredProjectCount": 7,
+  "nonemptyProjects": [
+    {
+      "projectId": "a79f4915296f4091",
+      "projectName": "creator-ai-variant-import-acceptance-20261017",
+      "currentCount": 6,
+      "all": {
+        "sessionId": "c5369676-22aa-44fd-ba59-6d90df0b47b0",
+        "total": 6,
+        "retained": 6,
+        "returned": 6,
+        "nextBefore": null,
+        "records": [
+          {
+            "id": "f8f45a10-1b0d-49ab-bc9f-c1e778351f28",
+            "sequence": 6,
+            "operation": "tool-preset.select",
+            "operationNameZh": "切换工具范围",
+            "status": "success",
+            "source": "web",
+            "startedAt": "2026-10-19T15:22:54.385Z",
+            "durationMs": 7,
+            "inputSha256": "6fd199f857bebd8afa36b440cd1cbadd73e2c4a23ce6a8a14a5f3d912cf00cb5",
+            "resultSha256": "d7fe8841ce9d5db6a5e17adfaa5579bd478fec0e17929e7a2d14da7779696c17",
+            "errorSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "id": "3ac38072-9074-4545-8655-37fc74ddf083",
+            "sequence": 5,
+            "operation": "creator.stop",
+            "operationNameZh": "其他操作",
+            "status": "success",
+            "source": "web",
+            "startedAt": "2026-10-19T15:11:58.546Z",
+            "durationMs": 3129,
+            "inputSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "resultSha256": "9ad10643733574436f93de929c31cb6958dfce12bf7ad38485b38e168ed717d7",
+            "errorSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "id": "db569e3b-955b-43f0-bfab-b23f37939354",
+            "sequence": 4,
+            "operation": "creator.start",
+            "operationNameZh": "其他操作",
+            "status": "success",
+            "source": "web",
+            "startedAt": "2026-10-19T15:11:42.462Z",
+            "durationMs": 14525,
+            "inputSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "resultSha256": "1a29af8c4ac303fced86fb8c816bfb8662bff69f000ae10ffe4b33b882ce96d3",
+            "errorSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "id": "01130da3-4f2c-4870-9a4d-b059c3495591",
+            "sequence": 3,
+            "operation": "creator.stop",
+            "operationNameZh": "其他操作",
+            "status": "success",
+            "source": "web",
+            "startedAt": "2026-10-19T14:56:27.463Z",
+            "durationMs": 2739,
+            "inputSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "resultSha256": "9ad10643733574436f93de929c31cb6958dfce12bf7ad38485b38e168ed717d7",
+            "errorSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "id": "2b39af2e-6c1b-4ebd-a009-ff5331e76617",
+            "sequence": 2,
+            "operation": "creator.restart",
+            "operationNameZh": "其他操作",
+            "status": "success",
+            "source": "web",
+            "startedAt": "2026-10-19T14:55:59.300Z",
+            "durationMs": 26015,
+            "inputSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "resultSha256": "0b0b1e43cab45c8b99745f2b9a3b4c93c92752310181a5608d9e09dacc7716dc",
+            "errorSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "id": "5c8ca827-36a5-4ca7-aa2f-3d5d1b6a7cf8",
+            "sequence": 1,
+            "operation": "creator.start",
+            "operationNameZh": "其他操作",
+            "status": "success",
+            "source": "web",
+            "startedAt": "2026-10-19T14:55:33.884Z",
+            "durationMs": 23831,
+            "inputSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "resultSha256": "5e0d85478fc86e4fef678c6d052fe9b877761f78ce8c89fa38b646588b5c8b15",
+            "errorSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ]
+      },
+      "failed": {
+        "returned": 0,
+        "nextBefore": null,
+        "recordIds": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "file": "inventory.json",
+    "bytes": 4476,
+    "sha256": "30358e0c2e8db8b2cac8874c6a51ac5972af923a20530790447f75f1251c7e85"
+  },
+  {
+    "file": "ui-proof.json",
+    "bytes": 2355,
+    "sha256": "8c4922605ccc97d8f51e07e4be4e759199f2a1b52907d08a13b21c31073857c0"
+  },
+  {
+    "file": "diagnostic-reuse.json",
+    "bytes": 870,
+    "sha256": "9f8263aadc5acb49d6787b82fdbb05da7010e6cfa8b1a6c8bed4cfbaefd114cd"
+  },
+  {
+    "file": "protection-after.json",
+    "bytes": 380,
+    "sha256": "f78579ce2623cf60a1a57b0c026c83fb2f48ce2e925a3dae3deb9e3679074bc7"
+  },
+  {
+    "file": "runtime-after.json",
+    "bytes": 990,
+    "sha256": "04ef2622036932082c007763e9b99bf61b09432b0c6c3126b6db4493e807cc10"
+  },
+  {
+    "file": "nonempty-summary.png",
+    "bytes": 83150,
+    "sha256": "53ca2d2305cd6e49ea26bdf656d05843fe2055d561ff77931b7cb265a535b522"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\calls-current-readonly-20261019.mjs",
+    "bytes": 2315,
+    "sha256": "ad84363d0b6dd5b31555a9dc1fe96b801180380e06f45d237693e7b5440a65a5"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\calls-real-ui-20261019.mjs",
+    "bytes": 7263,
+    "sha256": "dac605a7163f311fab441845cc64584144cb3fea2b1ad9e5371a53dd86b94bb7"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\calls-real-protection.py",
+    "bytes": 3623,
+    "sha256": "53e9774f710fb17ff45e2b7067025d95f401b52145901ae9a641343b89e86df1"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\calls-real-final-state.mjs",
+    "bytes": 776,
+    "sha256": "ad3b254b897e8932ac9ee067ec59ca009f96da9772cd4efb9a1c83047db891be"
+  }
+]

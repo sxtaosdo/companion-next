@@ -1,0 +1,99 @@
+{
+  "atUtc": "2026-10-19T15:34:46.047Z",
+  "mode": "REAL_EXISTING_NONEMPTY_CALLS_UI_READONLY",
+  "projectId": "a79f4915296f4091",
+  "sessionId": "c5369676-22aa-44fd-ba59-6d90df0b47b0",
+  "steps": [],
+  "historicalDataInjected": 0,
+  "businessToolCalls": 0,
+  "modelActions": 0,
+  "deletes": 0,
+  "clientConfigurationWrites": 0,
+  "all": {
+    "total": 6,
+    "retained": 6,
+    "returned": 6,
+    "sequences": [
+      6,
+      5,
+      4,
+      3,
+      2,
+      1
+    ],
+    "uiOrderExact": true,
+    "nextBefore": null,
+    "paginationThreshold": 50,
+    "loadMoreVisible": 0
+  },
+  "detail": {
+    "id": "f8f45a10-1b0d-49ab-bc9f-c1e778351f28",
+    "sequence": 6,
+    "status": "success",
+    "inputResultErrorExactAfterDisplayRedaction": true,
+    "sectionCount": 2,
+    "displaySummarySha256": [
+      "6fd199f857bebd8afa36b440cd1cbadd73e2c4a23ce6a8a14a5f3d912cf00cb5",
+      "d7fe8841ce9d5db6a5e17adfaa5579bd478fec0e17929e7a2d14da7779696c17"
+    ],
+    "rawSummaryArchived": false
+  },
+  "failedFilter": {
+    "status": 200,
+    "returned": 0,
+    "uiCountExact": true,
+    "total": 6,
+    "retained": 6,
+    "realFailureDetailVerified": false
+  },
+  "returnToAllExact": true,
+  "explicitRefreshExact": true,
+  "currentCountUnchanged": true,
+  "notVerified": "Only six existing success records available. No real multi-page cursor or failure detail; no records injected or actions executed to manufacture them.",
+  "requests": [
+    {
+      "path": "/next/index.html",
+      "query": ""
+    },
+    {
+      "path": "/next/assets/index-Dx563SKg.js",
+      "query": ""
+    },
+    {
+      "path": "/next/assets/index-CReVohLD.css",
+      "query": ""
+    },
+    {
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50"
+    },
+    {
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50&status=failed"
+    },
+    {
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50"
+    },
+    {
+      "path": "/api/projects/a79f4915296f4091/calls",
+      "query": "?limit=50"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "finishedAtUtc": "2026-10-19T15:34:48.392Z",
+  "ownedBrowserClosed": true
+}

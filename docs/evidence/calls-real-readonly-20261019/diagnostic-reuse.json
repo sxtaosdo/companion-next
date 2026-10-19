@@ -1,0 +1,26 @@
+{
+  "mode": "REUSED_PRIOR_REAL_DIAGNOSTIC_NOT_RERUN",
+  "sourceProof": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-log-tools-20261017\\tools-delivery\\browser-log-tools.json",
+  "sourceProofSha256": "d7866ab30edc25f1f4ab1599f85a20f050a069574c8c69f68c795f2fe2894f2c",
+  "sourceAtUtc": "2026-10-17T11:11:49.366Z",
+  "ok": true,
+  "realDiagnostics": 1,
+  "productionDeletes": 0,
+  "pageErrors": [],
+  "downloadConfirmed": true,
+  "diagnostic": {
+    "path": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-log-tools-20261017\\tools-delivery\\real-diagnostic.json",
+    "bytes": 583,
+    "sha256": "a0bd80cfeff50b97efa9924bd00b94466d1dbd464e1d738f66294cc0e69e8f6f",
+    "topKeys": [
+      "generatedAt",
+      "projectId",
+      "status",
+      "logs"
+    ],
+    "logsCount": 1
+  },
+  "rawContentCopied": false,
+  "newDiagnosticRequests": 0,
+  "newDownloads": 0
+}
