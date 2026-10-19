@@ -22,3 +22,19 @@ describe('knowledge read state isolation',()=>{
  it('failed query never reuses the previous success',async()=>{const s=useKnowledgeReadStore(),p=knowledgeFixture();await s.connect(p);await s.run('bases');vi.mocked(p.listKnowledgeBases).mockRejectedValue(new Error('token'));await s.run('bases');expect(s.result).toBeNull();expect(s.error).not.toContain('token')})
  it('cancelReads keeps newer action results safe from old status completions',async()=>{const s=useKnowledgeReadStore(),p=knowledgeFixture(),d=deferred<KnowledgeStatus>();vi.mocked(p.status).mockReturnValueOnce(d.promise).mockResolvedValue(knowledgeStatus);const first=s.connect(p);s.cancelReads();await s.refreshStatus();d.resolve({...knowledgeStatus,cli:{available:false,compatible:false}});await first;expect(s.status?.cli.available).toBe(true)})
 })
+
+describe('knowledge document source generations',()=>{
+ it.each(['documents','document','chunks','original'] as const)('discards late %s content after the selected KB or document changes',async kind=>{
+  const s=useKnowledgeReadStore(),p=knowledgeFixture(),pending=deferred<any>()
+  const method={documents:'listDocuments',document:'viewDocument',chunks:'listChunks',original:'downloadDocument'} as const
+  vi.mocked(p[method[kind]]).mockReturnValueOnce(pending.promise)
+  await s.connect(p);s.kbId='kb-old';s.documentId='doc-old'
+  const work=s.run(kind),signal=vi.mocked(p[method[kind]]).mock.calls[0]![1]!
+  if(kind==='documents')s.kbId='kb-new';else s.documentId='doc-new'
+  expect(signal.aborted).toBe(true)
+  pending.resolve(kind==='original'?{docId:'doc-old',fileName:'old.txt',bytes:3,truncated:false,isBase64:false,content:'old'}:kind==='document'?{item:{id:'doc-old',description:'old'}}:{items:[{id:'old',content:'old'}],truncated:false})
+  await work
+  expect(s.result).toBeNull();expect(s.error).toBe('');expect(s.loading).toBe(false);expect(s.invalidated).toBe(true)
+  expect(p[method[kind]]).toHaveBeenCalledTimes(1)
+ })
+})

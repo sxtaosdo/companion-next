@@ -25,3 +25,26 @@ describe('knowledge page read boundaries',()=>{
  it('clears result and cancels pending work on tab change and unmount',async()=>{const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store,router}=await setup();await store.connect(p);await store.run('bases');const cancel=vi.spyOn(store,'cancelReads');await router.push('/knowledge?tab=models');expect(store.result).toBeNull();expect(cancel).toHaveBeenCalledTimes(1);wrapper!.unmount();wrapper=undefined;expect(cancel).toHaveBeenCalledTimes(2)})
  it('disconnects immediately if provider identity changed off page or while mounted',async()=>{const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p);registerKnowledgeReadProvider(knowledgeFixture());await flushPromises();expect(store.provider).toBeNull();expect(store.status).toBeNull()})
 })
+
+describe('knowledge bounded read presentation',()=>{
+ it('keeps unverified keyword status distinct from an explicit enabled search entry',async()=>{
+  const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p)
+  await wrapper!.get('input[aria-label="检索关键词"]').setValue('offline fixture')
+  expect(store.status?.retrieval.keyword).toBe('unverified')
+  expect(button('检索知识库').attributes('disabled')).toBeUndefined()
+  expect(p.search).not.toHaveBeenCalled()
+ })
+ it('shows document and chunk truncation without inventing pagination or loading more',async()=>{
+  const p=knowledgeFixture();vi.mocked(p.listDocuments).mockResolvedValue({items:[{id:'doc1',title:'Synthetic bounded document'}],truncated:true})
+  registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p)
+  await button('读取文档列表').trigger('click');await flushPromises()
+  expect(wrapper!.text()).toContain('仍有未返回文档（此页无分页）')
+  expect(p.listDocuments).toHaveBeenCalledTimes(1)
+  await button('选用此文档').trigger('click');await flushPromises()
+  expect(p.viewDocument).not.toHaveBeenCalled();expect(p.listChunks).not.toHaveBeenCalled()
+  await button('读取文档切片').trigger('click');await flushPromises()
+  expect(wrapper!.text()).toContain('仍有未返回内容');expect(wrapper!.text()).toContain('chunk text')
+  expect(p.listChunks).toHaveBeenCalledTimes(1);expect(p.downloadDocument).not.toHaveBeenCalled()
+  expect(wrapper!.findAll('button').some(b=>/下一页|加载更多/.test(b.text()))).toBe(false)
+ })
+})

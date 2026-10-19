@@ -322,6 +322,9 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.findAll('.legacy-changelog')).toHaveLength(CHANGELOG.length)
     expect(wrapper!.find('.legacy-changelog summary').text()).toContain('0.3.148')
     expect(wrapper!.text()).toContain('北京时间日历日')
+    expect(wrapper!.text()).toContain('已在本机完成独立启动与HTTP核验')
+    expect(wrapper!.text()).toContain('历史UNKNOWN仍保留，完整恢复另行验收')
+    expect(wrapper!.text()).not.toContain('未接入或部署，不代表P1060已恢复')
     for (const entry of CHANGELOG) for (const change of entry.changes) expect(wrapper!.text()).toContain(change)
   })
   it('keeps original AI icons and the separate keyword-search validation boundary visible', async () => {
@@ -339,7 +342,9 @@ describe('help, about and visible frontend identity', () => {
   it('marks missing old functionality explicitly instead of treating Picker or static help as completed migration', async () => {
     await setup('/migration?feature=knowledge')
     expect(wrapper!.text()).toContain('不是旧 Companion 的完整替换'); expect(wrapper!.text()).toContain(legacyReference.currentTarget)
-    expect(migrationFeatures.find(item=>item.id==='logs')?.status).toBe('日志工具条已接 · 实机待验')
+    expect(migrationFeatures.find(item=>item.id==='logs')?.status).toBe('日志工具条已接 · 限定专项已验')
+    expect(migrationFeatures.find(item=>item.id==='logs')?.detail).toContain('生产 DELETE 未执行；长时断线完整性与事件回放仍未验收')
+    expect(migrationFeatures.find(item=>item.id==='help')?.detail).toContain('未发送任务，不保证任意客户端状态或业务执行')
     expect(migrationFeatures.find(item=>item.id==='calls')?.status).toBe('实时读取已接 · 实机待验')
     expect(migrationFeatures.find((entry) => entry.id === 'knowledge')?.status).toBe('查询 / 问答 / 同步源码已接')
     expect(migrationFeatures.find((entry) => entry.id === 'models')?.status).toBe('原启停 / 管理面板已接')
