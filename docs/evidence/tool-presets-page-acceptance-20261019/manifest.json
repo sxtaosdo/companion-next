@@ -1,0 +1,62 @@
+[
+  {
+    "file": "proof.json",
+    "bytes": 2658,
+    "sha256": "3733313073ae2f836a5e08bc0570b9f63e730b99b6fcb95f79c44955f52346df"
+  },
+  {
+    "file": "save-readback.json",
+    "bytes": 338,
+    "sha256": "1c7521402260b67e59a9ac22ef4dba304ab0b4bbf91cc9cb860f5e1e6b67d5c3"
+  },
+  {
+    "file": "protection-after.json",
+    "bytes": 380,
+    "sha256": "f78579ce2623cf60a1a57b0c026c83fb2f48ce2e925a3dae3deb9e3679074bc7"
+  },
+  {
+    "file": "runtime-after.json",
+    "bytes": 990,
+    "sha256": "57170ab345e9fddcbe5f09cf112b5bda69ea9f4ae06fa2715eb9536288307d9b"
+  },
+  {
+    "file": "override-saved.png",
+    "bytes": 183806,
+    "sha256": "fa58f0cd344ac41d4688b677c54dec4b1d6e496e65246036dddacc0708e36962"
+  },
+  {
+    "file": "create-name-conflict.png",
+    "bytes": 150352,
+    "sha256": "8785bf477767f3d860acd9ee3b38597c5347c3dacc0b9ae2134c92e38eac0ef9"
+  },
+  {
+    "file": "import-name-conflict.png",
+    "bytes": 165232,
+    "sha256": "c7637d66165716fe4fe6670d16486fbc35345939237321c1d593c820289489fa"
+  },
+  {
+    "file": "import-id-conflict.png",
+    "bytes": 165522,
+    "sha256": "f5d260b223d0cc997b54d2305d9527e4917f189421a2dbb0abeae8ba6bf3e3b9"
+  },
+  {
+    "file": "restored.png",
+    "bytes": 148698,
+    "sha256": "43db7e25476697f93419476da902a6dde9d3d4eab861a5b2b2cd9da42945ff40"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\preset-page-20261019.mjs",
+    "bytes": 11503,
+    "sha256": "ef3968e6b99baa3c7d4149581b78b3d90f3b8db5dfb63150f8b7270fea0bad4f"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\preset-page-protection.py",
+    "bytes": 3624,
+    "sha256": "45e72b62ddcfec84605244cfdfe819b533801e46a9dff00e1f91d590c5675b63"
+  },
+  {
+    "temporaryScript": "C:\\Users\\33272\\AppData\\Local\\Temp\\preset-page-final-state.mjs",
+    "bytes": 777,
+    "sha256": "ff102dced6235442624392c6376c2cf657faf78fea472108c8f4d6ce6be029c9"
+  }
+]

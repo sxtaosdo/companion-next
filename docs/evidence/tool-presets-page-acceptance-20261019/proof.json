@@ -1,0 +1,94 @@
+{
+  "atUtc": "2026-10-19T15:28:52.591Z",
+  "fixture": "a79f4915296f4091",
+  "ownedIds": [
+    "preset-5d34f7e6-b8e3-445f-8013-cb8a55905841"
+  ],
+  "steps": [
+    {
+      "button": "将当前草稿创建为正式预设",
+      "method": "POST",
+      "path": "/api/tool-presets",
+      "status": 201
+    },
+    {
+      "button": "用当前草稿保存到预览自定义预设",
+      "method": "PATCH",
+      "path": "/api/tool-presets/preset-5d34f7e6-b8e3-445f-8013-cb8a55905841",
+      "status": 200
+    },
+    {
+      "button": "确认删除预览自定义预设",
+      "method": "DELETE",
+      "path": "/api/tool-presets/preset-5d34f7e6-b8e3-445f-8013-cb8a55905841",
+      "status": 200
+    }
+  ],
+  "originalPresetSha256": "dfe12eab0cb4206f682b77f95a4dabc11661362adcdc43387c29c568acd0dec2",
+  "originalOtherSelectionCount": 4,
+  "createdPreset": {
+    "id": "preset-5d34f7e6-b8e3-445f-8013-cb8a55905841",
+    "name": "Next1019-page-49f8e263"
+  },
+  "pageOverrideSave": {
+    "status": 200,
+    "id": "preset-5d34f7e6-b8e3-445f-8013-cb8a55905841",
+    "baseProfile": "core",
+    "enabled": [
+      "scene_create"
+    ],
+    "disabled": [
+      "project_write_lease"
+    ],
+    "apiDiskExact": true
+  },
+  "rejections": [
+    {
+      "case": "create-name-conflict",
+      "message": "草稿名称与已读取的自定义预设冲突。",
+      "actualPageGuard": true,
+      "httpWritesAttempted": 0,
+      "confirmationAbsent": true,
+      "persistentHashUnchanged": true
+    },
+    {
+      "case": "import-name-conflict",
+      "message": "草稿名称与已读取的自定义预设冲突。",
+      "actualPageGuard": true,
+      "httpWritesAttempted": 0,
+      "confirmationAbsent": true,
+      "persistentHashUnchanged": true
+    },
+    {
+      "case": "import-id-conflict",
+      "message": "草稿标识与已读取的自定义预设冲突。",
+      "actualPageGuard": true,
+      "httpWritesAttempted": 0,
+      "confirmationAbsent": true,
+      "persistentHashUnchanged": true
+    }
+  ],
+  "finalPresetSha256": "dfe12eab0cb4206f682b77f95a4dabc11661362adcdc43387c29c568acd0dec2",
+  "originalStateRestored": true,
+  "remainingOwnPresetCount": 0,
+  "events": [
+    {
+      "method": "POST",
+      "path": "/api/tool-presets"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/tool-presets/preset-5d34f7e6-b8e3-445f-8013-cb8a55905841"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/tool-presets/preset-5d34f7e6-b8e3-445f-8013-cb8a55905841"
+    }
+  ],
+  "blocked": [],
+  "finishedAtUtc": "2026-10-19T15:29:04.757Z",
+  "businessToolCalls": 0,
+  "modelActions": 0,
+  "realClientConfigurationWrites": 0,
+  "fixtureAssigned": false
+}

@@ -1,0 +1,16 @@
+{
+  "preset": {
+    "id": "preset-5d34f7e6-b8e3-445f-8013-cb8a55905841",
+    "name": "Next1019-page-49f8e263",
+    "baseProfile": "core",
+    "enabled": [
+      "scene_create"
+    ],
+    "disabled": [
+      "project_write_lease"
+    ],
+    "builtIn": false,
+    "updatedAt": "2026-10-19T15:28:59.785Z"
+  },
+  "selectedPresetId": "full"
+}
