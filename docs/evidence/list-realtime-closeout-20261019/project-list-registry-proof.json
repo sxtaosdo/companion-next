@@ -1,0 +1,69 @@
+{
+  "atUtc": "2026-10-19T13:06:34.030Z",
+  "mode": "REAL_REGISTRY_COUNTS_STATIC_WITH_GLOBAL_STATUS_LOCALLY_BLOCKED",
+  "realRegistryCount": 7,
+  "allRegistryIdsNamesMatchUi": true,
+  "target": {
+    "id": "a79f4915296f4091",
+    "pathSha256": "a79f4915296f409154d65b70a8a5fe017c7273af6a9ea4ced1c0885893b36d7c",
+    "taskOwned": true
+  },
+  "targetSearchAndCollapse": true,
+  "clearFilter": true,
+  "localUiCreatesNoApiRequests": true,
+  "globalStatusRequestsSent": 0,
+  "statusSuppressed": [
+    "GET /api/status"
+  ],
+  "currentRuntimeVerified": false,
+  "runtimeBoundary": "Global status probes Native for every registration; not sent. UI statuses are unknown due locally simulated 503. Reuse prior real status-to-UI receipt only as historical evidence.",
+  "before": {
+    "identity": {
+      "pid": 10820,
+      "startupEpoch": "7601ac9d-a500-46d8-8db0-9a0f28e7569c",
+      "startedAt": "2026-10-19T12:14:03.575Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "nativeEpochUnproven": 2,
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "after": {
+    "identity": {
+      "pid": 10820,
+      "startupEpoch": "7601ac9d-a500-46d8-8db0-9a0f28e7569c",
+      "startedAt": "2026-10-19T12:14:03.575Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "nativeEpochUnproven": 2,
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "requests": [
+    "/next/index.html",
+    "/next/assets/index-CRVreJhY.js",
+    "/next/assets/index-gwbq_QMl.css",
+    "/api/projects",
+    "/api/status",
+    "/api/calls/counts"
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "actualLoginPosts": 1,
+  "actualBusinessWrites": 0,
+  "creatorOrModelActions": 0,
+  "userBrowserUntouched": true,
+  "ownedBrowserClosed": true
+}

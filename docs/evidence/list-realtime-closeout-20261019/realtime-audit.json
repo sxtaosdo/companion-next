@@ -1,0 +1,97 @@
+{
+  "atUtc": "2026-10-19T13:03:14.953869+00:00",
+  "mode": "READ_ONLY_EXISTING_EVIDENCE_AUDIT_NO_NEW_EXECUTION",
+  "criterion": "Finite same-source enabled realtime updates; suspend away/hidden; one-stream resume; explicit stop persists; bounded network recovery clears stale readiness; local update does not reload document. No replay/full-history/losslessness requirement.",
+  "existingEvidence": {
+    "navigation": {
+      "file": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-sse-navigation-fix-20261018\\real-sse-http-proof.json",
+      "sha256": "397b73db5f22d001403fadabfbf18108d51f634cd6edd7eac93b15b53fd47eef",
+      "source": "81ea56c2df7757433f5f3514f57c827a590f73da",
+      "automaticResumePassed": true,
+      "explicitStopPreserved": true,
+      "sharedPageSuspended": true,
+      "maxActiveStreams": 1,
+      "returnReads": {
+        "projects": 1,
+        "status": 1,
+        "counts": 1,
+        "streams": 1
+      },
+      "businessWrites": 0
+    },
+    "finiteLog": {
+      "file": "D:\\code\\shidai3\\P8000\\companion-next\\docs\\evidence\\knowledge-sse-live-20261019\\log-live-proof.json",
+      "sha256": "ef7cb0417e258c653cfa7983f12d8adf7ba28ceaaa21357576056fa8f6f123c3",
+      "source": "ecabe7e628967b6f0c44532aa876137e175f9d6e",
+      "completed": true,
+      "filters": {
+        "bridge": 3,
+        "bridgeOrCompile": 4,
+        "compile": 1,
+        "error": 4,
+        "literalNonmatch": 0
+      },
+      "assertions": [
+        "three-existing-markers-reused",
+        "unregistered-fourth-target",
+        "original-session",
+        "snapshot-read",
+        "all-four-retained",
+        "real-fourth-catchup-proof-reused",
+        "recovery-stop-enabled",
+        "stop-no-further-reads-or-streams",
+        "stopped-state"
+      ],
+      "confirmedFourthNotStreamedOffline": true,
+      "fourthCaughtByFreshSnapshot": true,
+      "replayGuaranteed": false
+    }
+  },
+  "continuity": {
+    "base": "ecabe7e628967b6f0c44532aa876137e175f9d6e",
+    "changedRelevantFilesVsCurrentWorkingTree": [],
+    "currentFiles": [
+      {
+        "path": "src/stores/companion-browser.ts",
+        "sha256": "f45ed697e4fca18406571e93ca38f533f09686bafd22dcab95be45959b18fa2e"
+      },
+      {
+        "path": "src/adapters/companion-events.ts",
+        "sha256": "6903aec6e6a5f1f2eea531bc3683b08c78b17a7ca12624475ae725e316a1194f"
+      },
+      {
+        "path": "src/views/CompanionBrowserView.vue",
+        "sha256": "7927b724d47487b71936cb0af1e1be77818f79024848cad3ca3b6850f785aa92"
+      },
+      {
+        "path": "src/composables/use-companion-project-entry.ts",
+        "sha256": "ac7c4576acb9769f4dec2df841daa163cf63dc6848435843e7233ff2ace1550f"
+      },
+      {
+        "path": "src/composables/use-registered-project-page.ts",
+        "sha256": "86c8fece8a743e8b76c9cae5aec7c28605a2b98f1b90f9dd8ec55bb74eddf961"
+      }
+    ]
+  },
+  "reviewedTestsNotRerun": [
+    "companion-live-store.test.ts",
+    "companion-network-recovery.test.ts",
+    "companion-network-recovery-ui.test.ts",
+    "companion-passive-read.test.ts",
+    "project-entry.test.ts",
+    "companion-log-reconnect.test.ts",
+    "companion-browser-ui.test.ts"
+  ],
+  "mainFlowSufficient": true,
+  "notEstablished": [
+    "long-time global no-loss delivery",
+    "ring-evicted events recovery",
+    "all real call lifecycle events",
+    "current-page documentId/focus explicitly captured during background polling"
+  ],
+  "optionalSmallestExtra": "If literal DOM-stability evidence is required, use isolated static/fixture DOM identity and focus checks, not another real SSE/diagnostic loop. Existing real navigation and finite recovery need no repeat.",
+  "newApiRequests": 0,
+  "sessionPosts": 0,
+  "newBrowserRuns": 0,
+  "sourceOrDocsModified": false
+}

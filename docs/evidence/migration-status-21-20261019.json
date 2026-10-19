@@ -3,11 +3,11 @@
   "method": "21 grouped feature areas, equal weight. Complete means real acceptance of the approved main flow within the documented project/session scope, not exhaustive fault/stress coverage. Synthetic tests are never real acceptance.",
   "total": 21,
   "counts": {
-    "完整验收通过": 7,
-    "部分完成": 12,
+    "完整验收通过": 8,
+    "部分完成": 11,
     "未完成或阻塞": 2
   },
-  "completeItemPercent": 33.3,
+  "completeItemPercent": 38.1,
   "notWorkloadProgress": true,
   "rows": [
     {
@@ -28,8 +28,8 @@
       "id": 3,
       "name": "工程列表、状态同步、筛选、折叠",
       "status": "部分完成",
-      "evidenceAndRemaining": "基础真页/状态已验，全部状态与时序未全覆盖",
-      "remainingKind": "实机"
+      "evidenceAndRemaining": "本批真实7条登记与UI一致，任务fixture搜索/折叠/清除通过；模拟状态筛选和同页手动偏好通过。当前全局status会探测含P1060的所有登记，未发送；真实当前状态同步仍待验",
+      "remainingKind": "当前真实状态实机窗口/授权范围；不扩大UI或宿主"
     },
     {
       "id": 4,
@@ -90,9 +90,9 @@
     {
       "id": 12,
       "name": "局部实时更新、跨页恢复",
-      "status": "部分完成",
-      "evidenceAndRemaining": "日志有限SSE恢复/停止已验，调用等全部分支未全实机",
-      "remainingKind": "实机"
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "限定主流程：既有真实跨页自动恢复/单流/主动停止和有限断线快照补读；当前源码连续性复核，新全模拟DOM单次更新保留文档/节点/焦点及两个输入值。无长时零丢失承诺",
+      "remainingKind": "验收完成（限定主流程）；长期/livecalls不由此代证"
     },
     {
       "id": 13,
@@ -158,5 +158,6 @@
       "remainingKind": "模型暂停约束"
     }
   ],
-  "scopeCorrection": "Old Companion web has no evidenced image-task history entry. The independent public-image-review utility was incorrectly included in item18. Keep item18 as the approved narrow Owner preview/select/export surface; no old-data migration is required. The count change is a scope correction, not new implementation progress."
+  "scopeCorrection": "Old Companion web has no evidenced image-task history entry. The independent public-image-review utility was incorrectly included in item18. Keep item18 as the approved narrow Owner preview/select/export surface; no old-data migration is required. The count change is a scope correction, not new implementation progress.",
+  "progressUpdate": "Only item12 is newly closed by the finite main-flow evidence chain and independent review. Existing seven accepted items are unchanged. Item3 remains partial: no real global status probe because it includes paused P1060."
 }

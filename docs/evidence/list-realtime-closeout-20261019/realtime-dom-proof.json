@@ -1,0 +1,171 @@
+{
+  "atUtc": "2026-10-19T13:05:06.498Z",
+  "mode": "OFFLINE_SIMULATED_DOM_ONLY",
+  "statusDOM": {
+    "sameDocument": true,
+    "sameSearchNode": true,
+    "sameCardNode": true,
+    "sameStopButton": true,
+    "focusPreserved": true,
+    "draftPreserved": true
+  },
+  "logDOM": {
+    "sameDocument": true,
+    "sameInputNode": true,
+    "samePaneNode": true,
+    "sameFirstRowNode": true,
+    "focusPreserved": true,
+    "draftPreserved": true
+  },
+  "navigation": {
+    "tokenUnchanged": true,
+    "navigationEntryCount": 1,
+    "maxActiveStreams": 1,
+    "remainingActiveStreams": 0,
+    "documentRequests": 1
+  },
+  "statusUpdateCount": 1,
+  "logUpdateCount": 1,
+  "routeReturnOpenedOneStream": true,
+  "explicitStopPreserved": true,
+  "staticHashes": [
+    {
+      "path": "/next/index.html",
+      "sha256": "1bb7f3edb912cc64010ed37d152921a78b717a160f0bf8dd8960f8010f37d6d1"
+    },
+    {
+      "path": "/next/assets/index-gwbq_QMl.css",
+      "sha256": "0731082f61d115956d105d687cd742bdab49124a49112f773fefaa57877467db"
+    },
+    {
+      "path": "/next/assets/index-CRVreJhY.js",
+      "sha256": "0c53dfe075f66f5aa4faa6a2657c2136c4f6f7ddb7b04f3aab9015310875a010"
+    }
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/next/index.html",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-CRVreJhY.js",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/next/assets/index-gwbq_QMl.css",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/logs",
+      "query": "?limit=200"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/logs",
+      "query": "?search=DOM_KEEP&limit=200"
+    },
+    {
+      "method": "GET",
+      "path": "/api/logs",
+      "query": "?search=DOM_KEEP&limit=200"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/status",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "actualNetworkRequests": 0,
+  "sessionPosts": 0,
+  "realSseRequests": 0,
+  "businessWrites": 0,
+  "userBrowserUntouched": true,
+  "ownedBrowserClosed": true,
+  "boundary": "EventSource and all HTTP responses simulated; real event delivery/navigation proofs remain separate."
+}

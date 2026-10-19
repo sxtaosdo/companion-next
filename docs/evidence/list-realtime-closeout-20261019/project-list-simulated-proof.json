@@ -1,0 +1,63 @@
+{
+  "atUtc": "2026-10-19T13:05:12.866Z",
+  "mode": "DEPLOYED_STATIC_BYTES_WITH_ALL_API_SIMULATED",
+  "defaultReadyExpanded": true,
+  "defaultStoppedCollapsed": true,
+  "unknownDistinct": true,
+  "nameIdPathSearch": true,
+  "clearFilter": true,
+  "statusFilters": true,
+  "localUiCreatesNoApiRequests": true,
+  "staticHashes": [
+    {
+      "path": "/next/index.html",
+      "sha256": "1bb7f3edb912cc64010ed37d152921a78b717a160f0bf8dd8960f8010f37d6d1"
+    },
+    {
+      "path": "/next/assets/index-gwbq_QMl.css",
+      "sha256": "0731082f61d115956d105d687cd742bdab49124a49112f773fefaa57877467db"
+    },
+    {
+      "path": "/next/assets/index-CRVreJhY.js",
+      "sha256": "0c53dfe075f66f5aa4faa6a2657c2136c4f6f7ddb7b04f3aab9015310875a010"
+    },
+    {
+      "path": "/next/index.html",
+      "sha256": "1bb7f3edb912cc64010ed37d152921a78b717a160f0bf8dd8960f8010f37d6d1"
+    },
+    {
+      "path": "/next/assets/index-gwbq_QMl.css",
+      "sha256": "0731082f61d115956d105d687cd742bdab49124a49112f773fefaa57877467db"
+    },
+    {
+      "path": "/next/assets/index-CRVreJhY.js",
+      "sha256": "0c53dfe075f66f5aa4faa6a2657c2136c4f6f7ddb7b04f3aab9015310875a010"
+    }
+  ],
+  "requests": [
+    "/next/index.html",
+    "/next/assets/index-CRVreJhY.js",
+    "/next/assets/index-gwbq_QMl.css",
+    "/api/projects",
+    "/api/status",
+    "/api/calls/counts",
+    "/api/projects",
+    "/api/status",
+    "/next/index.html",
+    "/next/assets/index-CRVreJhY.js",
+    "/next/assets/index-gwbq_QMl.css",
+    "/api/projects",
+    "/api/status",
+    "/api/calls/counts"
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "actualNetworkRequests": 0,
+  "actualLoginPosts": 0,
+  "actualBusinessWrites": 0,
+  "creatorOrModelActions": 0,
+  "userBrowserUntouched": true,
+  "ownedBrowserClosed": true,
+  "manualPreferencesSurviveSamePageStatusSnapshot": true,
+  "reloadObservation": "Same-context page.reload executed, but post-refresh defaults equal prior manual choices. This observation does not establish persistence across reload or route remount."
+}
