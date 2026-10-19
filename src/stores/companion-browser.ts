@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { CompanionBrowserError } from '../adapters/companion-browser'
 import { ref, shallowRef, watch } from 'vue'
 import type { CompanionBrowserProvider, ManagedProject, ManagedStatus, DashboardProject, LogRecord, LogFilter, CallCounts, CallRecord, CallLatest } from '../domain/companion-browser'
 import { CompanionEventError, type CompanionCallUpdate, type CompanionEventProvider } from '../domain/companion-live'
@@ -18,7 +19,7 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  let epoch=0,sessionEpoch=0,callEventVersion=0,liveEpoch=0,streamEpoch=0
  let eventProvider:CompanionEventProvider|null=null,boundReadProvider:CompanionBrowserProvider|null=null,eventAbort:AbortController|undefined,unsubscribe:(()=>void)|undefined
  let pollTimer:ReturnType<typeof setTimeout>|undefined,retryTimer:ReturnType<typeof setTimeout>|undefined,logTimer:ReturnType<typeof setTimeout>|undefined,openTimer:ReturnType<typeof setTimeout>|undefined
- let logDirty=false,eventStopped=false
+ let logDirty=false,eventStopped=false,networkRecovering=false,networkRecoveryAttempts=0
  const versions={projects:0,logs:0,counts:0,calls:0,dashboard:0},controllers:Partial<Record<keyof typeof versions,AbortController>>={}
  function cancel(key:keyof typeof versions){versions[key]++;controllers[key]?.abort();delete controllers[key]}
  function resetCalls(){records.value=[];total.value=null;retained.value=null;nextBefore.value=undefined;callRead.value=false}
@@ -79,8 +80,20 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
    if(JSON.stringify(warnings.value)!==JSON.stringify(result.warnings))warnings.value=result.warnings
    connected.value=true;observedAt.value=new Date().toISOString()
    projectSnapshotRevision.value++
+   if(networkRecovering){networkRecovering=false;networkRecoveryAttempts=0;scheduleProjectPoll(liveEpoch);if(eventStopped)liveState.value='failed';else openLiveStream(liveEpoch)}
    if(callProjectId.value&&!projects.value.some(project=>project.id===callProjectId.value)){cancel('calls');callLoading.value=false;callProjectId.value='';resetCalls()}
-  }catch(cause){if(!read.current())return;epoch++;cancelReads();clearData();projectError.value=message(cause)}finally{if(read.current()){projectLoading.value=false;backgroundProjectRead.value=false}}
+  }catch(cause){
+   if(!read.current())return
+   const transient=cause instanceof CompanionBrowserError&&(cause.code==='network-error'||cause.code==='timeout')
+   const recoverable=background&&transient&&liveEnabled.value&&liveVisible.value&&livePageActive.value&&active===boundReadProvider
+   if(recoverable&&networkRecoveryAttempts<3){
+    networkRecoveryAttempts++;clearLiveWork();clearData();networkRecovering=true;liveState.value='retrying';liveError.value=message(cause);projectError.value=message(cause);scheduleNetworkRecovery(liveEpoch)
+   }else{
+    const exhausted=recoverable&&networkRecoveryAttempts>=3
+    epoch++;cancelReads();clearData();projectError.value=message(cause)
+    if(exhausted){liveState.value='failed';liveError.value=message(cause)}
+   }
+  }finally{if(read.current()){projectLoading.value=false;backgroundProjectRead.value=false}}
  }
  function cancelDashboardRead(){cancel('dashboard');dashboardLoading.value=false}
  async function refreshDashboard(){
@@ -152,7 +165,7 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  function liveCurrent(identity:number){return liveEnabled.value&&liveVisible.value&&livePageActive.value&&connected.value&&identity===liveEpoch&&provider.value===boundReadProvider}
  function closeStream(){streamEpoch++;clearTimeout(openTimer);openTimer=undefined;eventAbort?.abort();eventAbort=undefined;unsubscribe?.();unsubscribe=undefined}
  function clearLiveWork(){liveEpoch++;closeStream();clearTimeout(pollTimer);clearTimeout(retryTimer);clearTimeout(logTimer);pollTimer=retryTimer=logTimer=undefined;logDirty=false;cancelQueries()}
- function stopLive(){clearLiveWork();liveEnabled.value=false;liveState.value='off';liveError.value='';liveRetries.value=0;eventStopped=false;eventProvider=null;boundReadProvider=null}
+ function stopLive(){clearLiveWork();networkRecovering=false;networkRecoveryAttempts=0;liveEnabled.value=false;liveState.value='off';liveError.value='';liveRetries.value=0;eventStopped=false;eventProvider=null;boundReadProvider=null}
  function scheduleProjectPoll(identity:number,delay=3000){
   clearTimeout(pollTimer);pollTimer=undefined
   if(projectPollingPaused.value||!liveCurrent(identity))return
@@ -167,7 +180,7 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  function pauseProjectPolling(paused:boolean){
   if(projectPollingPaused.value===paused)return
   projectPollingPaused.value=paused;clearTimeout(pollTimer);pollTimer=undefined
-  if(!paused&&liveCurrent(liveEpoch))scheduleProjectPoll(liveEpoch)
+  if(!paused){if(networkRecovering)scheduleNetworkRecovery(liveEpoch);else if(liveCurrent(liveEpoch))scheduleProjectPoll(liveEpoch)}
  }
  function queueLiveLogs(identity:number){
   if(!liveCurrent(identity)||logsPaused.value)return
@@ -204,7 +217,13 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
   if(current())unsubscribe=stop;else stop()
   }catch{failStream(new CompanionEventError('connection-error'))}
  }
- function resumeLive(){const identity=liveEpoch;scheduleProjectPoll(identity,0);if(eventStopped)liveState.value='failed';else openLiveStream(identity)}
+ /** Retain only an explicitly enabled same-source read intent, never stale readiness. */
+ function scheduleNetworkRecovery(identity:number,delay=3000){
+  clearTimeout(pollTimer);pollTimer=undefined
+  if(projectPollingPaused.value||!networkRecovering||!liveEnabled.value||!liveVisible.value||!livePageActive.value||identity!==liveEpoch||provider.value!==boundReadProvider)return
+  pollTimer=setTimeout(()=>{pollTimer=undefined;if(!projectPollingPaused.value&&networkRecovering&&liveEnabled.value&&liveVisible.value&&livePageActive.value&&identity===liveEpoch&&provider.value===boundReadProvider)void refreshProjects(true)},delay)
+ }
+ function resumeLive(){const identity=liveEpoch;if(networkRecovering){liveState.value='retrying';scheduleNetworkRecovery(identity,0);return}scheduleProjectPoll(identity,0);if(eventStopped)liveState.value='failed';else openLiveStream(identity)}
  function startLive(next:CompanionEventProvider){
   if(!connected.value||!provider.value)return
   stopLive();eventProvider=next;boundReadProvider=provider.value;liveEnabled.value=true
