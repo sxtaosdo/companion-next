@@ -1,0 +1,250 @@
+{
+  "at": "2026-10-18T23:58:13.437Z",
+  "identity": {
+    "pid": 2772,
+    "startupEpoch": "0f7ad7e0-f8f4-4159-9582-c6a241795f39",
+    "startedAt": "2026-10-18T23:54:38.831Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "headlessEdge": true,
+  "realBackend": true,
+  "controlledNetworkConditions": true,
+  "realKnowledgeCredentialConfigured": false,
+  "static": [
+    {
+      "path": "assets/about-icon-BaVeClOr.svg",
+      "status": 200,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "assets/donation-qr-D7kdLLAm.png",
+      "status": 200,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "assets/index-CB_jf848.js",
+      "status": 200,
+      "sha256": "e554a007b1ecdb871f4151679852a09ffee93289c24f5f4a49299f6352776054"
+    },
+    {
+      "path": "assets/index-DHoPFkG3.css",
+      "status": 200,
+      "sha256": "58f26ff8cc97b9018c181e70984217d8bd663f5f052863bd8deeed6b643377c4"
+    },
+    {
+      "path": "favicon.svg",
+      "status": 200,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "index.html",
+      "status": 200,
+      "sha256": "685ba8679edd3cf491a9b80dbc1839827f7a46022c13fbced8f6c96ced1a9477"
+    }
+  ],
+  "pageErrors": [],
+  "fixtures": [
+    {
+      "kind": "project",
+      "id": "03e51ccce525e71d",
+      "path": "C:/Users/33272/AppData/Local/Temp/companion-credential-deploy-20261018-r3/fixture-project-A-r3",
+      "status": 201
+    },
+    {
+      "kind": "project",
+      "id": "f7fc61d33d65fd18",
+      "path": "C:/Users/33272/AppData/Local/Temp/companion-credential-deploy-20261018-r3/fixture-project-B-r3",
+      "status": 201
+    },
+    {
+      "kind": "preset",
+      "id": "preset-fa7c14b7-ee57-4453-a5e1-d4fa8880caa2",
+      "status": 201
+    }
+  ],
+  "cleanup": [
+    {
+      "kind": "preset",
+      "id": "preset-fa7c14b7-ee57-4453-a5e1-d4fa8880caa2",
+      "status": 200
+    },
+    {
+      "kind": "project",
+      "id": "03e51ccce525e71d",
+      "status": 200
+    },
+    {
+      "kind": "project",
+      "id": "f7fc61d33d65fd18",
+      "status": 200
+    }
+  ],
+  "scenarios": {
+    "preset": {
+      "fixtureIds": {
+        "projectA": "03e51ccce525e71d",
+        "projectB": "f7fc61d33d65fd18",
+        "presetId": "preset-fa7c14b7-ee57-4453-a5e1-d4fa8880caa2"
+      },
+      "writes": [
+        {
+          "method": "PATCH",
+          "path": "/api/tool-presets/preset-fa7c14b7-ee57-4453-a5e1-d4fa8880caa2",
+          "actualUpstreamStatus": 200
+        }
+      ],
+      "blocked": [],
+      "controlledFault": [
+        {
+          "method": "GET",
+          "path": "/api/tools",
+          "operation": "route.abort(failed)",
+          "naturalFailure": false
+        }
+      ],
+      "controlledDelay": [
+        {
+          "path": "/api/tools",
+          "purpose": "hold actual upstream response across project A→B→A"
+        },
+        {
+          "path": "/api/tool-presets/preset-fa7c14b7-ee57-4453-a5e1-d4fa8880caa2",
+          "purpose": "hold actual PATCH response across project change; mutation may have completed"
+        }
+      ],
+      "steps": [
+        {
+          "name": "cancel-confirmation",
+          "passed": true,
+          "writes": 0
+        },
+        {
+          "name": "refresh-project-aba-no-followup",
+          "passed": true
+        },
+        {
+          "name": "temporary-rename-late-response-unknown",
+          "passed": true
+        },
+        {
+          "name": "failed-tools-pending-presets-retains-busy",
+          "passed": true,
+          "controlledFault": true
+        },
+        {
+          "name": "readback-settles-without-clearing-unknown",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "logs": {
+      "kind": "bounded-real-log-sse",
+      "startedAt": "2026-10-18T23:58:17.890Z",
+      "fixtureIds": [
+        "03e51ccce525e71d",
+        "f7fc61d33d65fd18"
+      ],
+      "steps": [
+        {
+          "name": "real-sse-open-and-fixture-read",
+          "at": "2026-10-18T23:58:18.918Z",
+          "sseHeaders": 1,
+          "logReads": 1
+        },
+        {
+          "name": "controlled-subscription-establishment-failure-cooldown",
+          "at": "2026-10-18T23:58:19.091Z",
+          "sseHeaders": 1,
+          "logReads": 1
+        },
+        {
+          "name": "real-sse-reconnected-after-subscription-failure",
+          "at": "2026-10-18T23:58:20.093Z",
+          "sseHeaders": 2,
+          "logReads": 1
+        },
+        {
+          "name": "left-page-no-resubscription",
+          "at": "2026-10-18T23:58:21.366Z",
+          "sseHeaders": 2,
+          "logReads": 1
+        },
+        {
+          "name": "returned-page-fresh-real-stream",
+          "at": "2026-10-18T23:58:21.547Z",
+          "sseHeaders": 3,
+          "logReads": 1
+        },
+        {
+          "name": "paused-current-fixture-observation",
+          "at": "2026-10-18T23:58:24.175Z",
+          "sseHeaders": 3,
+          "logReads": 3
+        },
+        {
+          "name": "resumed-only-current-fixture",
+          "at": "2026-10-18T23:58:24.638Z",
+          "sseHeaders": 3,
+          "logReads": 4
+        }
+      ],
+      "sse": {
+        "requests": 4,
+        "successfulHeaders": 3,
+        "failures": 3,
+        "controlledSubscriptionFailures": 1
+      },
+      "logs": {
+        "requests": 4,
+        "successful": 3,
+        "blockedUnscoped": 1,
+        "perFixture": {
+          "03e51ccce525e71d": 1,
+          "f7fc61d33d65fd18": 2
+        }
+      },
+      "pageErrors": 0,
+      "status": "passed",
+      "reconnectScope": "One route-aborted browser subscription during establishment; subsequent real SSE response. Original TCP interruption and natural outages unverified.",
+      "currentFixtureRows": 1,
+      "finishedAt": "2026-10-18T23:58:24.740Z"
+    }
+  },
+  "knowledge": {
+    "auth": "missing",
+    "keyword": "unverified",
+    "writerEnabled": false,
+    "schedulerEnabled": false
+  },
+  "missingAuthRead": {
+    "httpStatus": 401,
+    "code": "AUTH_MISSING"
+  },
+  "ok": true,
+  "registryRestored": {
+    "projects.json": {
+      "semanticEqual": true,
+      "beforeSha256": "54727d55c2089d4c848f63bc95d983ab95afd394c2dcf86f63701c20aac09a25",
+      "afterCleanupSha256": "54727d55c2089d4c848f63bc95d983ab95afd394c2dcf86f63701c20aac09a25",
+      "exactBytesRestored": true
+    },
+    "tool-presets.json": {
+      "semanticEqual": true,
+      "beforeSha256": "dfe12eab0cb4206f682b77f95a4dabc11661362adcdc43387c29c568acd0dec2",
+      "afterCleanupSha256": "dfe12eab0cb4206f682b77f95a4dabc11661362adcdc43387c29c568acd0dec2",
+      "exactBytesRestored": true
+    }
+  },
+  "finalIdentity": {
+    "pid": 2772,
+    "startupEpoch": "0f7ad7e0-f8f4-4159-9582-c6a241795f39",
+    "startedAt": "2026-10-18T23:54:38.831Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "daemonUnchanged": true
+}

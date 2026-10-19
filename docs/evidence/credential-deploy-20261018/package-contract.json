@@ -1,0 +1,6 @@
+{
+  "cliCleanHelp": true,
+  "cliFictionalCredentialRejected": true,
+  "workerUnapprovedMethodRejected": true,
+  "realCredentialUsed": false
+}

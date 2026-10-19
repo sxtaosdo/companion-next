@@ -1,0 +1,72 @@
+{
+  "kind": "bounded-real-log-sse",
+  "startedAt": "2026-10-18T23:58:17.890Z",
+  "fixtureIds": [
+    "03e51ccce525e71d",
+    "f7fc61d33d65fd18"
+  ],
+  "steps": [
+    {
+      "name": "real-sse-open-and-fixture-read",
+      "at": "2026-10-18T23:58:18.918Z",
+      "sseHeaders": 1,
+      "logReads": 1
+    },
+    {
+      "name": "controlled-subscription-establishment-failure-cooldown",
+      "at": "2026-10-18T23:58:19.091Z",
+      "sseHeaders": 1,
+      "logReads": 1
+    },
+    {
+      "name": "real-sse-reconnected-after-subscription-failure",
+      "at": "2026-10-18T23:58:20.093Z",
+      "sseHeaders": 2,
+      "logReads": 1
+    },
+    {
+      "name": "left-page-no-resubscription",
+      "at": "2026-10-18T23:58:21.366Z",
+      "sseHeaders": 2,
+      "logReads": 1
+    },
+    {
+      "name": "returned-page-fresh-real-stream",
+      "at": "2026-10-18T23:58:21.547Z",
+      "sseHeaders": 3,
+      "logReads": 1
+    },
+    {
+      "name": "paused-current-fixture-observation",
+      "at": "2026-10-18T23:58:24.175Z",
+      "sseHeaders": 3,
+      "logReads": 3
+    },
+    {
+      "name": "resumed-only-current-fixture",
+      "at": "2026-10-18T23:58:24.638Z",
+      "sseHeaders": 3,
+      "logReads": 4
+    }
+  ],
+  "sse": {
+    "requests": 4,
+    "successfulHeaders": 3,
+    "failures": 3,
+    "controlledSubscriptionFailures": 1
+  },
+  "logs": {
+    "requests": 4,
+    "successful": 3,
+    "blockedUnscoped": 1,
+    "perFixture": {
+      "03e51ccce525e71d": 1,
+      "f7fc61d33d65fd18": 2
+    }
+  },
+  "pageErrors": 0,
+  "status": "passed",
+  "reconnectScope": "One route-aborted browser subscription during establishment; subsequent real SSE response. Original TCP interruption and natural outages unverified.",
+  "currentFixtureRows": 1,
+  "finishedAt": "2026-10-18T23:58:24.740Z"
+}

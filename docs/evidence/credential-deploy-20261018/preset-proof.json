@@ -1,0 +1,58 @@
+{
+  "fixtureIds": {
+    "projectA": "03e51ccce525e71d",
+    "projectB": "f7fc61d33d65fd18",
+    "presetId": "preset-fa7c14b7-ee57-4453-a5e1-d4fa8880caa2"
+  },
+  "writes": [
+    {
+      "method": "PATCH",
+      "path": "/api/tool-presets/preset-fa7c14b7-ee57-4453-a5e1-d4fa8880caa2",
+      "actualUpstreamStatus": 200
+    }
+  ],
+  "blocked": [],
+  "controlledFault": [
+    {
+      "method": "GET",
+      "path": "/api/tools",
+      "operation": "route.abort(failed)",
+      "naturalFailure": false
+    }
+  ],
+  "controlledDelay": [
+    {
+      "path": "/api/tools",
+      "purpose": "hold actual upstream response across project A→B→A"
+    },
+    {
+      "path": "/api/tool-presets/preset-fa7c14b7-ee57-4453-a5e1-d4fa8880caa2",
+      "purpose": "hold actual PATCH response across project change; mutation may have completed"
+    }
+  ],
+  "steps": [
+    {
+      "name": "cancel-confirmation",
+      "passed": true,
+      "writes": 0
+    },
+    {
+      "name": "refresh-project-aba-no-followup",
+      "passed": true
+    },
+    {
+      "name": "temporary-rename-late-response-unknown",
+      "passed": true
+    },
+    {
+      "name": "failed-tools-pending-presets-retains-busy",
+      "passed": true,
+      "controlledFault": true
+    },
+    {
+      "name": "readback-settles-without-clearing-unknown",
+      "passed": true
+    }
+  ],
+  "passed": true
+}

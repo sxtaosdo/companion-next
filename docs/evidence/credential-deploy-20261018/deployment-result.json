@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-18T23:54:23.757Z",
+  "sourceCommit": "e633e7a0bfbcfcb2416fff208ec37de70ea437b6",
+  "staticSourceCommit": "c63e4a5",
+  "hostBefore": {
+    "head": "07c2a990c23e5899e81d132a7d6343e0caba57499caa987af2bb1d17c7db2f30",
+    "status": "288ff957e1cfce9131c216a06b2cf2c9dc5dbd0d0cdc9d2061504867371cf36b",
+    "diff": "ec4c01b56d5433c3941bfae94277fbcc5f9bd98db2f09b74a683ecfea138eebf",
+    "index": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "beforeListening": false,
+  "runtimeBefore": {
+    "companion-daemon.js": "148f28ad4989a038de1825beae197c4db9947f3209a8f22cf07ec330047df526",
+    "companion-daemon.js.map": "993bba5b1fbfa10273a5ab8c7091160f0d3e9a7e510c308468900c4818bacd73",
+    "creator-ai.js": "6085072c7c9c7901b1a77d9392785209f9b80c00334a509afd9947f72cde87b8",
+    "creator-ai.js.map": "1d3fa9e2c00629a7775df27b24a777c32c2ea850718101388843d55b599c4681",
+    "knowledge-worker.js": null,
+    "knowledge-worker.js.map": null
+  },
+  "registryBefore": {
+    "projects.json": "54727d55c2089d4c848f63bc95d983ab95afd394c2dcf86f63701c20aac09a25",
+    "tool-presets.json": "dfe12eab0cb4206f682b77f95a4dabc11661362adcdc43387c29c568acd0dec2"
+  },
+  "steps": [
+    "Two loopback checks confirm no running daemon; no stop or kill invoked."
+  ],
+  "realKnowledgeCredentialConfigured": false,
+  "forcedKill": false,
+  "runtimeInstalled": true,
+  "staticInstalled": true,
+  "start": {
+    "status": "PASSED"
+  },
+  "started": true,
+  "identity": {
+    "pid": 2772,
+    "startupEpoch": "0f7ad7e0-f8f4-4159-9582-c6a241795f39",
+    "startedAt": "2026-10-18T23:54:38.831Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "staticMatches": true,
+  "oldStaticAssetsPreserved": true,
+  "hostUnchanged": true,
+  "registryUnchanged": {
+    "projects.json": true,
+    "tool-presets.json": true
+  },
+  "ok": true,
+  "expected": {
+    "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+    "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+    "assets/index-CB_jf848.js": "e554a007b1ecdb871f4151679852a09ffee93289c24f5f4a49299f6352776054",
+    "assets/index-DHoPFkG3.css": "58f26ff8cc97b9018c181e70984217d8bd663f5f052863bd8deeed6b643377c4",
+    "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+    "index.html": "685ba8679edd3cf491a9b80dbc1839827f7a46022c13fbced8f6c96ced1a9477"
+  }
+}

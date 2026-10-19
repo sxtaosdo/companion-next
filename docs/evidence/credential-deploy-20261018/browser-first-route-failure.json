@@ -1,0 +1,120 @@
+{
+  "at": "2026-10-18T23:55:45.884Z",
+  "identity": {
+    "pid": 2772,
+    "startupEpoch": "0f7ad7e0-f8f4-4159-9582-c6a241795f39",
+    "startedAt": "2026-10-18T23:54:38.831Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "headlessEdge": true,
+  "realBackend": true,
+  "controlledNetworkConditions": true,
+  "realKnowledgeCredentialConfigured": false,
+  "static": [
+    {
+      "path": "assets/about-icon-BaVeClOr.svg",
+      "status": 200,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "assets/donation-qr-D7kdLLAm.png",
+      "status": 200,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "assets/index-CB_jf848.js",
+      "status": 200,
+      "sha256": "e554a007b1ecdb871f4151679852a09ffee93289c24f5f4a49299f6352776054"
+    },
+    {
+      "path": "assets/index-DHoPFkG3.css",
+      "status": 200,
+      "sha256": "58f26ff8cc97b9018c181e70984217d8bd663f5f052863bd8deeed6b643377c4"
+    },
+    {
+      "path": "favicon.svg",
+      "status": 200,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "index.html",
+      "status": 200,
+      "sha256": "685ba8679edd3cf491a9b80dbc1839827f7a46022c13fbced8f6c96ced1a9477"
+    }
+  ],
+  "pageErrors": [],
+  "fixtures": [
+    {
+      "kind": "project",
+      "id": "6f7f95115ca41be8",
+      "path": "C:/Users/33272/AppData/Local/Temp/companion-credential-deploy-20261018-r3/fixture-project-A",
+      "status": 201
+    },
+    {
+      "kind": "project",
+      "id": "d93437749fa2ca51",
+      "path": "C:/Users/33272/AppData/Local/Temp/companion-credential-deploy-20261018-r3/fixture-project-B",
+      "status": 201
+    },
+    {
+      "kind": "preset",
+      "id": "preset-35ccf988-c8c3-4a30-840f-791f65fb579d",
+      "status": 201
+    }
+  ],
+  "cleanup": [
+    {
+      "kind": "preset",
+      "id": "preset-35ccf988-c8c3-4a30-840f-791f65fb579d",
+      "status": 200
+    },
+    {
+      "kind": "project",
+      "id": "6f7f95115ca41be8",
+      "status": 200
+    },
+    {
+      "kind": "project",
+      "id": "d93437749fa2ca51",
+      "status": 200
+    }
+  ],
+  "scenarios": {},
+  "knowledge": {
+    "auth": "missing",
+    "keyword": "unverified",
+    "writerEnabled": false,
+    "schedulerEnabled": false
+  },
+  "missingAuthRead": {
+    "httpStatus": 401,
+    "code": "AUTH_MISSING"
+  },
+  "error": "READ_FAILED_404_/api/projects/6f7f95115ca41be8/status",
+  "ok": false,
+  "registryRestored": {
+    "projects.json": {
+      "semanticEqual": true,
+      "beforeSha256": "54727d55c2089d4c848f63bc95d983ab95afd394c2dcf86f63701c20aac09a25",
+      "afterCleanupSha256": "54727d55c2089d4c848f63bc95d983ab95afd394c2dcf86f63701c20aac09a25",
+      "exactBytesRestored": true
+    },
+    "tool-presets.json": {
+      "semanticEqual": true,
+      "beforeSha256": "dfe12eab0cb4206f682b77f95a4dabc11661362adcdc43387c29c568acd0dec2",
+      "afterCleanupSha256": "dfe12eab0cb4206f682b77f95a4dabc11661362adcdc43387c29c568acd0dec2",
+      "exactBytesRestored": true
+    }
+  },
+  "finalIdentity": {
+    "pid": 2772,
+    "startupEpoch": "0f7ad7e0-f8f4-4159-9582-c6a241795f39",
+    "startedAt": "2026-10-18T23:54:38.831Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "daemonUnchanged": true
+}

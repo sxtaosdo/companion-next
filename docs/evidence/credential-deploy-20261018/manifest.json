@@ -1,0 +1,20 @@
+{
+  "files": {
+    "browser-first-route-failure.json": "2d6a87adc6773ff760083c302a4453f9d0ae5b0d1adadd5f12919d398c99cbcb",
+    "browser-result.json": "dfec2038ba58b609aeb1d333eb7cef51b913c0b0561057038d05d726ced623bb",
+    "browser-second-method-failure.json": "9e8412bd2ce4555a04b41525a12f9edc51f5d026cc5142ca36d58153722e8422",
+    "build-proof.json": "a23d941ba17e7fb7a18407d5e528f56c87f645ecca4ee280e8aefd0d2b6f15fb",
+    "deployment-result.json": "d4589a403d9305b954b877f3018580c1ff0e94aec54abaa0dfbbe53431bd2904",
+    "final-review.md": "1608c86861e22d202bdcb7e126232cbbb0f64846cf22a888a76679d65eaf0a9b",
+    "final-shared-preservation.json": "5485e419ff25b2c90a828c665bf988bce9d2088d84d09f37e7d15adf2ed20e37",
+    "full-typecheck-resolved.txt": "fc8ea7c2ebe529bf0863c6e1dbf45f31a79b2b00bd65838d8eb47b2fcd6bbd2e",
+    "live-state-only.png": "40b5834da4e2c642daffc228b35f2bf14552a8516491401b3b9ae4505071f682",
+    "logs-scenario.mjs": "5c75247b8af3808d3fd1662cba6519508decc418ad2ba530cd4268269c045057",
+    "logs-sse-proof.json": "62f6f08c614a3a2e5678c457d1a833a67a3131eb03a6edd461007ac00e26371c",
+    "package-contract.json": "2bf13fbb1a279ae78dfb7e791fab70fd0fd9a615fc0e21fb4824bcefe24787e9",
+    "preset-proof.json": "045291b3b6d9b3af183af228daf1eeee851131170c5222df16822ae7f667b14b",
+    "preset-readback-held.png": "d60bb623979aa366cce700cb9a6bbfac7dc1b5a8352346528fa74a93d4902599",
+    "preset-scenario.mjs": "7f30228518930805ab3eed8cf85000ede1cfab5578cf465664be8e7e33aa0187"
+  },
+  "rawAuthOrRegistryBackupsArchived": false
+}
