@@ -1,0 +1,127 @@
+{
+  "mode": "EXISTING_FILES_ONLY_NO_HTTP_NO_PROCESS_ACTION",
+  "firstFailureWindow": [
+    {
+      "id": "1dd46566-5b80-4fc1-bdab-76080a0f0c5c",
+      "time": "2026-10-19T17:02:35.867Z",
+      "source": "launcher",
+      "level": "info",
+      "message": "Creator state: launching",
+      "projectId": "a79f4915296f4091",
+      "instanceId": "08c2a4cd-d903-42c0-83b4-f92efbc4ba13"
+    },
+    {
+      "id": "6608e1e5-91bd-4aee-84f0-6598900d77e3",
+      "time": "2026-10-19T17:02:36.424Z",
+      "source": "launcher",
+      "level": "info",
+      "message": "Creator state: launching",
+      "projectId": "a79f4915296f4091",
+      "instanceId": "08c2a4cd-d903-42c0-83b4-f92efbc4ba13"
+    },
+    {
+      "id": "56e2f6a2-d070-4d14-a387-d3754a328522",
+      "time": "2026-10-19T17:02:37.395Z",
+      "source": "launcher",
+      "level": "info",
+      "message": "Creator state: launching",
+      "projectId": "a79f4915296f4091",
+      "instanceId": "08c2a4cd-d903-42c0-83b4-f92efbc4ba13"
+    },
+    {
+      "id": "b4d5a271-4ce3-42b5-bc10-b4e7c3cee49b",
+      "time": "2026-10-19T17:02:37.928Z",
+      "source": "launcher",
+      "level": "info",
+      "message": "Creator state: bridge-wait",
+      "projectId": "a79f4915296f4091",
+      "instanceId": "08c2a4cd-d903-42c0-83b4-f92efbc4ba13"
+    },
+    {
+      "id": "54c40aaa-18c6-4f6e-98d9-230301abe47a",
+      "time": "2026-10-19T17:02:51.943Z",
+      "source": "launcher",
+      "level": "info",
+      "message": "Creator state: ready",
+      "projectId": "a79f4915296f4091",
+      "instanceId": "08c2a4cd-d903-42c0-83b4-f92efbc4ba13",
+      "sessionId": "c18a91f7-cb5c-4132-877a-78300e3355a7"
+    },
+    {
+      "id": "3b3eb4e4-53c3-45ae-bee5-d36b97aafa17",
+      "time": "2026-10-19T17:02:57.115Z",
+      "source": "launcher",
+      "level": "info",
+      "message": "Creator state: stopping",
+      "projectId": "a79f4915296f4091",
+      "instanceId": "08c2a4cd-d903-42c0-83b4-f92efbc4ba13",
+      "sessionId": "c18a91f7-cb5c-4132-877a-78300e3355a7"
+    },
+    {
+      "id": "050f36dc-4ba2-4261-acf2-bfe131e074fb",
+      "time": "2026-10-19T17:03:00.019Z",
+      "source": "launcher",
+      "level": "error",
+      "message": "Creator 所属进程退出未能确认；保留原进程身份，未自动重试",
+      "projectId": "a79f4915296f4091",
+      "instanceId": "08c2a4cd-d903-42c0-83b4-f92efbc4ba13",
+      "sessionId": "c18a91f7-cb5c-4132-877a-78300e3355a7"
+    }
+  ],
+  "stopConfirmationElapsedMs": 2904,
+  "firstCandidate": {
+    "patchCommit": "9fbf317",
+    "sha256": "006f4bfa94ea81ff0931e190b07d7e6cf783cffb168a04e22bf2f7ac04637c9a",
+    "actualArchivedJsSha256": "006f4bfa94ea81ff0931e190b07d7e6cf783cffb168a04e22bf2f7ac04637c9a"
+  },
+  "current": {
+    "patchCommit": "55256cb",
+    "identityOnDisk": {
+      "pid": 20332,
+      "startupEpoch": "eced9fac-c162-4b9d-8f6e-e2756c40e2db",
+      "startedAt": "2026-10-19T17:12:43.632Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "1984698ce8b2ec524d1e9e2b0d4d8733075ea4783bfa0f0e9d72b8dad8b6ce94",
+      "nodeVersion": "v25.2.1"
+    },
+    "actualJsSha256": "1984698ce8b2ec524d1e9e2b0d4d8733075ea4783bfa0f0e9d72b8dad8b6ce94",
+    "actualMapSha256": "91e9c88026f959285cfb0761f046314351f7350961e30cae587bd04a3f90b68f"
+  },
+  "firstVsSecondOwnSourceContentChanged": [
+    "companion/creator-process-stop.ts"
+  ],
+  "firstOwnSources": 82,
+  "secondOwnSources": 82,
+  "knownBoundaries": {
+    "requestDispatchedOnce": true,
+    "unsavedCheckPassedBeforeStopping": true,
+    "helperOrItsNodeReceiptFailed": true,
+    "restartLaunchNotReached": true,
+    "not20sTreeDeadlineOr30sExecTimeout": true,
+    "postFailureCreatorZeroIsNotSuccessProof": true
+  },
+  "lostEvidence": [
+    "raw execFile error/exitCode/signal/stdout/stderr",
+    "PowerShell failure stage and Win32 error code",
+    "held child PID/creation tree and per-handle stop timing before failure",
+    "native process exit timing at the failing boundary"
+  ],
+  "causalConclusion": "Failure is localized to host stop helper/receipt, but exact trigger cannot be determined from surviving evidence. Duplicate termination is a code-supported candidate, not a proven incident cause. Final success is not retroactive proof.",
+  "versionFacts": {
+    "sourceLineageLabel": "9b8f979/package0.3.147 (Git lineage; not current daemon semver field)",
+    "installedMcpServerVersionConstant": "0.3.142",
+    "sharedSourcePackageVersion": "0.3.142",
+    "isolatedPatchPackageVersion": "0.3.150",
+    "daemonBundleHasStandaloneReleaseSemver": false,
+    "nextProductVersion": "1.3.173",
+    "nextDeployedInternalRevision": "1.3.173.146",
+    "nextDeployedCommit": "a8e88ac",
+    "nextDeployedJs": "index-Dx563SKg.js",
+    "nextDeployedJsSha256": "b2b29887dbc1e62e9f25fd1856afac8dc49dc0d6232de12346b2e00e90b5eda9",
+    "nextDocCheckpointBeforeReview": "ebab2bb/1.3.173.154",
+    "docCheckpointIsNotDeployedUi": true
+  },
+  "businessCallsAdded": 0,
+  "lifecycleCallsAdded": 0,
+  "newServiceOrModelActions": 0
+}

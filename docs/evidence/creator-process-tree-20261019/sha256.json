@@ -14,5 +14,6 @@
   "kb-origin-guard-rejection.json": "e321be93644ad7613f07677a576c5d38247b8e72f98b160d10bba349678f8fcf",
   "kb-preserved.json": "a72b9073d386984d2d4647106f8f5017d50197ec85a99a7642f88aa8fe402be8",
   "second-build.json": "9491acb3651ffc84118724b195a5850f4cbc5d54f176f2f695d075c56c702a10",
-  "test-summary.json": "4834690de8fb33e58e81becc9c47750b07dc59859d3604a5a7912acc0de9890c"
+  "test-summary.json": "4834690de8fb33e58e81becc9c47750b07dc59859d3604a5a7912acc0de9890c",
+  "first-500-readonly-audit.json": "61e93701938e83299bfbe75f8784aee3e5d238504c4d8b28bf287dc6a5ac114e"
 }

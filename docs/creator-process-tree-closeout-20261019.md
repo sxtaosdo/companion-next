@@ -49,3 +49,5 @@ Windows用固定OS句柄绑定PID、创建时间、CocosCreator.exe绝对路径�
 证据：[连续实机](evidence/creator-process-tree-20261019/continuous-proof.json)、[首次失败](evidence/creator-process-tree-20261019/first-failed-journal.json)、[保护核对](evidence/creator-process-tree-20261019/continuous-protection-after.json)、[离线测试](evidence/creator-process-tree-20261019/test-summary.json)、[局部补丁](evidence/creator-process-tree-20261019/creator-lifecycle-local.patch)、[SHA清单](evidence/creator-process-tree-20261019/sha256.json)。
 
 剩余仍为#5/#13/#14实际客户端接入，#10真实清空（本轮不执行），#11真实分页/失败详情，#16模型链部分；#20/#21模型相关暂停。原#11只读验收时6条成功是历史快照，本轮生命周期产生的新成功/失败记录尚未用于补验，不注入凑分页数据。
+
+版本字段及首候选500只读追溯补充：[已证实边界、缺失证据与实际版本字段](creator-first-500-readonly-review-20261019.md)。历史“原.147”为Git谱系，当前安装MCP常量及共享package字段仍0.3.142；补丁0.3.150、daemon SHA和Next运行UI.146需分别阅读，文档.154未部署UI。
