@@ -1,0 +1,20 @@
+{
+  "startupEntry": "scripts/connect-knowledge-reader.ps1 -StartOnly -NoBrowser",
+  "sameOriginalCredentialReference": true,
+  "userReferencePersisted": true,
+  "temporaryProcessReferenceExplicitlyClearedBeforeSecondStart": true,
+  "secondStartLoadedUserReference": true,
+  "credentialBytesReadByAgent": false,
+  "newCredentialsOrAccounts": false,
+  "permissionScopeExpanded": false,
+  "sameAllowedKB": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+  "original147InstalledByteIdentical": true,
+  "rounds": 2,
+  "firstInterruptedHttp": "UNCLASSIFIED_HTTP_1 under explicit force-exit authorization; not claimed SSE or clean drain",
+  "secondInterruptedHttp": 0,
+  "sourceAndMetadataOnlyEvidence": true,
+  "screenshotsOrOriginalContentCopied": false,
+  "originalHashMatchesAcrossStarts": true,
+  "finalPid": 4264,
+  "finalEpoch": "b4ad0920-0c1a-4add-889e-cde005e96e6f"
+}

@@ -3,11 +3,11 @@
   "method": "21 grouped feature areas, equal weight. Complete means real acceptance of the approved main flow within the documented project/session scope, not exhaustive fault/stress coverage. Synthetic tests are never real acceptance.",
   "total": 21,
   "counts": {
-    "完整验收通过": 10,
-    "部分完成": 9,
+    "完整验收通过": 11,
+    "部分完成": 8,
     "未完成或阻塞": 2
   },
-  "completeItemPercent": 47.6,
+  "completeItemPercent": 52.4,
   "notWorkloadProgress": true,
   "rows": [
     {
@@ -139,9 +139,9 @@
     {
       "id": 19,
       "name": "知识库、文档、分片、原文、搜索",
-      "status": "部分完成",
-      "evidenceAndRemaining": "当前浏览器登录成功，Companion知识适配器在发起worker/WeKnora调用前因缺credentialFile启动引用而401 AUTH_MISSING。原脚本仅进程环境，正常入口无持久恢复/热加载；原文件存在，未读密钥。当前KB修复及doc/chunk/original/search/正常重启验收尚未完成",
-      "remainingKind": "知识启动引用持久性缺口；现有宿主普通重启受UNKNOWN2守卫阻止"
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "原reader启动路径持久化修复，保持同一.147/原权限。清除临时进程引用后第二次正常入口启动，文档列表/详情、限1分片、2235B原文及搜索两轮各7项HTTP200，API→UI/hash对应；不遍历全库，不含写入/问答/同步",
+      "remainingKind": "验收完成（限定原reader只读主流程）；非全量切片/全库验收"
     },
     {
       "id": 20,
@@ -159,6 +159,6 @@
     }
   ],
   "scopeCorrection": "Old Companion web has no evidenced image-task history entry. The independent public-image-review utility was incorrectly included in item18. Keep item18 as the approved narrow Owner preview/select/export surface; no old-data migration is required. The count change is a scope correction, not new implementation progress.",
-  "progressUpdate": "This batch closes only items3 and8 by bounded actual status/UI observations and independently reviewed existing Preview/Profiler evidence. Previous8 accepted items unchanged. P1060 development pause does not prohibit read-only identity queries. Current knowledge AUTH_MISSING remains a blocker. Candidate deployment/restart already authorized; this batch dependencies only.",
+  "progressUpdate": "Item19 approved retrieve-only main flow closes after same147 application recovery and two real7-endpoint UI/API chains, including normal startup after clearing temporary Process reference. UNKNOWN2 and all310 installed files remain. VSCode candidate remains excluded and unloaded.",
   "latestScopeCorrection": "User does not use VS Code: deployment and its dedicated successor-lock development cancelled before any freeze/termination/install/start. Preserved isolated source without deployment. This candidate is not a current migration acceptance blocker. Knowledge authentication recovery remains open."
 }

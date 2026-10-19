@@ -1,0 +1,57 @@
+{
+  "atUtc": "2026-10-19T13:44:59.411782+00:00",
+  "oldIdentity": {
+    "pid": 18564,
+    "startupEpoch": "09613e2a-9b9a-401e-a62c-5643d66e1884",
+    "startedAt": "2026-10-19T13:43:05.047Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+    "nodeVersion": "v25.2.1"
+  },
+  "newIdentity": {
+    "pid": 4264,
+    "startupEpoch": "b4ad0920-0c1a-4add-889e-cde005e96e6f",
+    "startedAt": "2026-10-19T13:44:52.971Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+    "nodeVersion": "v25.2.1"
+  },
+  "phase": "OPEN",
+  "counts": {
+    "http": 0,
+    "mcp": 0,
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "maintenanceObservations": 0,
+    "projectActions": 0,
+    "globalActions": 0,
+    "recovery": 0,
+    "setup": 0,
+    "builds": 0,
+    "observedBuilds": 0,
+    "sidecars": 0,
+    "nativeEpochUnproven": 2,
+    "ownerStarting": 0,
+    "ownerRequests": 0,
+    "ownerHandlers": 0,
+    "ownerBusy": 0,
+    "ownerWorker": 0,
+    "setupPolls": 0,
+    "setupTimers": 0,
+    "icons": 0,
+    "maintenanceVerifications": 0
+  },
+  "unknown": [
+    "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+  ],
+  "allInstalledRuntimeFilesUnchanged": true,
+  "runtimeFiles": 310,
+  "original147": true,
+  "VSCodeCandidateLoaded": false,
+  "immutableConfigAndUnknownJournalUnchanged": true,
+  "businessTablesUnchanged": 9,
+  "originalKnownWriterLockRetained": true,
+  "historicalUnknown": 2,
+  "quiescenceEvidenceCount": 0,
+  "windowsRestarted": false
+}
