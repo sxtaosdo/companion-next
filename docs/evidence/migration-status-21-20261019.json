@@ -3,11 +3,11 @@
   "method": "21 grouped feature areas, equal weight. Complete means real acceptance of the approved main flow within the documented project/session scope, not exhaustive fault/stress coverage. Synthetic tests are never real acceptance.",
   "total": 21,
   "counts": {
-    "完整验收通过": 6,
+    "完整验收通过": 7,
     "部分完成": 12,
-    "未完成或阻塞": 3
+    "未完成或阻塞": 2
   },
-  "completeItemPercent": 28.6,
+  "completeItemPercent": 33.3,
   "notWorkloadProgress": true,
   "rows": [
     {
@@ -131,10 +131,10 @@
     },
     {
       "id": 18,
-      "name": "图片Owner完整旧功能",
-      "status": "未完成或阻塞",
-      "evidenceAndRemaining": "当前窄入口已验，批量/合并/删除/历史/回收等未迁入",
-      "remainingKind": "代码缺口；扩大交互先明确方案"
+      "name": "Owner预览、选择、保存（已批准窄入口）",
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "已批准窄入口已有限定真实验收；独立public-image-review的任务记录/搜索/回收不是旧Companion缺失；旧图片数据搬迁已明确取消",
+      "remainingKind": "验收完成；旧数据搬迁移出范围"
     },
     {
       "id": 19,
@@ -157,5 +157,6 @@
       "evidenceAndRemaining": "WeKnora恢复已有证据，模型启停/切换/GPU推理暂停未验",
       "remainingKind": "模型暂停约束"
     }
-  ]
+  ],
+  "scopeCorrection": "Old Companion web has no evidenced image-task history entry. The independent public-image-review utility was incorrectly included in item18. Keep item18 as the approved narrow Owner preview/select/export surface; no old-data migration is required. The count change is a scope correction, not new implementation progress."
 }
