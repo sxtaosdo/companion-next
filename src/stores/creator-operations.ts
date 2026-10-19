@@ -134,6 +134,7 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
   const barriers = shallowRef<readonly ReadBarrier[]>([])
   // A receipt records the result boundary before publishing it to synchronous observers.
   const removalResults = new Map<number, ReadBarrier>()
+  const stopResults = new Map<number, { boundary: ReadBarrier; sessionId: string }>()
   const sourceGeneration = ref(0)
   let activeProjectRead: ProjectReadStart | null = null
   const projectObservation = shallowRef<ProjectObservation | null>(null)
@@ -244,6 +245,7 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
   function updateResult(op: Operation, resultPhase: CreatorReceiptPhase, message: string, errorCode: string | null, reply: CreatorOperationReply | null = null) {
     const boundary = resultBoundary(op)
     if (op.prepared.action === 'remove-registration') removalResults.set(op.id, boundary)
+    if (resultPhase === 'acknowledged' && reply?.action === 'stop') stopResults.set(op.id, { boundary, sessionId: browser.sessionId })
     if (resultPhase === 'unknown' || resultPhase === 'reported-failure') requireNewRead(boundary)
     replaceReceipt(op.id, { phase: resultPhase, message, errorCode, reply, detached: op.detached })
     if (visibleReceiptId.value === op.id) { phase.value = resultPhase; error.value = resultPhase === 'acknowledged' ? '' : message }
@@ -262,6 +264,10 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
     cancelWaiting()
   }
   function invalidateContext() {
+    for (const [id, stopped] of stopResults) {
+      const record = records.value.find(item => item.id === id), project = record && currentProject(record.project.id)
+      if (!project || projectKey(project) !== stopped.boundary.projectKey) stopResults.delete(id)
+    }
     snapshotGeneration++
     const hadDraft = !!prepared.value
     if (hadDraft) { revoke(); phase.value = 'invalidated'; error.value = contextMessage }
@@ -281,10 +287,11 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
   // re-associate with a reconnected session, even when the reader object is reused.
   watch(() => [browser.provider, browser.connected] as const, ([provider, connected], [previousProvider, wasConnected]) => {
     if (provider !== previousProvider || (!connected && wasConnected)) {
-      sourceGeneration.value++; activeProjectRead = null; projectObservation.value = null
+      sourceGeneration.value++; activeProjectRead = null; projectObservation.value = null; stopResults.clear()
     }
   }, { flush: 'sync' })
-  watch(() => creatorOperationsProvider.value, () => { operationGeneration++ }, { flush: 'sync' })
+  watch(() => creatorOperationsProvider.value, () => { operationGeneration++; stopResults.clear() }, { flush: 'sync' })
+  watch(() => browser.sessionId, () => stopResults.clear(), { flush: 'sync' })
   watch(() => browser.projectLoading, (loading, previous) => {
     if (loading && !previous) {
       readGeneration++
@@ -297,6 +304,15 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
     if (started && browser.connected && started.readProvider === activeReadProvider() && started.sourceGeneration === sourceGeneration.value) {
       projectObservation.value = { ...started, snapshotRevision: revision, observedAt: browser.observedAt,
         projects: new Map(browser.projects.map(project => [project.id, projectKey(project)])) }
+    }
+    // Once a new runtime or a different error is observed, an old stop receipt
+    // must never mask a later failure, even if Bridge becomes unreachable again.
+    for (const [id, stopped] of stopResults) {
+      const record = records.value.find(item => item.id === id)
+      if (record && projectObservation.value && qualifiesRegistrationRead(stopped.boundary, projectObservation.value, true)
+        && (currentRuntime(record.project.id)?.pid !== undefined || currentRuntime(record.project.id)?.sessionId !== undefined
+          || currentRuntime(record.project.id)?.creatorVersion !== undefined
+          || (currentRuntime(record.project.id)?.state !== 'stopped' && !isPlainBridgeDisconnect(currentRuntime(record.project.id))))) stopResults.delete(id)
     }
     // A read already in flight when uncertainty began cannot clear its barrier.
     barriers.value = barriers.value.filter(barrier => {
@@ -426,6 +442,20 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
     }
     return acknowledged
   }
+  function isPlainBridgeDisconnect(status: ManagedStatus | undefined): boolean {
+    return status?.state === 'error' && status.lastError === 'Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志'
+      && status.pid === undefined && status.sessionId === undefined && status.creatorVersion === undefined
+  }
+  /** Presentation only: never change raw status, filtering, or action eligibility. */
+  function isExpectedStopDisconnect(projectId: string): boolean {
+    const record = records.value.filter(item => item.project.id === projectId).at(-1)
+    const stopped = record && stopResults.get(record.id), observation = projectObservation.value
+    return !!record && record.action === 'stop' && record.phase === 'acknowledged' && !record.detached
+      && !transportPending.value && !settlementFailed.value && !!stopped && !!stopped.sessionId
+      && stopped.sessionId === browser.sessionId && isReceiptCurrent(record.id)
+      && !!observation && qualifiesRegistrationRead(stopped.boundary, observation, true)
+      && isPlainBridgeDisconnect(currentRuntime(projectId))
+  }
   /** Completed receipts keep their exact source session even after transport cleanup. */
   function isReceiptCurrent(receiptId: number): boolean {
     const record = records.value.find(item => item.id === receiptId), binding = receiptBindings.get(receiptId)
@@ -467,7 +497,7 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
     prepared: computed(() => prepared.value), receipt, lastReceipt, registrationReadback, canRefreshRegistration, refreshRegistration, receipts: computed(() => records.value),
     pending: computed(() => pending.value), transportPending: computed(() => transportPending.value),
     dialogOpen: computed(() => dialogOpen.value), error: computed(() => error.value), display,
-    prepare, send, direct, refreshStatus, isReceiptCurrent, cancelWaiting, closeDialog, leave, blocksAutomaticProjectRead, canPrepare, blockingReason,
+    prepare, send, direct, refreshStatus, isReceiptCurrent, isExpectedStopDisconnect, cancelWaiting, closeDialog, leave, blocksAutomaticProjectRead, canPrepare, blockingReason,
   }
 })
 

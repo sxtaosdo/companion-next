@@ -1227,3 +1227,69 @@ describe('the pre-existing lifecycle lane also blocks management dispatch', () =
     expect(store.canPrepare(B, 'open-folder')).toBe(true); expect(store.canPrepare(B, 'remove-registration')).toBe(true)
   })
 })
+
+describe('successful stop context is presentation only', () => {
+  const disconnected = (): ManagedStatus => ({ projectId: A, state: 'error', capabilityProfile: 'unknown', lastError: 'Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志' })
+  async function stopped() {
+    let current: ManagedStatus = { ...status(A, 'ready'), pid: 123, sessionId: 'creator-old' }
+    const read = reader({ loadProjects: vi.fn(async () => ({ ...snapshot('ready'), statuses: [current, status(B)] })) })
+    const env = await setup(read)
+    const draft = env.store.prepare(A, 'stop')!
+    expect(await env.store.send(draft, true)).toBe(true)
+    env.store.closeDialog()
+    return { ...env, set: (next: ManagedStatus) => { current = next } }
+  }
+  it('requires post-result read and preserves raw error, filtering state, and operation guards', async () => {
+    const { store, browser, set, provider } = await stopped()
+    expect(store.isExpectedStopDisconnect(A)).toBe(false)
+    set(disconnected()); await browser.refreshProjects()
+    expect(store.isExpectedStopDisconnect(A)).toBe(true)
+    expect(browser.statuses[0]).toEqual(disconnected())
+    expect(store.canPrepare(A, 'start')).toBe(true)
+    expect(store.isExpectedStopDisconnect(B)).toBe(false)
+    expect(provider.run).toHaveBeenCalledTimes(1)
+  })
+  it.each([
+    { ...disconnected(), lastError: 'Creator Bridge 文档写入中；等待原操作结束并查询日志，不要重放' },
+    { ...disconnected(), lastError: 'AUTH_DENIED' },
+    { ...disconnected(), pid: 456 }, { ...disconnected(), sessionId: 'new-session' },
+    { ...disconnected(), creatorVersion: '3.8.8' }, { ...disconnected(), state: 'unknown' as const },
+  ])('never contextualizes a different failure or runtime identity: %j', async next => {
+    const { store, browser, set } = await stopped(); set(next); await browser.refreshProjects()
+    expect(store.isExpectedStopDisconnect(A)).toBe(false)
+    set(disconnected()); await browser.refreshProjects(); expect(store.isExpectedStopDisconnect(A)).toBe(false)
+  })
+  it('revokes after a new running observation, new action, daemon session or disconnect', async () => {
+    for (const change of ['ready', 'start', 'session', 'disconnect'] as const) {
+      const { store, browser, set, read } = await stopped(); set(disconnected()); await browser.refreshProjects()
+      expect(store.isExpectedStopDisconnect(A)).toBe(true)
+      if (change === 'ready') { set(status(A, 'ready')); await browser.refreshProjects(); set(disconnected()); await browser.refreshProjects() }
+      if (change === 'start') { await store.direct(A, 'start'); await browser.refreshProjects() }
+      if (change === 'session') { browser.sessionId = 'new-daemon'; browser.sessionId = 'fake-session' }
+      if (change === 'disconnect') { browser.disconnect(); await browser.connect(read) }
+      expect(store.isExpectedStopDisconnect(A)).toBe(false)
+    }
+  })
+  it('permanently revokes a stopped observation carrying a new identity', async () => {
+    const { store, browser, set } = await stopped(); set(disconnected()); await browser.refreshProjects()
+    expect(store.isExpectedStopDisconnect(A)).toBe(true)
+    set({ ...status(A, 'stopped'), pid: 456, sessionId: 'other' }); await browser.refreshProjects()
+    set(disconnected()); await browser.refreshProjects(); expect(store.isExpectedStopDisconnect(A)).toBe(false)
+  })
+  it('never resurrects the stop context after project identity A to B to A', async () => {
+    const { store, browser, set } = await stopped(); set(disconnected()); await browser.refreshProjects()
+    expect(store.isExpectedStopDisconnect(A)).toBe(true)
+    browser.projects = [{ ...projectA, path: '/changed' }, projectB]
+    browser.projects = [{ ...projectA }, projectB]
+    await browser.refreshProjects(); expect(store.isExpectedStopDisconnect(A)).toBe(false)
+  })
+  it('does not apply failed or cancelled stop receipts', async () => {
+    const read = reader({ loadProjects: async () => snapshot('ready') })
+    const { store, browser } = await setup(read, actions({ run: async () => { throw new CreatorOperationError('timeout', 'unknown') } }))
+    const draft = store.prepare(A, 'stop')!; expect(await store.send(draft, true)).toBe(false)
+    read.loadProjects = async () => ({ ...snapshot(), statuses: [disconnected()] })
+    await browser.refreshProjects()
+    browser.statuses = [disconnected()]
+    expect(store.isExpectedStopDisconnect(A)).toBe(false)
+  })
+})
