@@ -1,0 +1,44 @@
+diff --git a/mcp/src/companion/knowledge-worker-core.ts b/mcp/src/companion/knowledge-worker-core.ts
+index d642de9..30bdda3 100644
+--- a/mcp/src/companion/knowledge-worker-core.ts
++++ b/mcp/src/companion/knowledge-worker-core.ts
+@@ -10,7 +10,7 @@ export function validReaderIdentity(payload: unknown, now = Date.now()): boolean
+   return value?.success === true && !!d && d.key_id === 3 && d.tenant_id === 1 && d.scope_type === "tenant" &&
+     d.full_access === false && JSON.stringify(d.knowledge_base_ids) === JSON.stringify([READER_KB]) &&
+     JSON.stringify(d.capabilities) === '["retrieve"]' && typeof d.expires_at === "string" &&
+-    Date.parse(d.expires_at) > now && Date.parse(d.expires_at) === Date.parse("2026-11-08T01:25:46Z");
++    Date.parse(d.expires_at) > now && Date.parse(d.expires_at) === Date.parse("2026-11-08T01:25:46.685460Z");
+ }
+ 
+ export async function verifyReader(key: string, signal: AbortSignal, endpoint = "http://127.0.0.1:8081"): Promise<void> {
+diff --git a/mcp/tests/knowledge-isolation.test.ts b/mcp/tests/knowledge-isolation.test.ts
+index d6883ae..86ecb40 100644
+--- a/mcp/tests/knowledge-isolation.test.ts
++++ b/mcp/tests/knowledge-isolation.test.ts
+@@ -11,7 +11,7 @@ import { jsonProcessInFlightCount, runJsonProcess } from "../src/companion/knowl
+ 
+ const KEY = 'fictional-reader-only-"-20261018';
+ const identity = () => ({ success: true, data: { key_id: 3, tenant_id: 1, scope_type: "tenant", full_access: false,
+-  knowledge_base_ids: [READER_KB], capabilities: ["retrieve"], expires_at: "2026-11-08T01:25:46Z" } });
++  knowledge_base_ids: [READER_KB], capabilities: ["retrieve"], expires_at: "2026-11-08T01:25:46.68546Z" } });
+ let server: Server; let root: string; let endpoint: string; let workerPath: string; let childPid = 0;
+ let mode = "good"; const received: Array<{ key?: string; other?: string; args: string[] }> = [];
+ 
+@@ -110,9 +110,16 @@ describe("private reader process", () => {
+   });
+   it("pins reader scope/expiry and makes no assumption from stored metadata", () => {
+     expect(validReaderIdentity(identity())).toBe(true);
+-    for (const patch of [{ key_id: 4 }, { tenant_id: 2 }, { scope_type: "user" }, { capabilities: ["retrieve", "chat"] }, { expires_at: "2026-11-09T01:25:46Z" }, { full_access: true }]) {
++    // The original reader has fractional seconds; the service uses RFC3339Nano.
++    expect(validReaderIdentity({ success: true, data: { ...identity().data, expires_at: "2026-11-08T01:25:46.685460+00:00" } })).toBe(true);
++    for (const patch of [{ key_id: 4 }, { tenant_id: 2 }, { scope_type: "user" }, { capabilities: ["retrieve", "chat"] },
++      { knowledge_base_ids: [READER_KB, "unapproved"] }, { capabilities: [] },
++      { expires_at: "2026-11-08T01:25:46Z" }, { expires_at: "2026-11-08T01:25:46.684Z" },
++      { expires_at: "2026-11-08T01:25:46.686Z" }, { expires_at: "2026-11-08T01:25:47.685Z" },
++      { expires_at: "2026-11-09T01:25:46Z" }, { full_access: true }]) {
+       expect(validReaderIdentity({ success: true, data: { ...identity().data, ...patch } })).toBe(false);
+     }
++    expect(validReaderIdentity(identity(), Date.parse("2026-11-08T01:25:46.68546Z"))).toBe(false);
+     expect(validReaderIdentity(identity(), Date.parse("2026-11-09"))).toBe(false);
+   });
+   it("decrypts only a newly generated fictional DPAPI fixture through private pipes", async () => {

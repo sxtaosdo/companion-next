@@ -1,0 +1,19 @@
+
+ RUN  v4.1.10 C:/Users/33272/AppData/Local/Temp/companion-credential-isolation-20261018/worktree/mcp
+
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > rejects legacy shared secret names without reading their values 3ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > keeps the fake key in worker-owned CLI only; projects and redacts before pipe return 573ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > checks current identity and denies broader scope and redirects before CLI 423ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > does not open inference, writer or arbitrary worker method capabilities 1ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > runs reader searches with no-vector and redacts encoded document payloads 459ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > confirms fake CLI exit before cancel settles and sidecar count becomes zero 470ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > pins reader scope/expiry and makes no assumption from stored metadata 1ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > decrypts only a newly generated fictional DPAPI fixture through private pipes 827ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > uses cooperative cancel on output overflow and lets the worker confirm owned child close 115ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > keeps ownership and unknown during the parent deadline until the worker confirms child exit 665ms
+ 鉁?tests/knowledge-isolation.test.ts > private reader process > retains unknown and blocks further use when a worker exits without child-close acknowledgement 100ms
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  11:36:59
+   Duration  4.13s (transform 76ms, setup 0ms, import 188ms, tests 3.75s, environment 0ms)

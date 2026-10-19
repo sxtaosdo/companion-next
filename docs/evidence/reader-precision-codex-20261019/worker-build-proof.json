@@ -1,0 +1,13 @@
+{
+  "baselineByteIdentical": true,
+  "baselineSha256": "ff0ff14026e3d5790ac48f83c901053ffd58055e5ab6c6be7fbd9dcdb134d699",
+  "newSha256": "07c4861de1716058f79866df3b15e64286b1281da8478e5f8feef192964013d4",
+  "newMapSha256": "8431aff6da611a4d836fa4b34f04e1629e0f1cb00baaa56cdb65e43e84cecb2c",
+  "sourceChange": "knowledge-worker-core.ts: existing key3 expiry precision only",
+  "oldPinnedExpiry": "2026-11-08T01:25:46Z",
+  "existingMetadataExpiry": "2026-11-08T01:25:46.685460Z",
+  "credentialRead": false,
+  "credentialConfigChanged": false,
+  "daemonRestarted": false,
+  "deployed": false
+}

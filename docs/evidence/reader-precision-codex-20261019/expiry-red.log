@@ -1,0 +1,37 @@
+
+ RUN  v4.1.10 C:/Users/33272/AppData/Local/Temp/companion-credential-isolation-20261018/worktree/mcp
+
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > rejects legacy shared secret names without reading their values
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > keeps the fake key in worker-owned CLI only; projects and redacts before pipe return
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > checks current identity and denies broader scope and redirects before CLI
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > does not open inference, writer or arbitrary worker method capabilities
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > runs reader searches with no-vector and redacts encoded document payloads
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > confirms fake CLI exit before cancel settles and sidecar count becomes zero
+ 脳 tests/knowledge-isolation.test.ts > private reader process > pins reader scope/expiry and makes no assumption from stored metadata 6ms
+   鈫?expected false to be true // Object.is equality
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > decrypts only a newly generated fictional DPAPI fixture through private pipes
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > uses cooperative cancel on output overflow and lets the worker confirm owned child close
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > keeps ownership and unknown during the parent deadline until the worker confirms child exit
+ 鈫?tests/knowledge-isolation.test.ts > private reader process > retains unknown and blocks further use when a worker exits without child-close acknowledgement
+
+鈳幆鈳幆鈳幆鈳?Failed Tests 1 鈳幆鈳幆鈳幆鈳?
+ FAIL  tests/knowledge-isolation.test.ts > private reader process > pins reader scope/expiry and makes no assumption from stored metadata
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ 鉂?tests/knowledge-isolation.test.ts:112:45
+    110|   });
+    111|   it("pins reader scope/expiry and makes no assumption from stored met鈥?    112|     expect(validReaderIdentity(identity())).toBe(true);
+       |                                             ^
+    113|     // The original reader has fractional seconds; the service uses RF鈥?    114|     expect(validReaderIdentity({ success: true, data: { ...identity().鈥?
+鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆鈳幆[1/1]鈳?
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 skipped (11)
+   Start at  11:35:51
+   Duration  501ms (transform 76ms, setup 0ms, import 181ms, tests 126ms, environment 0ms)

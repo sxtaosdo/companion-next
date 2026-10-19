@@ -1,0 +1,27 @@
+{
+  "at": "2026-10-19T03:36:46.256982+00:00",
+  "databaseReadOnly": true,
+  "queryOnly": true,
+  "query": "SELECT id,tenant_id,scope_type,full_access,knowledge_base_ids,capabilities,expires_at,revoked_at FROM tenant_api_keys WHERE id=3",
+  "readerMetadata": [
+    {
+      "id": 3,
+      "tenant_id": 1,
+      "scope_type": "tenant",
+      "full_access": 0,
+      "knowledge_base_ids": "[\"da1051a5-3fff-4198-ba55-017ea79df9c3\"]",
+      "capabilities": "[\"retrieve\"]",
+      "expires_at": "2026-11-08T01:25:46.685460+00:00",
+      "revoked_at": null
+    }
+  ],
+  "credentialFileStatOnly": {
+    "exists": true,
+    "isFile": true,
+    "isSymlink": false,
+    "size": 620
+  },
+  "credentialContentRead": false,
+  "secretOrHashColumnsSelected": false,
+  "authRequests": 0
+}

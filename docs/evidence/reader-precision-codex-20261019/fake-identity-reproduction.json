@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-19T03:34:59.149Z",
+  "bundlePath": "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/knowledge-worker.js",
+  "syntheticInputs": true,
+  "credentialRead": false,
+  "authenticatedRequests": 0,
+  "secondsFixturePass": true,
+  "actualMetadataExpiryFixturePass": false,
+  "expiryDeltaMs": 685,
+  "cause": "LOCAL_PINNED_EXPIRY_PRECISION_MISMATCH",
+  "limitation": "Confirms deterministic local rejection if server authenticates the existing key; does not prove upstream acceptance."
+}

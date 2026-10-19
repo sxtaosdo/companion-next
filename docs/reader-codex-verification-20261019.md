@@ -1,3 +1,5 @@
+2026-10-19 03:45 UTC: Reader403根因为本机到期常量丢失小数秒，仅修worker复用原配置、无重启；授权KB及3项文档元数据200、auth=verified，keyword仍unverified。Codex此前误读placeholder；真实Next标记完整接收并精确清理，无发送。见[原因与证据](reader-precision-codex-receipt-20261019.md)。
+
 # 用户执行接入后的限定核验（2026-10-19 03:31 UTC）
 
 用户已自行执行知识接入命令并明确允许清空剪贴板。本轮没有重复运行包装脚本、读取/解密/打印凭据或改变认证配置。

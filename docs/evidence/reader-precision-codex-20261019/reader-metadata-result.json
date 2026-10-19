@@ -1,0 +1,97 @@
+{
+  "at": "2026-10-19T03:43:47.817Z",
+  "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+  "requests": [
+    {
+      "path": "/api/knowledge/status",
+      "status": 200
+    },
+    {
+      "path": "/api/knowledge/kb/view",
+      "status": 200,
+      "input": {
+        "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3"
+      }
+    },
+    {
+      "path": "/api/knowledge/doc/list",
+      "status": 200,
+      "input": {
+        "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+        "limit": 3
+      }
+    },
+    {
+      "path": "/api/knowledge/status",
+      "status": 200
+    }
+  ],
+  "wrapperExecuted": false,
+  "credentialFileReadByAgent": false,
+  "credentialConfigChanged": false,
+  "searchPerformed": false,
+  "bodyChunkOriginalRead": false,
+  "syncOrInference": false,
+  "ok": true,
+  "beforeIdentity": {
+    "pid": 1748,
+    "startupEpoch": "453db64a-5cfe-4e53-b7aa-6df9e609a59b",
+    "startedAt": "2026-10-19T03:14:05.666Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "statusBefore": {
+    "auth": "denied",
+    "keyword": "unverified",
+    "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+    "cliAvailable": true,
+    "cliCompatible": true,
+    "writerEnabled": false,
+    "schedulerEnabled": false
+  },
+  "knowledgeBase": {
+    "id": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+    "metadataReceived": true
+  },
+  "documents": {
+    "count": 3,
+    "truncated": true,
+    "items": [
+      {
+        "id": "97c5935f-6114-43e9-8ead-d0319f61ab9a",
+        "parseStatus": "finalizing",
+        "fileType": "md"
+      },
+      {
+        "id": "4f63f120-4813-415e-a014-4cabee156089",
+        "parseStatus": "finalizing",
+        "fileType": "md"
+      },
+      {
+        "id": "bd14a374-9822-42f5-9e64-9976ffc262df",
+        "parseStatus": "processing",
+        "fileType": "md"
+      }
+    ],
+    "titlesOrBodiesArchived": false
+  },
+  "statusAfter": {
+    "auth": "verified",
+    "keyword": "unverified",
+    "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+    "cliAvailable": true,
+    "cliCompatible": true,
+    "writerEnabled": false,
+    "schedulerEnabled": false
+  },
+  "afterIdentity": {
+    "pid": 1748,
+    "startupEpoch": "453db64a-5cfe-4e53-b7aa-6df9e609a59b",
+    "startedAt": "2026-10-19T03:14:05.666Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "daemonUnchanged": true
+}

@@ -1,3 +1,5 @@
+2026-10-19 03:45 UTC: Reader403根因为本机到期常量丢失小数秒，仅修worker复用原配置、无重启；授权KB及3项文档元数据200、auth=verified，keyword仍unverified。Codex此前误读placeholder；真实Next标记完整接收并精确清理，无发送。见[原因与证据](reader-precision-codex-receipt-20261019.md)。
+
 2026-10-19 03:31 UTC: 用户自行运行接入后，Companion1748状态auth=denied，固定授权KB元数据403/AUTH_DENIED，正向读取未通过并停止；未重复运行脚本或读取凭据。明确批准后剪贴板已清空，但Codex当前输入框仍非空，未填标记或发送。见[本次真实核验](reader-codex-verification-20261019.md)。
 
 2026-10-19 03:22 UTC: 知识库本人接入已封装为一条命令，静态校验通过、未执行。Codex真实UI已定位；调用新聊天与无prompt入口后编辑区仍非空，未读取或覆盖。清剪贴板被自动审批拒绝，未绕过、未投递或发送。见[单行命令与具体阻塞](one-command-codex-20261019.md)。

@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-19T03:42:12.780Z",
+  "marker": "COMPANION_PREFILL_ONLY_20261019_cf1921727aec4a639ad06cab8ac7665c",
+  "materialFixtureOnly": true,
+  "handlerOrTransportMocked": false,
+  "sendSubmitted": false,
+  "blocked": [],
+  "pageErrors": [],
+  "clicked": true,
+  "fixture": {
+    "path": "/next/assets/index-Dva5JRrN.js",
+    "onlyLiteralReplaced": true,
+    "originalSha256": "e2b90f434e0099eeb70a05690ccb4c0c2c214b987356869955858f6c43b674b5"
+  }
+}

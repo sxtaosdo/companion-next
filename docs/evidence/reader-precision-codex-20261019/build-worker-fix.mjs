@@ -1,0 +1,20 @@
+import {createRequire} from 'node:module';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {dirname,join} from 'node:path';
+import {createHash} from 'node:crypto';
+const {build}=createRequire('D:/code/shidai3/P8000/cocos-mcp/mcp/package.json')('esbuild');
+const root='C:/Users/33272/AppData/Local/Temp/companion-reader-denial-diagnosis-20261019',source=join(root,'verified-source'),live='D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion',candidate='C:/Users/33272/AppData/Local/Temp/companion-credential-isolation-20261018/worktree/mcp/src/companion/knowledge-worker-core.ts';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const original=await readFile(live+'/knowledge-worker.js'),map=JSON.parse(await readFile(live+'/knowledge-worker.js.map','utf8'));
+if(sha(original)!=='ff0ff14026e3d5790ac48f83c901053ffd58055e5ab6c6be7fbd9dcdb134d699')throw Error('LIVE_WORKER_BASELINE_CHANGED');
+await mkdir(source,{recursive:true});for(let i=0;i<map.sources.length;i++){const marker='/verified-source/';if(!map.sources[i].includes(marker))continue;const rel=map.sources[i].split(marker)[1];if(rel.split(/[\\/]/).includes('..'))throw Error('UNSAFE_SOURCE_PATH');const p=join(source,rel);await mkdir(dirname(p),{recursive:true});await writeFile(p,map.sourcesContent[i]);}
+const common={absWorkingDir:join(source,'mcp'),bundle:true,platform:'node',format:'esm',target:'node20',sourcemap:true,nodePaths:['D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules'],external:['playwright','playwright-core','chromium-bidi','fsevents','better-sqlite3','typescript'],banner:{js:"import {createRequire} from 'node:module';const require=createRequire(import.meta.url);"}};
+await mkdir(join(root,'baseline'),{recursive:true});await build({...common,entryPoints:['src/knowledge-worker.ts'],outfile:join(root,'baseline/knowledge-worker.js')});
+const baseline=await readFile(join(root,'baseline/knowledge-worker.js'));if(!baseline.equals(original))throw Error('WORKER_BASELINE_REBUILD_DIFFERS');
+const path=join(source,'mcp/src/companion/knowledge-worker-core.ts'),before=await readFile(path,'utf8'),next=await readFile(candidate,'utf8');
+const oldExpiry='2026-11-08T01:25:46Z',newExpiry='2026-11-08T01:25:46.685460Z';
+if(before.split(oldExpiry).length!==2||before.replace(oldExpiry,newExpiry).replaceAll('\r','')!==next.replaceAll('\r',''))throw Error('WORKER_SOURCE_DIFF_NOT_ONE_EXPIRY_LITERAL');
+await writeFile(path,before.replace(oldExpiry,newExpiry));await mkdir(join(root,'candidate'));await build({...common,entryPoints:['src/knowledge-worker.ts'],outfile:join(root,'candidate/knowledge-worker.js')});
+const updated=await readFile(join(root,'candidate/knowledge-worker.js')),updatedMap=await readFile(join(root,'candidate/knowledge-worker.js.map'));
+const proof={baselineByteIdentical:true,baselineSha256:sha(baseline),newSha256:sha(updated),newMapSha256:sha(updatedMap),sourceChange:'knowledge-worker-core.ts: existing key3 expiry precision only',oldPinnedExpiry:oldExpiry,existingMetadataExpiry:newExpiry,credentialRead:false,credentialConfigChanged:false,daemonRestarted:false,deployed:false};
+await writeFile(root+'/worker-build-proof.json',JSON.stringify(proof,null,2)+'\n');console.log(JSON.stringify(proof));

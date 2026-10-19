@@ -1,0 +1,35 @@
+[
+  {
+    "className": "ProseMirror",
+    "framework": "Chrome",
+    "rectangle": [
+      1443.0,
+      1173.0,
+      533.0,
+      36.0
+    ],
+    "focused": false,
+    "patternNames": [
+      "ValuePatternIdentifiers.Pattern",
+      "TextPatternIdentifiers.Pattern",
+      "ScrollItemPatternIdentifiers.Pattern"
+    ],
+    "rangeEnclosingType": "ControlType.Group",
+    "rangeEnclosingClass": "placeholder",
+    "rangeEnclosesSameElement": false,
+    "isReadOnly": false,
+    "children": [
+      {
+        "type": "ControlType.Text",
+        "className": "",
+        "offscreen": false
+      },
+      {
+        "type": "ControlType.Text",
+        "className": "ProseMirror-trailingBreak",
+        "offscreen": false
+      }
+    ],
+    "contentRead": false
+  }
+]

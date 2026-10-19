@@ -1,3 +1,5 @@
+2026-10-19 03:45 UTC: Reader403根因为本机到期常量丢失小数秒，仅修worker复用原配置、无重启；授权KB及3项文档元数据200、auth=verified，keyword仍unverified。Codex此前误读placeholder；真实Next标记完整接收并精确清理，无发送。见[原因与证据](reader-precision-codex-receipt-20261019.md)。
+
 最新核验：用户本人执行接入命令后，2026-10-19 03:31 UTC状态为 `auth=denied`；唯一授权KB元数据请求返回 `403 AUTH_DENIED`，尚未正向通过。请停止后续读取，不重复运行包装脚本；见[实际回执](reader-codex-verification-20261019.md)。下文恢复结果及命令按各自时间和执行者阅读。
 
 # 知识库服务恢复与本机只读接入（2026-10-19）

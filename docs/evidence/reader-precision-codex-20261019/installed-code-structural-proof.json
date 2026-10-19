@@ -1,0 +1,15 @@
+{
+  "installedPackage": "OpenAI.Codex_26.1013.4894.0_x64",
+  "placeholder": {
+    "sourceSha256": "c70d95da34ba7e5962a559dbf68d0102d10b4b47b877f5d9933629bb5a1f3a10",
+    "excerpt": "if(t.childCount===1&&t.firstChild?.type===e.schema.nodes.paragraph&&t.firstChild.content.size===0&&Ri.getState(e)?.source?.kind!==`mcp-extension`){let n=tUu.getState(e)?.placeholder;return xc.create(t,[Sl.node(0,t.content.size,{class:`placeholder`,\"data-placeholder\":n})])}return null}}})}var tUu;function nUu(){return(nUu=t((()=>{lc(),js()",
+    "meaning": "decoration only for one empty paragraph"
+  },
+  "newThreadParser": {
+    "sourceSha256": "a8fdd0feea4448d66037df9f264aade773f1405299bbccf2418544e4b619b41b",
+    "gD_excerpt": "function gD(e){let t=_D(e),n=e.searchParams.getAll(`mode`),r=Q(e,`originUrl`),a=Q(e,`path`),o=Q(e,`projectId`),s;if(n.length>1)return null;if(n.length===1){let e=i.to.safeParse(n[0]);if(!e.success)return null;s=e.data}return t==null||a!=null&&!i.mi(a)||t.prompt==null&&t.browserUrl==null&&s==null&&r==null&&a==null&&o==null?null:{codexAppMode:s,kind:`newThread`,originUrl:r,path:a,projectId:o==null?void 0:i.an(o),...t}}function _D(e){let t=Q(e,`prompt`),n=e.searchParams.get(`browserTabId`),r=n==null?null:eD.safeParse(n),i=e.sea",
+    "bareNewWithoutParameters": "rejected",
+    "threadsNewWithoutParameters": "kind newThread directly"
+  },
+  "userContentRead": false
+}
