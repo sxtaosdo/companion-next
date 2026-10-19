@@ -105,8 +105,8 @@
       "id": 14,
       "name": "五客户端MCP登记",
       "status": "部分完成",
-      "evidenceAndRemaining": "VSCode servers格式候选dacb89b/0.3.148与114项既有回归保留；本批核对33文件与4载荷SHA、依赖及源码绑定通过，未部署。现有UNKNOWN2阻止普通关闭，强退后的后继boot-lock交接缺精确证明路径",
-      "remainingKind": "宿主锁交接代码缺口/部署/真实客户端连接"
+      "evidenceAndRemaining": "五客户端旧功能合同保留；用户明确未使用VS Code，已撤销其候选部署及专属锁交接开发，保留隔离代码但不作为当前迁移验收阻塞。其余实际使用客户端按原范围验收",
+      "remainingKind": "实际使用客户端实机；VS Code候选排除当前阻塞"
     },
     {
       "id": 15,
@@ -140,8 +140,8 @@
       "id": 19,
       "name": "知识库、文档、分片、原文、搜索",
       "status": "部分完成",
-      "evidenceAndRemaining": "历史元数据及关键词证据保留；当前实例status200，但首个kb/list实际401 AUTH_MISSING，未到doc/chunk/original。实际安装源码在缺credentialFile引用时直接拒绝；原凭据文件存在且未读取密钥",
-      "remainingKind": "运行实例启动凭据引用缺失；文档链未验"
+      "evidenceAndRemaining": "当前浏览器登录成功，Companion知识适配器在发起worker/WeKnora调用前因缺credentialFile启动引用而401 AUTH_MISSING。原脚本仅进程环境，正常入口无持久恢复/热加载；原文件存在，未读密钥。当前KB修复及doc/chunk/original/search/正常重启验收尚未完成",
+      "remainingKind": "知识启动引用持久性缺口；现有宿主普通重启受UNKNOWN2守卫阻止"
     },
     {
       "id": 20,
@@ -159,5 +159,6 @@
     }
   ],
   "scopeCorrection": "Old Companion web has no evidenced image-task history entry. The independent public-image-review utility was incorrectly included in item18. Keep item18 as the approved narrow Owner preview/select/export surface; no old-data migration is required. The count change is a scope correction, not new implementation progress.",
-  "progressUpdate": "This batch closes only items3 and8 by bounded actual status/UI observations and independently reviewed existing Preview/Profiler evidence. Previous8 accepted items unchanged. P1060 development pause does not prohibit read-only identity queries. Current knowledge AUTH_MISSING remains a blocker. Candidate deployment/restart already authorized; this batch dependencies only."
+  "progressUpdate": "This batch closes only items3 and8 by bounded actual status/UI observations and independently reviewed existing Preview/Profiler evidence. Previous8 accepted items unchanged. P1060 development pause does not prohibit read-only identity queries. Current knowledge AUTH_MISSING remains a blocker. Candidate deployment/restart already authorized; this batch dependencies only.",
+  "latestScopeCorrection": "User does not use VS Code: deployment and its dedicated successor-lock development cancelled before any freeze/termination/install/start. Preserved isolated source without deployment. This candidate is not a current migration acceptance blocker. Knowledge authentication recovery remains open."
 }
