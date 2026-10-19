@@ -1,0 +1,65 @@
+{
+  "migration": [
+    [
+      30,
+      0
+    ]
+  ],
+  "quick_check": "ok",
+  "empty_trigger_counts": {
+    "task_pending_ops": 0,
+    "data_sources": 0,
+    "im_channels": 0,
+    "mcp_services": 0,
+    "sync_logs": 0,
+    "tenant_sandbox_configs": 0,
+    "temporary_documents": 0,
+    "fork_snapshot_leases": 0,
+    "tenant_skills": 0,
+    "sessions_with_fork_bootstrap": 0
+  },
+  "mcp_endpoint_state": {
+    "count": 1,
+    "state": "approved_disabled",
+    "id": "8f9d7d6c-cec1-4017-b4a2-ed648f372182",
+    "tenant_id": 1,
+    "tools": [
+      "list_knowledge_bases",
+      "search_knowledge",
+      "grep_chunks",
+      "list_documents",
+      "read_document",
+      "ask",
+      "wiki_search",
+      "wiki_read_page",
+      "wiki_index"
+    ],
+    "knowledge_base_ids": [
+      "da1051a5-3fff-4198-ba55-017ea79df9c3"
+    ]
+  },
+  "knowledge_statuses": [
+    [
+      "completed",
+      157
+    ],
+    [
+      "finalizing",
+      356
+    ],
+    [
+      "processing",
+      1137
+    ]
+  ],
+  "knowledge_state_sha256": "2bdae1ba12dad8adb3ce61a25fa57366081821e40af1abb4a236277fa2c7e2b5",
+  "counts": {
+    "knowledges": 1650,
+    "chunks": 59433,
+    "lite_embeddings": 2272,
+    "auth_tokens": 38,
+    "users": 2,
+    "tenants": 2
+  },
+  "temporary_kbs": 0
+}

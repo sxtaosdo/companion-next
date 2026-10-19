@@ -1,0 +1,31 @@
+{
+  "checkedAtUtc": "2026-10-19T00:14:27.6478459Z",
+  "sockets": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 32180,
+      "OwningProcess": 8844
+    },
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 8081,
+      "OwningProcess": 16812
+    }
+  ],
+  "health": {
+    "status": "ok"
+  },
+  "processes": [
+    {
+      "Id": 8844,
+      "ProcessName": "node",
+      "Path": "C:\\Program Files\\nodejs\\node.exe"
+    },
+    {
+      "Id": 16812,
+      "ProcessName": "weknora",
+      "Path": "D:\\services\\weknora\\normal-reader-recovery-v0.8.2\\weknora.exe"
+    }
+  ],
+  "startRequests": 0
+}

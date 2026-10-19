@@ -1,0 +1,28 @@
+{
+  "scriptSha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+  "exeSha256": "b05899bc8ccaf299f8d5b5bb7c131cedf81491e51b02906b4321d72c10d6ce64",
+  "flags": {
+    "AUTO_MIGRATE": "false",
+    "AUTO_RECOVER_DIRTY": "false",
+    "WEKNORA_HOUSEKEEPING_ENABLED": "false"
+  },
+  "migration": [
+    [
+      30,
+      0
+    ]
+  ],
+  "quickCheck": "ok",
+  "triggersEmpty": true,
+  "historicalStateSha256": "2bdae1ba12dad8adb3ce61a25fa57366081821e40af1abb4a236277fa2c7e2b5",
+  "counts": {
+    "knowledges": 1650,
+    "chunks": 59433,
+    "lite_embeddings": 2272,
+    "auth_tokens": 38,
+    "users": 2,
+    "tenants": 2
+  },
+  "elapsedSeconds": 0.38,
+  "realReaderLoaded": false
+}

@@ -1,3 +1,5 @@
+2026-10-19 00:14 UTC: 8081 restored and reused (WeKnora16812 / health ok); Companion8844 remains missing-auth with keyword unverified and writer/scheduler disabled. Both bind127.0.0.1. Startup migration/recovery/housekeeping flags remain false; sampled metadata unchanged. Real reader not loaded. See [restoration evidence and user-local manual commands](knowledge-service-restored-20261019.md). Earlier stopped-service entries below describe their original timestamps.
+
 # 已部署的预设修复与凭据隔离（2026-10-18）
 
 **已部署到本机32180，并通过真实Edge浏览器的限定验收。尚未读取/解密/注入真实知识凭据，不代表全部旧功能已验收对齐。**

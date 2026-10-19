@@ -1,0 +1,15 @@
+{
+  "sharedHead": "6ff44f5574ed2f1b81741e86c3ca1210c6c0085a",
+  "sharedDiffUnchanged": true,
+  "sharedStatusUnchanged": true,
+  "registries": {
+    "projects.json": {
+      "bytesUnchanged": true,
+      "sha256": "54727d55c2089d4c848f63bc95d983ab95afd394c2dcf86f63701c20aac09a25"
+    },
+    "tool-presets.json": {
+      "bytesUnchanged": true,
+      "sha256": "dfe12eab0cb4206f682b77f95a4dabc11661362adcdc43387c29c568acd0dec2"
+    }
+  }
+}

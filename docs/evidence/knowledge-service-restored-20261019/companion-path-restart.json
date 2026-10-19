@@ -1,0 +1,101 @@
+{
+  "at": "2026-10-19T00:08:31.317Z",
+  "readerKeyConfigured": false,
+  "readerFilePathConfigured": false,
+  "onlyChildPathChanged": true,
+  "forcedKill": false,
+  "idle": [
+    {
+      "schemaVersion": "companion-daemon-inflight-v1",
+      "identity": {
+        "pid": 2772,
+        "startupEpoch": "0f7ad7e0-f8f4-4159-9582-c6a241795f39",
+        "startedAt": "2026-10-18T23:54:38.831Z",
+        "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+        "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+        "nodeVersion": "v25.2.1"
+      },
+      "generation": 238,
+      "phase": "OPEN",
+      "observedAt": "2026-10-19T00:08:31.599Z",
+      "counts": {
+        "http": 0,
+        "mcp": 0,
+        "nativeAwaiting": 0,
+        "nativeUncertain": 0,
+        "maintenanceObservations": 0,
+        "projectActions": 0,
+        "globalActions": 0,
+        "recovery": 0,
+        "setup": 0,
+        "builds": 0,
+        "observedBuilds": 0,
+        "sidecars": 0,
+        "ownerStarting": 0,
+        "ownerRequests": 0,
+        "ownerHandlers": 0,
+        "ownerBusy": 0,
+        "ownerWorker": 0,
+        "setupPolls": 0,
+        "setupTimers": 0,
+        "icons": 0
+      },
+      "unknown": [],
+      "historicalUnknownIsInFlight": false,
+      "creatorGlobalDrainVerified": false,
+      "nativeCancellationConfirmed": false
+    },
+    {
+      "schemaVersion": "companion-daemon-inflight-v1",
+      "identity": {
+        "pid": 2772,
+        "startupEpoch": "0f7ad7e0-f8f4-4159-9582-c6a241795f39",
+        "startedAt": "2026-10-18T23:54:38.831Z",
+        "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+        "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+        "nodeVersion": "v25.2.1"
+      },
+      "generation": 238,
+      "phase": "OPEN",
+      "observedAt": "2026-10-19T00:08:32.318Z",
+      "counts": {
+        "http": 0,
+        "mcp": 0,
+        "nativeAwaiting": 0,
+        "nativeUncertain": 0,
+        "maintenanceObservations": 0,
+        "projectActions": 0,
+        "globalActions": 0,
+        "recovery": 0,
+        "setup": 0,
+        "builds": 0,
+        "observedBuilds": 0,
+        "sidecars": 0,
+        "ownerStarting": 0,
+        "ownerRequests": 0,
+        "ownerHandlers": 0,
+        "ownerBusy": 0,
+        "ownerWorker": 0,
+        "setupPolls": 0,
+        "setupTimers": 0,
+        "icons": 0
+      },
+      "unknown": [],
+      "historicalUnknownIsInFlight": false,
+      "creatorGlobalDrainVerified": false,
+      "nativeCancellationConfirmed": false
+    }
+  ],
+  "oldPathSpawnFailed": "ENOENT",
+  "correctedPathVersion": 5,
+  "cliStatus": "PASSED",
+  "after": {
+    "pid": 8844,
+    "startupEpoch": "47f16305-4783-4671-a0ad-dced4d79e156",
+    "startedAt": "2026-10-19T00:08:33.312Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "ok": true
+}

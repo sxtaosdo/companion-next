@@ -1,0 +1,58 @@
+{
+  "at": "2026-10-19T00:07:18.806Z",
+  "preflight": {
+    "scriptSha256": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+    "exeSha256": "b05899bc8ccaf299f8d5b5bb7c131cedf81491e51b02906b4321d72c10d6ce64",
+    "flags": {
+      "AUTO_MIGRATE": "false",
+      "AUTO_RECOVER_DIRTY": "false",
+      "WEKNORA_HOUSEKEEPING_ENABLED": "false"
+    },
+    "migration": [
+      [
+        30,
+        0
+      ]
+    ],
+    "quickCheck": "ok",
+    "triggersEmpty": true,
+    "historicalStateSha256": "2bdae1ba12dad8adb3ce61a25fa57366081821e40af1abb4a236277fa2c7e2b5",
+    "counts": {
+      "knowledges": 1650,
+      "chunks": 59433,
+      "lite_embeddings": 2272,
+      "auth_tokens": 38,
+      "users": 2,
+      "tenants": 2
+    },
+    "elapsedSeconds": 10.55,
+    "realReaderLoaded": false
+  },
+  "companionBefore": {
+    "pid": 2772,
+    "startupEpoch": "0f7ad7e0-f8f4-4159-9582-c6a241795f39",
+    "startedAt": "2026-10-18T23:54:38.831Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "beforeListening": false,
+  "startRequests": 1,
+  "realReaderLoaded": false,
+  "readerConfigChanged": false,
+  "modelOrCreatorStarted": false,
+  "blocked": [],
+  "stateBefore": {
+    "running": false,
+    "frameable": false
+  },
+  "start": {
+    "status": 503,
+    "body": {
+      "running": false,
+      "frameable": false,
+      "error": "本机没有找到知识库服务启动脚本。"
+    }
+  },
+  "error": "GUARDED_START_NOT_SUCCESSFUL"
+}
