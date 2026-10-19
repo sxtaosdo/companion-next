@@ -1,0 +1,107 @@
+{
+  "atUtc": "2026-10-19T13:23:00.705Z",
+  "mode": "REAL_API_STATUS_TO_DEPLOYED_NEXT_UI",
+  "registryCount": 7,
+  "statusSnapshots": [
+    {
+      "count": 7,
+      "stateCounts": {
+        "error": 7
+      }
+    },
+    {
+      "count": 7,
+      "stateCounts": {
+        "error": 7
+      }
+    }
+  ],
+  "allRegistryIdsNamesMatch": true,
+  "allStateLabelsAndRawStatesMatch": true,
+  "creatorVersionFieldMatchesActualResponse": true,
+  "creatorVersionPresentChecks": 0,
+  "creatorVersionAbsentShownUnreadChecks": 14,
+  "target": {
+    "alias": "existing-variant-acceptance-fixture",
+    "pathSha256": "a79f4915296f409154d65b70a8a5fe017c7273af6a9ea4ced1c0885893b36d7c",
+    "initialState": "error",
+    "refreshedState": "error"
+  },
+  "errorExcludedFromStoppedAndRunning": true,
+  "realRefreshCount": 1,
+  "samePageManualCollapsePreferencePreserved": true,
+  "reloadPersistenceClaim": false,
+  "allApisActualNoSimulatedResponses": true,
+  "requests": [
+    "/next/index.html",
+    "/next/assets/index-CRVreJhY.js",
+    "/next/assets/index-gwbq_QMl.css",
+    "/api/projects",
+    "/api/status",
+    "/api/calls/counts",
+    "/api/projects",
+    "/api/status"
+  ],
+  "staticHashes": [
+    {
+      "path": "/next/index.html",
+      "sha256": "1bb7f3edb912cc64010ed37d152921a78b717a160f0bf8dd8960f8010f37d6d1"
+    },
+    {
+      "path": "/next/assets/index-CRVreJhY.js",
+      "sha256": "0c53dfe075f66f5aa4faa6a2657c2136c4f6f7ddb7b04f3aab9015310875a010"
+    },
+    {
+      "path": "/next/assets/index-gwbq_QMl.css",
+      "sha256": "0731082f61d115956d105d687cd742bdab49124a49112f773fefaa57877467db"
+    }
+  ],
+  "blocked": [],
+  "pageErrors": [],
+  "before": {
+    "identity": {
+      "pid": 10820,
+      "startupEpoch": "7601ac9d-a500-46d8-8db0-9a0f28e7569c",
+      "startedAt": "2026-10-19T12:14:03.575Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "nativeEpochUnproven": 2,
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "after": {
+    "identity": {
+      "pid": 10820,
+      "startupEpoch": "7601ac9d-a500-46d8-8db0-9a0f28e7569c",
+      "startedAt": "2026-10-19T12:14:03.575Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "nativeEpochUnproven": 2,
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "actualLoginPostsThisAttempt": 1,
+  "actualLoginPostsTotal": 2,
+  "previousAttempt": {
+    "stage": "match-refreshed",
+    "failure": "Script attempted to read v-if detail of the deliberately collapsed fixture; selector timed out. Initial mapping, filters and refresh assertions had completed. Owned browser closed in finally. No successful proof was written; corrected by expanding before detail checks."
+  },
+  "businessWrites": 0,
+  "creatorLifecycleActions": 0,
+  "modelActions": 0,
+  "userBrowserUntouched": true,
+  "ownedBrowserClosed": true,
+  "scope": "Existing status identity reads can update Companion memory/cache and status logs; error is not stopped. No lifecycle, model or project writes."
+}

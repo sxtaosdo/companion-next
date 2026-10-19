@@ -3,11 +3,11 @@
   "method": "21 grouped feature areas, equal weight. Complete means real acceptance of the approved main flow within the documented project/session scope, not exhaustive fault/stress coverage. Synthetic tests are never real acceptance.",
   "total": 21,
   "counts": {
-    "完整验收通过": 8,
-    "部分完成": 11,
+    "完整验收通过": 10,
+    "部分完成": 9,
     "未完成或阻塞": 2
   },
-  "completeItemPercent": 38.1,
+  "completeItemPercent": 47.6,
   "notWorkloadProgress": true,
   "rows": [
     {
@@ -27,9 +27,9 @@
     {
       "id": 3,
       "name": "工程列表、状态同步、筛选、折叠",
-      "status": "部分完成",
-      "evidenceAndRemaining": "本批真实7条登记与UI一致，任务fixture搜索/折叠/清除通过；模拟状态筛选和同页手动偏好通过。当前全局status会探测含P1060的所有登记，未发送；真实当前状态同步仍待验",
-      "remainingKind": "当前真实状态实机窗口/授权范围；不扩大UI或宿主"
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "真实两次status各7条error，工程ID/名称/中文标签/rawstate/版本缺省均与UI对应；真实刷新一次后同页折叠保留，error不进stopped/running筛选。无模拟；不代证ready转换、长时同步或跨整页偏好",
+      "remainingKind": "验收完成（限定主流程）"
     },
     {
       "id": 4,
@@ -49,8 +49,8 @@
       "id": 6,
       "name": "Creator启动、聚焦、停止、重启",
       "status": "部分完成",
-      "evidenceAndRemaining": "聚焦等主链已验，全生命周期和异常分支未全验；当前不启Creator",
-      "remainingKind": "实机/暂停约束"
+      "evidenceAndRemaining": "既有Next聚焦200与OS前台PID/session真实通过；setup/恢复脚本启动与停止不能代证Next主按钮。最小剩余为自有fixture的Next启动→重启→停止；本批不执行Creator生命周期",
+      "remainingKind": "Next按钮实机；非P1060只读查询阻塞"
     },
     {
       "id": 7,
@@ -62,9 +62,9 @@
     {
       "id": 8,
       "name": "Preview、刷新、Profiler",
-      "status": "部分完成",
-      "evidenceAndRemaining": "已有真实主链，失败状态/运行工程全部刷新分支未全验",
-      "remainingKind": "实机/暂停约束"
+      "status": "完整验收通过",
+      "evidenceAndRemaining": "复核既有真实Preview start200/runningtrue/canvas可见，reload200/connections1及Profiler200/848 samples；三组证据SHA通过，相关Next源码未变。本批没有重新启动Creator或宣称当前宿主重跑",
+      "remainingKind": "验收完成（限定主流程）；非穷尽异常分支"
     },
     {
       "id": 9,
@@ -105,8 +105,8 @@
       "id": 14,
       "name": "五客户端MCP登记",
       "status": "部分完成",
-      "evidenceAndRemaining": "运行包回滚93项隔离通过；VSCode格式候选dacb89b/0.3.148修复、114项通过并构建，尚未部署/连接",
-      "remainingKind": "部署/实机/真实写入范围"
+      "evidenceAndRemaining": "VSCode servers格式候选dacb89b/0.3.148与114项既有回归保留；本批核对33文件与4载荷SHA、依赖及源码绑定通过，未部署。现有UNKNOWN2阻止普通关闭，强退后的后继boot-lock交接缺精确证明路径",
+      "remainingKind": "宿主锁交接代码缺口/部署/真实客户端连接"
     },
     {
       "id": 15,
@@ -140,8 +140,8 @@
       "id": 19,
       "name": "知识库、文档、分片、原文、搜索",
       "status": "部分完成",
-      "evidenceAndRemaining": "元数据与真实关键词命中3/空0/越权403已验，全部文档/分片实机链未全验",
-      "remainingKind": "实机"
+      "evidenceAndRemaining": "历史元数据及关键词证据保留；当前实例status200，但首个kb/list实际401 AUTH_MISSING，未到doc/chunk/original。实际安装源码在缺credentialFile引用时直接拒绝；原凭据文件存在且未读取密钥",
+      "remainingKind": "运行实例启动凭据引用缺失；文档链未验"
     },
     {
       "id": 20,
@@ -159,5 +159,5 @@
     }
   ],
   "scopeCorrection": "Old Companion web has no evidenced image-task history entry. The independent public-image-review utility was incorrectly included in item18. Keep item18 as the approved narrow Owner preview/select/export surface; no old-data migration is required. The count change is a scope correction, not new implementation progress.",
-  "progressUpdate": "Only item12 is newly closed by the finite main-flow evidence chain and independent review. Existing seven accepted items are unchanged. Item3 remains partial: no real global status probe because it includes paused P1060."
+  "progressUpdate": "This batch closes only items3 and8 by bounded actual status/UI observations and independently reviewed existing Preview/Profiler evidence. Previous8 accepted items unchanged. P1060 development pause does not prohibit read-only identity queries. Current knowledge AUTH_MISSING remains a blocker. Candidate deployment/restart already authorized; this batch dependencies only."
 }

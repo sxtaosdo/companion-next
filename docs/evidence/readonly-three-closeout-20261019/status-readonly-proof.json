@@ -1,0 +1,79 @@
+{
+  "atUtc": "2026-10-19T13:20:26.126914+00:00",
+  "mode": "REAL_READ_ONLY_STATUS_OBSERVATION",
+  "statusRoute": "GET /v1/status",
+  "before": {
+    "identity": {
+      "pid": 10820,
+      "startupEpoch": "7601ac9d-a500-46d8-8db0-9a0f28e7569c",
+      "startedAt": "2026-10-19T12:14:03.575Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "nativeEpochUnproven": 2,
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "after": {
+    "identity": {
+      "pid": 10820,
+      "startupEpoch": "7601ac9d-a500-46d8-8db0-9a0f28e7569c",
+      "startedAt": "2026-10-19T12:14:03.575Z",
+      "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "entrySha256": "aa703700e04116f3a03352ed63fc59e39e46cf82c0645202a408810086becc6f",
+      "nodeVersion": "v25.2.1"
+    },
+    "phase": "OPEN",
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "nativeEpochUnproven": 2,
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "projectCount": 7,
+  "observations": [
+    {
+      "projectId": "68a5dccc481a8588",
+      "state": "error"
+    },
+    {
+      "projectId": "214a2184be887306",
+      "state": "error"
+    },
+    {
+      "projectId": "cdc0709d4eaaa8a2",
+      "state": "error"
+    },
+    {
+      "projectId": "c16c713714956b4e",
+      "state": "error"
+    },
+    {
+      "projectId": "04c4cde24ee76d83",
+      "state": "error"
+    },
+    {
+      "projectId": "87224a1a9dbb5736",
+      "state": "error"
+    },
+    {
+      "projectId": "a79f4915296f4091",
+      "state": "error"
+    }
+  ],
+  "installedResolvedStatusSha256": "a9d8681e7a8fa46c6c0401754404466e98fb81734ec890906b3abeb834f6cc09",
+  "editorProjectInfoSourceSha256": "6ff5e923054c062958c74a0e04e918811e76d66a03561f4b643ea822fb67ee7d",
+  "effects": "Reads existing connection metadata and invokes identity-only projectInfo. Refreshes in-memory connection/lifecycle state and status logs; does not start/focus/stop/restart Creator or write project files.",
+  "projectWrites": 0,
+  "creatorLifecycleActions": 0,
+  "modelActions": 0,
+  "p1060DevelopmentActions": 0,
+  "notPureMemoryRead": true,
+  "rawConnectionCredentialsStored": false
+}
