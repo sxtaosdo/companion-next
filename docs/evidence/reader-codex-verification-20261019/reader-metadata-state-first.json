@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-19T03:30:13.760Z",
+  "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+  "requests": [
+    {
+      "path": "/api/knowledge/status",
+      "status": 200
+    }
+  ],
+  "wrapperExecuted": false,
+  "credentialFileReadByAgent": false,
+  "credentialConfigChanged": false,
+  "searchPerformed": false,
+  "bodyChunkOriginalRead": false,
+  "syncOrInference": false,
+  "ok": false,
+  "beforeIdentity": {
+    "pid": 1748,
+    "startupEpoch": "453db64a-5cfe-4e53-b7aa-6df9e609a59b",
+    "startedAt": "2026-10-19T03:14:05.666Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "statusBefore": {
+    "auth": "denied",
+    "keyword": "unverified",
+    "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+    "cliAvailable": true,
+    "cliCompatible": true,
+    "writerEnabled": false,
+    "schedulerEnabled": false
+  },
+  "error": "READER_NOT_CONFIGURED_FOR_APPROVED_KB"
+}
