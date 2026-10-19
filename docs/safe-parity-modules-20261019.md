@@ -1,6 +1,6 @@
 # 旧功能与失败路径增量（2026-10-19）
 
-状态：源码候选已验证；共享网页部署另记。基线 a0fe818 / 1.3.173.118，工作区干净。仅新 Companion Next，与 cocos-mcp 原 UI 对照；不涉及 game-ops-admin、7470/7471。历史矩阵中的“缺失”先与后续交付核对，不将已补控件重复开发。
+状态：源码已验证并静态部署到本机32180；真实业务验收范围如下。基线 a0fe818 / 1.3.173.118，工作区干净。仅新 Companion Next，与 cocos-mcp 原 UI 对照；不涉及 game-ops-admin、7470/7471。历史矩阵中的“缺失”先与后续交付核对，不将已补控件重复开发。
 
 | 本轮实际模块 | 发现与修改 | 验证级别及证据 |
 | --- | --- | --- |
@@ -33,3 +33,11 @@ binding版本只能观察Vue实际通知的provider/connected/label变化；raw�
 [知识服务恢复与接入说明](knowledge-service-restored-20261019.md)已改为简明中文，含步骤、预期结果、错误处理。唯一PowerShell命令块与原文逐字节一致，SHA256为288c243202cf19a9d1b2f89fc87d794490a2e19ccce2108a05457fa6b3e7cd92；仅修改说明，没有执行该块。
 
 [Codex前置回执](evidence/safe-parity-modules-20261019/codex-empty-preflight.json)仅记录空值判断/窗口可见性，clipboardContentRead=false、inputContentRead=false、mutations=0。非空剪贴板按用户约束构成本轮真实阻塞；没有清除未知内容，也没有发送或创建任务。
+
+## 本机静态部署回执
+
+源码检查点 `2ee3388 / 1.3.173.119` 已按原静态流程部署，只新增hash资产并原子更新index，原hash资源全部保留。六文件HTTP200且SHA与构建一致，JS为 `index-Dva5JRrN.js`；独立headless Edge可见更新记录，pageErrors与blocked均为空。没有刷新/关闭用户窗口，没有共享daemon重启或真实客户端写入；daemon PID/epoch/入口SHA、projects.json、tool-presets.json与共享cocos-mcp HEAD/status/diff/index均保持。见[部署JSON](evidence/safe-parity-modules-20261019/static-deployment.json)与[限定页面截图](evidence/safe-parity-modules-20261019/changelog-live.png)。
+
+这证明该静态版本已可达和限定页面显示，不代替本轮合成接口回归的真实登记/客户端成功业务验收。Codex在非空剪贴板前置条件处停止，不记作投递成功。
+
+归档日志仅统一换行并去掉末尾空白行，未更改输出内容；原始重定向文件仍保留在任务Temp `companion-safe-parity-20261019`。

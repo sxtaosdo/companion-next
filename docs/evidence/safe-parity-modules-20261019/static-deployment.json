@@ -1,0 +1,76 @@
+{
+  "at": "2026-10-19T03:09:25.867Z",
+  "sourceCommit": "2ee3388987a0acff8191f8caef70f5d2048036d1",
+  "beforeIdentity": {
+    "pid": 8844,
+    "startupEpoch": "47f16305-4783-4671-a0ad-dced4d79e156",
+    "startedAt": "2026-10-19T00:08:33.312Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "expected": {
+    "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+    "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+    "assets/index-BnFY6Zbl.css": "ada8e8367ea0493931a847e7566f9c0d76dbfc4c6bf3afdd7359120e6b58d198",
+    "assets/index-Dva5JRrN.js": "e2b90f434e0099eeb70a05690ccb4c0c2c214b987356869955858f6c43b674b5",
+    "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+    "index.html": "2472987c12b9b6a245c6b743236cd525c58fabfeba3e13482fa03006bb65053c"
+  },
+  "steps": [],
+  "realReaderLoaded": false,
+  "restarts": 0,
+  "businessWrites": 0,
+  "blocked": [],
+  "pageErrors": [],
+  "http": [
+    {
+      "path": "/next/assets/about-icon-BaVeClOr.svg",
+      "status": 200,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "/next/assets/donation-qr-D7kdLLAm.png",
+      "status": 200,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "/next/assets/index-BnFY6Zbl.css",
+      "status": 200,
+      "sha256": "ada8e8367ea0493931a847e7566f9c0d76dbfc4c6bf3afdd7359120e6b58d198"
+    },
+    {
+      "path": "/next/assets/index-Dva5JRrN.js",
+      "status": 200,
+      "sha256": "e2b90f434e0099eeb70a05690ccb4c0c2c214b987356869955858f6c43b674b5"
+    },
+    {
+      "path": "/next/favicon.svg",
+      "status": 200,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "/next/index.html",
+      "status": 200,
+      "sha256": "2472987c12b9b6a245c6b743236cd525c58fabfeba3e13482fa03006bb65053c"
+    }
+  ],
+  "changelogVisible": true,
+  "staticMatches": true,
+  "oldAssetsPreserved": true,
+  "afterIdentity": {
+    "pid": 8844,
+    "startupEpoch": "47f16305-4783-4671-a0ad-dced4d79e156",
+    "startedAt": "2026-10-19T00:08:33.312Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "9d2d01747eb2830d0b4d7c6b8456846fc02c131b9a1d4625839b4a4214f99fa5",
+    "nodeVersion": "v25.2.1"
+  },
+  "daemonUnchanged": true,
+  "sharedUnchanged": true,
+  "registriesUnchanged": {
+    "projects.json": true,
+    "tool-presets.json": true
+  },
+  "ok": true
+}
