@@ -1,4 +1,4 @@
-2026-10-20 用户已批准服务状态合并项目概览。本轮实现紧凑状态摘要、最近读取时间、局部自动更新与异常详情；旧/services保留query并兼容跳转至overview#service-status，取消独立侧栏入口。工程状态复用原单例SSE/3秒轮询；知识与模型启动器status GET完成后间隔15秒，无新增服务控制；可达不代表就绪，ComfyUI保持未知。隐藏/离页取消、代际、UNKNOWN/互斥、会话暂停及断线有界恢复均保留。当前源码检查完成，静态候选与真实页面验证进行中，尚未部署本片或用户验收；下方美术分组部署为上一轮时点。Library原tools/list403仍停止，未重试上传。
+2026-10-20 服务状态已合并项目概览：实际部署源码 **7261a35 / 1.3.173.184**，产品页面1.3.173。概览紧凑摘要显示Companion、知识服务及模型启动器的响应与更新时间，异常可展开；移除独立服务状态导航，旧/services保留query并转至overview#service-status。工程沿用原单例事件流与3秒状态轮询；服务status GET完成后15秒再读，失败显示未知/待核对，可达不代表模型或ComfyUI就绪。暂停会话、隐藏/离页取消、代际、UNKNOWN/互斥及有界恢复已核。183项受影响用例已覆盖（最终修复后定向51通过，其余132不变通过）、严格类型/构建/独立审查；候选27项、部署后29项实际浏览器检查和6HTTP SHA通过。**自检完成／已部署／待用户看图验收**。实际截图保留本机；此前Library工具发现阶段403未获新访问证据，本轮未重试、无Library ID。当前322文件保护基线与全部回执位于 `C:/Users/33272/AppData/Local/Temp/companion-overview-services-20261020`；下方7261a35之前的部署与基线均按历史时点阅读。
 
 2026-10-20 美术资源分组交付：源码与实际部署 **3b96bad / 1.3.173.181**，页面产品版本1.3.173。一级“美术资源”下为AI图标／游戏资源／图片素材；父项仅开合，原三个路由和业务保持，进入子页自动展开且仅子项高亮。概览首项及模型服务／服务状态保持。89项相关测试、严格类型、构建、独立只读审查通过；候选36项和部署后38项实际浏览器检查通过，6静态HTTP SHA一致，7完整工程卡及无横向溢出已核。**自检完成／已部署／待用户看图验收**，不称全部迁移验收完成。两张实际部署高清截图保留本机，授权Library保存因当前官方批量助手在tools/list阶段返回403而未能开始上传，未创建Library ID。证据目录：`C:/Users/33272/AppData/Local/Temp/companion-art-navigation-20261020`。下方338e759/.179为上一轮交付时点。
 
@@ -18,11 +18,17 @@
 
 隔离验证：向导最终13场景含四来源、失败/UNKNOWN、返回取消、卡B上下文、安装→Agent跳过/仅Codex→完成。14次POST全内存mock、真实业务写0；不等于真实安装或客户端配置成功。严格类型、构建、相关回归和独立审查通过；独立审查不能替代本段的真实页面目视。
 
-### 本轮已批准结构与剩余服务建议
+### 已批准导航结构与概览服务摘要
 
 用户已批准“美术资源”一级父项，二级为AI图标／游戏资源／图片素材；已在3b96bad/.181实现并部署。仅分组导航，不合并业务、修改API或迁移三个原平面路由。父项支持Enter/Space开合，隐藏子项不进入Tab，子项切换关闭手机侧栏；深链、刷新、前后退、真实工程上下文及无效参数保护均已实测。
 
-旧真实index.html:25、191–205有独立模型服务tab，无独立服务状态。新/services为额外只读汇总，重复读取model-service/status；新知识页也额外显示模型控制。建议保留模型服务入口，服务状态从帮助/关于进入，知识库模型控制回归模型页；这部分尚待用户确认，本轮未实施。
+旧真实index.html:25、191–205有独立模型服务tab，无独立服务状态。用户已明确批准动态监控合入首项“项目概览”；本轮7261a35/.184已执行，服务状态不再移帮助/关于。模型服务保留原启停管理，知识库控制未重组。原/services深链保留全部query并重定向overview#service-status，前进后退和显式工程上下文已实测。
+
+本轮服务合并证据：Temp/companion-overview-services-20261020，含source-validation.json、candidate-browser.json、after-browser.json、http-verification.json、post-static-baseline.json及两张review-shots实际概览图。Edge使用真实同源GET；隐藏/恢复通过受控visibilitychange输入验证，未声称OS窗口切换。初次整合曾有1项来源替换失败，修复只暂停所拥有live后51项相关回归通过，未隐去失败。服务慢GET跨工程轮询、迟到回执、UNKNOWN/互斥及暂停恢复由19项隔离用例补证；未注入生产故障或启停服务。
+
+322运行文件基线、daemon6564/OPEN、9业务表、三配置当前值、共享22修改和知识服务保持；当前配置没有覆盖回历史值。源码7261a35与后续文档HEAD分开。rollback-index.py受当前入口hash守卫，可仅恢复本轮backup-index.html到上一3b96bad入口，保留全部hash资源；未回滚。
+
+下方为上一轮美术导航交付证据，不是当前322基线。
 
 本轮证据在Temp/companion-art-navigation-20261020：candidate-browser.json、after-browser.json、http-verification.json、post-static-baseline.json及delivery-summary.json。320运行文件、PID6564/OPEN、9业务表、三配置当前值、共享22修改和知识PID600保持。唯一历史基线差异是本轮开始已观测的.codex/config.toml哈希变化，原因未核实；已记录prior-baseline-drift.json，未覆盖或恢复配置。没有模型/Creator/客户端写入。
 
