@@ -36,19 +36,23 @@ function selectRegisteredProject(id: string) {
   registered.restoreRouteProject(id)
   void router.push({ path: route.path, query: { ...route.query, project: id } })
 }
-// Keep one destination per task; the original four Companion domains stay together.
+// Group only navigation; each art page keeps its existing route and business flow.
 const nav = [
   { path: '/overview', label: '项目概览' },
-  { path: '/ai-icons', label: 'AI 图标' },
   { path: '/projects', label: '工程' },
   { path: '/knowledge', label: '知识库' },
   { path: '/knowledge?tab=models', label: '模型服务' },
 ]
-const resourceNav = [
+const artNav = [
+  { path: '/ai-icons', label: 'AI 图标' },
   { path: '/resources', label: '游戏资源' },
   { path: '/image-assets', label: '图片素材' },
-  { path: '/services', label: '服务状态' },
 ]
+const artExpanded = ref(false)
+watch(() => route.fullPath, () => {
+  if (artNav.some(item => item.path === route.path)) artExpanded.value = true
+}, { immediate: true })
+const resourceNav = [{ path: '/services', label: '服务状态' }]
 function isNavActive(path: string) {
   if (path === '/knowledge?tab=models') return route.path === '/knowledge' && route.query.tab === 'models'
   if (path === '/knowledge') return route.path === '/knowledge' && route.query.tab !== 'models'
@@ -114,7 +118,17 @@ const dateLabel = computed(() => {
     <button v-if="menuOpen" class="sidebar-scrim" aria-label="关闭导航" @click="menuOpen = false"></button>
     <aside class="sidebar" :class="{ 'is-open': menuOpen }">
       <RouterLink to="/about" class="brand" aria-label="关于 Companion" @click="menuOpen = false"><span class="brand-mark">C</span><span>Companion</span></RouterLink>
-      <nav class="nav-list" aria-label="主导航"><RouterLink v-for="item in nav" :key="item.path" :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><span>{{ item.label }}</span></RouterLink></nav>
+      <nav class="nav-list" aria-label="主导航">
+        <template v-for="(item, index) in nav" :key="item.path">
+          <RouterLink :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><span>{{ item.label }}</span></RouterLink>
+          <div v-if="index === 0" class="art-nav-group">
+            <button class="nav-item art-nav-toggle" type="button" :aria-expanded="artExpanded" aria-controls="art-navigation" @click="artExpanded = !artExpanded"><span>美术资源</span><el-icon aria-hidden="true" :class="{ 'is-expanded': artExpanded }"><ArrowDown/></el-icon></button>
+            <div v-show="artExpanded" id="art-navigation" class="art-nav-children">
+              <RouterLink v-for="child in artNav" :key="child.path" :to="projectLink(child.path)" class="nav-item art-nav-child" :class="{ 'is-active': isNavActive(child.path) }" active-class="" :aria-current="isNavActive(child.path) ? 'page' : undefined" @click="menuOpen = false">{{ child.label }}</RouterLink>
+            </div>
+          </div>
+        </template>
+      </nav>
       <nav class="legacy-nav supplementary-nav" aria-label="补充入口"><RouterLink v-for="item in resourceNav" :key="item.path" :to="projectLink(item.path)" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false">{{ item.label }}</RouterLink></nav>
       <div class="sidebar-footer">前端 v{{ frontendIdentity.version }}</div>
     </aside>
@@ -141,6 +155,12 @@ const dateLabel = computed(() => {
 .nav-list { margin-top: 24px; }
 .nav-list { gap: 3px; }
 .nav-item { padding: 10px 14px; }
+.art-nav-toggle { width: 100%; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; text-align: left; cursor: pointer; justify-content: space-between; }
+.art-nav-toggle .el-icon { transform: rotate(-90deg); transition: transform .15s; }
+.art-nav-toggle .el-icon.is-expanded { transform: rotate(0); }
+.art-nav-children { display: grid; gap: 3px; margin-top: 3px; }
+.art-nav-child { padding-left: 30px; }
+.art-nav-toggle:focus-visible { outline: 2px solid #cfc3ff; outline-offset: 2px; }
 .supplementary-nav .is-active { color: #fff; font-weight: 600; }
 .registered-source-note,.registered-read-warnings { display:flex; align-items:center; flex-wrap:wrap; gap:6px; color:var(--text-secondary,#637187); font-size:12px; margin-bottom:16px; overflow-wrap:anywhere; }
 .projects-main { padding-top: 18px; }

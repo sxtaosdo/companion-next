@@ -265,9 +265,9 @@ describe('help, about and visible frontend identity', () => {
   it('uses the approved overview-first order and preserves other navigation groups, destinations and brand-about access', async () => {
     await setup('/overview')
     const navigation = wrapper!.find('nav[aria-label="主导航"]')
-    expect(navigation.findAll('a').map((a) => a.attributes('href'))).toEqual(['/overview', '/ai-icons', '/projects', '/knowledge', '/knowledge?tab=models'])
+    expect(navigation.findAll('a').map((a) => a.attributes('href'))).toEqual(['/overview', '/ai-icons', '/resources', '/image-assets', '/projects', '/knowledge', '/knowledge?tab=models'])
     const supplementary = wrapper!.find('nav[aria-label="补充入口"]')
-    expect(supplementary.findAll('a').map((a) => a.attributes('href'))).toEqual(['/resources', '/image-assets', '/services'])
+    expect(supplementary.findAll('a').map((a) => a.attributes('href'))).toEqual(['/services'])
     expect(wrapper!.find('nav[aria-label="旧版功能入口"]').exists()).toBe(false)
     expect(wrapper!.find('.sidebar-utility').exists()).toBe(false)
     expect(wrapper!.find('.topbar a[href="/help"]').exists()).toBe(true)
@@ -280,7 +280,8 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.find('.sidebar a[href="/history"]').exists()).toBe(false)
     expect(wrapper!.find('.sidebar a[href="/migration"]').exists()).toBe(false)
     expect(wrapper!.find('.workspace-label').exists()).toBe(false)
-    expect(wrapper!.find('.nav-item .el-icon').exists()).toBe(false)
+    expect(wrapper!.find('a.nav-item .el-icon').exists()).toBe(false)
+    expect(wrapper!.find('.art-nav-toggle .el-icon').attributes('aria-hidden')).toBe('true')
   })
   it('keeps the shell compact and page help keyboard-accessible without migration captions', async () => {
     await setup('/projects')
@@ -379,10 +380,41 @@ describe('implemented feature help navigation',()=>{
 
 
 describe('restored Companion navigation categories', () => {
-  it('keeps the original four tasks together, one engineering link and every supplementary route reachable', async () => {
+  it('toggles the art parent without navigating or requests, and closes mobile navigation only on child selection', async () => {
+    const fetch = vi.fn(); vi.stubGlobal('fetch', fetch)
+    const { router } = await setup('/help')
+    const toggle = wrapper!.get('.art-nav-toggle')
+    expect(toggle.attributes('type')).toBe('button'); expect(toggle.attributes('aria-expanded')).toBe('false')
+    expect(wrapper!.get('#art-navigation').isVisible()).toBe(false)
+    await wrapper!.get('button[aria-label="打开导航"]').trigger('click')
+    await toggle.trigger('click'); await flushPromises()
+    expect(router.currentRoute.value.fullPath).toBe('/help'); expect(fetch).not.toHaveBeenCalled()
+    expect(toggle.attributes('aria-expanded')).toBe('true'); expect(wrapper!.get('.sidebar').classes()).toContain('is-open')
+    await wrapper!.get('.art-nav-child[href="/image-assets"]').trigger('click'); await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/image-assets'); expect(wrapper!.get('.sidebar').classes()).not.toContain('is-open')
+    expect(wrapper!.findAll('.sidebar [aria-current="page"]').map(item => item.text())).toEqual(['图片素材'])
+    await toggle.trigger('click'); expect(wrapper!.get('#art-navigation').isVisible()).toBe(false)
+    await router.push('/help'); await router.push('/resources?project=invalid'); await flushPromises()
+    expect(toggle.attributes('aria-expanded')).toBe('true')
+    expect(wrapper!.findAll('.sidebar [aria-current="page"]').map(item => item.text())).toEqual(['游戏资源'])
+    expect(fetch).not.toHaveBeenCalled()
+  })
+  it.each(['/ai-icons', '/resources', '/image-assets'])('expands art navigation for a direct %s link and browser return', async path => {
+    const { router } = await setupBrowser(path)
+    expect(wrapper!.get('.art-nav-toggle').attributes('aria-expanded')).toBe('true')
+    expect(wrapper!.findAll('.sidebar [aria-current="page"]')).toHaveLength(1)
+    await wrapper!.get('.art-nav-toggle').trigger('click')
+    await router.push('/help'); await flushPromises()
+    router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe(path)); await flushPromises()
+    expect(wrapper!.get('.art-nav-toggle').attributes('aria-expanded')).toBe('true')
+    router.forward(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/help')); await flushPromises()
+    expect(wrapper!.findAll('.sidebar [aria-current="page"]')).toHaveLength(0)
+  })
+
+  it('keeps the approved art hierarchy, one engineering link and every supplementary route reachable', async () => {
     const fetch = vi.fn(); vi.stubGlobal('fetch', fetch)
     const { router } = await setup('/knowledge?tab=models')
-    expect(wrapper!.findAll('.nav-list .nav-item').map(item => item.text())).toEqual(['项目概览', 'AI 图标', '工程', '知识库', '模型服务'])
+    expect(wrapper!.findAll('.nav-list .nav-item').map(item => item.text())).toEqual(['项目概览', '美术资源', 'AI 图标', '游戏资源', '图片素材', '工程', '知识库', '模型服务'])
     const sidebar = wrapper!.get('.sidebar')
     expect(sidebar.findAll('a[href="/projects"]')).toHaveLength(1)
     expect(sidebar.findAll('a[href="/ai-icons"]')).toHaveLength(1)

@@ -221,7 +221,8 @@ describe('registered project overview and resource context', () => {
   it('preserves selected real identity into resources and across step changes without sample resources or fabricated counts', async () => {
     const { router, workspace } = await setup(`/overview?project=${id}`, { demo: true })
     expect(workspace.mode).toBe('disconnected')
-    await wrapper!.get('.supplementary-nav a[href^="/resources"]').trigger('click'); await flushPromises()
+    await wrapper!.get('.art-nav-toggle').trigger('click')
+    await wrapper!.get('.art-nav-child[href^="/resources"]').trigger('click'); await flushPromises()
     expect(router.currentRoute.value.query.project).toBe(id); expect(wrapper!.find('.real-resource-identity').text()).toContain('/real/project-a')
     expect(wrapper!.findAll('.resource-row')).toHaveLength(0); expect(wrapper!.findAll('img')).toHaveLength(0)
     expect(wrapper!.text()).toContain('尚未读取任务历史')
