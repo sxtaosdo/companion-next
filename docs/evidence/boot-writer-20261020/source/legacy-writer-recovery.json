@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "scope": "WRITER_ONLY",
+  "anchorDigest": "d68d89cb64051ee6a5873635f5b129b907fef45ddea74878233da04513e8aa73",
+  "currentSession": {
+    "machineId": "8ec639b5-1fa2-4f4f-8cff-95f00f289d26",
+    "bootId": "a49be189-172d-11f0-8a7d-8c9774127e68",
+    "systemProcessCreatedAt": "2026-10-20T00:39:52.8919050Z"
+  },
+  "oldIdentity": {
+    "pid": 3860,
+    "startupEpoch": "2d198c64-75c0-4e6b-b3b5-2eac2015bf78",
+    "startedAt": "2026-10-19T17:31:10.011Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
+    "nodeVersion": "v25.2.1"
+  },
+  "lock": {
+    "sha256": "1987d8331722bb5ca7b496bfb80d24137f115e6d3c33c9549546ff3cd7d8e21e",
+    "bytes": 116
+  }
+}

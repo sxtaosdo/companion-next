@@ -1,0 +1,8 @@
+{
+  "atUtc": "2026-10-20T01:33:21.563144+00:00",
+  "daemonSha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+  "mapSha256": "a37eab4792d6b9b98365a8b1823513d322701422ff5b860179cc00ba00c1b878",
+  "changedFiles": 2,
+  "uiAndCliUnchanged": true,
+  "serviceStarted": false
+}

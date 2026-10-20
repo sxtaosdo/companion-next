@@ -1,0 +1,191 @@
+import { describe, it, expect, vi } from 'vitest';
+import { readFile, writeFile, rename, lstat, open, link, mkdir, symlink, readdir } from 'node:fs/promises';
+import { recoverWriterLock, writerOwnerSchema } from '../src/companion/native-writer-recovery.ts';
+import { retainWindowsWriterLock, WRITER_RETENTION_SCRIPT } from '../src/companion/windows-writer-lock-retention.ts';
+import { execFile } from 'node:child_process';
+import { NativeBootAuthority } from '../src/companion/native-boot-authority.ts';
+import { NativeMaintenance } from '../src/companion/native-maintenance.ts';
+import { openNativeEpochJournal } from '../src/companion/native-epoch-journal.ts';
+import { bootAnchorSchema } from '../src/companion/native-boot-authority.ts';
+import { fixture, session, identity, owner, sum, binding, priorTime, currentTime, otherBootId } from './writer-fixtures';
+
+const bare = (s = session()) => ({ machineId: s.machineId, bootId: s.bootId, systemProcessCreatedAt: s.systemProcessCreatedAt });
+function makeOwner(pid = 88) {
+  return writerOwnerSchema.parse({ kind: 'native-writer-owner-v2', daemonIdentity: { ...identity(pid), startedAt: '2026-10-20T01:25:00.050Z' },
+    os: owner(pid, '2026-10-20T01:25:00.0000000Z'), bootSession: bare() });
+}
+async function inputs() {
+  const f = await fixture();
+  await writeFile(f.root + '/daemon.json', JSON.stringify({ identity: f.oldIdentity }), { flag: 'wx' });
+  const legacy = { schemaVersion: 1 as const, scope: 'WRITER_ONLY' as const, anchorDigest: sum(JSON.stringify(f.anchor)),
+    currentSession: bare(), oldIdentity: f.oldIdentity, lock: binding(f.lock) };
+  const opts = { journalPath: f.journalPath, session: session(), owner: makeOwner(), anchorDigest: legacy.anchorDigest,
+    legacy, inspectOwner: vi.fn(async (_pid: number) => null as ReturnType<typeof owner> | null), recheck: vi.fn(async () => {}) };
+  const retained: string[] = [];
+  // Logical recovery seam. The real Windows retention boundary is tested below.
+  const retain = vi.fn(async (path: string, digest: string, bytes: number) => {
+    const b = await readFile(path); expect(b.length).toBe(bytes); expect(sum(b)).toBe(digest);
+    const destination = path + '.retained-' + digest;
+    await expect(lstat(destination)).rejects.toMatchObject({ code: 'ENOENT' });
+    await rename(path, destination); retained.push(destination); return destination;
+  });
+  return { f, opts, retain, retained };
+}
+async function v2Lock(f: Awaited<ReturnType<typeof fixture>>, previous = makeOwner(77)) {
+  const record = { schemaVersion: 2, writer: '88888888-8888-4888-8888-888888888888', pid: previous.daemonIdentity.pid,
+    openedAt: previous.daemonIdentity.startedAt, owner: previous };
+  await writeFile(f.lockPath, JSON.stringify(record) + '\n'); return record;
+}
+
+describe('independent writer-only ownership boundaries with isolated files', () => {
+  it('rejects legacy mismatch without the reviewed binding and preserves every fixture byte', async () => {
+    const { f, opts, retain } = await inputs();
+    await expect(recoverWriterLock({ ...opts, legacy: undefined }, retain)).rejects.toThrow('NATIVE_WRITER_OWNERSHIP_UNVERIFIED');
+    expect(retain).not.toHaveBeenCalled(); expect(await f.untouched()).toBe(true); expect(await readFile(f.lockPath)).toEqual(f.lock);
+  });
+  it('allows only the bound absent legacy owner while retaining canonical path and historical bytes', async () => {
+    const { f, opts, retain, retained } = await inputs(); const before = await lstat(f.lockPath);
+    expect(await recoverWriterLock(opts, retain)).toBe(f.lockPath);
+    expect(opts.inspectOwner.mock.calls).toEqual([[77], [77]]); expect(retain).toHaveBeenCalledTimes(1);
+    expect(await readFile(retained[0])).toEqual(f.lock); expect((await lstat(retained[0])).ino).toBe(before.ino); expect(await f.untouched()).toBe(true);
+  });
+  it('refuses any present legacy PID because v1 has no historical OS creation identity', async () => {
+    const { f, opts, retain } = await inputs(); opts.inspectOwner.mockResolvedValue(owner(77, currentTime));
+    await expect(recoverWriterLock(opts, retain)).rejects.toThrow(); expect(retain).not.toHaveBeenCalled(); expect(await readFile(f.lockPath)).toEqual(f.lock);
+  });
+  it.each(['anchor', 'session', 'digest', 'size', 'identity'] as const)('refuses mismatched legacy %s binding', async field => {
+    const { f, opts, retain } = await inputs();
+    if (field === 'anchor') opts.legacy.anchorDigest = 'f'.repeat(64);
+    if (field === 'session') opts.legacy.currentSession.systemProcessCreatedAt = priorTime;
+    if (field === 'digest') opts.legacy.lock.sha256 = 'f'.repeat(64);
+    if (field === 'size') opts.legacy.lock.bytes++;
+    if (field === 'identity') opts.legacy.oldIdentity.entrySha256 = 'f'.repeat(64);
+    await expect(recoverWriterLock(opts, retain)).rejects.toThrow(); expect(retain).not.toHaveBeenCalled(); expect(await readFile(f.lockPath)).toEqual(f.lock);
+  });
+  it('refuses an exact live v2 owner without controlling or retaining its process', async () => {
+    const { f, opts, retain } = await inputs(); const previous = makeOwner(77); await v2Lock(f, previous);
+    opts.inspectOwner.mockResolvedValue(previous.os);
+    await expect(recoverWriterLock(opts, retain)).rejects.toThrow(); expect(retain).not.toHaveBeenCalled(); expect(opts.inspectOwner).toHaveBeenCalledExactlyOnceWith(77); expect(await f.untouched()).toBe(true);
+  });
+  it('accepts a positively observed reused v2 PID only as writer ownership, never process control', async () => {
+    const { f, opts, retain } = await inputs(); await v2Lock(f, makeOwner(77));
+    opts.inspectOwner.mockResolvedValue(owner(77, '2026-10-20T01:26:00.0000000Z'));
+    expect(await recoverWriterLock(opts, retain)).toBe(f.lockPath); expect(opts.inspectOwner.mock.calls).toEqual([[77], [77]]); expect(retain).toHaveBeenCalledTimes(1); expect(await f.untouched()).toBe(true);
+  });
+  it('refuses owner observation failure before retaining the v2 lock', async () => {
+    const { f, opts, retain } = await inputs(); await v2Lock(f); opts.inspectOwner.mockRejectedValue(new Error('sample unavailable'));
+    await expect(recoverWriterLock(opts, retain)).rejects.toThrow('sample unavailable'); expect(retain).not.toHaveBeenCalled(); expect(await f.untouched()).toBe(true);
+  });
+  it('recognizes only the exact post-open current owner and never recovers its own lock', async () => {
+    const { f, opts, retain } = await inputs(); const record = await v2Lock(f, opts.owner);
+    expect(await recoverWriterLock(opts, retain)).toBe(f.lockPath); expect(retain).not.toHaveBeenCalled(); expect(opts.inspectOwner).not.toHaveBeenCalled();
+    expect(JSON.parse((await readFile(f.lockPath)).toString())).toEqual(record);
+  });
+  it('fails closed when the session changes before retention', async () => {
+    const { f, opts, retain } = await inputs(); opts.recheck.mockRejectedValue(new Error('session changed'));
+    await expect(recoverWriterLock(opts, retain)).rejects.toThrow('session changed'); expect(retain).not.toHaveBeenCalled(); expect(await readFile(f.lockPath)).toEqual(f.lock);
+  });
+  it('preserves a retained old lock across interrupted admission and gives competing new writers one wx path', async () => {
+    const { f, opts, retain, retained } = await inputs(); opts.recheck.mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error('interrupted after retain'));
+    await expect(recoverWriterLock(opts, retain)).rejects.toThrow('interrupted after retain'); expect(await readFile(retained[0])).toEqual(f.lock);
+    const paths = await Promise.all([recoverWriterLock({ ...opts, recheck: async () => {} }, retain), recoverWriterLock({ ...opts, owner: makeOwner(99), recheck: async () => {} }, retain)]);
+    expect(paths).toEqual([f.lockPath, f.lockPath]);
+    const acquired = await Promise.allSettled(paths.map(path => open(path, 'wx')));
+    expect(acquired.filter(x => x.status === 'fulfilled')).toHaveLength(1);
+    await Promise.all(acquired.flatMap(x => x.status === 'fulfilled' ? [x.value.close()] : [])); expect(await f.untouched()).toBe(true);
+  });
+});
+
+describe('independent authority does not turn writer recovery into native quiescence', () => {
+  it('rejects ambiguous tuple without current writer binding before file mutation', async () => {
+    const { f, opts } = await inputs(); const authority = NativeBootAuthority.forService(f.anchor, async () => session(), opts.inspectOwner);
+    await expect(authority.prepareWriter(f.journalPath)).rejects.toThrow('verified writer-only binding'); expect(await f.untouched()).toBe(true); expect(await readFile(f.lockPath)).toEqual(f.lock);
+  });
+  it('still rejects ambiguous tuple quiescence even with a reviewed writer recovery binding', async () => {
+    const { f, opts } = await inputs(); const authority = NativeBootAuthority.forService(f.anchor, async () => session(), opts.inspectOwner, opts.legacy);
+    await expect(authority.proof({ aggregateDigest: f.anchor.aggregateDigests[0], aggregate: { count: 2 } } as any)).rejects.toThrow('different kernel boot AND System process lifetime');
+    expect(await f.untouched()).toBe(true); expect(await readFile(f.lockPath)).toEqual(f.lock);
+  });
+  it('retains rejection for reversed inconsistency and foreign machines', async () => {
+    const { f, opts } = await inputs();
+    const reversed = NativeBootAuthority.forService(f.anchor, async () => session(priorTime, otherBootId), opts.inspectOwner);
+    await expect(reversed.prepareWriter(f.journalPath, opts.owner)).rejects.toThrow('inconsistent');
+    const foreign = NativeBootAuthority.forService(f.anchor, async () => ({ ...session(), machineId: otherBootId }), opts.inspectOwner);
+    await expect(foreign.prepareWriter(f.journalPath, opts.owner)).rejects.toThrow('another Windows installation'); expect(await f.untouched()).toBe(true);
+  });
+});
+
+describe.skipIf(process.platform !== 'win32')('real Windows retention against independent Temp files only', () => {
+  it('captures native existing destination raw output without swallowing diagnostics', async () => {
+    const f = await fixture(); const target = f.lockPath + '.retained-' + sum(f.lock); await writeFile(target, 'existing destination', { flag: 'wx' });
+    const before = { source: (await lstat(f.lockPath)).ino, target: (await lstat(target)).ino };
+    const payload = Buffer.from(JSON.stringify({ path: f.lockPath, destination: target, sha256: sum(f.lock), bytes: f.lock.length })).toString('base64');
+    const script = WRITER_RETENTION_SCRIPT.replace('__PAYLOAD__', payload);
+    const raw = await new Promise(resolve => execFile('powershell.exe', ['-NoProfile', '-NonInteractive', '-OutputFormat', 'Text', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, timeout: 15000, encoding: 'utf8' }, (error, stdout, stderr) => resolve({ error: error && { message: error.message, code: (error as any).code }, stdout, stderr })));
+    const sourceAfter = await lstat(f.lockPath).then(async x => ({ ino: x.ino, text: (await readFile(f.lockPath)).toString() }), e => ({ error: e.code }));
+    const evidence = { root: f.root, before, raw, sourceAfter, targetAfter: { ino: (await lstat(target)).ino, text: (await readFile(target)).toString() } };
+    await writeFile('C:/Users/33272/AppData/Local/Temp/boot-writer-independent-20261020/destination-raw.json', JSON.stringify(evidence, null, 2));
+    expect((await readFile(target)).toString()).toBe('existing destination');
+  }, 30000);
+  it('opens actual maintenance with a v2 writer and retains UNKNOWN 2 and every historical byte', async () => {
+    const f = await fixture(); const path = f.root + '/valid-native.jsonl';
+    const initial = await openNativeEpochJournal({ path });
+    const target = await initial.recordUnknownAggregate({ daemonIdentity: identity(44), aggregate: { count: 2 } });
+    const oldLegacy = await readFile(path + '.lock'); await initial.close();
+    await writeFile(path + '.lock', oldLegacy, { flag: 'wx' });
+    const data = await readFile(path), head = await readFile(path + '.head');
+    const anchor = bootAnchorSchema.parse({ ...f.anchor, journalPath: path, journal: binding(data), head: binding(head), legacyLock: binding(oldLegacy),
+      aggregateDigests: [target.aggregateDigest], previousOwner: { ...f.anchor.previousOwner, daemonIdentity: identity(process.pid), os: owner(process.pid) } });
+    // Initial journal's legacy lock uses this test process; the historic creation identity is synthetic and distinct.
+    const canonical = path + '.boot-' + session().bootId + '.lock'; await writeFile(canonical, f.lock, { flag: 'wx' });
+    await writeFile(f.root + '/daemon.json', JSON.stringify({ identity: f.oldIdentity }), { flag: 'wx' });
+    const legacy = { schemaVersion: 1 as const, scope: 'WRITER_ONLY' as const, anchorDigest: sum(JSON.stringify(anchor)), currentSession: bare(), oldIdentity: f.oldIdentity, lock: binding(f.lock) };
+    const current = { ...identity(process.pid, '99999999-9999-4999-8999-999999999999'), startedAt: '2026-10-20T01:25:00.050Z' };
+    const inspect = vi.fn(async (pid: number) => pid === process.pid ? owner(pid, currentTime) : null);
+    const authority = NativeBootAuthority.forService(anchor, async () => session(), inspect, legacy);
+    const maintenance = await NativeMaintenance.open({ identity: current, journalPath: path, bootAuthority: authority });
+    try {
+      expect(JSON.parse((await readFile(canonical)).toString())).toMatchObject({ schemaVersion: 2, pid: process.pid, owner: { daemonIdentity: current, bootSession: bare() } });
+      expect(await maintenance.history()).toMatchObject({ historicalUnknownCount: 2, archivedUnknownCount: 0, unprovenInFlightCount: 2, quiescenceEvidence: [] });
+      expect(await maintenance.observeHistory()).toEqual({ counts: { nativeEpochUnproven: 2 }, unknown: ['NATIVE_PRIOR_EPOCH_UNVERIFIED'] });
+      await expect(maintenance.verifyExit({ identity: current, phase: 'DRAINING', counts: { nativeUncertain: 0, nativeEpochUnproven: 2 }, unknown: ['NATIVE_PRIOR_EPOCH_UNVERIFIED'], observedAt: new Date().toISOString() } as any)).rejects.toThrow();
+      expect(await readFile(path)).toEqual(data); expect(await readFile(path + '.head')).toEqual(head); expect(await readFile(path + '.lock')).toEqual(oldLegacy);
+      expect(await readFile(canonical + '.retained-' + sum(f.lock))).toEqual(f.lock);
+    } finally { await maintenance.close(); }
+  }, 30000);
+  it('renames the same exact file object and preserves bytes with a poisoned inherited module path', async () => {
+    const f = await fixture(); const before = await lstat(f.lockPath); const prior = process.env.PSModulePath; process.env.PSModulePath = 'C:/fixture-only/missing-modules';
+    try { const target = await retainWindowsWriterLock(f.lockPath, sum(f.lock), f.lock.length); expect(await readFile(target)).toEqual(f.lock); expect((await lstat(target)).ino).toBe(before.ino); expect((await readdir(f.root)).filter(x => x.includes('.retained-'))).toEqual([target.substring(target.lastIndexOf('\\') + 1)]); }
+    finally { if (prior === undefined) delete process.env.PSModulePath; else process.env.PSModulePath = prior; }
+  }, 30000);
+  it.each(['hash', 'size', ...Array.from({ length: 10 }, () => 'destination')])('refuses wrong %s without changing source or replacing a destination', async mismatch => {
+    const f = await fixture(); const target = f.lockPath + '.retained-' + sum(f.lock);
+    if (mismatch === 'destination') await writeFile(target, 'existing destination', { flag: 'wx' });
+    const before = mismatch === 'destination' ? { source: (await lstat(f.lockPath)).ino, target: (await lstat(target)).ino } : {};
+    let result: string | undefined, error: string | undefined;
+    try { result = await retainWindowsWriterLock(f.lockPath, mismatch === 'hash' ? '0'.repeat(64) : sum(f.lock), mismatch === 'size' ? f.lock.length + 1 : f.lock.length); } catch (e) { error = String(e); }
+    if (mismatch === 'destination') {
+      const sourceAfter = await lstat(f.lockPath).then(x => ({ ino: x.ino }), e => ({ error: e.code }));
+      await writeFile('C:/Users/33272/AppData/Local/Temp/boot-writer-independent-20261020/destination-evidence.json', JSON.stringify({ root: f.root, before, result, error, sourceAfter, targetAfter: { ino: (await lstat(target)).ino, text: (await readFile(target)).toString() } }, null, 2));
+    }
+    expect(error).toContain('WRITER_RETENTION_UNCONFIRMED');
+    if (mismatch === 'destination') expect((await readdir(f.root)).filter(x => x.includes('.retained-'))).toEqual([target.substring(target.lastIndexOf('\\') + 1)]);
+    expect(await readFile(f.lockPath)).toEqual(f.lock); if (mismatch === 'destination') expect((await readFile(target)).toString()).toBe('existing destination');
+  }, 30000);
+  it('refuses a hardlinked source while preserving all names', async () => {
+    const f = await fixture(); const alias = f.lockPath + '.alias'; await link(f.lockPath, alias);
+    await expect(retainWindowsWriterLock(f.lockPath, sum(f.lock), f.lock.length)).rejects.toThrow(); expect(await readFile(f.lockPath)).toEqual(f.lock); expect(await readFile(alias)).toEqual(f.lock);
+  }, 30000);
+  it('refuses a junction source without touching the directory target', async () => {
+    const f = await fixture(); const directory = f.root + '/target'; const junction = f.root + '/junction'; await mkdir(directory); await symlink(directory, junction, 'junction');
+    await expect(retainWindowsWriterLock(junction, sum(f.lock), f.lock.length)).rejects.toThrow(); expect((await lstat(junction)).isSymbolicLink()).toBe(true); expect((await lstat(directory)).isDirectory()).toBe(true);
+  }, 30000);
+  it('allows at most one native retainer and never replaces its retained destination', async () => {
+    const f = await fixture(); const before = await lstat(f.lockPath);
+    const runs = await Promise.allSettled([retainWindowsWriterLock(f.lockPath, sum(f.lock), f.lock.length), retainWindowsWriterLock(f.lockPath, sum(f.lock), f.lock.length)]);
+    expect(runs.filter(x => x.status === 'fulfilled')).toHaveLength(1); const target = f.lockPath + '.retained-' + sum(f.lock);
+    expect(await readFile(target)).toEqual(f.lock); expect((await lstat(target)).ino).toBe(before.ino);
+  }, 30000);
+});
+
+

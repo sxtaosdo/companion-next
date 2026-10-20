@@ -1,0 +1,13 @@
+{
+  "atUtc": "2026-10-20T01:41:44.337556+00:00",
+  "pid": 7156,
+  "phase": "OPEN",
+  "daemonSha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+  "nativeEpochUnproven": 2,
+  "shared22Preserved": true,
+  "business9TablesPreserved": true,
+  "otherRuntime310Preserved": true,
+  "oldLockBytesAndInodePreserved": true,
+  "frozenEvidenceHashesVerified": 22,
+  "deployOrStartRepeatedAfterDisconnect": false
+}

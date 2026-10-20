@@ -1,3 +1,5 @@
+2026-10-20 01:38 UTC：已批准writer-only修复7965c4b精确部署，PID7156/32180/OPEN，Next原静态200且hash不变，UNKNOWN2/共享22修改/9业务表保持；但原入口首次8秒超时（实际13.769秒就绪），原reader授权KB元数据403/AUTH_DENIED。历史13/6/2不代表当前可用，#19当前鉴权阻塞；调用新session空，真实分页/失败详情未验。见[修复与真实剩余](boot-writer-recovery-closeout-20261020.md)。
+
 2026-10-19 03:45 UTC: Reader403根因为本机到期常量丢失小数秒，仅修worker复用原配置、无重启；授权KB及3项文档元数据200、auth=verified，keyword仍unverified。Codex此前误读placeholder；真实Next标记完整接收并精确清理，无发送。见[原因与证据](reader-precision-codex-receipt-20261019.md)。
 
 2026-10-19 03:31 UTC: 用户自行运行接入后，Companion1748状态auth=denied，固定授权KB元数据403/AUTH_DENIED，正向读取未通过并停止；未重复运行脚本或读取凭据。明确批准后剪贴板已清空，但Codex当前输入框仍非空，未填标记或发送。见[本次真实核验](reader-codex-verification-20261019.md)。

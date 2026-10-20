@@ -1,0 +1,22 @@
+[
+  {
+    "Path": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-boot-repair-20261020\\src\\companion\\native-writer-recovery.ts",
+    "Hash": "DA21200E9FF4306EA108CC50E85A58F1AA562EB95E33290CBC23F4B8197DACD2"
+  },
+  {
+    "Path": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-boot-repair-20261020\\src\\companion\\windows-writer-lock-retention.ts",
+    "Hash": "8F0BCD94E03CE7E856FB6FE90403F99C055307F72BBAEC18AFFADEB67BC4DCED"
+  },
+  {
+    "Path": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-boot-repair-20261020\\src\\companion\\native-boot-authority.ts",
+    "Hash": "6F3C579B431C7A0D7C0C6A7FA4184771D1A5540635C6A061A1E66B6BEE5844EA"
+  },
+  {
+    "Path": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-boot-repair-20261020\\src\\companion\\native-maintenance.ts",
+    "Hash": "544B434D6CC4AE1732271FC09294B97882FC3180A488BF01EA3EB459B4965EBF"
+  },
+  {
+    "Path": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-boot-repair-20261020\\src\\companion\\native-epoch-journal.ts",
+    "Hash": "4D22B3774FFA7CB6FD55BB3D8588132F287C32D91D19126581BBBCEA929ADA66"
+  }
+]

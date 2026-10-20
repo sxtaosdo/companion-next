@@ -1,0 +1,257 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { createHash } from "node:crypto";
+import { appendFile, mkdtemp, open, readFile, rm, truncate, writeFile, access } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { basename, dirname, join, resolve } from "node:path";
+import { NativeEpochJournal, openNativeEpochJournal, type TrustedQuiescenceVerifier } from "../src/companion/native-epoch-journal.js";
+import type { DaemonIdentity } from "../src/companion/lifecycle-drain.js";
+
+const fixtures: string[] = [];
+const journals: NativeEpochJournal[] = [];
+const identity: DaemonIdentity = { pid: 1234, startupEpoch: "11111111-1111-4111-8111-111111111111",
+  startedAt: "2026-10-19T00:00:00.000Z", entryPath: resolve("synthetic-daemon.js"), entrySha256: "a".repeat(64), nodeVersion: "v25.0.0" };
+const nextIdentity: DaemonIdentity = { ...identity, pid: 5678, startupEpoch: "22222222-2222-4222-8222-222222222222" };
+const aggregate = { count: 2, nativeUncertain: 2, observation: "anonymous aggregate; request identities unavailable" };
+const trustedVerifier: TrustedQuiescenceVerifier = async (binding, proof) => {
+  // Synthetic service-owned observer. Production must independently sample Native/process quiescence.
+  if (proof.fixtureObservation !== "quiescent") throw new Error("fixture observation not quiescent");
+  return { kind: "native-quiescence-observed-v1", ...binding };
+};
+async function fixture(): Promise<string> {
+  const directory = await mkdtemp(join(tmpdir(), "native-epoch-journal-test-")); fixtures.push(directory);
+  return join(directory, "native.jsonl");
+}
+async function start(path: string, verifier?: TrustedQuiescenceVerifier): Promise<NativeEpochJournal> {
+  const journal = await openNativeEpochJournal({ path, ...(verifier ? { trustedVerifier: verifier } : {}) });
+  journals.push(journal); return journal;
+}
+afterEach(async () => {
+  vi.restoreAllMocks();
+  for (const journal of journals.splice(0)) await journal.close();
+  for (const directory of fixtures.splice(0)) {
+    // Only remove this test's exclusively created fixture, never a shared task directory.
+    if (dirname(directory) !== resolve(tmpdir()) || !basename(directory).startsWith("native-epoch-journal-test-")) throw new Error("unexpected fixture path");
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+describe("durable Native epoch UNKNOWN journal", () => {
+  it("keeps anonymous UNKNOWN unchanged across close/reopen and a new zero-free epoch", async () => {
+    const path = await fixture(); const journal = await start(path);
+    const record = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    expect(record.aggregate).toEqual(aggregate); expect(record.outcome).toBe("UNKNOWN");
+    expect(record).not.toHaveProperty("requestId"); expect(record).not.toHaveProperty("success");
+    const originalBytes = await readFile(path);
+    await journal.close();
+    const restarted = await start(path);
+    expect(await restarted.loadHistory()).toMatchObject({ historicalUnknownCount: 2, archivedUnknownCount: 0, unprovenInFlightCount: 2 });
+    await restarted.recordUnknownAggregate({ daemonIdentity: nextIdentity, aggregate: { count: 1 } });
+    const state = await restarted.loadHistory();
+    expect(state).toMatchObject({ historicalUnknownCount: 3, unprovenInFlightCount: 3 });
+    expect(state.unknownAggregates[0]).toEqual(record);
+    expect((await readFile(path)).subarray(0, originalBytes.length)).toEqual(originalBytes);
+  });
+
+  it("serializes same-instance concurrent duplicates and makes retries byte-idempotent", async () => {
+    const path = await fixture(); const journal = await start(path);
+    const records = await Promise.all(Array.from({ length: 8 }, () => journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate })));
+    expect(records.every((row) => row.aggregateDigest === records[0]!.aggregateDigest)).toBe(true);
+    const before = await readFile(path); const beforeHead = await readFile(`${path}.head`);
+    await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    expect(await readFile(path)).toEqual(before); expect(await readFile(`${path}.head`)).toEqual(beforeHead);
+    expect((await journal.loadHistory()).unknownAggregates).toHaveLength(1);
+  });
+
+  it("rejects a concurrent instance without deleting the owner's lock and can reopen after close", async () => {
+    const path = await fixture(); const journal = await start(path); const lock = await readFile(`${path}.lock`);
+    await expect(start(path)).rejects.toMatchObject({ code: "EEXIST" });
+    expect(await readFile(`${path}.lock`)).toEqual(lock);
+    await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    await journal.close(); expect((await (await start(path)).loadHistory()).historicalUnknownCount).toBe(2);
+  });
+
+  it("all concurrent close callers wait for lock cleanup and reject subsequent appends", async () => {
+    const path = await fixture(); const journal = await start(path);
+    const pending = journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    const first = journal.close(); const second = journal.close();
+    expect(second).toBe(first);
+    await Promise.all([pending, first, second]);
+    await expect(journal.recordUnknownAggregate({ daemonIdentity: nextIdentity, aggregate })).rejects.toThrow("closed");
+    expect((await (await start(path)).loadHistory()).historicalUnknownCount).toBe(2);
+  });
+
+  it("retains an unexplained/stale lock instead of taking ownership or silently repairing", async () => {
+    const path = await fixture(); const stale = JSON.stringify({ writer: "synthetic-stale-owner", pid: 8888 });
+    await writeFile(`${path}.lock`, stale, { flag: "wx" });
+    await expect(start(path)).rejects.toMatchObject({ code: "EEXIST" });
+    expect(await readFile(`${path}.lock`, "utf8")).toBe(stale);
+    await expect(access(path)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("rejects zero/lowered invalid aggregates and a direct boolean proof without touching history", async () => {
+    const path = await fixture(); const journal = await start(path, trustedVerifier);
+    const row = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate }); const before = await readFile(path);
+    expect(() => journal.recordUnknownAggregate({ daemonIdentity: nextIdentity, aggregate: { count: 0 } })).toThrow();
+    expect(() => journal.recordUnknownAggregate({ daemonIdentity: nextIdentity, aggregate: { count: Number.MAX_SAFE_INTEGER + 1 } })).toThrow();
+    expect(() => journal.recordQuiescenceEvidence({ daemonIdentity: identity, aggregateDigest: row.aggregateDigest,
+      proof: true as unknown as Record<string, string> })).toThrow();
+    expect(await readFile(path)).toEqual(before); expect((await journal.loadHistory()).unprovenInFlightCount).toBe(2);
+  });
+
+  it.each(["count", "pid", "entrySha256", "entryPath"])("rejects conflicting same-epoch %s without changing records", async (field) => {
+    const path = await fixture(); const journal = await start(path);
+    await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate }); const before = await readFile(path);
+    const daemonIdentity = { ...identity, ...(field === "pid" ? { pid: 9999 } : {}),
+      ...(field === "entrySha256" ? { entrySha256: "b".repeat(64) } : {}), ...(field === "entryPath" ? { entryPath: resolve("other.js") } : {}) };
+    await expect(journal.recordUnknownAggregate({ daemonIdentity, aggregate: field === "count" ? { ...aggregate, count: 1 } : aggregate })).rejects.toThrow("conflict");
+    expect(await readFile(path)).toEqual(before); expect((await journal.loadHistory()).unprovenInFlightCount).toBe(2);
+  });
+
+  it("archives only an exact verified binding, preserves UNKNOWN and makes evidence retries idempotent", async () => {
+    const path = await fixture(); const verifier = vi.fn(trustedVerifier); const journal = await start(path, verifier);
+    const record = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate }); const original = await readFile(path);
+    const input = { daemonIdentity: identity, aggregateDigest: record.aggregateDigest, proof: { fixtureObservation: "quiescent" } };
+    const evidence = await journal.recordQuiescenceEvidence(input);
+    expect(evidence.binding).toMatchObject({ daemonIdentity: identity, aggregateDigest: record.aggregateDigest, proofHash: expect.stringMatching(/^[a-f0-9]{64}$/) });
+    expect((await readFile(path)).subarray(0, original.length)).toEqual(original);
+    const beforeRetry = await readFile(path);
+    expect(await journal.recordQuiescenceEvidence(input)).toEqual(evidence); expect(verifier).toHaveBeenCalledTimes(1);
+    expect(await readFile(path)).toEqual(beforeRetry);
+    await journal.close();
+    const state = await (await start(path)).loadHistory();
+    expect(state).toMatchObject({ historicalUnknownCount: 2, archivedUnknownCount: 2, unprovenInFlightCount: 0 });
+    expect(state.unknownAggregates).toEqual([record]); expect(state.unknownAggregates[0]!.outcome).toBe("UNKNOWN");
+    expect(state.quiescenceEvidence).toEqual([evidence]);
+  });
+
+  it("does not allow a new epoch's evidence to clear an old epoch", async () => {
+    const journal = await start(await fixture(), trustedVerifier);
+    await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    const newer = await journal.recordUnknownAggregate({ daemonIdentity: nextIdentity, aggregate: { count: 1 } });
+    await journal.recordQuiescenceEvidence({ daemonIdentity: nextIdentity, aggregateDigest: newer.aggregateDigest, proof: { fixtureObservation: "quiescent" } });
+    expect(await journal.loadHistory()).toMatchObject({ historicalUnknownCount: 3, archivedUnknownCount: 1, unprovenInFlightCount: 2 });
+  });
+
+  it("keeps the blocker without a trusted verifier, or when the verifier returns a caller boolean", async () => {
+    const path = await fixture(); let journal = await start(path);
+    const record = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    const input = { daemonIdentity: identity, aggregateDigest: record.aggregateDigest, proof: { fixtureObservation: "quiescent" } };
+    const before = await readFile(path);
+    await expect(journal.recordQuiescenceEvidence(input)).rejects.toThrow("verifier unavailable");
+    await journal.close();
+    journal = await start(path, (async () => true) as unknown as TrustedQuiescenceVerifier);
+    await expect(journal.recordQuiescenceEvidence(input)).rejects.toThrow();
+    expect(await readFile(path)).toEqual(before); expect((await journal.loadHistory()).unprovenInFlightCount).toBe(2);
+  });
+
+  it.each(["pid", "startupEpoch", "entrySha256", "aggregateDigest", "proofHash"])("rejects verifier substitution of %s", async (field) => {
+    const verifier: TrustedQuiescenceVerifier = async (binding) => ({ kind: "native-quiescence-observed-v1", ...binding,
+      ...(field === "aggregateDigest" ? { aggregateDigest: "b".repeat(64) } : {}),
+      ...(field === "proofHash" ? { proofHash: "b".repeat(64) } : {}),
+      daemonIdentity: { ...binding.daemonIdentity, ...(field === "pid" ? { pid: 9999 } : {}),
+        ...(field === "startupEpoch" ? { startupEpoch: nextIdentity.startupEpoch } : {}), ...(field === "entrySha256" ? { entrySha256: "b".repeat(64) } : {}) } });
+    const journal = await start(await fixture(), verifier);
+    const row = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    await expect(journal.recordQuiescenceEvidence({ daemonIdentity: identity, aggregateDigest: row.aggregateDigest, proof: { fixtureObservation: "quiescent" } })).rejects.toThrow("binding mismatch");
+    expect((await journal.loadHistory()).unprovenInFlightCount).toBe(2);
+  });
+
+  it("rejects mismatched evidence targets and unverified fresh proof, keeping original evidence", async () => {
+    const path = await fixture(); const journal = await start(path, trustedVerifier);
+    const row = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    const input = { daemonIdentity: identity, aggregateDigest: row.aggregateDigest, proof: { fixtureObservation: "quiescent" } };
+    await expect(journal.recordQuiescenceEvidence({ ...input, daemonIdentity: nextIdentity })).rejects.toThrow("identity mismatch");
+    await journal.recordQuiescenceEvidence(input); const before = await readFile(path);
+    await expect(journal.recordQuiescenceEvidence({ ...input, proof: { fixtureObservation: "not-quiescent", other: 1 } })).rejects.toThrow("not quiescent");
+    expect(await readFile(path)).toEqual(before);
+  });
+
+  it("appends independently verified fresh proofs and deduplicates concurrent retries and archived counts", async () => {
+    const path = await fixture(); const verifier = vi.fn(trustedVerifier); const journal = await start(path, verifier);
+    const row = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    const firstInput = { daemonIdentity: identity, aggregateDigest: row.aggregateDigest,
+      proof: { fixtureObservation: "quiescent", observedAt: "2026-10-19T00:01:00.000Z" } };
+    const first = await journal.recordQuiescenceEvidence(firstInput);
+    const previousBytes = await readFile(path); const previousHead = await readFile(`${path}.head`);
+    const freshInput = { ...firstInput, proof: { ...firstInput.proof, observedAt: "2026-10-19T00:02:00.000Z" } };
+    const fresh = await Promise.all(Array.from({ length: 8 }, () => journal.recordQuiescenceEvidence(freshInput)));
+    expect(verifier).toHaveBeenCalledTimes(2);
+    expect(fresh.every((evidence) => evidence.binding.proofHash === fresh[0]!.binding.proofHash)).toBe(true);
+    expect(fresh[0]!.binding.proofHash).not.toBe(first.binding.proofHash);
+    expect((await readFile(path)).subarray(0, previousBytes.length)).toEqual(previousBytes);
+    expect((await readFile(`${path}.head`)).subarray(0, previousHead.length)).toEqual(previousHead);
+    await journal.close();
+    const state = await (await start(path)).loadHistory();
+    expect(state).toMatchObject({ historicalUnknownCount: 2, archivedUnknownCount: 2, unprovenInFlightCount: 0 });
+    expect(state.unknownAggregates).toEqual([row]); expect(state.quiescenceEvidence).toEqual([first, fresh[0]]);
+  });
+
+  it("requires a valid verifier for a changed proof even when the aggregate was already archived", async () => {
+    const path = await fixture(); let journal = await start(path, trustedVerifier);
+    const row = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    const input = { daemonIdentity: identity, aggregateDigest: row.aggregateDigest, proof: { fixtureObservation: "quiescent" } };
+    await journal.recordQuiescenceEvidence(input); const before = await readFile(path); await journal.close();
+    journal = await start(path);
+    await expect(journal.recordQuiescenceEvidence({ ...input, proof: { ...input.proof, fresh: 1 } })).rejects.toThrow("verifier unavailable");
+    await journal.close();
+    journal = await start(path, async (binding) => ({ kind: "native-quiescence-observed-v1", ...binding, proofHash: "b".repeat(64) }));
+    await expect(journal.recordQuiescenceEvidence({ ...input, proof: { ...input.proof, fresh: 2 } })).rejects.toThrow("binding mismatch");
+    expect(await readFile(path)).toEqual(before);
+    expect(await journal.loadHistory()).toMatchObject({ archivedUnknownCount: 2, unprovenInFlightCount: 0 });
+  });
+
+  it("rejects an identical evidence binding duplicated on disk even with a valid chain and witness", async () => {
+    const path = await fixture(); const journal = await start(path, trustedVerifier);
+    const row = await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    await journal.recordQuiescenceEvidence({ daemonIdentity: identity, aggregateDigest: row.aggregateDigest, proof: { fixtureObservation: "quiescent" } });
+    await journal.close();
+    const records = (await readFile(path, "utf8")).trimEnd().split("\n").map((line) => JSON.parse(line) as { sequence: number; hash: string; payload: unknown });
+    const last = records.at(-1)!;
+    // Deliberately forge a structurally valid fixture chain so semantic duplicate validation is exercised.
+    const fixtureDigest = (value: unknown): string => createHash("sha256").update(JSON.stringify(value, (_key, item: unknown) =>
+      item !== null && typeof item === "object" && !Array.isArray(item)
+        ? Object.fromEntries(Object.entries(item).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)) : item)).digest("hex");
+    const unsigned = { schemaVersion: 1, sequence: last.sequence + 1, previousHash: last.hash, payload: last.payload };
+    const hash = fixtureDigest(unsigned); const witness = { sequence: unsigned.sequence, recordHash: hash };
+    await appendFile(path, `${JSON.stringify({ ...unsigned, hash })}\n`);
+    await appendFile(`${path}.head`, `${JSON.stringify({ ...witness, checksum: fixtureDigest(witness) })}\n`);
+    await expect(start(path)).rejects.toThrow("duplicate quiescence evidence binding");
+  });
+
+  it.each(["partial-line", "data-tail", "head-tail", "corrupt-hash", "missing-head"])("fails closed for %s and removes only its failed-open lock", async (fault) => {
+    const path = await fixture(); const journal = await start(path);
+    await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate }); await journal.close();
+    if (fault === "partial-line") await appendFile(path, "{\"unfinished\":");
+    if (fault === "data-tail") await truncate(path, 0);
+    if (fault === "head-tail") await truncate(`${path}.head`, 0);
+    if (fault === "corrupt-hash") await writeFile(path, (await readFile(path, "utf8")).replace('"count":2', '"count":1'));
+    if (fault === "missing-head") await rm(`${path}.head`);
+    const damaged = await readFile(path);
+    await expect(start(path)).rejects.toThrow(); expect(await readFile(path)).toEqual(damaged);
+    await expect(access(`${path}.lock`)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("detects an externally replaced or appended journal while open", async () => {
+    const path = await fixture(); const journal = await start(path);
+    await journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate });
+    await appendFile(path, "{}\n");
+    await expect(journal.loadHistory()).rejects.toThrow();
+    await expect(journal.recordUnknownAggregate({ daemonIdentity: nextIdentity, aggregate: { count: 1 } })).rejects.toThrow("failed writer");
+  });
+
+  it.each([1, 2])("never acknowledges failed fsync %s and refuses uncertain continuation/reopen", async (failedSync) => {
+    const path = await fixture(); const journal = await start(path);
+    const probe = await open(join(dirname(path), "sync-probe"), "wx+"); const prototype = Object.getPrototypeOf(probe) as { sync: () => Promise<void> }; await probe.close();
+    const originalSync = prototype.sync;
+    const sync = vi.spyOn(prototype, "sync");
+    if (failedSync === 2) sync.mockImplementationOnce(function (this: { sync: () => Promise<void> }) { return originalSync.call(this); });
+    sync.mockRejectedValueOnce(new Error("synthetic fsync failure"));
+    await expect(journal.recordUnknownAggregate({ daemonIdentity: identity, aggregate })).rejects.toThrow("synthetic fsync failure");
+    await expect(journal.loadHistory()).rejects.toThrow("failed writer");
+    sync.mockRestore(); await journal.close();
+    // A failed data sync leaves an unmatched data record. A failed witness sync may have reached disk;
+    // either way the API already rejected, and no caller can treat it as successful Native work.
+    if (failedSync === 1) await expect(start(path)).rejects.toThrow("uncommitted");
+    else expect((await (await start(path)).loadHistory()).unknownAggregates[0]!.outcome).toBe("UNKNOWN");
+  });
+});

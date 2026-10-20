@@ -1,0 +1,14 @@
+{
+  "normalEntryInitialExit": 1,
+  "creatorProcesses": 0,
+  "timestampComparison": "PS ConvertFrom-Json DateTime normalized to seven digits",
+  "creationTime": "2026-10-20T01:33:36.2865950Z",
+  "pid": 7156,
+  "listen32180OwnerMatches": true,
+  "startupToLocatorMs": 13769.405,
+  "locatorCreatedAt": "2026-10-20T01:33:50.056Z",
+  "lockOsIdentityMatches": true,
+  "normalEntryTimeoutMs": 8000,
+  "duplicateStartIssued": false,
+  "atUtc": "2026-10-20T01:37:12.7125797Z"
+}

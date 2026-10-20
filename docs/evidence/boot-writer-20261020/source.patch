@@ -1,0 +1,330 @@
+diff --git a/src/companion/legacy-writer-recovery.json b/src/companion/legacy-writer-recovery.json
+new file mode 100644
+index 0000000..3188b7e
+--- /dev/null
++++ b/src/companion/legacy-writer-recovery.json
+@@ -0,0 +1,22 @@
++{
++  "schemaVersion": 1,
++  "scope": "WRITER_ONLY",
++  "anchorDigest": "d68d89cb64051ee6a5873635f5b129b907fef45ddea74878233da04513e8aa73",
++  "currentSession": {
++    "machineId": "8ec639b5-1fa2-4f4f-8cff-95f00f289d26",
++    "bootId": "a49be189-172d-11f0-8a7d-8c9774127e68",
++    "systemProcessCreatedAt": "2026-10-20T00:39:52.8919050Z"
++  },
++  "oldIdentity": {
++    "pid": 3860,
++    "startupEpoch": "2d198c64-75c0-4e6b-b3b5-2eac2015bf78",
++    "startedAt": "2026-10-19T17:31:10.011Z",
++    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
++    "entrySha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
++    "nodeVersion": "v25.2.1"
++  },
++  "lock": {
++    "sha256": "1987d8331722bb5ca7b496bfb80d24137f115e6d3c33c9549546ff3cd7d8e21e",
++    "bytes": 116
++  }
++}
+diff --git a/src/companion/native-boot-authority.ts b/src/companion/native-boot-authority.ts
+index 016676d..22410de 100644
+--- a/src/companion/native-boot-authority.ts
++++ b/src/companion/native-boot-authority.ts
+@@ -2,11 +2,13 @@ import { createHash } from "node:crypto";
+ import { lstat, readFile, open } from "node:fs/promises";
+ import { resolve } from "node:path";
+ import { z } from "zod";
+-import { DaemonDrainError, daemonIdentitySchema } from "./lifecycle-drain.js";
++import { DaemonDrainError, daemonIdentitySchema, type DaemonIdentity } from "./lifecycle-drain.js";
+ import type { JournalJson, NativeUnknownRecord, TrustedQuiescenceVerifier } from "./native-epoch-journal.js";
+ import { sampleWindowsBootSession, type BootSessionSampler } from "./windows-boot-session.js";
+ import compiledAnchor from "./native-boot-anchor.json" with { type: "json" };
+ import { sampleWindowsDaemonOwner, type WindowsDaemonOwner } from "./windows-daemon-owner.js";
++import { writerOwnerSchema, legacyWriterRecoverySchema, recoverWriterLock, sameWriterSession, type WriterOwner, type LegacyWriterRecovery } from "./native-writer-recovery.js";
++import compiledWriterRecovery from "./legacy-writer-recovery.json" with { type: "json" };
+ 
+ const hash = z.string().regex(/^[a-f0-9]{64}$/);
+ const utc = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{7}Z$/);
+@@ -51,15 +53,15 @@ export class NativeBootAuthority {
+   private verificationCheck: (() => void) | undefined;
+   private readonly issuedTargets = new Map<string, { bootId: string; systemProcessCreatedAt: string; machineId: string }>();
+   private constructor(private readonly anchor: NativeBootAnchor, private readonly sample: BootSessionSampler,
+-    private readonly inspectOwner: (pid: number) => Promise<WindowsDaemonOwner | null>) {}
++    private readonly inspectOwner: (pid: number) => Promise<WindowsDaemonOwner | null>, private readonly writerRecovery?: LegacyWriterRecovery) {}
+   static production(journalPath: string): NativeBootAuthority | undefined {
+     const anchor = bootAnchorSchema.parse(compiledAnchor);
+-    return resolve(journalPath) === resolve(anchor.journalPath) ? new NativeBootAuthority(anchor, sampleWindowsBootSession, sampleWindowsDaemonOwner) : undefined;
++    return resolve(journalPath) === resolve(anchor.journalPath) ? new NativeBootAuthority(anchor, sampleWindowsBootSession, sampleWindowsDaemonOwner, legacyWriterRecoverySchema.parse(compiledWriterRecovery)) : undefined;
+   }
+   /** Service-construction seam for isolated OS/fixture tests; never a request argument. */
+   static forService(anchor: NativeBootAnchor, sample: BootSessionSampler = sampleWindowsBootSession,
+-    inspectOwner: (pid: number) => Promise<WindowsDaemonOwner | null> = sampleWindowsDaemonOwner): NativeBootAuthority {
+-    return new NativeBootAuthority(bootAnchorSchema.parse(anchor), sample, inspectOwner);
++    inspectOwner: (pid: number) => Promise<WindowsDaemonOwner | null> = sampleWindowsDaemonOwner, writerRecovery?: LegacyWriterRecovery): NativeBootAuthority {
++    return new NativeBootAuthority(bootAnchorSchema.parse(anchor), sample, inspectOwner, writerRecovery && legacyWriterRecoverySchema.parse(writerRecovery));
+   }
+   private anchorDigest(): string { return digest(JSON.stringify(this.anchor)); }
+   private handoffPath(path: string): string { return `${path}.handoff-${this.anchorDigest()}.json`; }
+@@ -79,10 +81,15 @@ export class NativeBootAuthority {
+   }
+   /** Called only after journal-chain validation and acquiring this boot's unique writer
+    * lock. Durable ownership metadata is distinct from Native quiescence evidence. */
+-  async persistWriterHandoff(path: string): Promise<void> {
++  async persistWriterHandoff(path: string, writerOwner?: WriterOwner): Promise<void> {
+     const current = await this.currentSession();
+     if (current.bootId !== this.anchor.bootId) return;
+-    if (current.systemProcessCreatedAt !== this.anchor.systemProcessCreatedAt) return refuse("Inconsistent handoff boot identity");
++    if (current.systemProcessCreatedAt !== this.anchor.systemProcessCreatedAt) {
++      if (!writerOwner || !sameWriterSession(writerOwner.bootSession, current)) return refuse("Writer-only handoff lacks current OS binding");
++      // The journal holds this exact v2 writer. Do not rewrite the old same-boot
++      // handoff or issue any native quiescence evidence for this ambiguous tuple.
++      return;
++    }
+     await this.verifyPreviousWriterGone();
+     if (await this.validHandoff(path)) return;
+     const body = this.handoffBody(), receipt = { body, sha256: digest(JSON.stringify(body)) };
+@@ -115,11 +122,23 @@ export class NativeBootAuthority {
+   }
+   /** Preserve legacy .lock bytes forever. Each kernel boot has a distinct wx writer lock;
+    * all instances of this protocol contend on the same boot key. No stale-lock deletion. */
+-  async prepareWriter(journalPath: string): Promise<string> {
++  async writerOwnerBinding(identity: DaemonIdentity): Promise<WriterOwner | undefined> {
++    const current = await this.currentSession();
++    if (current.bootId !== this.anchor.bootId || current.systemProcessCreatedAt === this.anchor.systemProcessCreatedAt) return undefined;
++    const os = await this.inspectOwner(identity.pid);
++    if (!os || os.pid !== identity.pid) return refuse("Current writer OS identity unavailable");
++    const again = await this.currentSession();
++    if (!sameWriterSession(current, again)) return refuse("Writer session changed during binding");
++    return writerOwnerSchema.parse({ kind: "native-writer-owner-v2", daemonIdentity: identity, os,
++      bootSession: { machineId: current.machineId, bootId: current.bootId, systemProcessCreatedAt: current.systemProcessCreatedAt } });
++  }
++  async prepareWriter(journalPath: string, writerOwner?: WriterOwner): Promise<string> {
+     if (resolve(journalPath) !== resolve(this.anchor.journalPath)) return refuse("Anchor journal path mismatch");
+     const current = await this.currentSession();
+     const sameBoot = current.bootId === this.anchor.bootId;
+-    if (sameBoot !== (current.systemProcessCreatedAt === this.anchor.systemProcessCreatedAt)) return refuse("Kernel identity is inconsistent with the anchor");
++    const writerOnly = sameBoot && current.systemProcessCreatedAt !== this.anchor.systemProcessCreatedAt;
++    if (!sameBoot && current.systemProcessCreatedAt === this.anchor.systemProcessCreatedAt) return refuse("Kernel identity is inconsistent with the anchor");
++    if (writerOnly && (!writerOwner || !sameWriterSession(writerOwner.bootSession, current))) return refuse("Inconsistent kernel identity requires a verified writer-only binding");
+     if (sameBoot) await this.verifyPreviousWriterGone();
+     const [data, head, lock] = await Promise.all([regularBytes(journalPath), regularBytes(`${journalPath}.head`), regularBytes(`${journalPath}.lock`)]);
+     if (!matches(lock, this.anchor.legacyLock) || !prefixMatches(data, this.anchor.journal) || !prefixMatches(head, this.anchor.head)) return refuse("Preboot journal/head/legacy lock binding changed");
+@@ -147,6 +166,9 @@ export class NativeBootAuthority {
+     const again = await this.currentSession();
+     if (again.bootId !== current.bootId || again.systemProcessCreatedAt !== current.systemProcessCreatedAt) return refuse("Kernel boot changed during writer admission");
+     if (sameBoot) await this.verifyPreviousWriterGone();
++    if (writerOnly) return recoverWriterLock({ journalPath, session: current, owner: writerOwner!, anchorDigest: this.anchorDigest(),
++      legacy: this.writerRecovery, inspectOwner: this.inspectOwner,
++      recheck: async () => { if (!sameWriterSession(current, await this.currentSession())) return refuse("Writer session changed during admission"); } });
+     return `${journalPath}.boot-${current.bootId}.lock`;
+   }
+   /** Writer ownership only. This neither covers Native workers nor archives UNKNOWN.
+diff --git a/src/companion/native-epoch-journal.ts b/src/companion/native-epoch-journal.ts
+index 95b121c..9a0cda0 100644
+--- a/src/companion/native-epoch-journal.ts
++++ b/src/companion/native-epoch-journal.ts
+@@ -1,4 +1,5 @@
+ import { createHash, randomUUID } from "node:crypto";
++import { writerOwnerSchema, type WriterOwner } from "./native-writer-recovery.js";
+ import { lstat, open, unlink, type FileHandle } from "node:fs/promises";
+ import { resolve } from "node:path";
+ import { z } from "zod";
+@@ -122,12 +123,14 @@ export class NativeEpochJournal {
+     private readonly lockToken: string, private readonly verifier: TrustedQuiescenceVerifier | undefined,
+     private readonly lockPath: string) {}
+ 
+-  static async open(options: { path: string; trustedVerifier?: TrustedQuiescenceVerifier; writerLockPath?: string }): Promise<NativeEpochJournal> {
++  static async open(options: { path: string; trustedVerifier?: TrustedQuiescenceVerifier; writerLockPath?: string; writerOwner?: WriterOwner }): Promise<NativeEpochJournal> {
+     const path = resolve(options.path);
+     // Only trusted service composition may choose a boot-scoped writer lock.
+     const lockPath = options.writerLockPath === undefined ? `${path}.lock` : resolve(options.writerLockPath);
+     if (lockPath !== `${path}.lock` && !new RegExp(`^${path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\.boot-[0-9a-f-]{36}\\.lock$`, "i").test(lockPath)) fail("invalid writer lock path");
+-    const lockToken = JSON.stringify({ schemaVersion: 1, writer: randomUUID(), pid: process.pid, openedAt: new Date().toISOString() });
++    const owner = options.writerOwner && writerOwnerSchema.parse(options.writerOwner);
++    if (owner && owner.daemonIdentity.pid !== process.pid) fail("writer owner does not bind this process");
++    const lockToken = JSON.stringify({ schemaVersion: owner ? 2 : 1, writer: randomUUID(), pid: process.pid, openedAt: new Date().toISOString(), ...(owner ? { owner } : {}) });
+     // A failed wx acquisition never touches somebody else's lock.
+     const lock = await open(lockPath, "wx+", 0o600);
+     let data: FileHandle | undefined; let witness: FileHandle | undefined;
+diff --git a/src/companion/native-maintenance.ts b/src/companion/native-maintenance.ts
+index d04f85f..78af1c0 100644
+--- a/src/companion/native-maintenance.ts
++++ b/src/companion/native-maintenance.ts
+@@ -19,13 +19,14 @@ export class NativeMaintenance {
+     private readonly bootAuthority: NativeBootAuthority | undefined) {}
+   static async open(options: NativeMaintenanceOptions): Promise<NativeMaintenance> {
+     const authority = options.bootAuthority ?? NativeBootAuthority.production(options.journalPath);
+-    const writerLockPath = authority ? await authority.prepareWriter(options.journalPath) : undefined;
++    const writerOwner = authority ? await authority.writerOwnerBinding(options.identity) : undefined;
++    const writerLockPath = authority ? await authority.prepareWriter(options.journalPath, writerOwner) : undefined;
+     const journal = await openNativeEpochJournal({ path: options.journalPath,
+-      ...(authority ? { trustedVerifier: authority.verifier } : {}), ...(writerLockPath ? { writerLockPath } : {}) });
++      ...(authority ? { trustedVerifier: authority.verifier } : {}), ...(writerLockPath ? { writerLockPath } : {}), ...(writerOwner ? { writerOwner } : {}) });
+     try {
+       // Recheck the stable bootstrap after obtaining this boot's exclusive writer lock.
+-      if (authority && await authority.prepareWriter(options.journalPath) !== writerLockPath) throw new Error("Boot writer identity changed");
+-      if (authority) await authority.persistWriterHandoff(options.journalPath);
++      if (authority && await authority.prepareWriter(options.journalPath, writerOwner) !== writerLockPath) throw new Error("Boot writer identity changed");
++      if (authority) await authority.persistWriterHandoff(options.journalPath, writerOwner);
+       return new NativeMaintenance(options, journal, authority);
+     } catch (error) { await journal.close(); throw error; }
+   }
+diff --git a/src/companion/native-writer-recovery.ts b/src/companion/native-writer-recovery.ts
+new file mode 100644
+index 0000000..5f1281d
+--- /dev/null
++++ b/src/companion/native-writer-recovery.ts
+@@ -0,0 +1,81 @@
++import { createHash } from "node:crypto";
++import { lstat, open } from "node:fs/promises";
++import { dirname, join, resolve } from "node:path";
++import { z } from "zod";
++import { daemonIdentitySchema } from "./lifecycle-drain.js";
++import type { WindowsDaemonOwner } from "./windows-daemon-owner.js";
++import type { WindowsBootSession } from "./windows-boot-session.js";
++import { retainWindowsWriterLock } from "./windows-writer-lock-retention.js";
++
++const hash = z.string().regex(/^[a-f0-9]{64}$/);
++const utc = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{7}Z$/);
++export const writerSessionSchema = z.object({ machineId: z.string().uuid(), bootId: z.string().uuid(), systemProcessCreatedAt: utc }).strict();
++const osSchema = z.object({ pid: z.number().int().positive(), creationTime: utc, executablePath: z.string().min(1), commandLineSha256: hash }).strict();
++export const writerOwnerSchema = z.object({ kind: z.literal("native-writer-owner-v2"), daemonIdentity: daemonIdentitySchema,
++  os: osSchema, bootSession: writerSessionSchema }).strict().refine(value => value.os.pid === value.daemonIdentity.pid);
++export type WriterOwner = z.infer<typeof writerOwnerSchema>;
++export const legacyWriterRecoverySchema = z.object({ schemaVersion: z.literal(1), scope: z.literal("WRITER_ONLY"),
++  anchorDigest: hash, currentSession: writerSessionSchema, oldIdentity: daemonIdentitySchema,
++  lock: z.object({ sha256: hash, bytes: z.number().int().positive().max(32768) }).strict() }).strict();
++export type LegacyWriterRecovery = z.infer<typeof legacyWriterRecoverySchema>;
++const baseLock = z.object({ writer: z.string().uuid(), pid: z.number().int().positive(), openedAt: z.string().datetime() });
++const lockSchema = z.union([baseLock.extend({ schemaVersion: z.literal(1) }).strict(),
++  baseLock.extend({ schemaVersion: z.literal(2), owner: writerOwnerSchema }).strict()]);
++const digest = (value: Buffer) => createHash("sha256").update(value).digest("hex");
++const refuse = (): never => { throw new Error("NATIVE_WRITER_OWNERSHIP_UNVERIFIED"); };
++export const sameWriterSession = (left: z.infer<typeof writerSessionSchema>, right: z.infer<typeof writerSessionSchema>) =>
++  left.machineId === right.machineId && left.bootId === right.bootId && left.systemProcessCreatedAt === right.systemProcessCreatedAt;
++export async function boundedWriterFile(path: string): Promise<Buffer> {
++  const before = await lstat(path);
++  if (!before.isFile() || before.isSymbolicLink() || before.nlink !== 1 || before.size > 32768) return refuse();
++  const handle = await open(path, "r");
++  try {
++    const opened = await handle.stat();
++    if (opened.ino !== before.ino || opened.dev !== before.dev || opened.size !== before.size || opened.nlink !== 1) return refuse();
++    const bytes = await handle.readFile(); const after = await handle.stat(); const named = await lstat(path);
++    if (after.ino !== named.ino || after.dev !== named.dev || after.size !== before.size || after.mtimeMs !== before.mtimeMs || named.nlink !== 1) return refuse();
++    return bytes;
++  } finally { await handle.close(); }
++}
++
++/** Service-only writer ownership. Never native-worker exit or quiescence authority. */
++export async function recoverWriterLock(options: {
++  journalPath: string; session: WindowsBootSession; owner: WriterOwner; anchorDigest: string;
++  legacy?: LegacyWriterRecovery; inspectOwner: (pid: number) => Promise<WindowsDaemonOwner | null>;
++  recheck: () => Promise<void>;
++}, retain = retainWindowsWriterLock): Promise<string> {
++  const owner = writerOwnerSchema.parse(options.owner);
++  if (!sameWriterSession(owner.bootSession, options.session)) return refuse();
++  const path = `${options.journalPath}.boot-${options.session.bootId}.lock`;
++  let bytes: Buffer;
++  try { bytes = await boundedWriterFile(path); }
++  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") { await options.recheck(); return path; } throw error; }
++  const lock = lockSchema.parse(JSON.parse(bytes.toString("utf8")));
++  if (lock.schemaVersion === 2 && lock.pid === owner.daemonIdentity.pid && JSON.stringify(lock.owner) === JSON.stringify(owner)) {
++    await options.recheck(); return path; // Post-acquisition recheck of this exact service owner.
++  }
++  if (lock.schemaVersion === 1) {
++    const binding = options.legacy && legacyWriterRecoverySchema.parse(options.legacy);
++    if (!binding || binding.anchorDigest !== options.anchorDigest || !sameWriterSession(binding.currentSession, options.session)
++      || binding.lock.bytes !== bytes.length || binding.lock.sha256 !== digest(bytes) || binding.oldIdentity.pid !== lock.pid) return refuse();
++    const locator = JSON.parse((await boundedWriterFile(join(dirname(options.journalPath), "daemon.json"))).toString("utf8")) as { identity?: unknown };
++    const identity = daemonIdentitySchema.parse(locator.identity);
++    if (JSON.stringify(identity) !== JSON.stringify(binding.oldIdentity) || resolve(identity.entryPath) !== resolve(owner.daemonIdentity.entryPath)) return refuse();
++    // A legacy PID has no stored OS creation identity: require positive absence.
++    if (await options.inspectOwner(lock.pid) !== null) return refuse();
++  } else {
++    const previous = lock.owner;
++    if (previous.daemonIdentity.pid !== lock.pid || previous.bootSession.machineId !== options.session.machineId
++      || previous.bootSession.bootId !== options.session.bootId || resolve(previous.daemonIdentity.entryPath) !== resolve(owner.daemonIdentity.entryPath)) return refuse();
++    const observed = await options.inspectOwner(lock.pid);
++    if (observed && (observed.pid !== lock.pid || observed.creationTime === previous.os.creationTime)) return refuse();
++    // A reused PID is observed only; never terminated or treated as the old owner.
++  }
++  await options.recheck();
++  const observedAgain = await options.inspectOwner(lock.pid);
++  if (observedAgain && (lock.schemaVersion === 1 || observedAgain.pid !== lock.pid || observedAgain.creationTime === lock.owner.os.creationTime)) return refuse();
++  const retained = await retain(path, digest(bytes), bytes.length);
++  if (retained !== `${path}.retained-${digest(bytes)}` || digest(await boundedWriterFile(retained)) !== digest(bytes)) return refuse();
++  await options.recheck();
++  return path; // Every contender still acquires the SAME canonical path with wx.
++}
+diff --git a/src/companion/windows-writer-lock-retention.ts b/src/companion/windows-writer-lock-retention.ts
+new file mode 100644
+index 0000000..68461ec
+--- /dev/null
++++ b/src/companion/windows-writer-lock-retention.ts
+@@ -0,0 +1,66 @@
++import { execFile } from "node:child_process";
++import { isAbsolute } from "node:path";
++
++/** Rename the verified file object, never replace a path or delete lock bytes. */
++export async function retainWindowsWriterLock(path: string, sha256: string, bytes: number): Promise<string> {
++  if (process.platform !== "win32" || !isAbsolute(path) || !/^[a-f0-9]{64}$/.test(sha256)
++    || !Number.isSafeInteger(bytes) || bytes <= 0 || bytes > 32768) throw new Error("WRITER_RETENTION_INPUT_UNVERIFIED");
++  const destination = `${path}.retained-${sha256}`;
++  const payload = Buffer.from(JSON.stringify({ path, destination, sha256, bytes })).toString("base64");
++  const script = WRITER_RETENTION_SCRIPT.replace("__PAYLOAD__", payload);
++  const output = await new Promise<string>((accept, reject) => execFile("powershell.exe",
++    ["-NoProfile", "-NonInteractive", "-OutputFormat", "Text", "-EncodedCommand", Buffer.from(script, "utf16le").toString("base64")],
++    { windowsHide: true, timeout: 15000, maxBuffer: 32768, encoding: "utf8" },
++    (error, stdout) => error ? reject(new Error("WRITER_RETENTION_UNCONFIRMED")) : accept(stdout.replace(/^\uFEFF/, "").trim())));
++  if (output !== "RETAINED") throw new Error("WRITER_RETENTION_UNCONFIRMED");
++  return destination;
++}
++
++export const WRITER_RETENTION_SCRIPT = String.raw`
++$ErrorActionPreference='Stop'
++$env:PSModulePath=$PSHOME+'\Modules'
++[Console]::OutputEncoding=New-Object System.Text.UTF8Encoding $false
++$inputData=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('__PAYLOAD__'))|ConvertFrom-Json
++Add-Type -TypeDefinition @'
++using System;
++using System.ComponentModel;
++using System.IO;
++using System.Runtime.InteropServices;
++using System.Security.Cryptography;
++using System.Text;
++using Microsoft.Win32.SafeHandles;
++public static class VerifiedWriterRetention {
++ [StructLayout(LayoutKind.Sequential)] struct FileInfo {
++  public uint Attributes; public System.Runtime.InteropServices.ComTypes.FILETIME Created,Accessed,Written;
++  public uint Volume,SizeHigh,SizeLow,Links,IndexHigh,IndexLow;
++ }
++ [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] static extern SafeFileHandle CreateFile(string name,uint access,uint share,IntPtr security,uint disposition,uint flags,IntPtr template);
++ [DllImport("kernel32.dll",SetLastError=true)] static extern bool GetFileInformationByHandle(SafeFileHandle h,out FileInfo info);
++ [DllImport("kernel32.dll",SetLastError=true)] static extern bool SetFileInformationByHandle(SafeFileHandle h,int kind,IntPtr data,uint length);
++ public static void Retain(string path,string destination,string expected,long bytes) {
++  // DELETE permits rename. Share zero pins the same object against replacement.
++  using(var h=CreateFile(path,0x80010000,0,IntPtr.Zero,3,0x00200000,IntPtr.Zero)) {
++   if(h.IsInvalid)throw new Win32Exception();
++   FileInfo info;if(!GetFileInformationByHandle(h,out info))throw new Win32Exception();
++   if((info.Attributes&0x410)!=0 || info.Links!=1 || info.SizeHigh!=0 || info.SizeLow!=bytes)throw new InvalidOperationException("unverified file");
++   using(var stream=new FileStream(h,FileAccess.Read,4096,false)) {
++    string actual;using(var hash=SHA256.Create())actual=BitConverter.ToString(hash.ComputeHash(stream)).Replace("-","").ToLowerInvariant();
++    if(actual!=expected)throw new InvalidOperationException("identity changed");
++    byte[] name=Encoding.Unicode.GetBytes(destination);int root=IntPtr.Size==8?8:4;int length=root+IntPtr.Size;int offset=length+4;
++    // The Win32 path normalizer also requires a NUL-terminated WCHAR name.
++    // FileNameLength excludes that terminator; the allocated buffer must include it.
++    int size=offset+name.Length+2;IntPtr buffer=Marshal.AllocHGlobal(size);
++    try {
++     Marshal.Copy(new byte[size],0,buffer,size);
++     // ReplaceIfExists=false, RootDirectory=NULL, exact absolute destination.
++     Marshal.WriteInt32(buffer,length,name.Length);Marshal.Copy(name,0,IntPtr.Add(buffer,offset),name.Length);
++     if(!SetFileInformationByHandle(h,3,buffer,(uint)size))throw new Win32Exception();
++    } finally {Marshal.FreeHGlobal(buffer);}
++   }
++  }
++ }
++}
++'@
++[VerifiedWriterRetention]::Retain([string]$inputData.path,[string]$inputData.destination,[string]$inputData.sha256,[long]$inputData.bytes)
++'RETAINED'
++`;

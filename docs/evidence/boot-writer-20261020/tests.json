@@ -1,0 +1,268 @@
+{
+  "success": true,
+  "numTotalTests": 65,
+  "numPassedTests": 65,
+  "numFailedTests": 0,
+  "tests": [
+    {
+      "name": "durable Native epoch UNKNOWN journal keeps anonymous UNKNOWN unchanged across close/reopen and a new zero-free epoch",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal serializes same-instance concurrent duplicates and makes retries byte-idempotent",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects a concurrent instance without deleting the owner's lock and can reopen after close",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal all concurrent close callers wait for lock cleanup and reject subsequent appends",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal retains an unexplained/stale lock instead of taking ownership or silently repairing",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects zero/lowered invalid aggregates and a direct boolean proof without touching history",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects conflicting same-epoch count without changing records",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects conflicting same-epoch pid without changing records",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects conflicting same-epoch entrySha256 without changing records",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects conflicting same-epoch entryPath without changing records",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal archives only an exact verified binding, preserves UNKNOWN and makes evidence retries idempotent",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal does not allow a new epoch's evidence to clear an old epoch",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal keeps the blocker without a trusted verifier, or when the verifier returns a caller boolean",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects verifier substitution of pid",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects verifier substitution of startupEpoch",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects verifier substitution of entrySha256",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects verifier substitution of aggregateDigest",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects verifier substitution of proofHash",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects mismatched evidence targets and unverified fresh proof, keeping original evidence",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal appends independently verified fresh proofs and deduplicates concurrent retries and archived counts",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal requires a valid verifier for a changed proof even when the aggregate was already archived",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal rejects an identical evidence binding duplicated on disk even with a valid chain and witness",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal fails closed for partial-line and removes only its failed-open lock",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal fails closed for data-tail and removes only its failed-open lock",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal fails closed for head-tail and removes only its failed-open lock",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal fails closed for corrupt-hash and removes only its failed-open lock",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal fails closed for missing-head and removes only its failed-open lock",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal detects an externally replaced or appended journal while open",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal never acknowledges failed fsync 1 and refuses uncertain continuation/reopen",
+      "status": "passed"
+    },
+    {
+      "name": "durable Native epoch UNKNOWN journal never acknowledges failed fsync 2 and refuses uncertain continuation/reopen",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files rejects legacy mismatch without the reviewed binding and preserves every fixture byte",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files allows only the bound absent legacy owner while retaining canonical path and historical bytes",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files refuses any present legacy PID because v1 has no historical OS creation identity",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files refuses mismatched legacy anchor binding",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files refuses mismatched legacy session binding",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files refuses mismatched legacy digest binding",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files refuses mismatched legacy size binding",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files refuses mismatched legacy identity binding",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files refuses an exact live v2 owner without controlling or retaining its process",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files accepts a positively observed reused v2 PID only as writer ownership, never process control",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files refuses owner observation failure before retaining the v2 lock",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files recognizes only the exact post-open current owner and never recovers its own lock",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files fails closed when the session changes before retention",
+      "status": "passed"
+    },
+    {
+      "name": "independent writer-only ownership boundaries with isolated files preserves a retained old lock across interrupted admission and gives competing new writers one wx path",
+      "status": "passed"
+    },
+    {
+      "name": "independent authority does not turn writer recovery into native quiescence rejects ambiguous tuple without current writer binding before file mutation",
+      "status": "passed"
+    },
+    {
+      "name": "independent authority does not turn writer recovery into native quiescence still rejects ambiguous tuple quiescence even with a reviewed writer recovery binding",
+      "status": "passed"
+    },
+    {
+      "name": "independent authority does not turn writer recovery into native quiescence retains rejection for reversed inconsistency and foreign machines",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only captures native existing destination raw output without swallowing diagnostics",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only opens actual maintenance with a v2 writer and retains UNKNOWN 2 and every historical byte",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only renames the same exact file object and preserves bytes with a poisoned inherited module path",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong hash without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong size without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses wrong destination without changing source or replacing a destination",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses a hardlinked source while preserving all names",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only refuses a junction source without touching the directory target",
+      "status": "passed"
+    },
+    {
+      "name": "real Windows retention against independent Temp files only allows at most one native retainer and never replaces its retained destination",
+      "status": "passed"
+    }
+  ]
+}
