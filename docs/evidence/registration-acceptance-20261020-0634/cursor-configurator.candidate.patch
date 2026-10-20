@@ -1,0 +1,75 @@
+diff --git "a/C:\\Users\\33272\\AppData\\Local\\Temp\\companion-registration-acceptance-20261020-0634\\cursor-configurator.ts" "b/C:\\Users\\33272\\AppData\\Local\\Temp\\companion-registration-acceptance-20261020-0634\\cursor-configurator.candidate.ts"
+index 6405adc..c8177c0 100644
+--- "a/C:\\Users\\33272\\AppData\\Local\\Temp\\companion-registration-acceptance-20261020-0634\\cursor-configurator.ts"
++++ "b/C:\\Users\\33272\\AppData\\Local\\Temp\\companion-registration-acceptance-20261020-0634\\cursor-configurator.candidate.ts"
+@@ -1,6 +1,6 @@
+ import { access, mkdir, readFile } from "node:fs/promises";
+ import { homedir } from "node:os";
+-import { basename, dirname, join } from "node:path";
++import { basename, dirname, join, win32 } from "node:path";
+ import { stableMcpName } from "./codex-configurator.js";
+ import { atomicConfigWrite, type AtomicConfigFileOps } from "./atomic-config-write.js";
+ 
+@@ -26,19 +26,20 @@ interface CursorMcpFile {
+   [key: string]: unknown;
+ }
+ 
+-function isManagedEntry(entry: CursorMcpServerEntry | undefined, projectId: string): boolean {
+-  if (!entry || typeof entry.command !== "string" || !Array.isArray(entry.args)) return false;
+-  if (!entry.args.every((item): item is string => typeof item === "string")) return false;
+-  return entry.args.includes("mcp")
+-    && entry.args.includes("--project")
+-    && entry.args.includes(projectId)
+-    && !entry.args.some((item) => /connection\.json|token|ws:\/\//i.test(item));
++function sameLaunchPath(actual: string, expected: string): boolean {
++  return process.platform === "win32" ? win32.normalize(actual).toLowerCase() === win32.normalize(expected).toLowerCase() : actual === expected;
+ }
+ 
+ function sameEntry(entry: CursorMcpServerEntry | undefined, command: string, args: string[]): boolean {
+   if (!entry || typeof entry.command !== "string" || !Array.isArray(entry.args)) return false;
+-  if (entry.command !== command || entry.args.length !== args.length) return false;
+-  return entry.args.every((item, index) => item === args[index]);
++  if (entry.type !== undefined && entry.type !== "stdio") return false;
++  if (!sameLaunchPath(entry.command, command) || entry.args.length !== args.length || !entry.args.every((item): item is string => typeof item === "string")) return false;
++  return entry.args.every((item, index) => index === 0 && args.length === 4 ? sameLaunchPath(item, args[index]) : item === args[index]);
++}
++
++function isManagedEntry(entry: CursorMcpServerEntry | undefined, creatorAiPath: string, projectId: string): boolean {
++  const args = ["mcp", "--project", projectId];
++  return sameEntry(entry, creatorAiPath, args) || sameEntry(entry, process.execPath, [creatorAiPath, ...args]);
+ }
+ 
+ /** 解析 Cursor 全局 MCP 配置文件路径（可用依赖注入覆盖，便于测试）。 */
+@@ -70,10 +71,12 @@ export async function configureCursorMcp(input: {
+   const accessPath = options.accessPath ?? (async (path) => { await access(path); });
+   const configPath = input.configPath ?? cursorMcpConfigPath();
+   const name = stableMcpName(input.projectName ?? basename(input.projectPath ?? "project"), input.projectId);
+-  const args = ["mcp", "--project", input.projectId];
+-  const command = input.creatorAiPath;
++  const useNode = process.platform === "win32" && /\.(?:c?js|mjs)$/i.test(input.creatorAiPath);
++  const command = useNode ? process.execPath : input.creatorAiPath;
++  const args = [...(useNode ? [input.creatorAiPath] : []), "mcp", "--project", input.projectId];
+ 
+-  await accessPath(command);
++  await accessPath(input.creatorAiPath);
++  if (useNode) await accessPath(command);
+ 
+   let file: CursorMcpFile = {};
+   let original: string | undefined;
+@@ -97,13 +100,13 @@ export async function configureCursorMcp(input: {
+   const servers = { ...(file.mcpServers ?? {}) };
+   const existing = servers[name];
+   if (sameEntry(existing, command, args)) {
+-    return { name, command, args, projectId: input.projectId, configPath, changed: false };
++    return { name, command: existing!.command as string, args: existing!.args as string[], projectId: input.projectId, configPath, changed: false };
+   }
+-  if (existing && !isManagedEntry(existing, input.projectId)) {
++  if (existing && !isManagedEntry(existing, input.creatorAiPath, input.projectId)) {
+     throw new Error(`Cursor 中已存在同名 MCP ${name}，但不是当前工程可迁移的配置；未覆盖`);
+   }
+ 
+-  servers[name] = { command, args };
++  servers[name] = { ...existing, command, args };
+   const next: CursorMcpFile = { ...file, mcpServers: servers };
+   await ensureDir(dirname(configPath));
+   const nextText = `${JSON.stringify(next, null, 2)}\n`;

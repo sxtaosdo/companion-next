@@ -1,0 +1,87 @@
+{
+  "atUtc": "2026-10-20T06:39:35.877265+00:00",
+  "sessionId": "519428df-ecb7-449d-8348-bce7e511d13e",
+  "countsBefore": {
+    "04c4cde24ee76d83": 19
+  },
+  "countsAfter": {
+    "04c4cde24ee76d83": 19
+  },
+  "countsUnchangedWithinClassificationReads": true,
+  "countsMatchInitialHistoryRead": true,
+  "antCookInitialCount": 19,
+  "antCookAfterCount": 19,
+  "naturalFailureCount": 2,
+  "failures": [
+    {
+      "id": "493d905e-7953-49c0-9769-d2b9c5476d1c",
+      "operation": "playtest_run",
+      "source": "cli",
+      "status": "failed",
+      "startedAt": "2026-10-20T04:03:48.406Z",
+      "errorSummarySha256": "0530776c35d5cbb7d4bcb2bdf0e228205569fbad9c7d2c4c2393dd15f8f6add6",
+      "errorEncoding": "text_or_truncated",
+      "jsonFieldNames": [],
+      "safeCodes": [],
+      "mentions": {
+        "compileMention": false,
+        "timeoutMention": false,
+        "validationMention": false,
+        "bridgeMention": true,
+        "notReadyMention": false,
+        "toolUnknownMention": false,
+        "connectionMention": false,
+        "policyMention": false,
+        "testFailureMention": true,
+        "upstreamMention": false
+      },
+      "predatesThisTask": true,
+      "migrationDefectProven": false
+    },
+    {
+      "id": "66d250e0-0b03-4744-bda4-483ce6fbd7da",
+      "operation": "script_wait_compile",
+      "source": "cli",
+      "status": "failed",
+      "startedAt": "2026-10-20T03:57:36.070Z",
+      "errorSummarySha256": "d1c8e03a51c4bd39630316de749db45963f1b587721b743af987aa4fa7970a6b",
+      "errorEncoding": "json",
+      "jsonFieldNames": [
+        "code",
+        "details",
+        "expected",
+        "message",
+        "path",
+        "retryable"
+      ],
+      "safeCodes": [
+        {
+          "field": "code",
+          "value": "INVALID_REQUEST"
+        },
+        {
+          "field": "code",
+          "value": "invalid_type"
+        }
+      ],
+      "mentions": {
+        "compileMention": false,
+        "timeoutMention": false,
+        "validationMention": false,
+        "bridgeMention": false,
+        "notReadyMention": false,
+        "toolUnknownMention": false,
+        "connectionMention": false,
+        "policyMention": false,
+        "testFailureMention": false,
+        "upstreamMention": false
+      },
+      "predatesThisTask": true,
+      "migrationDefectProven": false
+    }
+  ],
+  "newMcpCalls": 0,
+  "writes": 0,
+  "replayedFailures": 0,
+  "classificationScope": "Stored CLI operation failures predating this acceptance task. Successful history read and display do not establish whether the earlier tool/business failure was a migration software defect."
+}

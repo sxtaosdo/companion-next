@@ -32,6 +32,31 @@ function button(w:VueWrapper,text:string){return w.findAll('button').find(b=>b.t
 afterEach(()=>{for(const w of wrappers.splice(0))w.unmount();projectConnectionsProvider.value=null;companionBrowserProvider.value=null;projectSetupProvider.value=null;toolPresetReadProvider.value=null;vi.useRealTimers();vi.restoreAllMocks();document.body.innerHTML=''})
 describe('exact legacy client and setup-scope transport',()=>{
  it.each(CLIENT_TARGETS)('sends only approved original target %s and validates its matching receipt',async target=>{const fetch=vi.fn(async()=>json(clientReply(target))),api=createProjectConnectionsProvider({fetch});const request={kind:'client' as const,projectId:id,target},reply=await api.run(request);expect(fetch).toHaveBeenCalledExactlyOnceWith(`/api/projects/${id}/mcp/register`,expect.objectContaining({method:'POST',body:JSON.stringify({target}),credentials:'same-origin',redirect:'error'}));expect(reply.key).toBe(JSON.stringify(request))})
+ it.each(['codex','cursor'] as const)('accepts the exact repaired Windows Node receipt for %s',async target=>{
+  const raw={...clientReply(target),command:'C:/Program Files/nodejs/node.exe',args:['D:/Companion/mcp/dist/companion/creator-ai.js','mcp','--project',id]}
+  const api=createProjectConnectionsProvider({fetch:async()=>json(raw)}),reply=await api.run({kind:'client',projectId:id,target})
+  expect(JSON.parse(reply.text)).toMatchObject({command:raw.command,args:raw.args});await api.waitForIdle()
+ })
+ it('accepts native Windows separators and an unchanged Node registration receipt',async()=>{
+  const raw={...clientReply('cursor'),changed:false,command:'C:\\Program Files\\nodejs\\node.exe',args:['D:\\Companion\\mcp\\dist\\companion\\creator-ai.js','mcp','--project',id]}
+  const reply=await createProjectConnectionsProvider({fetch:async()=>json(raw)}).run({kind:'client',projectId:id,target:'cursor'})
+  expect(JSON.parse(reply.text).changed).toBe(false)
+ })
+ it.each([
+  {command:'C:/Windows/cmd.exe'},
+  {command:'node'},
+  {args:['D:/Companion/arbitrary.js','mcp','--project',id]},
+  {args:['creator-ai.js','mcp','--project',id]},
+  {args:['D:/Companion/../creator-ai.js','mcp','--project',id]},
+  {args:['D:/Companion/creator-ai.js','mcp','--project','fedcba9876543210']},
+  {args:['D:/Companion/creator-ai.js','mcp','--project',id,'--extra']},
+  {args:['D:/Companion/creator-ai.js','mcp','--project',id+'\n']},
+ ])('rejects a mismatched Node registration receipt without retry: %j',async invalid=>{
+  const raw={...clientReply(),command:'C:/Program Files/nodejs/node.exe',args:['D:/Companion/creator-ai.js','mcp','--project',id],...invalid},fetch=vi.fn(async()=>json(raw))
+  const api=createProjectConnectionsProvider({fetch})
+  await expect(api.run({kind:'client',projectId:id,target:'codex'})).rejects.toMatchObject({code:'invalid-shape',outcome:'unknown'})
+  expect(fetch).toHaveBeenCalledTimes(1);await api.waitForIdle()
+ })
  it('uses the original completed setup link, never a plain unbound assignment',async()=>{const fetch=vi.fn(async()=>json(core)),api=createProjectConnectionsProvider({fetch});await api.run({kind:'setup-scope',projectId:id,setupOperationId:operationId,preset:core});expect(fetch.mock.calls[0]).toEqual([`/api/projects/${id}/tool-preset`,expect.objectContaining({body:JSON.stringify({presetId:'core',setupOperationId:operationId})})])})
  it.each([{kind:'client',projectId:id,target:'other'},{kind:'client',projectId:id,target:'codex',codexPath:'x'},{kind:'client',projectId:'../bad',target:'codex'},{kind:'setup-scope',projectId:id,setupOperationId:'bad',preset:core}])('rejects non-contract input without dispatch: %j',async input=>{const fetch=vi.fn(),api=createProjectConnectionsProvider({fetch});expect(()=>normalizeConnectionRequest(input)).toThrow();await expect(api.run(input as never)).rejects.toMatchObject({outcome:'not-dispatched'});expect(fetch).not.toHaveBeenCalled()})
  it.each(['project','target','args','shape'])('rejects mismatched %s receipt as uncertain',async kind=>{const raw=clientReply();if(kind==='project')raw.projectId='fedcba9876543210';else if(kind==='target')raw.target='cursor';else if(kind==='args')raw.args=['unexpected'];else (raw as unknown as Record<string,unknown>).changed='yes';const api=createProjectConnectionsProvider({fetch:async()=>json(raw)});await expect(api.run({kind:'client',projectId:id,target:'codex'})).rejects.toMatchObject({outcome:'unknown'})})

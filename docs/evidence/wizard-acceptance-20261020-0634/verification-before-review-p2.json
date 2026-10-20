@@ -1,0 +1,99 @@
+{
+  "atUtc": "2026-10-20T06:42:54.457Z",
+  "scope": "OFFLINE_CANDIDATE_AND_REAL_CLI_IN_TASK_OWNED_CODEX_HOME_ONLY",
+  "rows": [
+    {
+      "scenario": "candidate-old-direct-js-upgrade-actual-cli-isolated-home",
+      "status": "passed",
+      "changed": true,
+      "unrelatedEntryBytesPreserved": true
+    },
+    {
+      "scenario": "deployed-baseline-rejects-repaired-node-shape",
+      "status": "reproduced-defect",
+      "reads": 1,
+      "mutationCommands": 0
+    },
+    {
+      "scenario": "candidate-new-node-idempotent-actual-cli-isolated-home",
+      "status": "passed",
+      "wholeConfigBytesUnchanged": true
+    },
+    {
+      "scenario": "candidate-node-path-case-and-separator-noop",
+      "status": "passed",
+      "mutationCommands": 0
+    },
+    {
+      "scenario": "candidate-refuses-other-project",
+      "status": "passed",
+      "mutationCommands": 0,
+      "configBytesUnchanged": true
+    },
+    {
+      "scenario": "candidate-refuses-tool-restrictions",
+      "status": "passed",
+      "mutationCommands": 0,
+      "configBytesUnchanged": true
+    },
+    {
+      "scenario": "candidate-refuses-unrelated-command",
+      "status": "passed",
+      "mutationCommands": 0,
+      "configBytesUnchanged": true
+    },
+    {
+      "scenario": "candidate-refuses-permission-login-unknown-or-other-name-mixed-output",
+      "status": "passed",
+      "cases": 4,
+      "mutationCommands": 0
+    }
+  ],
+  "actualCodexCliCommands": [
+    {
+      "verb": "add",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "remove",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "add",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    }
+  ],
+  "passed": 7,
+  "reproducedDefects": 1,
+  "productionSetupRequests": 0,
+  "realGlobalConfigWrites": 0,
+  "mcpServerStarts": 0,
+  "modelCalls": 0,
+  "creatorActions": 0,
+  "isolatedConfigSha256": "018aaa4b66d2024ae8e5d790dab75eda760ec0ec73ba2530cb4c0aa5417c85d7",
+  "realGlobalConfigAndInstalledRuntimeHashesUnchanged": true
+}

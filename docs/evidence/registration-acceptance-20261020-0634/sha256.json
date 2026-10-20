@@ -1,0 +1,17 @@
+{
+  "audit.py": "963b6af64a5d75117c476ab695aceae0c50accf30508f0b3098a1b62052af2ce",
+  "candidate-bindings.json": "fad662adef88fb66fbaa726c2c6fd1ed9354113f8d312574121fd43a41f2aaf6",
+  "cursor-candidate-results.json": "6e5e876589042535dc9eaf51e5a2572308a7360befc0e46040a19da023a71544",
+  "cursor-candidate.test.mjs": "e57e0eb7d3d9802d845ba578e4587d65d573ab48aff31c48ae5dadae9fab4a87",
+  "cursor-configurator.candidate.patch": "748f3fff3d5821dd3a021604eab18e5db325169fb89b03d97251257416107112",
+  "cursor-configurator.candidate.ts": "e3ff92fc02e4cba4e2e204f048d05e4202d24199b66a955733e0951b111d742c",
+  "cursor-configurator.ts": "27cc842a4894948333d21f9f25924c849711cac3775857dc381d97389697cd62",
+  "finalize.py": "34a6c94e1afce5d853593d94ded1260140888a632c2764b5a12adfbc4bb5c8cc",
+  "installed-source-audit.json": "3a079426ec06d949d5b30a83c37e3c7fb1c630719507715a9f0fc7e7765a73cc",
+  "prepare-candidate.mjs": "c59b67243461db97a45a17fbe0ecfd8797e59d07771be2a0cb3a33389624415b",
+  "result.json": "c82c88900abd337c13def4e7f51c502961fb82e1e19b757a1aa1d19c871fa134",
+  "tsconfig.json": "527e3af6d7ea182dfece19787e8fa91befc192a90ac335a3993212d3763f525b",
+  "dependencies/atomic-config-write.ts": "4e8b1ac1a6f9c8269a9c982ce9d157169e55943e8b84bbbcc262ff29f0fe096e",
+  "dependencies/codex-configurator.ts": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+  "dependencies/config-file-security.ts": "37bdfd68ac2d61f195f75b5e542745eab5f95bb4958a2d74b0e5cd308910ec8d"
+}

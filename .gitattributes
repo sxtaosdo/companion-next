@@ -14,3 +14,15 @@ docs/evidence/three-client-repair-20261020/** -text -whitespace
 docs/evidence/cursor-daily-acceptance-20261020/** -text -whitespace
 
 docs/evidence/cursor-agent-status-20261020/** -text -whitespace
+
+docs/evidence/history-acceptance-20261020-0634/** -text -whitespace
+
+docs/evidence/history-ui-acceptance-20261020-0634/** -text -whitespace
+
+docs/evidence/registration-acceptance-20261020-0634/** -text -whitespace
+
+docs/evidence/wizard-acceptance-20261020-0634/** -text -whitespace
+
+docs/evidence/registration-next-20261020-0634/** -text -whitespace
+
+docs/evidence/parallel-closeout-20261020-0634/** -text -whitespace

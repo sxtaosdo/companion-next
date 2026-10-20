@@ -1,0 +1,81 @@
+{
+  "atUtc": "2026-10-20T06:41:57.416Z",
+  "actualDeployedUi": true,
+  "headlessIsolatedBrowser": true,
+  "newListener": false,
+  "userBrowserUntouched": true,
+  "projectId": "04c4cde24ee76d83",
+  "failedDetailsPassed": [
+    {
+      "id": "493d905e-7953-49c0-9769-d2b9c5476d1c",
+      "sequence": 15,
+      "operation": "playtest_run",
+      "status": "failed",
+      "errorSummarySha256": "0530776c35d5cbb7d4bcb2bdf0e228205569fbad9c7d2c4c2393dd15f8f6add6",
+      "errorSummaryBytes": 2090,
+      "expanded": true,
+      "actualApiMatch": true
+    },
+    {
+      "id": "66d250e0-0b03-4744-bda4-483ce6fbd7da",
+      "sequence": 10,
+      "operation": "script_wait_compile",
+      "status": "failed",
+      "errorSummarySha256": "d1c8e03a51c4bd39630316de749db45963f1b587721b743af987aa4fa7970a6b",
+      "errorSummaryBytes": 213,
+      "expanded": true,
+      "actualApiMatch": true
+    }
+  ],
+  "total": 19,
+  "retained": 19,
+  "failedOnlyUiRows": 2,
+  "secondPageButtonPresent": false,
+  "countsBeforeAfterEqual": true,
+  "apiRequests": [
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/04c4cde24ee76d83/calls",
+      "query": "?limit=50"
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects/04c4cde24ee76d83/calls",
+      "query": "?limit=50&status=failed"
+    }
+  ],
+  "blockedUnrelatedReads": [
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    }
+  ],
+  "pageErrors": [],
+  "generatedToolCalls": 0,
+  "configurationWrites": 0,
+  "creatorActions": 0
+}

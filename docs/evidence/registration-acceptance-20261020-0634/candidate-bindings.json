@@ -1,0 +1,9 @@
+{
+  "baseline": "27cc842a4894948333d21f9f25924c849711cac3775857dc381d97389697cd62",
+  "candidate": "e3ff92fc02e4cba4e2e204f048d05e4202d24199b66a955733e0951b111d742c",
+  "dependencies": {
+    "codex-configurator.ts": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+    "atomic-config-write.ts": "4e8b1ac1a6f9c8269a9c982ce9d157169e55943e8b84bbbcc262ff29f0fe096e",
+    "config-file-security.ts": "37bdfd68ac2d61f195f75b5e542745eab5f95bb4958a2d74b0e5cd308910ec8d"
+  }
+}

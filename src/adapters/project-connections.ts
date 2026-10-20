@@ -16,6 +16,13 @@ function sanitize(value:unknown,depth=0):unknown {
  for(const [key,v] of Object.entries(object(value))){result[key]=/(?:token|password|passwd|authorization|secret|api[-_]?key|credential|cookie)/i.test(key)?'[redacted]':sanitize(v,depth+1)}
  return result
 }
+/** Accept only the original receipt or its explicit Node + creator-ai.js equivalent. */
+function validClientArgs(command:string,args:unknown,projectId:string):args is string[] {
+ const tail=['mcp','--project',projectId]
+ if(JSON.stringify(args)===JSON.stringify(tail))return true
+ const absolute=(value:unknown):value is string=>typeof value==='string'&&value.length<=4096&&value===value.trim()&&!/[\0-\x1f\x7f]/.test(value)&&/^(?:[a-z]:[\\/]|\/(?!\/))/i.test(value)&&!value.split(/[\\/]/).some(part=>part==='.'||part==='..')
+ return absolute(command)&&/(?:^|[\\/])node(?:\.exe)?$/i.test(command)&&Array.isArray(args)&&args.length===4&&absolute(args[0])&&/(?:^|[\\/])creator-ai\.js$/i.test(args[0])&&JSON.stringify(args.slice(1))===JSON.stringify(tail)
+}
 type Track = <T>(pending: Promise<T>) => Promise<T>
 function discardBody(response: Response, track: Track): void {
   try { if (response.body) void track(response.body.cancel()).catch(() => undefined) } catch { /* No raw diagnostics. */ }
@@ -110,7 +117,7 @@ export function createProjectConnectionsProvider(options:{fetch:ProjectConnectio
         if(response.status!==200)throw fail('backend-failure')
         const reply=object(raw)
         if(request.kind==='client'){
-          if(reply.target!==request.target||reply.projectId!==request.projectId||typeof reply.changed!=='boolean'||typeof reply.name!=='string'||!/^[a-zA-Z0-9_-]{1,256}$/.test(reply.name)||typeof reply.command!=='string'||!reply.command||reply.command.length>4096||JSON.stringify(reply.args)!==JSON.stringify(['mcp','--project',request.projectId])||(reply.configPath!==undefined&&(typeof reply.configPath!=='string'||reply.configPath.length>4096)))throw fail('invalid-shape')
+          if(reply.target!==request.target||reply.projectId!==request.projectId||typeof reply.changed!=='boolean'||typeof reply.name!=='string'||!/^[a-zA-Z0-9_-]{1,256}$/.test(reply.name)||typeof reply.command!=='string'||!reply.command||reply.command.length>4096||!validClientArgs(reply.command,reply.args,request.projectId)||(reply.configPath!==undefined&&(typeof reply.configPath!=='string'||reply.configPath.length>4096)))throw fail('invalid-shape')
           const receipt={target:reply.target,name:reply.name,changed:reply.changed,command:reply.command,args:reply.args,...(reply.configPath===undefined?{}:{configPath:reply.configPath})}
           return {key:JSON.stringify(request),text:JSON.stringify(sanitize(receipt),null,2)}
         }

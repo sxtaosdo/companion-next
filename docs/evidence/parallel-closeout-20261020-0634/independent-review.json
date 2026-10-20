@@ -1,0 +1,18 @@
+{
+  "reviewScope": [
+    "Next receipt adapter",
+    "Cursor offline candidate",
+    "Codex offline candidate"
+  ],
+  "initialFindings": [
+    {
+      "priority": "P2",
+      "issue": "Windows non-JS entry was incorrectly wrapped in Node by Codex candidate",
+      "status": "fixed and independently rechecked"
+    }
+  ],
+  "finalCodexCandidateSha256": "b2803071aa2ffd26dda82dc7152099b5b34259738887d0b6d33a6f9281000e5d",
+  "remainingP1P2Findings": 0,
+  "testsRunByReviewer": 0,
+  "productionActionsByReviewer": 0
+}

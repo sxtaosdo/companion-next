@@ -1,0 +1,14 @@
+{
+  "atUtc": "2026-10-20T06:48:06.269212+00:00",
+  "daemonSha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+  "daemonMapSha256": "a37eab4792d6b9b98365a8b1823513d322701422ff5b860179cc00ba00c1b878",
+  "cliSha256": "8ba06c7629b666980b9c998baa76223cdc8129b660824f5e007f8cc89aa8a6a9",
+  "baselineSourceSha256": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+  "candidateSourceSha256": "b2803071aa2ffd26dda82dc7152099b5b34259738887d0b6d33a6f9281000e5d",
+  "sourceLocator": "../../companion-client-rollback-fix-20261019/mcp/src/companion/codex-configurator.ts",
+  "scope": "OFFLINE_CANDIDATE_ONLY_NO_DEPLOYMENT",
+  "realGlobalConfigBefore": {
+    "C:\\Users\\33272\\.codex\\config.toml": "82d8f17513797fe33de35c332cecc797ab13160999d159c22931e2aa7cb79fe2",
+    "C:\\Users\\33272\\.cursor\\mcp.json": "b9ee6000736a75b663c6b70c130aa214c60acc76e2a24af740f90deb33d69434"
+  }
+}

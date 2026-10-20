@@ -1,0 +1,11 @@
+{
+  "adapterBefore": "3f059d3bcdf5563c7c5d5a6e0500fab039821bf74425ced7a2fc074b9477143e",
+  "adapterAfter": "268f606bc616ab755720f04108fcd5343aeb9437fe7ed5c94a01697758e1ada9",
+  "testBefore": "534929c4b4a492263785ed059b4931fcf6f942b6a538b374e41c36f2f6b7483b",
+  "files": [
+    "src/adapters/project-connections.ts",
+    "tests/project-connections.test.ts"
+  ],
+  "adapterAfterLineEndingCleanup": "4b583b206505f4574736d87631662442d5944c9855e4df55d24f17ae03b28c44",
+  "cleanupOnlyChangedReceiptLineCRLFtoLF": true
+}

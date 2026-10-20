@@ -1,0 +1,74 @@
+{
+  "atUtc": "2026-10-20T06:41:19.279Z",
+  "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('combobox', { name: '调用记录工程', exact: true })\u001b[22m\n\u001b[2m    - locator resolved to <input readonly type=\"text\" tabindex=\"0\" role=\"combobox\" autocomplete=\"off\" spellcheck=\"false\" id=\"el-id-3696-18\" aria-label=\"调用记录工程\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"el-select__input\" aria-activedescendant=\"\" aria-autocomplete=\"none\" aria-controls=\"el-id-3696-10\"/>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"el-select__selected-item el-select__placeholder is-transparent\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"el-select__selected-item el-select__placeholder is-transparent\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    57 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"el-select__selected-item el-select__placeholder is-transparent\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n",
+  "seen": [
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/projects",
+      "query": ""
+    },
+    {
+      "method": "GET",
+      "path": "/api/calls/counts",
+      "query": ""
+    }
+  ],
+  "blocked": [
+    {
+      "method": "GET",
+      "path": "/about-icon.svg"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "method": "GET",
+      "path": "/api/status"
+    }
+  ],
+  "pageErrors": []
+}

@@ -1,3 +1,5 @@
+2026-10-20 06:34续核最新结论：两条自然失败的API及实际部署UI详情已通过，19→19、错误摘要匹配、页面错误0；正式50条第二页仍缺自然数据。Cursor本轮无现有进程/窗口，依用户一次尝试上限跳过，发送0；旧额度拦截请求1次不重放。正式登记写入器Windows回退/冲突缺陷已有离线候选，新后台回执兼容源码48项测试/类型/构建通过，但均未部署，生产登记/01仍未执行。当前仍13通过/6部分/2暂停。完整分类、建议和所需条件见[跳过项与待解决问题](skipped-and-open-issues-20261020.md)。以下较早记录按其历史时点阅读。
+
 # Cursor one-shot project status acceptance, 2026-10-20
 
 The one authorized Agent request was sent exactly once in the existing normal Cursor window (PID 23912). Its existing conversation is titled **MCP connection acceptance**. The exact request only permits `project_get_status {}` on `cocos-creator-cocos-214a2184`, then stop; it prohibits other tools/servers, file reads or writes, shell, Creator/model/service management, retries and automatic continuation. No source files were attached. The cook server was not invoked.

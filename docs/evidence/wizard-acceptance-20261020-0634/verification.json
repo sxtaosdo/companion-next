@@ -1,0 +1,185 @@
+{
+  "atUtc": "2026-10-20T06:49:08.528Z",
+  "scope": "OFFLINE_CANDIDATE_AND_REAL_CLI_IN_TASK_OWNED_CODEX_HOME_ONLY",
+  "candidateSourceSha256": "b2803071aa2ffd26dda82dc7152099b5b34259738887d0b6d33a6f9281000e5d",
+  "rows": [
+    {
+      "scenario": "deployed-baseline-rejects-repaired-node-shape",
+      "status": "reproduced-defect",
+      "reads": 1,
+      "mutationCommands": 0,
+      "carriedForwardFromUnchangedLogic": true,
+      "priorSourceSha256": "11fc783c06d658e03ee25353a17e0cb32b247cc2b6fdc3d25b6fdba29cf8c8a8"
+    },
+    {
+      "scenario": "candidate-refuses-other-project",
+      "status": "passed",
+      "mutationCommands": 0,
+      "configBytesUnchanged": true,
+      "carriedForwardFromUnchangedLogic": true,
+      "priorSourceSha256": "11fc783c06d658e03ee25353a17e0cb32b247cc2b6fdc3d25b6fdba29cf8c8a8"
+    },
+    {
+      "scenario": "candidate-refuses-tool-restrictions",
+      "status": "passed",
+      "mutationCommands": 0,
+      "configBytesUnchanged": true,
+      "carriedForwardFromUnchangedLogic": true,
+      "priorSourceSha256": "11fc783c06d658e03ee25353a17e0cb32b247cc2b6fdc3d25b6fdba29cf8c8a8"
+    },
+    {
+      "scenario": "candidate-refuses-unrelated-command",
+      "status": "passed",
+      "mutationCommands": 0,
+      "configBytesUnchanged": true,
+      "carriedForwardFromUnchangedLogic": true,
+      "priorSourceSha256": "11fc783c06d658e03ee25353a17e0cb32b247cc2b6fdc3d25b6fdba29cf8c8a8"
+    },
+    {
+      "scenario": "candidate-refuses-permission-login-unknown-or-other-name-mixed-output",
+      "status": "passed",
+      "cases": 4,
+      "mutationCommands": 0,
+      "carriedForwardFromUnchangedLogic": true,
+      "priorSourceSha256": "11fc783c06d658e03ee25353a17e0cb32b247cc2b6fdc3d25b6fdba29cf8c8a8"
+    },
+    {
+      "scenario": "candidate-old-direct-js-upgrade-actual-cli-isolated-home",
+      "status": "passed",
+      "changed": true,
+      "unrelatedEntryBytesPreserved": true,
+      "retestedAfterP2": true
+    },
+    {
+      "scenario": "candidate-new-node-idempotent-actual-cli-isolated-home",
+      "status": "passed",
+      "wholeConfigBytesUnchanged": true,
+      "retestedAfterP2": true
+    },
+    {
+      "scenario": "candidate-node-path-case-and-separator-noop",
+      "status": "passed",
+      "mutationCommands": 0,
+      "retestedAfterP2": true
+    },
+    {
+      "scenario": "candidate-non-js-exe-and-cmd-preserve-native-command-three-args",
+      "status": "passed",
+      "exeActualIsolatedCliCreateAndReadback": true,
+      "exeNoopWholeConfigBytesUnchanged": true,
+      "cmdControlledCliReadNoop": true,
+      "mcpServerStarts": 0,
+      "retestedAfterP2": true
+    }
+  ],
+  "actualCodexCliCommands": [
+    {
+      "verb": "add",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "remove",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "add",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-native-fixture-feedface"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-native-fixture-feedface"
+    },
+    {
+      "verb": "add",
+      "target": "cocos-creator-native-fixture-feedface"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-native-fixture-feedface"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-native-fixture-feedface"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-native-fixture-feedface"
+    }
+  ],
+  "priorActualCodexCliCommands": [
+    {
+      "verb": "add",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "remove",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "add",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    },
+    {
+      "verb": "get",
+      "target": "cocos-creator-ant-cook-04c4cde2"
+    }
+  ],
+  "passed": 8,
+  "retestedAfterP2": 4,
+  "carriedForwardPassedScenarios": 4,
+  "reproducedDefects": 1,
+  "productionSetupRequests": 0,
+  "realGlobalConfigWrites": 0,
+  "mcpServerStarts": 0,
+  "modelCalls": 0,
+  "creatorActions": 0,
+  "realGlobalConfigAndInstalledRuntimeHashesUnchanged": true
+}

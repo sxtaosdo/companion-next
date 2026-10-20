@@ -1,0 +1,66 @@
+--- a/mcp/src/companion/codex-configurator.ts
++++ b/mcp/src/companion/codex-configurator.ts
+@@ -89,6 +89,17 @@
+     && !/connection\.json|token|ws:\/\//i.test(text);
+ }
+ 
++function matchesTargetTransport(text: string, target: { command: string; args: string[] }, useNode: boolean): boolean {
++  const transport = parsedTransport(text);
++  if (!transport || transport.args.length !== target.args.length) return false;
++  const samePath = (left: string, right: string) => process.platform === "win32"
++    ? left.replace(/\\/g, "/").toLowerCase() === right.replace(/\\/g, "/").toLowerCase()
++    : left === right;
++  return samePath(transport.command, target.command)
++    && transport.args.every((item, index) => useNode && index === 0
++      ? samePath(item, target.args[index]!) : item === target.args[index]);
++}
++
+ function legacyForProject(text: string, projectPath?: string): { command: string; args: string[] } | undefined {
+   if (!projectPath) return undefined;
+   const transport = parsedTransport(text);
+@@ -117,10 +128,14 @@
+ function isMissingEntry(error: unknown, name: string): boolean {
+   const value = error as { code?: unknown; message?: unknown; stderr?: unknown } | null;
+   if (value?.code !== 1) return false;
+-  return [value.message, value.stderr].some(text => typeof text === "string" && (
+-    text.trim() === `No MCP server named '${name}' found.`
+-    || text.trim() === `error: No MCP server named '${name}' found.`
+-  ));
++  const text = typeof value.stderr === "string" && value.stderr.trim() ? value.stderr : value.message;
++  if (typeof text !== "string") return false;
++  const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
++  const missing = (line: string) => line === `No MCP server named '${name}' found.`
++    || line === `error: No MCP server named '${name}' found.`
++    || line === `Error: No MCP server named '${name}' found.`;
++  return lines.some(missing) && lines.every(line => missing(line)
++    || line.startsWith('WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir '));
+ }
+ 
+ /** These defaults are reproducible by `mcp add -- command args`. Reject extra settings
+@@ -161,7 +176,10 @@
+   const execFile = options.execFile ?? defaultExecFile;
+   const codexPath = input.codexPath ?? await findCodexCli({ execFile });
+   const name = stableMcpName(input.projectName ?? basename(input.projectPath ?? "project"), input.projectId);
+-  const target = { command: input.creatorAiPath, args: ["mcp", "--project", input.projectId] };
++  const useNode = process.platform === "win32" && /\.(?:c?js|mjs)$/i.test(input.creatorAiPath);
++  const target = useNode
++    ? { command: process.execPath, args: [input.creatorAiPath, "mcp", "--project", input.projectId] }
++    : { command: input.creatorAiPath, args: ["mcp", "--project", input.projectId] };
+   const result = { name, ...target, projectId: input.projectId };
+   const read = async (): Promise<Entry> => {
+     try { return { state: "present", text: (await execFile(codexPath, ["mcp", "get", name, "--json"])).stdout }; }
+@@ -169,8 +187,12 @@
+   };
+   const initial = await read();
+   if (initial.state === "unknown") throw new CodexConfigurationFault("read", "unknown");
+-  if (initial.state === "present" && reproducibleTransport(initial.text, name) && matchesManagedConfig(initial.text, input.creatorAiPath, input.projectId)) return { ...result, changed: false };
+-  const previous = initial.state === "present" ? legacyForProject(initial.text, input.projectPath) : undefined;
++  if (initial.state === "present" && reproducibleTransport(initial.text, name) && matchesTargetTransport(initial.text, target, useNode)) return { ...result, changed: false };
++  const previous = initial.state === "present"
++    ? legacyForProject(initial.text, input.projectPath)
++      ?? (useNode && matchesManagedConfig(initial.text, input.creatorAiPath, input.projectId)
++        ? reproducibleTransport(initial.text, name) : undefined)
++    : undefined;
+   if (initial.state === "present" && (!previous || !reproducibleTransport(initial.text, name))) {
+     throw new CodexConfigurationFault("read", "conflict");
+   }

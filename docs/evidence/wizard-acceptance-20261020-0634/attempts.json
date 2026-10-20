@@ -1,0 +1,25 @@
+{
+  "scope": "Task-owned Temp CODEX_HOME only; no global configuration or server execution",
+  "attempts": [
+    {
+      "stage": "actual CLI seed preparation before candidate invocation",
+      "outcome": "failed assertion: beforeMigration.toString().includes(unrelated)",
+      "observation": "Installed Codex CLI removed a leading file comment while serializing the isolated seed. This is not a candidate migration failure. Verification narrowed to exact unrelated entry bytes and whole-file no-op preservation; arbitrary comment preservation is not claimed."
+    },
+    {
+      "stage": "first actual isolated CLI migration candidate",
+      "outcome": "failed: CODEX_MCP_CONFIGURATION_FAILED stage=remove recovery=unknown",
+      "observation": "After remove, installed CLI stderr contained its known PATH-alias Temp warning followed by capitalized Error: No MCP server named 'cocos-creator-ant-cook-04c4cde2' found. The original exact whole-string parser did not recognize it. The task-owned target was absent afterward; global configuration was untouched."
+    },
+    {
+      "stage": "final candidate after precise missing-entry recognition and strict error whitelist",
+      "outcome": "passed: verification.json contains actual isolated CLI exit/readback and controlled refusal assertions",
+      "observation": "The isolated fixture was explicitly reseeded before the next known attempt; no uncertain production write or repeated Agent request occurred."
+    },
+    {
+      "stage": "independent review P2: non-JS override compatibility",
+      "outcome": "fixed and verified in offline candidate only",
+      "observation": "Previous 7-scenario candidate wrapped every Windows creatorAiPath. Final candidate wraps only js/cjs/mjs and gates legacy managed upgrade on useNode; native exe actual isolated CLI create/get/no-op and cmd controlled read remain original command plus three args. Four affected/new scenarios rerun; four unchanged scenarios carried from preserved prior receipt. Strict semantic types passed."
+    }
+  ]
+}

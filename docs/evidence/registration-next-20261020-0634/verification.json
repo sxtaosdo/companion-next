@@ -1,0 +1,36 @@
+{
+  "atUtc": "2026-10-20T06:50:51.084949+00:00",
+  "sourceFiles": {
+    "src/adapters/project-connections.ts": "4b583b206505f4574736d87631662442d5944c9855e4df55d24f17ae03b28c44",
+    "tests/project-connections.test.ts": "2a9edb7d8681cf1056f8f6e13a156070d64e962793031ee1400c30ef92f3eef6"
+  },
+  "targetedVitest": {
+    "command": "node node_modules/vitest/vitest.mjs run tests/project-connections.test.ts",
+    "exitCode": 0,
+    "testFilesPassed": 1,
+    "testsPassed": 48,
+    "testsFailed": 0,
+    "observedDurationSeconds": 2.92
+  },
+  "strictTypecheck": {
+    "command": "node node_modules/vue-tsc/bin/vue-tsc.js --noEmit",
+    "exitCode": 0
+  },
+  "offlineBuild": {
+    "mode": "companion-workspace",
+    "exitCode": 0,
+    "observedDurationSeconds": 7.63,
+    "files": {
+      "favicon.svg": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715",
+      "index.html": "1a7807b11e209e8fe5299be97734fd21ab2fdde17c54c312c8719635e5f7b3e4",
+      "assets/about-icon-BaVeClOr.svg": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228",
+      "assets/donation-qr-D7kdLLAm.png": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1",
+      "assets/index-CReVohLD.css": "e44b42194289bc35b3bc3726c19d6aba3d1307744cf2ae812f01bb288611087c",
+      "assets/index-DHfuB-xN.js": "f4339be33f589fcfcca3a88eef6730b16d5b6fc43875730a2fc856b5ad5efddc"
+    }
+  },
+  "deployed": false,
+  "configurationWrites": 0,
+  "productionRegistrationPosts": 0,
+  "newListeners": 0
+}

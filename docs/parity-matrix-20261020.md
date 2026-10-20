@@ -1,10 +1,4 @@
-2026-10-20 Cursor actual-call update: one authorized project_get_status-only Agent request was sent once. Cursor returned Weekly usage limit reached / Buy credits or Upgrade Plan before any tool receipt. STOPPED, no retry or paid action; actual Cursor business invocation remains unverified. Matrix remains 13/6/2. [Evidence and remaining blocker](cursor-agent-status-20261020.md).
-
-2026-10-20日常Cursor后续：已在原用户窗口分别单条Reload cocos/cook，各1次，均Connected/117工具，原来源及配置SHA保持。Cursor业务工具调用0：正常MCP面板仅Reload/Done及开关，没有无推理Run/Test入口，未新发Agent回合。详见[日常连接与剩余一步](cursor-daily-acceptance-20261020.md)。
-
-2026-10-20三条配置修复：用户批准的Codex ant-cook及Cursor cocos/cook已备份并修为Node+原JS，其他条目/权限保持。实际codex.exe发现117工具并只读调用PASSED；Cursor隔离实际客户端目标未创建，日常Cursor定向重载/回执仍未验证，不能报全通过。详见[修复与精确剩余](three-client-repair-20261020.md)。
-
-2026-10-20后续只读收尾：Codex/Cursor配置存在但未正确证明接通；3个Windows条目直接启动JS（OS193），Cursor另8条旧Mac路径。独立Node+MCP SDK握手117工具及2次真实只读调用通过；真实limit1游标通过，正式50条第二页/失败详情仍缺自然数据。两文件三条目的具体改法与6项分类见[精确剩余条件](partial-six-remaining-20261020.md)。没有写配置/凭据、刷51次、清空日志或启模型/Creator。
+2026-10-20 06:34续核最新结论：两条自然失败的API及实际部署UI详情已通过，19→19、错误摘要匹配、页面错误0；正式50条第二页仍缺自然数据。Cursor本轮无现有进程/窗口，依用户一次尝试上限跳过，发送0；旧额度拦截请求1次不重放。正式登记写入器Windows回退/冲突缺陷已有离线候选，新后台回执兼容源码48项测试/类型/构建通过，但均未部署，生产登记/01仍未执行。当前仍13通过/6部分/2暂停。完整分类、建议和所需条件见[跳过项与待解决问题](skipped-and-open-issues-20261020.md)。以下较早记录按其历史时点阅读。
 
 # 新旧 Companion 功能对齐矩阵（2026-10-20）
 
@@ -16,16 +10,16 @@
 | 2 | 概览默认真实首工程 | 已验证 | 7工程列表、默认/无效值回退及移除回读 |
 | 3 | 工程状态、筛选、折叠 | 已验证 | 真实状态刷新/ready转换与同页折叠；不是全异常覆盖 |
 | 4 | 添加/导入/登记布局 | 已验证 | 真实登记移除、目录与布局；权限异常未穷尽 |
-| 5 | 五步安装及可选配置 | 部分完成；有未验证 | 00/10真实通过；01/11实际客户端写入与接入未验收 |
+| 5 | 五步安装与可选动作 | 部分完成，01/11真实组合未验证 | 00/10历史真实通过；01受已部署Codex写入器缺陷阻塞，11还需专用Creator验收窗口；离线候选通过不代替向导完成 |
 | 6 | Creator启动/聚焦/停止/重启 | 历史限定主流程已验证 | 真实Next进程树生命周期证据；本轮未启动Creator |
 | 7 | 打开目录、移除登记 | 已验证 | 真实目录与可恢复登记回读 |
 | 8 | Preview/刷新/Profiler | 历史限定主流程已验证 | Preview画布与Profiler848样本；本轮未重复 |
 | 9 | 日志筛选/暂停/滚到底 | 已验证 | 真实日志、SSE与底部恢复；长期压力未验 |
 | 10 | 日志清空/导出/诊断 | 部分完成；清空实测禁止 | 导出和诊断有真实证据；未删除用户真实日志 |
-| 11 | 调用记录/详情/分页 | 部分完成；自然数据未验证 | 有界非空列表/筛选有证据；自然分页与失败详情未验，未注入假记录充数 |
+| 11 | 调用记录/筛选/详情/分页 | 部分完成，仅正式50条第二页缺自然数据 | 19条自然记录含2失败，失败API及当前部署UI展开/错误摘要匹配/19→19通过；真实小页游标已过，正式50条后续游标不存在 |
 | 12 | 局部实时更新/恢复 | 限定主流程已验证 | 同页节点/焦点保留、真实恢复及SSE证据 |
-| 13 | CLI/IDE使用 | 部分完成；实际接入未验证 | 本轮完整CLI启动已修且实证exit0；实际外部IDE执行仍未验收 |
-| 14 | 多客户端MCP登记 | 部分完成；实际接入未验证 | 合同与只读清单已核；实际使用客户端接入未验，VS Code按用户排除 |
+| 13 | CLI/IDE使用 | 部分完成，Cursor实际工具调用未验证 | 实际Codex只读调用PASSED；历史Cursor cocos/cook Connected/117。本轮无现有Cursor进程/窗口，按用户上限跳过，发送0；不是当前MCP失败 |
+| 14 | 多客户端MCP登记 | 部分完成，正式写入器交付与读回未验 | 3条现有Windows配置已修且保持；当前正式writer会回退/冲突，生产POST0；Cursor/Codex离线候选、新后台回执兼容已验，均未部署；VS Code已排除 |
 | 15 | 工具目录/范围/预设导入导出 | 限定主流程已验证 | 真实CRUD/保存/导入导出/冲突拒绝；IDE执行另属13/14 |
 | 16 | AI资源生成/编辑/变体/导入 | 部分完成；模型部分暂停 | 96变体PNG/meta/UUID、重开、Preview/Build/Smoke已验；真实模型生成未验 |
 | 17 | 工程资源盘点 | 限定主流程已验证 | 733条接口/聚合/UI对应；非全局扫描 |

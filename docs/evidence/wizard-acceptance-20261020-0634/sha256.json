@@ -1,0 +1,17 @@
+{
+  "attempts.json": "4cee772dbf249be807f2a938b2f28951dca54185efa8f721a14775f63c6f5680",
+  "baseline.json": "bb86b333a936ab5ff9d8804189314a978c97b9d45025ea93a665e8f43a7e7793",
+  "candidate-before-review-p2.ts": "11fc783c06d658e03ee25353a17e0cb32b247cc2b6fdc3d25b6fdba29cf8c8a8",
+  "codex-configurator.patch": "4b6ca01dc493807a933f35549b06cb118aaa4fa9cd00102583383e5768eb23fc",
+  "encoding-check.json": "56c58413d76781a27c3a7d75cdfc143b059db07daeb9e3c9ec5d3539efb0304d",
+  "finalize.py": "13db2c252c8d63fbf474164e847762680f6886095ce670f69b2a65281efb0179",
+  "prepare.py": "58e6122206fd6fd343274ce40acf2959dbe3b89a7d47848f94ca84a28f84f859",
+  "typecheck.json": "330b8c79cc402a41d4c003da6e4d73f5c488c38acb664c446cd6304b8b447534",
+  "typecheck.mjs": "3c798327d3cadca89f7f23a84366cd9704820f916bce2e99e3fe51bfdffacc26",
+  "verification-before-review-p2.json": "077e84c67814a0d7bb450a2af1ea49897be5dd18a3552fa146fd5cfa3b40dfbb",
+  "verification.json": "1f09020079b3008a7a12303365ffbef0749abfc8c8472bea916e5c2d97aa1292",
+  "verify-followup.mjs": "6ab6a1f31b84fe02a88ba7d71bcbb76845b7a0b68a750feac7f51d55c003a016",
+  "verify.mjs": "8050da57d13ce79a2f1d3dcd88f5c82aa5503a1592fd5fba3aa47f9e9191c3db",
+  "baseline/codex-configurator.ts": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+  "candidate/codex-configurator.ts": "b2803071aa2ffd26dda82dc7152099b5b34259738887d0b6d33a6f9281000e5d"
+}

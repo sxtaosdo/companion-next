@@ -1,0 +1,74 @@
+{
+  "bundleSha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+  "mapSha256": "a37eab4792d6b9b98365a8b1823513d322701422ff5b860179cc00ba00c1b878",
+  "sources": {
+    "companion/cursor-configurator.ts": {
+      "sha256": "27cc842a4894948333d21f9f25924c849711cac3775857dc381d97389697cd62",
+      "lines": [
+        {
+          "line": 38,
+          "text": "function sameEntry(entry: CursorMcpServerEntry | undefined, command: string, args: string[]): boolean {"
+        },
+        {
+          "line": 73,
+          "text": "const args = [\"mcp\", \"--project\", input.projectId];"
+        },
+        {
+          "line": 74,
+          "text": "const command = input.creatorAiPath;"
+        }
+      ]
+    },
+    "companion/codex-configurator.ts": {
+      "sha256": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+      "lines": [
+        {
+          "line": 70,
+          "text": "const command = value.transport?.command;"
+        },
+        {
+          "line": 71,
+          "text": "const args = value.transport?.args;"
+        },
+        {
+          "line": 79,
+          "text": "function matchesManagedConfig(text: string, creatorAiPath: string, projectId: string): boolean {"
+        },
+        {
+          "line": 164,
+          "text": "const target = { command: input.creatorAiPath, args: [\"mcp\", \"--project\", input.projectId] };"
+        },
+        {
+          "line": 172,
+          "text": "if (initial.state === \"present\" && reproducibleTransport(initial.text, name) && matchesManagedConfig(initial.text, input.creatorAiPath, input.projectId)) return { ...result, changed: false };"
+        }
+      ]
+    },
+    "companion/http-server.ts": {
+      "sha256": "70e73fe0328d7670291d49cf35087324674584ae8beaf7848fcb518ed6efde32",
+      "lines": [
+        {
+          "line": 755,
+          "text": "if (tail === \"mcp/register\" && method === \"POST\") {"
+        }
+      ]
+    },
+    "companion-daemon.ts": {
+      "sha256": "0cfb7cf74ba4d80d3eb6b1c2d68d2f6b4debb1aff90c57a450696650b08d9664",
+      "lines": [
+        {
+          "line": 402,
+          "text": "registerMcp: async (projectId, target) => {"
+        },
+        {
+          "line": 408,
+          "text": "creatorAiPath: context.creatorAiPath,"
+        },
+        {
+          "line": 638,
+          "text": "creatorAiPath: context.creatorAiPath,"
+        }
+      ]
+    }
+  }
+}

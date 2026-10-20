@@ -1,0 +1,73 @@
+{
+  "atUtc": "2026-10-20T06:51:16.518357+00:00",
+  "runtime312MatchExistingBaseline": true,
+  "business9TablesMatchExistingBaseline": true,
+  "noncanonicalCompanionFilesMatchExistingBaseline": true,
+  "approvedClientConfigurationsUnchanged": true,
+  "daemonIdentityUnchanged": true,
+  "daemonIdentity": {
+    "pid": 6564,
+    "startupEpoch": "15e6f683-4962-40de-965d-8984805da96b",
+    "startedAt": "2026-10-20T02:53:04.716Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "phase": "OPEN",
+  "counts": {
+    "http": 0,
+    "mcp": 0,
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "maintenanceObservations": 0,
+    "projectActions": 0,
+    "globalActions": 0,
+    "recovery": 0,
+    "setup": 0,
+    "builds": 0,
+    "observedBuilds": 0,
+    "sidecars": 0,
+    "nativeEpochUnproven": 2,
+    "ownerStarting": 0,
+    "ownerRequests": 0,
+    "ownerHandlers": 0,
+    "ownerBusy": 0,
+    "ownerWorker": 0,
+    "setupPolls": 0,
+    "setupTimers": 0,
+    "icons": 0,
+    "maintenanceVerifications": 0
+  },
+  "knowledgeService": {
+    "path": "D:\\services\\weknora\\normal-reader-recovery-v0.8.2\\weknora.exe",
+    "pid": 600,
+    "created": "2026-10-20T02:03:09.5395770Z"
+  },
+  "sharedWorktree": {
+    "head": "6ff44f5574ed2f1b81741e86c3ca1210c6c0085a",
+    "dirtyEntryCount": 22,
+    "statusSha256": "dcc2e12b57e746e00a45187a46b9b1b7f2ef642d51b45dc16af7ed2546e10739",
+    "diffSha256": "ec4c01b56d5433c3941bfae94277fbcc5f9bd98db2f09b74a683ecfea138eebf",
+    "indexDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "sharedFingerprintsMatchPreviousCheckpoint": true,
+  "historicalExact21FileBaselineAvailable": false,
+  "cursorObservation": {
+    "atUtc": "2026-10-20T06:51:16.3637144Z",
+    "visibleWindowCount": 0,
+    "processCount": 0
+  },
+  "cursorThisResumeAttemptCount": 1,
+  "cursorThisResumeRequestsSent": 0,
+  "cursorPreviousConfirmedRequestsSent": 1,
+  "cursorPreviousToolReceipts": 0,
+  "cursorThisResumeOutcome": "SKIPPED_NO_EXISTING_DAILY_WINDOW",
+  "cursorCurrentQuotaTested": false,
+  "paidActions": 0,
+  "configurationWrites": 0,
+  "productionRegistrationPosts": 0,
+  "productionSetupPosts": 0,
+  "creatorControlActions": 0,
+  "modelControlActions": 0,
+  "newListeners": 0
+}

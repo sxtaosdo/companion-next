@@ -1,0 +1,38 @@
+{
+  "platform": "win32",
+  "node": "v25.2.1",
+  "defaultFilesystemIO": true,
+  "noHttp": true,
+  "noClientLaunch": true,
+  "noGlobalConfigWrites": true,
+  "cases": [
+    {
+      "label": "baseline_regression_reproduced",
+      "passed": true
+    },
+    {
+      "label": "legacy_upgrade_preserves_settings",
+      "passed": true
+    },
+    {
+      "label": "repaired_node_transport_byte_idempotent",
+      "passed": true
+    },
+    {
+      "label": "other_project_conflict_no_write",
+      "passed": true
+    },
+    {
+      "label": "foreign_command_conflict_no_write",
+      "passed": true
+    },
+    {
+      "label": "foreign_script_and_extra_arguments_conflict",
+      "passed": true
+    },
+    {
+      "label": "non_js_executable_unchanged",
+      "passed": true
+    }
+  ]
+}

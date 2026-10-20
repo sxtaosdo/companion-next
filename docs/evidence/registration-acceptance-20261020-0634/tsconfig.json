@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "D:/code/shidai3/P8000/cocos-mcp/mcp/node_modules/@types"
+    ]
+  },
+  "include": [
+    "*.ts"
+  ]
+}
