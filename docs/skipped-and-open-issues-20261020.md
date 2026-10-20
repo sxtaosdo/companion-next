@@ -28,7 +28,7 @@
 
 本轮rollback-index.py仅在入口仍匹配3b96bad回执时恢复backup-index.html至338e759，保留全部hash资源，不重启服务；未执行回滚。
 
-### 本机交付与回滚证据
+### 上一轮338e759交付与回滚证据（历史318基线）
 
 最新证据目录：`C:/Users/33272/AppData/Local/Temp/companion-old-experience-20261020/navigation-followup`。deployment.json和http-verification.json记录6资源逐项HTTP SHA；after-navigation.json/after-visual.json及本地PNG记录实际页面；post-static-baseline.json是后续318文件保护基线。daemon6564/32180未重启；9业务表、三客户端配置、共享22修改和知识服务600/8081保持。没有真实Creator/Cursor/模型/清日志动作，没有安装软件或改变安全权限。用户09:23明确要求看图验收后，仅将两张最终实际部署高清截图上传官方Library，非mock：工程/导航 libfile_3d1a43da76188191a194484967baff57；向导首屏 libfile_e0be07ce9eb48191a187378537ebf785。原PNG和SHA保留在最新证据目录review-shots。状态为本轮已实施范围自检完成、已部署、待用户看图验收，未替用户判定通过。
 
