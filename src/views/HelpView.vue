@@ -17,7 +17,10 @@ const expanded = ref<Record<number, boolean>>({})
 const copyMessage = ref(''),copying=ref(false)
 let copyEpoch = 0
 watch(active, () => { copyEpoch++; copyMessage.value = ''; expanded.value = {}; wraps.value = {} })
-function choose(topic: string) { router.push({ path: '/help', query: { topic } }) }
+function choose(topic: string) {
+  const project = route.query.project
+  void router.push({ path: '/help', query: { topic, ...(project === undefined ? {} : { project }) } })
+}
 async function copy(text: string) {
   if(copying.value||agentHandoffBusy.value)return
   copying.value=true;agentHandoffBusy.value=true

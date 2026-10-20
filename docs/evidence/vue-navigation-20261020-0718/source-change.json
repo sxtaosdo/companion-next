@@ -1,0 +1,6 @@
+{
+  "file": "src/views/HelpView.vue",
+  "beforeSha256": "5a0cf3ebc2febb0a43a4fc0dc461c1c7a0fa5a118917c9053b50f2650e41b2fd",
+  "afterSha256": "2ae4ff8799ee1c2824de240911a421994260b0563445e9add797d5b505c94945",
+  "changedBehavior": "Preserve only explicit project query through help topic navigation; unknown projects continue through existing rejection; no automatic writes or external handoff"
+}

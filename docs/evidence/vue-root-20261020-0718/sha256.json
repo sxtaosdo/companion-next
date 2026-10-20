@@ -1,0 +1,9 @@
+{
+  "archive-source.py": "803e26c67ce5b68fb2e98b4edb508945df7408c966a7f0a8f73f70d9be13510e",
+  "baseline.json": "464aabc5754aed891888c82f7da27c407958c95b4b900e0a557913fb14bb9a26",
+  "edit-call-status.py": "fad6755d7f62fb72cfc4ee238765180ca002b5c2fec5b15462d73447864bf0e3",
+  "edit-scope.py": "9bd4a151d2d77f7a7bfb885a44311eaa6cd0589fe20ea966bdaff411646d2893",
+  "protection.py": "e08a289d1629b1e838cb986e6281d6fea02615cd57a8049fc25e7ac31ffb8b00",
+  "source-verification.json": "bc93d26520d8c807f6bc6374be6bf668f355034477e191c11e6e2c48fbe4d180",
+  "update-scope-test.py": "4e5da0449e3696512f994f49429f85fe4ef31bf93f2af1c41465e609c636547f"
+}

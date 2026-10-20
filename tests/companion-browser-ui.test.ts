@@ -73,6 +73,14 @@ describe('Companion read UI and host identity',()=>{
   expect(p.loadCalls).not.toHaveBeenCalled();expect(wrapper!.findAll('button.project-call-summary')).toHaveLength(1)
   await summary.trigger('click');await flushPromises();expect(router.currentRoute.value.query.tab).toBe('calls');expect(store.callProjectId).toBe('p2');expect(p.loadCalls).toHaveBeenCalledExactlyOnceWith('p2',{failed:false},expect.any(AbortSignal))
  })
+ it('retains the original Chinese history statuses while preserving wire values and readonly expansion',async()=>{
+  const p=fixture(),statuses=['running','success','failed'] as const
+  vi.mocked(p.loadCalls).mockResolvedValue({sessionId:'s1',total:3,retained:3,records:statuses.map((status,index)=>({id:`call-${index}`,sequence:3-index,projectId:'p1',operation:`read_${index}`,operationNameZh:'读取状态',source:'mcp' as const,startedAt:'2026-10-20T00:00:00Z',status,inputSummary:'{}',...(status==='failed'?{errorSummary:'已记录的业务错误'}:{})}))})
+  registerCompanionBrowserProvider(p);const {store}=await setup();await button('连接 Companion').trigger('click');await flushPromises();await button('查看调用记录').trigger('click');await flushPromises()
+  const rows=wrapper!.findAll('details.companion-call-record');expect(rows).toHaveLength(3)
+  for(const [index,label] of ['进行中','成功','失败'].entries()){const summary=rows[index]!.get('summary');expect(summary.text()).toContain(label);expect(summary.text()).not.toContain(statuses[index]!);await summary.trigger('click')}
+  expect(store.records.map(record=>record.status)).toEqual(statuses);expect(p.loadCalls).toHaveBeenCalledTimes(1)
+ })
  it('retains actual call pagination while moving capacity limits into an accessible tip',async()=>{
   const p=fixture();vi.mocked(p.loadCalls).mockResolvedValueOnce({sessionId:'s1',total:80,retained:80,nextBefore:31,records:[]}).mockResolvedValueOnce({sessionId:'s1',total:80,retained:80,records:[]})
   registerCompanionBrowserProvider(p);await setup();await button('连接 Companion').trigger('click');await flushPromises();await button('查看调用记录').trigger('click');await flushPromises()

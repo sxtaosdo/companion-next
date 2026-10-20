@@ -85,7 +85,14 @@ watch(()=>[projects.provider,projectSetupProvider.value,projects.connected,JSON.
 watch([path,projectId,sourceMode,parentPath,projectName,()=>JSON.stringify(consents.value)],()=>{formEpoch++;store.clearPrepared();scaffold.clearPrepared()},{flush:'sync'})
 watch(open,value=>emit('dialog-visibility',value),{flush:'sync',immediate:true})
 function resetConsents(){consents.value={installBridge:false,startCreator:false,configureCodex:false,acknowledgeReuse:false,acknowledgeToolScope:false}}
-function show(id=''){if(lane.locked)return;agentsSkipped.value=false;dialogEpoch++;useCreatorOperationsStore().closeDialog();store.clearPrepared();scaffold.clearPrepared();sourceMode.value='custom';resetConsents();directoryError.value='';projectId.value=id;open.value=true}
+function show(id=''){
+ if(lane.locked)return
+ const target=id?projects.projects.find(project=>project.id===id):undefined
+ if(id&&!target)return
+ agentsSkipped.value=false;dialogEpoch++;useCreatorOperationsStore().closeDialog();store.clearPrepared();scaffold.clearPrepared();sourceMode.value='custom';resetConsents();directoryError.value=''
+ if(target)path.value=target.path
+ projectId.value=id;open.value=true
+}
 function close(){dialogEpoch++;store.clearPrepared();scaffold.clearPrepared();store.stopWaiting();projects.cancelDashboardRead();open.value=false}
 async function pickDirectory(target:'path'|'parent'='path'){
  const api=projectSetupProvider.value,source=projects.provider

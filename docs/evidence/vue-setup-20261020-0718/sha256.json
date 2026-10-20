@@ -1,0 +1,9 @@
+{
+  "add-regressions.py": "1fb35e9bc7a3b49b0621bd38d755497a18c4e22a557fa283cde75e4597bbd9bb",
+  "after-fix.json": "dd07f6a0db13bc55b70a51de160724c19ab90a657cd7c3639b5ad2648f0abde4",
+  "before-fix.json": "1fa012c09ee5fbc04b21677bffad75a6293b8489c6225399147a14530cf13a81",
+  "edit-result.json": "1834c16015be11a61217a470d2145e289dfbd66d2f3466d080f94bacdab12f1d",
+  "finalize.py": "40c860d74d97ebf3a5ef4a9654acec17fff3d78d1202a6b82926a2b66e21cacb",
+  "fix-context.py": "b46d39b422aceccef08bda1702a83045213dad810c4651e73409ddd5ade60c5b",
+  "result.json": "63105e6342f993a8f4f839f2612d9ef0c69aa23537a6da862570638d170f21aa"
+}

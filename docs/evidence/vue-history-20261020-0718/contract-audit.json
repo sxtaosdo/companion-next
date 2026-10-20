@@ -1,0 +1,45 @@
+{
+  "oldUi": {
+    "path": "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\src\\app.ts",
+    "sha256": "ff22b00dcc31213d810b2a63daba4263f9e424d803590b6b0d2c8c63f6b09be6",
+    "contractLines": {
+      "callRendering": "2053-2095",
+      "pageTransport": "2098-2128",
+      "filterAndMore": "2131-2153",
+      "logClear": "2507-2518",
+      "logDiagnostics": "3507-3525"
+    }
+  },
+  "newSource": {
+    "src/adapters/companion-browser.ts": "3d78fae7316f2931cda9d15e33b157ea40da1c39356f103a3a2b0f4ca5a3c401",
+    "src/stores/companion-browser.ts": "f45ed697e4fca18406571e93ca38f533f09686bafd22dcab95be45959b18fa2e",
+    "src/components/LogTools.vue": "25115c96573ee30cc3f53bb10a849e5d3afa05e20aef0488c333d3fdb3ee5c4a",
+    "src/adapters/log-tools.ts": "3e64c33574b4bc3937c775c0ec2db6ee1e52bd941b8ef6eaeb818100a33b9427",
+    "src/stores/log-tools.ts": "859561255191ac848ac74e7bf1eacfd25644efa1ddad4e8a29415d89e2540d25",
+    "tests/call-history-page-migration.test.ts": "3e6052af2026e8d22374884f4fa9da9f882117f4517cb0ea70bf7a7d90b4f960",
+    "tests/log-tools-ui.test.ts": "8d985436b7ec35e89cfd8009c8fad8111b3ed562d3475af94c909a55758d21ab",
+    "tests/log-tools-adapter.test.ts": "068aee6d0c0d36bdfa88bbb5898be78737b8735db9a79a1216ad54f3742c5f57"
+  },
+  "contractComparison": [
+    {
+      "feature": "call pages",
+      "legacy": "GET limit=50; status=failed optional; before exclusive server cursor",
+      "vue": "same endpoint, query shape and actual decoder; full DOM event path verified"
+    },
+    {
+      "feature": "call detail",
+      "legacy": "escaped text summaries, status label, preserves opened same-ID details",
+      "vue": "summaries escaped; same-key opened detail retained in actual page append; raw status label difference reported for root fix"
+    },
+    {
+      "feature": "clear logs",
+      "legacy": "DELETE /api/logs with selected projectId repeated; text/source/level do not scope deletion",
+      "vue": "same contract, explicit frozen confirmation; stale filter/identity invalidation, unknown-delivery lock; existing isolated tests reviewed, not rerun by this unit"
+    },
+    {
+      "feature": "diagnostic",
+      "legacy": "POST /api/projects/id/diagnostic; log project then last preview then first project",
+      "vue": "same target priority/POST; source-bound receipt, escaped/redacted result and local save; existing isolated UI/adapter tests reviewed, not rerun by this unit"
+    }
+  ]
+}

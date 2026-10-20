@@ -1,0 +1,64 @@
+{
+  "atUtc": "2026-10-20T07:25:25.510342+00:00",
+  "scope": "Vue migration: history/log page contracts and isolated interactions",
+  "newScenarios": [
+    {
+      "name": "Vue history page migration at the real 50-row boundary; isolated transport renders 51 records as 50 then 1, expands genuine response fields, preserves opened detail, and stops at the end",
+      "status": "passed",
+      "evidence": "first-attempt"
+    },
+    {
+      "name": "Vue history page migration at the real 50-row boundary; isolated transport uses the actual failed filter event, blocks duplicate append, and renders all 66 failures across two pages",
+      "status": "passed",
+      "evidence": "followup"
+    },
+    {
+      "name": "Vue history page migration at the real 50-row boundary; isolated transport retains the first page after append error and the retry button sends the same server cursor without duplication",
+      "status": "passed",
+      "evidence": "first-attempt"
+    },
+    {
+      "name": "Vue history page migration at the real 50-row boundary; isolated transport discards an older append after a filter change rather than mixing success records into failed-only results",
+      "status": "passed",
+      "evidence": "followup"
+    }
+  ],
+  "newScenariosPassed": 4,
+  "attempts": {
+    "first": {
+      "passed": 2,
+      "testSelectorFailures": 2
+    },
+    "followup": {
+      "passed": 2,
+      "earlierPassedNotRepeated": 2
+    }
+  },
+  "sourceChangesByThisUnit": 0,
+  "newTestFiles": [
+    "tests/call-history-page-migration.test.ts"
+  ],
+  "newSourceDefectReportedToRoot": {
+    "file": "src/views/CompanionBrowserView.vue",
+    "lineAtAudit": 159,
+    "difference": "raw English status instead of old Chinese label",
+    "owner": "root"
+  },
+  "productionToolCalls": 0,
+  "productionHistoryWrites": 0,
+  "productionLogDeletes": 0,
+  "desktopActions": 0,
+  "serviceActions": 0,
+  "migrationConclusion": {
+    "10": "Vue log-tools contract covered by existing isolated confirmation/error/receipt tests and exact old endpoint comparison; no requirement to delete production logs",
+    "11": "Vue page migration isolated pagination/detail/filter/retry/stale-read coverage passed; no natural >=51 history required for this conclusion"
+  },
+  "integrationEvidenceBoundary": {
+    "naturalSecondPage": "not run: previous real snapshot 19 records; independent production integration evidence gap, not frontend migration blocker",
+    "naturalFailedDetails": "previous actual deployed UI verification retained; not repeated"
+  },
+  "notes": [
+    "First two filter failures were test selector mismatches; no product defect inferred",
+    "No full-suite rerun; parent may run affected view tests after its status label change"
+  ]
+}

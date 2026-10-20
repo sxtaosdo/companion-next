@@ -1,0 +1,8 @@
+{
+  "contract-audit.json": "b733193c73220e7cb0dd28cca69e42d47157f8352324b1072325b21ca7f1c071",
+  "finalize.py": "2d01783c59ebf30fe8263a062759236cfe658862731a97abf163edef2294075f",
+  "fix-selector.py": "94b90598200260c9fc49541f40d94ac2dfcad2ce028eeb6992affc06a25668eb",
+  "result.json": "604ece6b7fd8381fc6008b5fb803b1f8bd6f26dba2bd0b3d911ece3c30445705",
+  "vitest-filter-followup.json": "362ebe20d320a9f908e9f48dddde1f8530190861bf474774d2cfce5be6897ce2",
+  "vitest-first-attempt.json": "b25bb6c560d31af4512871d5c1ed2ddaeba196a8947c1585bda1c36bbbf91729"
+}

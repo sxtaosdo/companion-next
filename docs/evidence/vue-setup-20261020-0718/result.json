@@ -1,0 +1,101 @@
+{
+  "atUtc": "2026-10-20T07:26:50.603633+00:00",
+  "scope": "Vue registration/setup UI migration; inherited host execution and external client sessions are independent integration evidence",
+  "legacyReadOnlySources": {
+    "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\src\\app.ts": "ff22b00dcc31213d810b2a63daba4263f9e424d803590b6b0d2c8c63f6b09be6",
+    "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\index.html": "009de5fa040e53c3893921ae95a980578ccff90c210af3ef34961f3ede0abdd9"
+  },
+  "legacyBindings": {
+    "registration": {
+      "sourceLines": "2451-2487",
+      "path": "/api/projects/{projectId}/mcp/register",
+      "method": "POST",
+      "bodyKeys": [
+        "target"
+      ],
+      "resultFields": [
+        "name",
+        "changed",
+        "command",
+        "args",
+        "configPath"
+      ],
+      "allFiveTargetsPreserved": true
+    },
+    "setup": {
+      "sourceLines": "377-415, 3180-3247",
+      "legacyPath": "/api/setup",
+      "bodyFields": [
+        "projectId or projectPath",
+        "startCreator",
+        "configureCodex"
+      ],
+      "vueStrictOptionsRoute": "/api/setup/options-v1",
+      "strictOptionsAcceptedAsExistingApprovedHostContract": true
+    },
+    "completion": {
+      "htmlLines": "424-434",
+      "usageControls": [
+        "readonly prompt",
+        "wrap toggle",
+        "copy",
+        "close"
+      ],
+      "vueControlsPreserved": true
+    }
+  },
+  "vueDefect": {
+    "trigger": "Cancel a draft path for project A, then open installation from registered project B card",
+    "before": "Step 1 retained project A path while installation selection targeted B",
+    "after": "A known explicit card ID binds both path and selected project; absent ID opens nothing; empty add entry preserves existing cancelled draft behavior",
+    "unknownIdNeverFallsBack": true
+  },
+  "changedFiles": {
+    "src/components/ProjectSetupWizard.vue": "f50039a532ab95f0dd15b0c907f409116fc2ec072d067d6f47ab6340d8d6c018",
+    "tests/project-setup-ui.test.ts": "eb100cb6f83f39fe1d5e7e36a95b9d7a8033fe070ee08de8457ab485bc8bb2bc"
+  },
+  "beforeRegression": {
+    "exitCode": 1,
+    "failedNewTests": 2
+  },
+  "afterRegression": {
+    "exitCode": 0,
+    "passedTests": 66,
+    "failedTests": 0,
+    "files": [
+      {
+        "file": "D:/code/shidai3/P8000/companion-next/tests/project-directory.test.ts",
+        "passed": 22
+      },
+      {
+        "file": "D:/code/shidai3/P8000/companion-next/tests/project-setup-ui.test.ts",
+        "passed": 44
+      }
+    ]
+  },
+  "migrationAssessment": {
+    "5": {
+      "vueContract": "passed for reviewed flows",
+      "evidence": "Four 00/10/01/11 strict-option UI cases in the affected full UI test file verify confirmation, exact flags, accepted task status/completion and conditional usage. Cancel/unknown/no-replay/failed receipt and native directory late-result cases remain covered.",
+      "productionIntegration": "01/11 not executed; host writer defects and Creator operation restrictions do not invalidate isolated Vue migration evidence."
+    },
+    "13": {
+      "reviewedSubscope": "Setup completion usage retains old prompt, wrap/copy and close controls. External Cursor start, real Agent call and quota are outside Vue migration gate.",
+      "wholeCliUseAssessment": "Root should combine existing CliUseDialog/handoff evidence; this unit did not modify or invoke external handoff."
+    },
+    "14": {
+      "vueContract": "Five client choices, exact target/project binding, explicit confirmation, serial batch/cancel/unknown guards and source-bound receipts are retained. Existing test contract/source audit covers these; no new external client execution is required to prove the chooser migration.",
+      "productionIntegration": "Host writer regression is tracked independently; this unit did not change it or run registration POST."
+    }
+  },
+  "productionActions": {
+    "registrationPosts": 0,
+    "setupPosts": 0,
+    "configurationWrites": 0,
+    "creatorOrModelActions": 0,
+    "externalClientActions": 0,
+    "oldHostWrites": 0
+  },
+  "deployed": false,
+  "gitCommittedByThisUnit": false
+}

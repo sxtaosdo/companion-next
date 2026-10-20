@@ -1,4 +1,4 @@
-import type { CallLatest } from './companion-browser'
+import type { CallLatest, CallStatus } from './companion-browser'
 /** Original call-meta relative display; invalid data is never an invented duration. */
 export function formatCallAge(at:string,now=Date.now()):string {
  const time=Date.parse(at);if(!Number.isFinite(time))return '时间未记录'
@@ -14,4 +14,9 @@ export function formatProjectCallMeta(call:CallLatest|undefined,now=Date.now()):
  if(typeof call.durationMs!=='number'||!Number.isFinite(call.durationMs)||call.durationMs<0)return `调用：${call.operationNameZh} 耗时未记录 · ${formatCallAge(call.startedAt,now)}开始`
  const duration=Math.floor(call.durationMs),finished=new Date(start+duration)
  return `调用：${call.operationNameZh} ${duration}ms ${Number.isFinite(finished.getTime())?formatCallAge(finished.toISOString(),now):'完成时间未记录'}`
+}
+
+/** Keep the original call-history labels without changing the wire status. */
+export function callStatusLabel(status:CallStatus):string {
+ return ({running:'进行中',success:'成功',failed:'失败'} satisfies Record<CallStatus,string>)[status] ?? '未知'
 }

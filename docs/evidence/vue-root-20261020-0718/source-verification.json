@@ -1,0 +1,2834 @@
+{
+  "atUtc": "2026-10-20T07:31:18.502702+00:00",
+  "scope": "Vue pages/interactions/API contracts only; external client/model/host execution separate",
+  "runtimeNodeUnchanged": "v25.2.1",
+  "testNode": "existing Node22.23.3",
+  "typecheckExitCode": 0,
+  "oldHostWriterChangesApplied": false,
+  "cursorActions": 0,
+  "productionBusinessWrites": 0,
+  "review": {
+    "remainingP1P2": 0,
+    "readonly": true,
+    "changedLayers": [
+      "Vue component state",
+      "display-only status formatter",
+      "help navigation",
+      "scope wording"
+    ]
+  },
+  "tests": {
+    "root-tests.json": {
+      "rawReportSha256": "bb41f04e86b1a4e9519c234dd58b257806237af7e143c43f525e8a1850b1daf4",
+      "total": 627,
+      "passed": 627,
+      "failed": 0,
+      "pending": 0,
+      "suites": [
+        {
+          "name": "ai-job-actions-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "old-task buttons and per-action consent is passive on mount and never enables confirm before checking the frozen scope",
+              "status": "passed"
+            },
+            {
+              "title": "old-task buttons and per-action consent accepts dispatch once, explicitly refreshes the same job and never claims completion",
+              "status": "passed"
+            },
+            {
+              "title": "old-task buttons and per-action consent resets confirmation on project-path or stage-operation-list change",
+              "status": "passed"
+            },
+            {
+              "title": "old-task buttons and per-action consent keeps resume distinct from generation and still requires approval",
+              "status": "passed"
+            },
+            {
+              "title": "old-task buttons and per-action consent leaves missing-mode/offline generation unavailable without hiding historical detail",
+              "status": "passed"
+            },
+            {
+              "title": "old-task buttons and per-action consent does not enable selection based on hash-only metadata without displayed verified bytes",
+              "status": "passed"
+            },
+            {
+              "title": "old-task buttons and per-action consent retains only original import/default/custom export buttons at the import stage",
+              "status": "passed"
+            },
+            {
+              "title": "old-task buttons and per-action consent unknown import has no retry button and keeps independent effect/lease warning",
+              "status": "passed"
+            },
+            {
+              "title": "old-task buttons and per-action consent does not replay after UNKNOWN or clear its marker on unmount",
+              "status": "passed"
+            },
+            {
+              "title": "stage changes during an outstanding read drain revokes captured approval before fence or dispatch without losing original job",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "ai-reference-upload-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "reference upload uses local canvas and original separate approvals previews locally in a readonly build with no remote image URL or request and discloses retained original metadata",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals requires separate confirmation and adds a valid receipt only to the existing configuration draft",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals removing an uploaded reference updates its actual membership and requires explicit reattachment",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals discarding and reopening the form preserves the receipt without claiming its path is still in the new draft",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals changing the selected file or any draft field withdraws upload approval",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals a failed bitmap decode removes the prior preview and leaves no uploadable selection",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals requires actual canvas capability before the UI permits uploading",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals does not fall back to external or data URLs when bitmap support is missing",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals closing during decode rejects its late preview and closes the bitmap",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals withdraws authority when upload provider is removed after a local preview",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals keeps an unknown receipt fenced and cannot resend the same original after reselecting it",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals blocks configuration saving while an upload is unresolved",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals refuses a fifth reference without uploading or silently dropping an existing path",
+              "status": "passed"
+            },
+            {
+              "title": "reference upload uses local canvas and original separate approvals clearing a local selection never uploads or clears an already persisted operation record",
+              "status": "passed"
+            },
+            {
+              "title": "upload registration retains the separate edit-build boundary does not allow edit capability on production",
+              "status": "passed"
+            },
+            {
+              "title": "upload registration retains the separate edit-build boundary does not allow edit capability on companion-readonly",
+              "status": "passed"
+            },
+            {
+              "title": "upload registration retains the separate edit-build boundary does not allow edit capability on development",
+              "status": "passed"
+            },
+            {
+              "title": "upload registration retains the separate edit-build boundary does not allow edit capability on test",
+              "status": "passed"
+            },
+            {
+              "title": "upload registration retains the separate edit-build boundary registration is passive and does not send a request or approve a selected image",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "ai-resource-editor-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "shared original AI configuration editor opens the same form in preview mode without automatic requests or approval",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor keeps engine design fields readonly, shows full frozen hash and resets approval on every edit",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor requires individual approval and only reports validated original service receipt as saved",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor refuses malformed fields even if approval is requested",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor new missing configuration can be authored when engine design is unknown",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor closing dirty form requires explicit discard and never writes",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor unknown response never becomes success and same-hash readback cannot clear the fence or resend",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor matching readback is labelled observation and adoption needs another explicit checkbox",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor keeps unsaved draft but disables saved target after context changes",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor keeps unsaved draft but disables saved target after reader changes",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor keeps unsaved draft but disables saved target after writer changes",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor restores retained draft after leaving and returning to the exact original binding",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor can inspect retained old draft under another project without granting save authority",
+              "status": "passed"
+            },
+            {
+              "title": "shared original AI configuration editor unregistering a writer during save retains unknown protection and ignores late success",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts never authorizes save registration in production",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts never authorizes save registration in companion-readonly",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts never authorizes save registration in test",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts never authorizes save registration in development",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts rejects nonexact host 0",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts rejects nonexact host 1",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts rejects nonexact host 2",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts rejects nonexact host 3",
+              "status": "passed"
+            },
+            {
+              "title": "write build is separate from existing readonly/static/Picker hosts requires explicit edit build but does not treat it as runtime authentication or issue requests",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "ai-resource-read-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "AI original resource read page keeps config reading but disables preview in config-only profile",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page does not auto-query on mount or project selection",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page requires real registered directory and host before read",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page shows saved single size, style and destination separately from unpersisted draft",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page missing config never appears as a saved default",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page retains saved config on engine-resolution invalidity, clearly displays issue",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page only explicit reference click requests preview and failure preserves config",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page clear/cancel does not issue mutation or automatic reload",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page discards pending config after project change",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page discards pending config after directory change",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page discards pending config after provider change",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page discards pending config after unmount change",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page path replacement invalidates the old registration until explicit reselection; identical refresh preserves it",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page registered-source replacement with same ids clears result without querying replacement",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page read failure is unknown, not missing config or success-empty",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page shows only checked PNG bytes, then drops preview when browser rejects display",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page rejects mismatched PNG hash rather than treating it as verified reference",
+              "status": "passed"
+            },
+            {
+              "title": "AI original resource read page preserves legacy multi-size metadata and disables unsafe legacy reference with explanation",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "ai-task-creation-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "compact original single-icon creation UI mount, registration and field editing trigger no requests",
+              "status": "passed"
+            },
+            {
+              "title": "compact original single-icon creation UI requires per-form approval and emits only after original status readback",
+              "status": "passed"
+            },
+            {
+              "title": "compact original single-icon creation UI editing or changing project context revokes confirmation without requests",
+              "status": "passed"
+            },
+            {
+              "title": "compact original single-icon creation UI explicitly blocks missing reader cleanup capability while leaving read-only available",
+              "status": "passed"
+            },
+            {
+              "title": "compact original single-icon creation UI does not emit acceptance on a readback failure and offers only original read recovery",
+              "status": "passed"
+            },
+            {
+              "title": "compact original single-icon creation UI a kept-mounted inactive step revokes approval and retains form without any new requests",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "cli-use-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "project-bound CLI text only shows exactly two real text blocks and no auto-network/clipboard handoff",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only copies the full original text even while folded and after wrapping changes",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only clipboard denial or absence never becomes success and never opens another app",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only refuses unsafe metadata rather than modifying or truncating a path",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only invalidates late clipboard notices on project and warns requests cannot be recalled",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only invalidates late clipboard notices on remove and warns requests cannot be recalled",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only invalidates late clipboard notices on source and warns requests cannot be recalled",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only invalidates late clipboard notices on close and warns requests cannot be recalled",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only blocks overlapping clipboard writes while an older target is unresolved",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only retains dialog for identical refreshed metadata but closes when a registered target changes",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only opens CLI only for real registered projects and clears it on disconnect",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only does not open a different path arriving between the click and next render",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only only opens the last target when A and B are clicked before the next render",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only ignores clipboard resolve after component unmount",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only ignores clipboard reject after component unmount",
+              "status": "passed"
+            },
+            {
+              "title": "project-bound CLI text only renders dangerous metadata as text only and never creates HTML nodes from it",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "companion-browser-adapter.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "v148 fixed same-origin read contract is passive and exposes only manually invoked reads, with GET and same-origin session credentials",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract projects only verified managed fields and preserves Dashboard timestamp units",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract preserves stopped without converting it into ready",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract preserves launching without converting it into ready",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract preserves bridge-wait without converting it into ready",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract preserves ready without converting it into ready",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract preserves stopping without converting it into ready",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract preserves crashed without converting it into ready",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract preserves incompatible without converting it into ready",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract preserves error without converting it into ready",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract uses unknown for unrecognized or absent runtime state undefined",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract uses unknown for unrecognized or absent runtime state future-state",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract uses unknown for unrecognized or absent runtime state null",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract uses unknown for unrecognized or absent runtime state 42",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract reports missing and orphan statuses without synthesizing registered projects",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract accepts confirmed zero projects and statuses",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract fails the whole project read if registration failed, rather than returning false zeros",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract marks a failed Dashboard read explicitly while keeping confirmed project/status reads",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract rejects malformed mandatory project data 0",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract rejects malformed mandatory project data 1",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract rejects malformed mandatory project data 2",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract rejects malformed mandatory project data 3",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract rejects malformed mandatory project data 4",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract keeps confirmed registrations but marks failed or malformed status reads unknown 0",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract keeps confirmed registrations but marks failed or malformed status reads unknown 1",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract keeps confirmed registrations but marks failed or malformed status reads unknown 2",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract keeps confirmed registrations but marks failed or malformed status reads unknown 3",
+              "status": "passed"
+            },
+            {
+              "title": "v148 fixed same-origin read contract redacts common credential forms from displayed backend status errors",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics sends repeated query values with OR semantics, deduplicates, and encodes literal text",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics retains DebugEvent identifiers, excludes arbitrary remote fields, and safely normalizes unknown source/level",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics filters normalized unknown sources client-side from a bounded broad query",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 0",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 1",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 2",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 3",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 4",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 5",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 6",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 7",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 8",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 9",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects invalid log query before fetch 10",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects malformed log data 0",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects malformed log data 1",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects malformed log data 2",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics rejects malformed log data 3",
+              "status": "passed"
+            },
+            {
+              "title": "v148 bounded logs and filter semantics applies OR within facets and AND across facets with case-insensitive literal search",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract preserves backend session/count/latest and ignores arbitrary fields",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract requests fixed 50-record failed pages and preserves total versus retained versus records",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract preserves an explicitly confirmed empty call session",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects inconsistent or unsafe count envelopes 0",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects inconsistent or unsafe count envelopes 1",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects inconsistent or unsafe count envelopes 2",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects inconsistent or unsafe count envelopes 3",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects inconsistent or unsafe count envelopes 4",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects inconsistent or unsafe count envelopes 5",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects inconsistent or unsafe count envelopes 6",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 0",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 1",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 2",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 3",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 4",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 5",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 6",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 7",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 8",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 9",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 10",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 11",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects malformed or cross-project pages 12",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects records violating the requested failed or before filter",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects unsafe project ID ../p1 without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects unsafe project ID https://private without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects unsafe project ID p1/other without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects unsafe project ID p1?token=SECRET without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects unsafe project ID  without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects unsafe project ID ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects invalid pagination 0 without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects invalid pagination -1 without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects invalid pagination NaN without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects invalid pagination Infinity without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects invalid pagination 1.5 without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract rejects invalid pagination 9007199254740992 without network access",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract snapshots call query options so later caller mutation cannot reinterpret the response",
+              "status": "passed"
+            },
+            {
+              "title": "v148 call session/count/retention/page contract merges newest first, deduplicates, and never lets stale running replace completed calls",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures never reads or echoes HTTP 401 error bodies",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures never reads or echoes HTTP 403 error bodies",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures never reads or echoes HTTP 500 error bodies",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures does not echo transport exceptions",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects non-JSON, malformed UTF-8 and redirected success responses 0",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects non-JSON, malformed UTF-8 and redirected success responses 1",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects non-JSON, malformed UTF-8 and redirected success responses 2",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects non-JSON, malformed UTF-8 and redirected success responses 3",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects an oversized declared response before reading it",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures enforces the actual byte limit without trusting content-length",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures bounds response chunk count including empty chunks",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures times out an injected fetch that ignores abort",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures times out a body read that never completes and cancels the reader",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures pre-aborted reads make no requests",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures settles explicit cancellation immediately and disposes a late response",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects the entire project result after explicit cancellation even if some reads succeeded",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures bounds concurrent reads but frees the slots synchronously when cancelled for immediate replacement",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects invalid timeout 0 without contacting transport",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects invalid timeout -1 without contacting transport",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects invalid timeout NaN without contacting transport",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects invalid timeout Infinity without contacting transport",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures rejects invalid timeout 10001 without contacting transport",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures requires explicit transport injection",
+              "status": "passed"
+            },
+            {
+              "title": "bounded transport and safe failures does not accept caller URL/header/token overrides at runtime",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "companion-browser-store.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "Companion read store; no mutation provider starts unknown, then reads projects and counts only after explicit connect",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider clears data rather than showing zero healthy projects when required project reads fail",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider preserves explicit Dashboard failure warning without losing valid project/status reads",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider does not let old project reads overwrite a replacement provider",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider invalidates pending log results immediately on filters, including A→B→A",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider keeps empty read separate from never-read and treats errors as unknown",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider freezes query input, then cancels and ignores reads after leaving the page",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider preserves failed counts as unknown without breaking independent project reads",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider reads fixed-context pages and append uses only the server cursor",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider refuses double load-more and rejects late pages after A→B→A context changes",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider invalidates old pages on new counts session without accepting stale records",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider rejects older-session counts that arrive after a new call-page session",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider does not adopt an old cursor page as a first page after session changed",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider clears invalid selected project and pending calls when registry removes it",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider does not continue a connect with counts after synchronous cancellation at project completion",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read store; no mutation provider ignores all late results after disconnect and never launches a request by itself",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "companion-browser-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "Companion read UI and host identity does not steal slash from the CLI dialog button",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity leaves slash with any visible modal and restores it after that modal closes",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity does not let a hidden dialog or modifier keys break ordinary slash search",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity restores both local filters from the no-match empty action without any extra reads",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity opens only the existing setup dialog from a verified empty registry and respects the lane",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity does not label a failed or unconnected read as an empty registered workspace",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity ticks recent-call milliseconds locally, pauses when hidden and cleans up on unmount",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity binds Dashboard tooltip data to its project without extra reads or permanent details",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity labels passive connection as unprobed and keeps its explanation in a tooltip",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity preserves opened-first ordering without treating missing or unknown state as opened",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity normalizes Windows display paths without changing POSIX case identity",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity registers only an explicit read build on the exact local host, never inferred from Picker path",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity does not fetch, embed the old UI or show fictitious zero counts on entry",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity reads only after explicit connect and leaves missing runtime and counts unknown",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity opens tools help for the exact project without extra project or call reads",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity opens calls for the explicit project, shows empty only after actual response and never replays",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity opens the exact project history from its recent-call summary without replaying",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity retains the original Chinese history statuses while preserving wire values and readonly expansion",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity retains actual call pagination while moving capacity limits into an accessible tip",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity keeps logs manual and invalidates old display after filter changes",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity keeps manual-refresh logs mounted and preserves bottom following=true",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity keeps manual-refresh logs mounted and preserves bottom following=false",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity checks provider identity immediately after returning from another route",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity disconnects on composition-root changes and cancels pending reads on unmount",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity requires a second explicit action for realtime and cleans it up on unmount",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity pauses only live logs through the visible controls",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity obeys document visibility and detaches old-provider subscriptions",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity shows each Dashboard informational notice once per connection, not on every poll",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity keeps important read failures persistently visible in compact form with full tooltip details",
+              "status": "passed"
+            },
+            {
+              "title": "Companion read UI and host identity retains actual connection errors instead of reducing them to transient success notices",
+              "status": "passed"
+            },
+            {
+              "title": "normal workspace explicit log filter reads queries edited filters with live paused=false without dispatching Creator",
+              "status": "passed"
+            },
+            {
+              "title": "normal workspace explicit log filter reads queries edited filters with live paused=true without dispatching Creator",
+              "status": "passed"
+            },
+            {
+              "title": "normal workspace explicit log filter reads does not auto-query outside normal visible log workspace: /projects",
+              "status": "passed"
+            },
+            {
+              "title": "normal workspace explicit log filter reads does not auto-query outside normal visible log workspace: /projects?tab=calls",
+              "status": "passed"
+            },
+            {
+              "title": "normal workspace explicit log filter reads does not auto-query outside normal visible log workspace: passive",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "companion-live-store.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle suspends page reads idempotently, preserves intent and resumes one stream and poll",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle keeps explicit stop while away and rejects a replaced event provider before return",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle does not reset exhausted event failures during navigation suspension",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle does not subscribe until both read connection and explicit realtime action",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle polls serially with a full interval after completion and coalesces manual refresh while busy",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle closes and cancels on hide, rejects late events and resumes with a new snapshot",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle can enable while hidden without starting either transport",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle invalidates callbacks and timers on stop",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle invalidates callbacks and timers on disconnect",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle invalidates callbacks and timers on leave",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle invalidates callbacks and timers on replace",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle failure of required project read closes realtime and clears stale state",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle reconciles counts and selected first page on open, ignoring repeated open callbacks",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle does not start follow-on calls after closing during open reconciliation",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle backs off 1/2/4 seconds then stops after three retries while project polling remains independent",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle does not retry protocol failure invalid-frame",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle does not retry protocol failure frame-too-large",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle has an opening deadline and safely handles synchronous subscriber exceptions",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle handles synchronous failure callbacks before subscribe returns",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle coalesces bursts of log hints and serializes hints arriving during pending read",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle pause only stops live logs; resume catches up once and manual read remains allowed",
+              "status": "passed"
+            },
+            {
+              "title": "visible Companion polling and bounded SSE lifecycle filter changes cancel old logs then refresh only the current filters",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation updates total and terminal detail without lowering either after late running snapshots",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation never lowers live total after a concurrent counts failure and stale call snapshot",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation keeps latest unknown when old completion 4 reveals a missing newer begin",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation keeps latest unknown when old completion 5 reveals a missing newer begin",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation does not restore an old HTTP latest when a newer live total has no known latest",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation does not let an older terminal record replace a known latest",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation clears counts, details and cursor on event session change; ignores pending old snapshots",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation invalidates old stream immediately when HTTP first confirms a new session",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation failed-only skips running/success yet accepts failed terminal and never invents retained count",
+              "status": "passed"
+            },
+            {
+              "title": "live call / snapshot reconciliation does not accumulate unknown-project maps and caps retained detail at 1000",
+              "status": "passed"
+            },
+            {
+              "title": "cross-project navigation during paused reconnect discards old log reads and stream callbacks, then reconciles only current project after return",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "companion-network-recovery-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "lets the original stop button cancel automatic recovery while the read connection is unknown",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "creator-project-poll-pause.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "confirmation pauses only scheduled project polling removes an already queued immediate poll without touching live events, counts or logs",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling pauses a queued ordinary poll and resumes once after the full ordinary interval",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling never cancels a manual read, and manual refresh remains available during the pause",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling lets an in-flight scheduled read finish but never schedules a hidden successor while paused",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling does not multiply timers through repeated pause/resume or a pending poll completion",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling unpausing while hidden does not restart reads; visibility restores normal polling",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling remaining paused across hide/show keeps project reads stopped and resumes events",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling cannot restart polling after stop",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling cannot restart polling after leave",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling cannot restart polling after disconnect",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling preserves a live confirmation pause across a realtime restart without accumulating timers",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling disconnect resets the temporary pause and an explicit fresh live session can poll normally",
+              "status": "passed"
+            },
+            {
+              "title": "confirmation pauses only scheduled project polling stale in-flight callbacks cannot resurrect polling after stop and pause release",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "knowledge-agent-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "original Agent selector/form and in-memory conversation UI is inert on mount/connect and lists only on explicit original action",
+              "status": "passed"
+            },
+            {
+              "title": "original Agent selector/form and in-memory conversation UI sends first/continuation from original form; new conversation clears answer without API",
+              "status": "passed"
+            },
+            {
+              "title": "original Agent selector/form and in-memory conversation UI Agent selection separates session and ignores unrelated selected KB",
+              "status": "passed"
+            },
+            {
+              "title": "original Agent selector/form and in-memory conversation UI refresh failure clears old selector and does not turn into a model permission conclusion",
+              "status": "passed"
+            },
+            {
+              "title": "original Agent selector/form and in-memory conversation UI original authentication missing gates ask/list without model probes",
+              "status": "passed"
+            },
+            {
+              "title": "original Agent selector/form and in-memory conversation UI original authentication denied gates ask/list without model probes",
+              "status": "passed"
+            },
+            {
+              "title": "original Agent selector/form and in-memory conversation UI CHAT_UNAVAILABLE is a fixed unknown message and does not change retrieval status",
+              "status": "passed"
+            },
+            {
+              "title": "original Agent selector/form and in-memory conversation UI stopping is UNKNOWN; remount does not replay/adopt late reply",
+              "status": "passed"
+            },
+            {
+              "title": "original Agent selector/form and in-memory conversation UI sync lease blocks original form including forced submit",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "knowledge-conversation-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "knowledge conversation build separation never registers send in production",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation never registers send in development",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation never registers send in test",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation never registers send in companion-readonly",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation never registers send in companion-config-editor",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation rejects nonexact local transport 0",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation rejects nonexact local transport 1",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation rejects nonexact local transport 2",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation rejects nonexact local transport 3",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation build separation keeps chat separate from config and read modes and registration passive",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI does not auto-send on registration, mount, connect or typing",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI explains missing send build while keeping typed draft",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI requires preview then a separate checkbox before every exact send",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI invalidates checked preview when question changes",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI does not infer a default knowledge target when status was not read",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI keeps new typing made while waiting for an answer",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI consumes confirmation once and blocks duplicate click while pending",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI requires explicit new session and preserves prior records without server deletion",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI retains old session on unknown and never auto-retries or changes read authentication",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI cancellation marks unknown, retains input, and waits for underlying settlement",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI switching KB detaches an in-flight answer and never adopts its session",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI source replacement invalidates confirmation and does not auto-send new provider",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI local project identity changes invalidate preview without sending project data",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI registered overview target changes invalidate confirmation without attaching project data",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI registered project changes detach late answers without adopting old session",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI a same-source status refresh preserves UNKNOWN and old session (explicit KB=false)",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI a same-source status refresh preserves UNKNOWN and old session (explicit KB=true)",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI refreshing read status does not cancel an in-flight answer in the same scope",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI failed default-KB status refresh suspends sending without forgetting the previous session",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI renders HTML and URL-like references only as inert text",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI does not call a successful but empty answer proof of problem solved",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge conversation explicit per-send UI unmount preserves the question and unknown record but rejects late reply",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "knowledge-sync-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "original collapsed sync controls is collapsed and inert on mount; connecting loads only status",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls uses source/channel and this sources flags, never retrieval auth or another approved source",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls missing approved remains unknown and denies execution",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls missing enabled remains unknown and denies execution",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls missing writerReady remains unknown and denies execution",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls global writer false disables run but leaves independent dryrun",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls shows queued receipt and keeps ledger as last snapshot until explicit refresh",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls shows precise policy rejection without arbitrary diagnostics",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls bad run receipt is UNKNOWN and cannot be retried by switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls stopping only aborts waiting; old underlying lease blocks new requests until settle",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls disconnect detaches old source and ignores late success",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls retains UNKNOWN barrier when the panel unmounts and remounts in the same session",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls blocks prepared chat send and new prepare while sync owns transport",
+              "status": "passed"
+            },
+            {
+              "title": "original collapsed sync controls provider replacement and source-status drift discard old plan and current success message",
+              "status": "passed"
+            },
+            {
+              "title": "Agent and sync shared pending lane blocks both sync actions during an Agent request and never replays them on release",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "local-service-operations-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "service controls build boundary denies operation registration in production",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies operation registration in development",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies operation registration in test",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies operation registration in companion-readonly",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies operation registration in companion-config-editor",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies operation registration in companion-knowledge-chat",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies nonexact transport 0",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies nonexact transport 1",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies nonexact transport 2",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary denies nonexact transport 3",
+              "status": "passed"
+            },
+            {
+              "title": "service controls build boundary permits only the exact workspace host and registration is passive",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection restores the original knowledge-only external link after explicit running/unframeable state",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection keeps the fallback link absent for stopped, frameable or unknown knowledge state 0",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection keeps the fallback link absent for stopped, frameable or unknown knowledge state 1",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection keeps the fallback link absent for stopped, frameable or unknown knowledge state 2",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection restores the fixed original knowledge iframe only after explicit running/frameable status",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection detaches the knowledge iframe during refresh, failed reads and provider changes",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection does not carry a running knowledge iframe into model navigation or service UNKNOWN",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection never embeds without a write host when modelsOnly=true",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection never embeds without a write host when modelsOnly=false",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection does not turn the old model iframe into a new external-link capability",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection removes the old link during refresh and on failed reads, without retaining success",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection invalidates the link on source and route changes without executing the link or operations",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection does not probe, use CLI, run operations or create iframe/links on mount",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection explains absent capability and does not silently use read-only builds",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection reads just the two service-status capability endpoints on explicit request",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection needs separate confirmation for every 知识库服务 close",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection needs separate confirmation for every 模型启动器 close",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection shows only model controls on model tab and gives precise launcher warning",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection invalidates a checked confirmation on route, project or provider changes",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection invalidates a checked confirmation on read source or modelsOnly changes",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection blocks rapid double confirmation and another service while pending",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection keeps UNKNOWN after status refresh; no retry and no successful late receipt",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection does not echo backend errors or render URLs/HTML as actions",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection keeps backend reported failure distinct from unknown",
+              "status": "passed"
+            },
+            {
+              "title": "explicit service-control UI and source protection leaving cannot turn a late reply into current success",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge start UI retains original flow with explicit side-effect review shows a real start only after explicit unreachable status and confirms the original script",
+              "status": "passed"
+            },
+            {
+              "title": "knowledge start UI retains original flow with explicit side-effect review restores model start after explicitly unreachable launcher state",
+              "status": "passed"
+            },
+            {
+              "title": "original model page iframe lifecycle reads status on model entry only, embeds the original page and does not dispatch an operation",
+              "status": "passed"
+            },
+            {
+              "title": "original model page iframe lifecycle removes model frame on refresh failure, confirmation and leaving model tab",
+              "status": "passed"
+            },
+            {
+              "title": "original model page iframe lifecycle confirms only one model-start and refreshes status without loading a model",
+              "status": "passed"
+            },
+            {
+              "title": "serial model entry probe during source/tab changes waits for the previous read and probes only the latest source context once",
+              "status": "passed"
+            },
+            {
+              "title": "serial model entry probe during source/tab changes waits for the previous read and probes only the latest tab context once",
+              "status": "passed"
+            },
+            {
+              "title": "serial model entry probe during source/tab changes drops a queued entry probe on unmount instead of starting a detached request",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "log-tools-ui.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "approved log tool confirmation and source boundaries does not delete before confirmation; scope ignores message filters and clears only selected projects",
+              "status": "passed"
+            },
+            {
+              "title": "approved log tool confirmation and source boundaries retains clear dialog content during its closing transition",
+              "status": "passed"
+            },
+            {
+              "title": "approved log tool confirmation and source boundaries filter change invalidates pending confirmation without deleting",
+              "status": "passed"
+            },
+            {
+              "title": "approved log tool confirmation and source boundaries blocks repeated clear when delivery is unknown and never treats reconnect as proof",
+              "status": "passed"
+            },
+            {
+              "title": "approved log tool confirmation and source boundaries defaults diagnostics to first registered project and renders only escaped text",
+              "status": "passed"
+            },
+            {
+              "title": "approved log tool confirmation and source boundaries source switch aborts and rejects delayed diagnostic from the previous source",
+              "status": "passed"
+            },
+            {
+              "title": "approved log tool confirmation and source boundaries uses same-Pinia lane so other project actions cannot race with confirmation send",
+              "status": "passed"
+            },
+            {
+              "title": "diagnostic target priority prefers explicit log project, then last Preview, then first registration without sending",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "project-call-meta.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "original recent-call age and duration display formats age 59000",
+              "status": "passed"
+            },
+            {
+              "title": "original recent-call age and duration display formats age 60000",
+              "status": "passed"
+            },
+            {
+              "title": "original recent-call age and duration display formats age 3600000",
+              "status": "passed"
+            },
+            {
+              "title": "original recent-call age and duration display formats age 3660000",
+              "status": "passed"
+            },
+            {
+              "title": "original recent-call age and duration display formats age 86400000",
+              "status": "passed"
+            },
+            {
+              "title": "original recent-call age and duration display shows running milliseconds and clamps future start without a request",
+              "status": "passed"
+            },
+            {
+              "title": "original recent-call age and duration display calculates completed age from start plus actual reported duration",
+              "status": "passed"
+            },
+            {
+              "title": "original recent-call age and duration display does not invent zero duration when it was not recorded",
+              "status": "passed"
+            },
+            {
+              "title": "original recent-call age and duration display handles unavailable and out-of-calendar data without throwing",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "project-connections.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "exact legacy client and setup-scope transport sends only approved original target codex and validates its matching receipt",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport sends only approved original target cursor and validates its matching receipt",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport sends only approved original target trae and validates its matching receipt",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport sends only approved original target kiro and validates its matching receipt",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport sends only approved original target vscode and validates its matching receipt",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport accepts the exact repaired Windows Node receipt for codex",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport accepts the exact repaired Windows Node receipt for cursor",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport accepts native Windows separators and an unchanged Node registration receipt",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects a mismatched Node registration receipt without retry: {\"command\":\"C:/Windows/cmd.exe\"}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects a mismatched Node registration receipt without retry: {\"command\":\"node\"}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects a mismatched Node registration receipt without retry: {\"args\":[\"D:/Companion/arbitrary.js\",\"mcp\",\"--project\",\"0123456789abcdef\"]}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects a mismatched Node registration receipt without retry: {\"args\":[\"creator-ai.js\",\"mcp\",\"--project\",\"0123456789abcdef\"]}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects a mismatched Node registration receipt without retry: {\"args\":[\"D:/Companion/../creator-ai.js\",\"mcp\",\"--project\",\"0123456789abcdef\"]}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects a mismatched Node registration receipt without retry: {\"args\":[\"D:/Companion/creator-ai.js\",\"mcp\",\"--project\",\"fedcba9876543210\"]}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects a mismatched Node registration receipt without retry: {\"args\":[\"D:/Companion/creator-ai.js\",\"mcp\",\"--project\",\"0123456789abcdef\",\"--extra\"]}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects a mismatched Node registration receipt without retry: {\"args\":[\"D:/Companion/creator-ai.js\",\"mcp\",\"--project\",\"0123456789abcdef\\n\"]}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport uses the original completed setup link, never a plain unbound assignment",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects non-contract input without dispatch: {\"kind\":\"client\",\"projectId\":\"0123456789abcdef\",\"target\":\"other\"}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects non-contract input without dispatch: {\"kind\":\"client\",\"projectId\":\"0123456789abcdef\",\"target\":\"codex\",\"codexPath\":\"x\"}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects non-contract input without dispatch: {\"kind\":\"client\",\"projectId\":\"../bad\",\"target\":\"codex\"}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects non-contract input without dispatch: {\"kind\":\"setup-scope\",\"projectId\":\"0123456789abcdef\",\"setupOperationId\":\"bad\",\"preset\":{\"id\":\"core\",\"name\":\"核心工具\",\"baseProfile\":\"core\",\"enabled\":[],\"disabled\":[],\"builtIn\":true,\"updatedAt\":\"1970-01-01T00:00:00.000Z\"}}",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects mismatched project receipt as uncertain",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects mismatched target receipt as uncertain",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects mismatched args receipt as uncertain",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport rejects mismatched shape receipt as uncertain",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport redacts returned credential-shaped text and renders no server HTML",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport distinguishes original authorization rejection from unknown failure",
+              "status": "passed"
+            },
+            {
+              "title": "exact legacy client and setup-scope transport retains physical cleanup after logical abort and blocks another dispatch",
+              "status": "passed"
+            },
+            {
+              "title": "source-bound explicit confirmation and serial batch never writes before confirmation and sends a frozen ordered batch only once",
+              "status": "passed"
+            },
+            {
+              "title": "source-bound explicit confirmation and serial batch stops at first uncertain target, preserves prior acknowledgments, and blocks remount replay",
+              "status": "passed"
+            },
+            {
+              "title": "source-bound explicit confirmation and serial batch cancels pending batch on source without dispatching later targets",
+              "status": "passed"
+            },
+            {
+              "title": "source-bound explicit confirmation and serial batch cancels pending batch on identity without dispatching later targets",
+              "status": "passed"
+            },
+            {
+              "title": "source-bound explicit confirmation and serial batch cancels pending batch on owner-close without dispatching later targets",
+              "status": "passed"
+            },
+            {
+              "title": "source-bound explicit confirmation and serial batch requires the matching current completed setup before scope preparation",
+              "status": "passed"
+            },
+            {
+              "title": "source-bound explicit confirmation and serial batch shares the same lane with existing project actions",
+              "status": "passed"
+            },
+            {
+              "title": "original card and wizard controls opens five client choices without a request and confirms the exact card target",
+              "status": "passed"
+            },
+            {
+              "title": "original card and wizard controls supports full/partial/none wizard selection and skip without POST",
+              "status": "passed"
+            },
+            {
+              "title": "original card and wizard controls loads the current setup scope and writes only after explicit selection/confirmation",
+              "status": "passed"
+            },
+            {
+              "title": "wizard skip belongs to a completed task shows Agent choices again when another setup completes inside the same open wizard",
+              "status": "passed"
+            },
+            {
+              "title": "legacy client refresh guidance retains the original cursor success guidance after an acknowledged registration",
+              "status": "passed"
+            },
+            {
+              "title": "legacy client refresh guidance retains the original trae success guidance after an acknowledged registration",
+              "status": "passed"
+            },
+            {
+              "title": "legacy client refresh guidance retains the original kiro success guidance after an acknowledged registration",
+              "status": "passed"
+            },
+            {
+              "title": "legacy client refresh guidance retains the original vscode success guidance after an acknowledged registration",
+              "status": "passed"
+            },
+            {
+              "title": "legacy client refresh guidance does not attach success guidance to an unknown registration",
+              "status": "passed"
+            },
+            {
+              "title": "client guidance follows only confirmed batch receipts retains the first confirmed client hint after later failure and stops the batch",
+              "status": "passed"
+            },
+            {
+              "title": "client guidance follows only confirmed batch receipts retains the first confirmed client hint after later unknown and stops the batch",
+              "status": "passed"
+            },
+            {
+              "title": "client guidance follows only confirmed batch receipts retains the first confirmed client hint after later mismatched-key and stops the batch",
+              "status": "passed"
+            },
+            {
+              "title": "client guidance follows only confirmed batch receipts retains the first confirmed client hint after later cancel and stops the batch",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "project-setup-completion.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "original completion usage prompt uses original missing-name fallback undefined",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt uses original missing-name fallback ",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt keeps the original valid backend name exactly",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt declines malformed returned MCP identity null",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt declines malformed returned MCP identity 1",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt declines malformed returned MCP identity \" bad\"",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt declines malformed returned MCP identity \"x\\ny\"",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt declines malformed returned MCP identity \"x; run\"",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt declines malformed returned MCP identity \"x<iframe>\"",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt declines malformed returned MCP identity \"x‮\"",
+              "status": "passed"
+            },
+            {
+              "title": "original completion usage prompt declines malformed returned MCP identity \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "project-setup-options.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "strict setup adapter isolated transports uses exclusive route and frozen exact options {\"startCreator\":false,\"configureCodex\":false}",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports uses exclusive route and frozen exact options {\"startCreator\":true,\"configureCodex\":false}",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports uses exclusive route and frozen exact options {\"startCreator\":false,\"configureCodex\":true}",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports uses exclusive route and frozen exact options {\"startCreator\":true,\"configureCodex\":true}",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports does not POST to an old server and never falls back to the legacy endpoint",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports dedicated POST still fails safely if server changes after capability GET",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports rejects unverified 202 version as UNKNOWN",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports rejects unverified 202 flags as UNKNOWN",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports rejects unverified 202 reused as UNKNOWN",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports rejects unverified 202 missing as UNKNOWN",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup adapter isolated transports maps strict conflict to rejected without exposing private diagnostics",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup store immutable approvals completes only matching 202 and GET {\"startCreator\":false,\"configureCodex\":false}",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup store immutable approvals completes only matching 202 and GET {\"startCreator\":true,\"configureCodex\":false}",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup store immutable approvals completes only matching 202 and GET {\"startCreator\":false,\"configureCodex\":true}",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup store immutable approvals completes only matching 202 and GET {\"startCreator\":true,\"configureCodex\":true}",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup store immutable approvals keeps write barrier on mismatched 202 and never retries",
+              "status": "passed"
+            },
+            {
+              "title": "strict setup store immutable approvals cannot treat mismatched complete snapshot as completed or unlock writes",
+              "status": "passed"
+            },
+            {
+              "title": "real adapter to store contract conflict retains UNKNOWN for GET version",
+              "status": "passed"
+            },
+            {
+              "title": "real adapter to store contract conflict retains UNKNOWN for GET invalid-options",
+              "status": "passed"
+            },
+            {
+              "title": "real adapter to store contract conflict retains UNKNOWN for GET missing",
+              "status": "passed"
+            },
+            {
+              "title": "real adapter to store contract conflict retains UNKNOWN for GET different-flags",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "project-setup-recovery.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "failed strict {\"startCreator\":false,\"configureCodex\":true} retains partial-effects warning and requires fresh confirmation for a second POST",
+              "status": "passed"
+            },
+            {
+              "title": "failed strict {\"startCreator\":true,\"configureCodex\":true} retains partial-effects warning and requires fresh confirmation for a second POST",
+              "status": "passed"
+            },
+            {
+              "title": "strict {\"startCreator\":false,\"configureCodex\":true} read failure permits only explicit same-ID GET recovery, never POST replay",
+              "status": "passed"
+            },
+            {
+              "title": "strict {\"startCreator\":true,\"configureCodex\":true} read failure permits only explicit same-ID GET recovery, never POST replay",
+              "status": "passed"
+            },
+            {
+              "title": "unselected step effect {\"startCreator\":false,\"configureCodex\":true} is UNKNOWN and retains write barrier",
+              "status": "passed"
+            },
+            {
+              "title": "unselected step effect {\"startCreator\":true,\"configureCodex\":false} is UNKNOWN and retains write barrier",
+              "status": "passed"
+            },
+            {
+              "title": "complete plus backend error suppresses completion usage and never displays raw error",
+              "status": "passed"
+            },
+            {
+              "title": "invalid MCP identity suppresses usage even after matching strict completion",
+              "status": "passed"
+            },
+            {
+              "title": "strict conflict is rejected with no GET tracking; a fresh approval is required",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "project-setup-store.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only does nothing automatically, requires original reader + writer and fresh registered IDs",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only freezes all project metadata, flags and source labels without freezing browser data",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only requires literal true for installBridge, never backend false-like defaults",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only requires literal true for startCreator, never backend false-like defaults",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only requires literal true for configureCodex, never backend false-like defaults",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only requires literal true for acknowledgeReuse, never backend false-like defaults",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only requires literal true for acknowledgeToolScope, never backend false-like defaults",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only requires an exact one-use preview and true confirmation; registration never starts setup",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only consumes setup permission before provider reentrancy and sends only the frozen registered ID",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after new-path, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after new-project, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after clear, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after manual-read, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after metadata, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after revision, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after reader, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after writer, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after connection, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after reader-label, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only invalidates old approvals after writer-label, including switching away and back",
+              "status": "passed"
+            },
+            {
+              "title": "opaque separately confirmed registration and full setup, fake sources only does not optimistically modify browser registry/status, request tools, or refresh",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup releases rejected only after cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup releases not-dispatched only after cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup keeps an unknown receipt and requires a new original read STARTED after the result",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup accepts a new original read synchronously started by unknown receipt publication",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup does not let a different reader or stale read clear the original-source uncertainty",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup ignores late registration after stop and holds the lease through actual cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup ignores late registration after leave and holds the lease through actual cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup ignores late registration after hidden and holds the lease through actual cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup ignores late registration after reader and holds the lease through actual cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup ignores late registration after writer and holds the lease through actual cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup ignores late registration after reconnect and holds the lease through actual cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "registration uncertainty and actual transport cleanup keeps acknowledged registration and blocks writes after cleanup failure",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup treats 202 as acceptance, polls serial GETs every second, never marks complete optimistically",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup only releases complete after actual terminal transport cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup only releases failed after actual terminal transport cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup allows a failed terminal legitimately lacking projectId while never promising rollback",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup does not infer false-like options, reused, Creator readiness or Codex effects from completion",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup releases explicit setup rejected only after idle and never polls",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup releases explicit setup not-dispatched only after idle and never polls",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup unknown acceptance with invalid operation ID undefined stays locked with no retry path",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup unknown acceptance with invalid operation ID  stays locked with no retry path",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup unknown acceptance with invalid operation ID arbitrary-id stays locked with no retry path",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup unknown acceptance with invalid operation ID 22222222-2222-1222-8222-222222222222 stays locked with no retry path",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup unknown POST cannot be unlocked by fresh read, leave or source reconnection",
+              "status": "passed"
+            },
+            {
+              "title": "accepted setup keeps the shared lease until a matching terminal and cleanup keeps terminal receipt but fails closed when terminal waitForIdle fails",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"id\":\"22222222-2222-4222-8222-222222222222\"}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"id\":\"not-a-uuid\"}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"projectPath\":\"/other/path\"}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"projectPath\":\"/fixture/a/\"}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"projectId\":\"bbbbbbbbbbbbbbbb\"}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"runtime\":{\"projectId\":\"bbbbbbbbbbbbbbbb\",\"state\":\"ready\"}}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"stage\":\"success\"}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"stage\":false}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"startedAt\":\"yesterday\"}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"failureReported\":\"false\"}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs never releases a mismatching or malformed terminal: {\"bridge\":{\"status\":false,\"version\":\"1\",\"targetPath\":\"/fixture/a/extensions\"}}",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs pauses on GET failure and explicitly retries only the same operation GET",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs keeps no overlapping HTTP calls through pause/late GET/actual cleanup and ignores a late terminal",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs hidden retains the receipt and operation; showing again requires explicit resume",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs leave retains the receipt and operation; showing again requires explicit resume",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs pauses at fifteen minutes without cancelling the backend or releasing the lease",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs permanently detaches the original operation after reader-a-b-a and never queries the new context",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs permanently detaches the original operation after writer-a-b-a and never queries the new context",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs permanently detaches the original operation after same-reader-reconnect and never queries the new context",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs permanently detaches the original operation after connection-a-b-a and never queries the new context",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs permanently detaches the original operation after project-a-b-a and never queries the new context",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs manual identical project refresh invalidates approvals but does not detach the active original task",
+              "status": "passed"
+            },
+            {
+              "title": "untrusted status, explicit GET resume and long-running jobs does not release uncertain accepted setup when an aborted old GET finally cleans up after source change",
+              "status": "passed"
+            },
+            {
+              "title": "one shared same-page write lane with the real Creator store accepted setup blocks all six Creator actions until matching terminal cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "one shared same-page write lane with the real Creator store Creator pending transport and cleanup blocks both registration and setup",
+              "status": "passed"
+            },
+            {
+              "title": "one shared same-page write lane with the real Creator store registration acknowledgement does not free the Creator lane until actual cleanup",
+              "status": "passed"
+            },
+            {
+              "title": "synchronous reentry, initial computed dependencies and pending transport guards canResume evaluated before any operation becomes true after an accepted pause",
+              "status": "passed"
+            },
+            {
+              "title": "synchronous reentry, initial computed dependencies and pending transport guards retains a new setup started synchronously on the previous terminal lane unlock",
+              "status": "passed"
+            },
+            {
+              "title": "synchronous reentry, initial computed dependencies and pending transport guards retains new registration started synchronously on the previous registration lane unlock",
+              "status": "passed"
+            },
+            {
+              "title": "synchronous reentry, initial computed dependencies and pending transport guards does not overwrite a pause synchronously triggered by the accepted pending=false boundary",
+              "status": "passed"
+            },
+            {
+              "title": "synchronous reentry, initial computed dependencies and pending transport guards never starts GET before accepted POST cleanup is actually idle",
+              "status": "passed"
+            },
+            {
+              "title": "synchronous reentry, initial computed dependencies and pending transport guards aborts pending setup POST without accepting its late operation ID or unlocking",
+              "status": "passed"
+            },
+            {
+              "title": "synchronous reentry, initial computed dependencies and pending transport guards the fifteen-minute deadline aborts an in-flight status GET but waits for cleanup before resume",
+              "status": "passed"
+            },
+            {
+              "title": "in-place provider metadata is checked again at each transport boundary detaches an active task after raw read-label mutation even without a Vue change event",
+              "status": "passed"
+            },
+            {
+              "title": "in-place provider metadata is checked again at each transport boundary detaches an active task after raw write-label mutation even without a Vue change event",
+              "status": "passed"
+            },
+            {
+              "title": "in-place provider metadata is checked again at each transport boundary detaches an active task after raw project-name mutation even without a Vue change event",
+              "status": "passed"
+            },
+            {
+              "title": "revalidates cached resumability before tracking and permanently detaches a raw label change",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "name": "registered-project-views.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "registered project overview and resource context opens overview by default and places it first, while preserving direct routes",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context selects the first real overview project after the entry read, preserves it on reorder and invalidates removal",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not substitute a default for an explicit unknown or empty overview project",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not turn malformed explicit overview intent into a default: /overview?project",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not turn malformed explicit overview intent into a default: /overview?project=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context waits through an empty registration snapshot and binds the first arriving real project only once",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context honors a later explicit choice instead of the pending default when the entry read arrives",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context lists every real registration and opens a selected overview without starting Creator or showing discovered/sample projects",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not change the original tab selection for a ctrlKey card click",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not change the original tab selection for a metaKey card click",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not change the original tab selection for a altKey card click",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not change the original tab selection for a shiftKey card click",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not change the original tab selection for a non-primary card click",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not change the original tab selection for a prevented card click",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context changes real projects through the selector, clears prior config, and restores the route through back/forward",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context keeps local entry empty until explicitly choosing samples, and removes them when a real reader is registered",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not offer samples in a dedicated build when the host reader is unavailable",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context preserves selected real identity into resources and across step changes without sample resources or fabricated counts",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context restores a real project and step from a direct resource link, never choosing the first project",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context does not create a selection from duplicated or missing query parameters",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context restores a pending deep link only after a real entry response and makes no AI/resource/write requests",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context waits for the real entry snapshot when a new deep-link ID is absent from an older connected cache",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context uses the existing entry guard and does not retry when a project-operation lane is released",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context cancels a pending normal entry read on leaving and ignores its late registered-project response",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context never retries a failed automatic entry in place",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context shows no demo fallback on registration failure or an empty real registration",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context invalidates removed or same-ID path-replaced projects until explicit reselection",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context manual registration refresh retains identical selection but invalidates a changed path without choosing another project",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context rejects same-ID source replacement without silently reopening the prior selection",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context keeps dedicated modes closed to sample entry even if their host provider is missing",
+              "status": "passed"
+            },
+            {
+              "title": "registered project overview and resource context keeps passive registration manual and preserves unknown runtime",
+              "status": "passed"
+            },
+            {
+              "title": "real saved config remains separate from local drafts requires explicit config read and displays only saved content, with no preview/generation/write",
+              "status": "passed"
+            },
+            {
+              "title": "real saved config remains separate from local drafts does not turn missing config or a suggested draft into saved content",
+              "status": "passed"
+            },
+            {
+              "title": "real saved config remains separate from local drafts discards an uncooperative late config response after project changes",
+              "status": "passed"
+            },
+            {
+              "title": "real saved config remains separate from local drafts discards an uncooperative late config response after source changes",
+              "status": "passed"
+            },
+            {
+              "title": "real saved config remains separate from local drafts discards an uncooperative late config response after path changes",
+              "status": "passed"
+            },
+            {
+              "title": "real saved config remains separate from local drafts discards an uncooperative late config response after disconnect changes",
+              "status": "passed"
+            },
+            {
+              "title": "real saved config remains separate from local drafts discards an uncooperative late config response after unmount changes",
+              "status": "passed"
+            },
+            {
+              "title": "real saved config remains separate from local drafts discards an uncooperative late config response after reader changes",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    "scope-test.json": {
+      "rawReportSha256": "8b32e1ba650666f94c468315f273d82806892a935ec868c01cb84aba27d7f81b",
+      "total": 32,
+      "passed": 1,
+      "failed": 0,
+      "pending": 31,
+      "suites": [
+        {
+          "name": "help-about-navigation.test.ts",
+          "status": "passed",
+          "assertions": [
+            {
+              "title": "help, about and visible frontend identity uses one frontend version in package, lock, header, sidebar and about without implying a daemon version",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity opens /help without a project, demo fallback or service request",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity opens /about without a project, demo fallback or service request",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity opens /changelog without a project, demo fallback or service request",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity opens /migration without a project, demo fallback or service request",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity keeps every existing route and adds utilities instead of redirecting them over older views",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity supports help deep links, every known old category, navigation and back without executing commands",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity returns a direct deep link safely to projects without following an unobserved browser entry or writing data",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity uses the page return control for exact internal query/hash routes and prevents repeated clicks from skipping pages",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity keeps return history aligned through native back/forward, query replacement and a new branch",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity returns to the replaced internal route after going forward instead of trusting stale back text",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity does not trust an unobserved browser history position or external back URL when returning",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity unlocks the return control after a canceled navigation without corrupting its next destination",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity preserves the active in-memory project and plan when returning from utilities",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity preserves project choice, in-memory plan and Picker manifest when opening and closing utilities",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity closes the mobile menu when using help and keeps version outside the hidden sidebar",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity keeps unparsed Picker text through help and never reuses a download confirmation on return",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity preserves parsed A separately from unparsed B across utilities and keeps submission blocked",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity does not unlock an active Picker write or clear an uncertain outcome through help navigation",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity copies only explicit diagnostic identity with a manual fallback and no transmission",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity uses real host evidence for history/about and copies only recognized numeric Creator versions",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity retains feedback and exact local v148 assets without automatic external requests",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity uses the approved overview-first order and preserves other navigation groups, destinations and brand-about access",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity keeps the shell compact and page help keyboard-accessible without migration captions",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity keeps unconnected, demo and failed live-source states explicit in the compact shell",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity renders complete original help text, copies unchanged code and retains wrap/expand controls",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity shows all legacy changelog groups separately from the real frontend version",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity keeps original AI icons and the separate keyword-search validation boundary visible",
+              "status": "skipped"
+            },
+            {
+              "title": "help, about and visible frontend identity separates Vue contract coverage from unverified host integration instead of equating a button with business completion",
+              "status": "passed"
+            },
+            {
+              "title": "implemented feature help navigation opens existing project controls from projects help without sending a business request",
+              "status": "skipped"
+            },
+            {
+              "title": "implemented feature help navigation opens existing project controls from mcp help without sending a business request",
+              "status": "skipped"
+            },
+            {
+              "title": "implemented feature help navigation opens existing project controls from profiler help without sending a business request",
+              "status": "skipped"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "changedSourceSha256": {
+    "src/components/ProjectSetupWizard.vue": "f50039a532ab95f0dd15b0c907f409116fc2ec072d067d6f47ab6340d8d6c018",
+    "src/views/HelpView.vue": "2ae4ff8799ee1c2824de240911a421994260b0563445e9add797d5b505c94945",
+    "src/views/MigrationView.vue": "c22cbb186621a5794c129c3657d679a26ff5290f22b4c063187d319306df8f3a",
+    "src/views/CompanionBrowserView.vue": "fffcf3ccc0910d260284683eeda08532b399b10dd054dd5ddfbcf515cdcab1fc",
+    "src/domain/project-call-meta.ts": "2c96ef0e18529631ca6d21ea0a7ef22318a7da34ff1259b0d2764509eb077dd9",
+    "src/domain/product-information.ts": "cc117463f4740cc7779c04090ce5d6259ff9a5ac1808c8c1b0182298dac2c5cd"
+  }
+}

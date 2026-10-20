@@ -1,0 +1,13 @@
+{
+  "sourceBeforeSha256": "379409214b60ad96d7a6363d362973b68a43369907ff1a16ac07677d1d7c7971",
+  "sourceAfterSha256": "f50039a532ab95f0dd15b0c907f409116fc2ec072d067d6f47ab6340d8d6c018",
+  "confirmedBeforeFailures": [
+    "existing project registration and explicit full setup UI binds the registration path to the explicit project card instead of a cancelled other-project draft",
+    "existing project registration and explicit full setup UI does not open a project-card setup for an ID absent from the current registration snapshot"
+  ],
+  "changedFiles": [
+    "src/components/ProjectSetupWizard.vue",
+    "tests/project-setup-ui.test.ts"
+  ],
+  "productionWrites": 0
+}

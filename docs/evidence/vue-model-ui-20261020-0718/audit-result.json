@@ -1,0 +1,238 @@
+{
+  "atUtc": "2026-10-20T07:27:32.404084+00:00",
+  "scope": "Vue migration contract only; no model or business lifecycle acceptance",
+  "nextHead": "c66e8fcf8d66f27220aabdf6219ff4a144cdbfb0",
+  "sourceSha256": {
+    "src/components/KnowledgeAgentPanel.vue": "cbecff5170d79657b55779a1454e6ec111340d872010f73d5265b33fcc31c0a5",
+    "src/components/KnowledgeConversationPanel.vue": "bcb6e7258b3fc9f8cc7b5dc00241d27976906ad636c728549938f24abdf8bbf5",
+    "src/components/KnowledgeSyncPanel.vue": "98de782f0d33c5e30dd90a38b597c1b5a01259497376113785039e0068c1ba7b",
+    "src/components/LocalServiceControls.vue": "58876a62f341bddbe9a74cf622bfc8a4f29864fd823dbe4ad4f0f3677d56c270",
+    "src/stores/knowledge-agent.ts": "00c528d417f242e1dfd8efe2ed83b1b6d12b5d3b4105f4def4c406a7bdb738a2",
+    "src/stores/knowledge-conversation.ts": "13a7dde7b42f3995ec2b462773bc59342a1004aaf9e326041f46a7df23981c8a",
+    "src/stores/local-service-operations.ts": "0f704520ccf09599a872cf6e0c7a25bf53cf750f303f629901f96f3c6b0a678b",
+    "src/adapters/knowledge-agent.ts": "a10df6b00cc4b0f8a0683450b0ce7e71f207439cecd4047858588077817bab2e",
+    "src/adapters/knowledge-conversation.ts": "c97367113bf9e9794cec522f73e7ed14df877ea550726ac5c72623b2d269d9ee",
+    "src/adapters/knowledge-sync.ts": "d8918adda0f0d12bdc1134fa6460ddcb1a4f6915204043dd6ad02471a0aa2c6e",
+    "src/adapters/local-service-operations.ts": "43b0cf1bebe72a24ca0a9af33d3d6a80ced1502a858f1a52edf82904ad8593c7",
+    "tests/knowledge-agent-ui.test.ts": "ad45437374ae369c6481221431423cd386d34f2d658a74156a104ab0db1a1e23",
+    "tests/knowledge-conversation-ui.test.ts": "b228c13fea328b131236365388be86f58e09f476985332b3eaefb3be5b9ed52d",
+    "tests/knowledge-sync-ui.test.ts": "d1c038d1f7c3caad6a8f70889c8e3e77ecc750e2832473f8c4fb982b48f27418",
+    "tests/local-service-operations-ui.test.ts": "d081bdbcc160995ac5ec0c7a7ac59ec40977ed3cb0e1d7824bf96d76dea259d1",
+    "src/views/AiResourceReadView.vue": "4931f2dae21a812afa11f3a7a5023845c699f5ae4edc6921e9f24588f7c22e2a",
+    "src/components/AiTaskCreationPanel.vue": "9e5aec11a0a580314e582ca001466aafb8fda30d10ea0415682256a019fae939",
+    "src/components/AiJobActionsPanel.vue": "44db6958aa7e1e7c78af2f5ad1416764da4fbd97e15b61f51937d53e21a015b1",
+    "src/components/AiResourceConfigDialog.vue": "574b68368b67eef881e849b630c39a203fb8dd84c4f071bafa12d128847e3cdf"
+  },
+  "oldUiSourceSha256": {
+    "knowledge-page.ts": "717e80e7040b00f878e52905a27e6daf3349d8956b721129e5f10207c3ac8402",
+    "app.ts": "ff22b00dcc31213d810b2a63daba4263f9e424d803590b6b0d2c8c63f6b09be6",
+    "ai-icons-page.ts": "16afa111eb008d9becee5d4eda2bb9050f24cd7db400fe2b508ec232afc1cf23"
+  },
+  "gitContinuity": {
+    "agent": {
+      "documentedCodeRevision": "5138bbf5896f4ad98a524cc959bf049b299dbd89",
+      "files": [
+        {
+          "file": "src/components/KnowledgeAgentPanel.vue",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "cbecff5170d79657b55779a1454e6ec111340d872010f73d5265b33fcc31c0a5",
+          "currentSha256": "cbecff5170d79657b55779a1454e6ec111340d872010f73d5265b33fcc31c0a5",
+          "byteEqual": true
+        },
+        {
+          "file": "src/adapters/knowledge-agent.ts",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "a10df6b00cc4b0f8a0683450b0ce7e71f207439cecd4047858588077817bab2e",
+          "currentSha256": "a10df6b00cc4b0f8a0683450b0ce7e71f207439cecd4047858588077817bab2e",
+          "byteEqual": true
+        },
+        {
+          "file": "tests/knowledge-agent-ui.test.ts",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "ad45437374ae369c6481221431423cd386d34f2d658a74156a104ab0db1a1e23",
+          "currentSha256": "ad45437374ae369c6481221431423cd386d34f2d658a74156a104ab0db1a1e23",
+          "byteEqual": true
+        }
+      ]
+    },
+    "sync": {
+      "documentedCodeRevision": "40d10892ea49fc62b6f30063540a837755be5d7a",
+      "files": [
+        {
+          "file": "src/components/KnowledgeSyncPanel.vue",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "be3420e09c61b0279e564571a0cf156d34c8a1336566c954e6586ee99ae02893",
+          "currentSha256": "98de782f0d33c5e30dd90a38b597c1b5a01259497376113785039e0068c1ba7b",
+          "byteEqual": false
+        },
+        {
+          "file": "src/adapters/knowledge-sync.ts",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "d8918adda0f0d12bdc1134fa6460ddcb1a4f6915204043dd6ad02471a0aa2c6e",
+          "currentSha256": "d8918adda0f0d12bdc1134fa6460ddcb1a4f6915204043dd6ad02471a0aa2c6e",
+          "byteEqual": true
+        },
+        {
+          "file": "tests/knowledge-sync-ui.test.ts",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "1a850c26d7753ae32bd0e97856ad538a24799cdc7d853ff8ba22a46fd151d5db",
+          "currentSha256": "d1c038d1f7c3caad6a8f70889c8e3e77ecc750e2832473f8c4fb982b48f27418",
+          "byteEqual": false
+        }
+      ]
+    },
+    "syncAfterAgentCoordination": {
+      "documentedCodeRevision": "5138bbf5896f4ad98a524cc959bf049b299dbd89",
+      "files": [
+        {
+          "file": "src/components/KnowledgeSyncPanel.vue",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "98de782f0d33c5e30dd90a38b597c1b5a01259497376113785039e0068c1ba7b",
+          "currentSha256": "98de782f0d33c5e30dd90a38b597c1b5a01259497376113785039e0068c1ba7b",
+          "byteEqual": true
+        },
+        {
+          "file": "src/adapters/knowledge-sync.ts",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "d8918adda0f0d12bdc1134fa6460ddcb1a4f6915204043dd6ad02471a0aa2c6e",
+          "currentSha256": "d8918adda0f0d12bdc1134fa6460ddcb1a4f6915204043dd6ad02471a0aa2c6e",
+          "byteEqual": true
+        }
+      ]
+    },
+    "model": {
+      "documentedCodeRevision": "9af58137f761ac330320e55476d23464b7a35685",
+      "files": [
+        {
+          "file": "src/components/LocalServiceControls.vue",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "58876a62f341bddbe9a74cf622bfc8a4f29864fd823dbe4ad4f0f3677d56c270",
+          "currentSha256": "58876a62f341bddbe9a74cf622bfc8a4f29864fd823dbe4ad4f0f3677d56c270",
+          "byteEqual": true
+        },
+        {
+          "file": "src/adapters/local-service-operations.ts",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "43b0cf1bebe72a24ca0a9af33d3d6a80ced1502a858f1a52edf82904ad8593c7",
+          "currentSha256": "43b0cf1bebe72a24ca0a9af33d3d6a80ced1502a858f1a52edf82904ad8593c7",
+          "byteEqual": true
+        },
+        {
+          "file": "tests/local-service-operations-ui.test.ts",
+          "historicalObjectAvailable": true,
+          "historicalSha256": "d081bdbcc160995ac5ec0c7a7ac59ec40977ed3cb0e1d7824bf96d76dea259d1",
+          "currentSha256": "d081bdbcc160995ac5ec0c7a7ac59ec40977ed3cb0e1d7824bf96d76dea259d1",
+          "byteEqual": true
+        }
+      ]
+    }
+  },
+  "freshTestsRunByThisUnit": 0,
+  "freshProductionRequests": 0,
+  "freshDesktopActions": 0,
+  "freshProductSourceEdits": 0,
+  "testFilesChanged": [
+    "tests/knowledge-sync-ui.test.ts"
+  ],
+  "newIsolatedUiCase": {
+    "name": "blocks both sync actions during an Agent request and never replays them on release",
+    "purpose": "Cross-panel pending-lane contract: disable dry/run/source controls, no automatic replay on lease release, one explicit dry-run uses exact original source/channel body",
+    "execution": "Assigned to root final single related-suite run; this unit does not report it as passed yet"
+  },
+  "syncHistoricalDifference": "Compared with original .76, current component adds knowledgeAgentPending import/gate introduced by .79 Agent migration. It is byte-identical to .79. The new cross-lane UI regression is a test-only change after those historical tests.",
+  "historicalRawTempEvidenceDirectoriesAvailable": {
+    "companion-next-agent-20261018": false,
+    "companion-next-knowledge-sync-20261018": false,
+    "companion-model-parity-20261018": false
+  },
+  "migrationContracts": [
+    {
+      "matrixItem": 20,
+      "feature": "Agent list, first/continued ask, local new conversation, cancellation and result feedback",
+      "oldAuthority": "web/src/knowledge-page.ts:664-675,749-769",
+      "newComponents": [
+        "KnowledgeAgentPanel.vue",
+        "KnowledgeConversationPanel.vue"
+      ],
+      "wire": {
+        "agentList": "POST /api/knowledge/agent/list {}",
+        "agentAsk": "POST /api/knowledge/agent/ask {query,agentId,sessionId?}",
+        "chat": "POST /api/knowledge/chat {query,kbId?,sessionId?}"
+      },
+      "coveredBy": [
+        "tests/knowledge-agent-ui.test.ts",
+        "tests/knowledge-conversation-ui.test.ts",
+        "tests/knowledge-agent-adapter.test.ts",
+        "tests/knowledge-conversation-adapter.test.ts"
+      ],
+      "contractFindings": "Original selectors/forms/session bindings and complete JSON display exist; local reset does not create/delete server session. Unknown and late-source results do not become current success. No missing original server session-history or streaming UI: the old contract has neither.",
+      "documentedHistoricalUiEvidence": "docs/knowledge-agent-parity-20261018.md: authenticated deployed static UI with six fully intercepted business flows; no real Agent call",
+      "freshGap": "No concrete missing Vue control identified in reviewed components; root should tie current targeted/full regression result to this mapping. Real model conversations remain separate paused integration evidence."
+    },
+    {
+      "matrixItem": 20,
+      "feature": "Sync source/status/dry-run/run/queued feedback",
+      "oldAuthority": "web/src/knowledge-page.ts:386-432,551-570",
+      "newComponents": [
+        "KnowledgeSyncPanel.vue"
+      ],
+      "wire": {
+        "dryRun": "POST /api/knowledge/sync/dry-run {sourceId,channel}",
+        "run": "POST /api/knowledge/sync/run {sourceId,channel}"
+      },
+      "coveredBy": [
+        "tests/knowledge-sync-ui.test.ts",
+        "tests/knowledge-sync-adapter.test.ts"
+      ],
+      "contractFindings": "Collapsed source selector and exact original two actions exist. Source-specific approved/enabled/writerReady and global writer gate are retained, distinct from retrieval authentication. Queued receipt is not displayed as completed indexing; policy rejection, malformed receipt UNKNOWN, cancellation and cross-source safety are covered.",
+      "documentedHistoricalUiEvidence": "docs/knowledge-sync-parity-20261018.md: five intercepted deployed-page flows, original exact source/channel bodies and queued receipt",
+      "freshGap": "No new original UI implementation gap identified; real sync policy/auth/knowledge writes remain separate integration evidence and were not executed."
+    },
+    {
+      "matrixItem": 21,
+      "feature": "Model launcher/knowledge service entry and start/stop/iframe feedback",
+      "oldAuthority": "web/src/app.ts:2853-2974,2984-3031",
+      "newComponents": [
+        "LocalServiceControls.vue"
+      ],
+      "wire": {
+        "knowledgeState": "GET /api/knowledge-service/status",
+        "modelState": "GET /api/model-service/status",
+        "startStop": "POST /api/{knowledge|model}-service/{start|stop} {}"
+      },
+      "coveredBy": [
+        "tests/local-service-operations-ui.test.ts",
+        "tests/local-service-operations-adapter.test.ts",
+        "tests/local-service-operations-store.test.ts"
+      ],
+      "contractFindings": "Fixed original 8081 and 8090 panels, running/unframeable fallback, model entry status read, both start/stop controls and original response distinctions exist. The model controls remain in the inherited launcher iframe; copying those controls as new Vue API would invent a different capability.",
+      "documentedHistoricalUiEvidence": "docs/model-service-parity-20261018.md: .94 deployed source, intercepted lifecycle cases plus real readonly original launcher with nine cards and route-leave iframe removal",
+      "freshGap": "No missing original Next control identified. Real start/stop/GPU/workflow results remain separate paused integration evidence, not a Vue migration prerequisite."
+    },
+    {
+      "matrixItem": 16,
+      "feature": "AI generate/edit/variant/import UI entry",
+      "oldAuthority": "web/src/ai-icons-page.ts",
+      "newComponents": [
+        "AiResourceReadView.vue",
+        "AiTaskCreationPanel.vue",
+        "AiJobActionsPanel.vue",
+        "AiResourceConfigDialog.vue"
+      ],
+      "coveredBy": [
+        "tests/ai-task-creation-ui.test.ts",
+        "tests/ai-resource-editor-ui.test.ts",
+        "tests/ai-job-actions-ui.test.ts",
+        "tests/ai-variant-import-write.test.ts"
+      ],
+      "contractFindings": "Read-only review confirms original creation/edit/action entry components are wired in the Vue resource page; root owns full #16 assessment. Existing 96-resource import and real Creator results are historical integration evidence, not a reason to rerun models.",
+      "freshGap": "No modifications made; broader resource UI parity is not newly certified by this limited component review."
+    }
+  ],
+  "separateIntegrationUnverified": [
+    "Actual Agent/model conversation and remote session persistence",
+    "Actual sync dry-run/run policy, queue and completed indexing",
+    "Actual model launcher start/stop and GPU/workflow execution"
+  ],
+  "recommendation": "Do not retain model pause as a Vue migration failure. Distinguish current source regression + historical deployed intercepted UI evidence from fresh production lifecycle calls. No external Cursor/client acceptance required for these Vue contracts."
+}

@@ -1,0 +1,76 @@
+{
+  "atUtc": "2026-10-20T07:28:48.253946+00:00",
+  "scope": "Vue navigation, explicit registered-project help context, migration status boundary copy",
+  "oldUi": {
+    "path": "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\src\\app.ts",
+    "sha256": "ff22b00dcc31213d810b2a63daba4263f9e424d803590b6b0d2c8c63f6b09be6",
+    "helpProjectReadLines": "975-998",
+    "helpTopicSwitchLines": "2378-2400,3091-3123",
+    "primaryPageLines": "2853-2872",
+    "observations": [
+      "Help tool manager preserves selectedProjectId across category switches and reloads the explicitly chosen project",
+      "Primary projects/knowledge/models/icons pages map to Vue projects/knowledge/knowledge?tab=models/ai-icons; no external client execution is necessary to compare routes"
+    ]
+  },
+  "sourceFiles": {
+    "src/views/HelpView.vue": "2ae4ff8799ee1c2824de240911a421994260b0563445e9add797d5b505c94945",
+    "src/views/MigrationView.vue": "c22cbb186621a5794c129c3657d679a26ff5290f22b4c063187d319306df8f3a",
+    "tests/help-project-context-navigation.test.ts": "326945f7bf3c37f050bc018997a158ffad66bf4d36d1c31ca998d00966af0898"
+  },
+  "reproducedDefect": {
+    "file": "src/views/HelpView.vue",
+    "trigger": "Enter tools via project card, switch help category, then return to tools",
+    "before": "choose() replaced query with topic only; explicit project binding was lost and requested-project reread was not restored",
+    "after": "choose() preserves project only, drops unrelated query; existing invalid-project checks still reject rather than falling back"
+  },
+  "newRegressionCases": 6,
+  "finalValidation": {
+    "node": "D:/code/shidai3/P8000/dual-game-build/node_modules/node/bin/node.exe",
+    "nodeVersionFamily": "22",
+    "testFiles": [
+      {
+        "name": "help-about-navigation.test.ts",
+        "passed": 32
+      },
+      {
+        "name": "help-project-context-navigation.test.ts",
+        "passed": 6
+      },
+      {
+        "name": "project-tool-scope-entry.test.ts",
+        "passed": 13
+      }
+    ],
+    "passed": 51,
+    "failed": 0,
+    "vueChangesUnderTest": [
+      "HelpView.vue topic navigation",
+      "MigrationView.vue two-layer verification copy"
+    ],
+    "parallelDomainChanges": "product-information.ts was separately owned and may have changed after this run loaded modules; this result does not claim final validation of subsequent domain text edits"
+  },
+  "preliminaryResults": {
+    "beforeFix": "before-fix.json: four query/navigation regressions failed, ordinary passive help passed",
+    "afterFixNode25": "after-fix.json: Node25 localStorage.clear harness failures and two initial fixture failures (missing required core preset); not product defects",
+    "resolution": "Corrected local fixture to include both built-in presets and used existing documented Node22 runtime; all final 51 passed"
+  },
+  "vueMigrationConclusions": {
+    "utilityNavigation": "Previously covered by existing suite; current adjacent suite passed",
+    "specificProjectHelpRoundtrip": "Passed by actual VueRouter and ToolPresetsReadPanel isolation",
+    "cancelLateReadOnTopicExit": "Passed; aborted signal and stale completion ignored",
+    "invalidOrRemovedProject": "Passed; explicit rejection retained and no fallback read",
+    "ordinaryHelp": "Passed; passive without explicit project request",
+    "migrationBoundary": "UI distinguishes Vue API/interaction evidence from inherited business availability"
+  },
+  "integrationLimits": [
+    "No claim of all 21 Vue areas passing from this navigation slice",
+    "No production deployment by this unit",
+    "No Cursor/Agent conversation, Creator, model, real configuration write, history mutation or real log deletion",
+    "Overview default real project behavior was inspected against existing registered-project tests; no additional runtime execution was required or claimed"
+  ],
+  "productionMutations": 0,
+  "desktopActions": 0,
+  "oldHostWrites": 0,
+  "newListeners": 0,
+  "gitCommitsByThisUnit": 0
+}

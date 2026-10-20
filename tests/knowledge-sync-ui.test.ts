@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import { mount, flushPromises } from '@vue/test-utils'
 import type { VueWrapper } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
+import { knowledgeAgentPending } from '../src/knowledge-agent-integration'
 import { useKnowledgeConversationStore } from '../src/stores/knowledge-conversation'
 import KnowledgeSyncPanel from '../src/components/KnowledgeSyncPanel.vue'
 import { useKnowledgeReadStore } from '../src/stores/knowledge-read'
@@ -34,4 +35,27 @@ describe('original collapsed sync controls',()=>{
  it('retains UNKNOWN barrier when the panel unmounts and remounts in the same session',async()=>{const fetch=vi.fn<KnowledgeSyncFetch>(async()=>reply({...queued,sourceId:'other'})),{pinia,connect}=await setup(fetch);await connect();await button('执行同步').trigger('click');await flushPromises();wrapper!.unmount();wrapper=mount(KnowledgeSyncPanel,{global:{plugins:[pinia,ElementPlus]}});await flushPromises();expect(wrapper!.text()).toContain('此来源存在未确认');expect(button('执行同步').attributes('disabled')).toBeDefined();expect(fetch).toHaveBeenCalledTimes(1)})
  it('blocks prepared chat send and new prepare while sync owns transport',async()=>{const d=deferred<Response>(),{pinia,connect,p}=await setup(()=>d.promise);await connect();const chat=useKnowledgeConversationStore(pinia),chatProvider={label:'OFFLINE',chat:vi.fn(async()=>({schemaVersion:KNOWLEDGE_SCHEMA,sessionId:'session1',answer:'answer',references:[]})),waitForIdle:async()=>{}};chat.syncContext({provider:chatProvider,readIdentity:p,kbId:'default',scopeKey:'test',ready:true});chat.query='question';const prepared=chat.prepareSend();expect(prepared).not.toBeNull();await button('执行同步').trigger('click');expect(chat.canPrepare).toBe(false);expect(await chat.send(prepared,true)).toBe(false);expect(chat.prepareSend()).toBeNull();expect(chatProvider.chat).not.toHaveBeenCalled();d.resolve(reply(queued));await flushPromises()})
  it('provider replacement and source-status drift discard old plan and current success message',async()=>{const {connect,read}=await setup();await connect();await button('执行同步').trigger('click');await flushPromises();expect(wrapper!.text()).toContain('同步任务已持久化排队');read.status={...read.status!,sync:{...read.status!.sync,writerEnabled:false}};await flushPromises();expect(wrapper!.text()).not.toContain('同步任务已持久化排队');expect(wrapper!.text()).toContain('原来源记录');expect(button('执行同步').attributes('disabled')).toBeDefined()})
+})
+
+
+describe('Agent and sync shared pending lane',()=>{
+ it('blocks both sync actions during an Agent request and never replays them on release',async()=>{
+  const fetch=vi.fn<KnowledgeSyncFetch>(async()=>reply(queued)),{connect}=await setup(fetch)
+  try{
+   await connect();knowledgeAgentPending.value=true;await flushPromises()
+   expect(button('同步演练').attributes('disabled')).toBeDefined()
+   expect(button('执行同步').attributes('disabled')).toBeDefined()
+   expect(wrapper!.get('select').attributes('disabled')).toBeDefined()
+   await button('同步演练').trigger('click');await button('执行同步').trigger('click')
+   expect(fetch).not.toHaveBeenCalled()
+   knowledgeAgentPending.value=false;await flushPromises()
+   expect(button('同步演练').attributes('disabled')).toBeUndefined()
+   expect(button('执行同步').attributes('disabled')).toBeUndefined()
+   expect(fetch).not.toHaveBeenCalled()
+   await button('同步演练').trigger('click');await flushPromises()
+   expect(fetch).toHaveBeenCalledTimes(1)
+   expect(fetch.mock.calls[0]![0]).toBe('/api/knowledge/sync/dry-run')
+   expect(JSON.parse(fetch.mock.calls[0]![1].body as string)).toEqual({sourceId:a.id,channel:a.channel})
+  }finally{knowledgeAgentPending.value=false}
+ })
 })

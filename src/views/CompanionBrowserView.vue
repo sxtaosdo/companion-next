@@ -2,7 +2,7 @@
 import ProjectClientRegistration from '../components/ProjectClientRegistration.vue'
 import { projectConnectionsProvider } from '../project-connections-integration'
 import ProjectPreviewActions from '../components/ProjectPreviewActions.vue'
-import { formatProjectCallMeta } from '../domain/project-call-meta'
+import { callStatusLabel, formatProjectCallMeta } from '../domain/project-call-meta'
 import { useProjectOperationLaneStore } from '../stores/project-operation-lane'
 import LogTools from '../components/LogTools.vue'
 import InfoTip from '../components/InfoTip.vue'
@@ -156,7 +156,7 @@ onBeforeUnmount(()=>{mounted=false;if(callTimer!==undefined)clearInterval(callTi
   </section>
   <section v-if="tab==='calls'" class="panel"><div class="section-heading"><h2>已有调用记录</h2><InfoTip label="调用记录说明" text="仅查询已有记录，不执行或重放工具调用。"/></div><div class="companion-filters"><el-select :model-value="store.callProjectId" aria-label="调用记录工程" placeholder="选择工程" @change="callProject"><el-option v-for="project in store.projects" :key="project.id" :value="project.id" :label="project.name"/></el-select><el-select :model-value="store.failedOnly" aria-label="调用记录筛选" @change="callFilter"><el-option label="全部调用" :value="false"/><el-option label="仅失败" :value="true"/></el-select><el-button :loading="store.callLoading" :disabled="!store.connected||!store.callProjectId" @click="store.loadCalls()">读取 / 刷新调用</el-button></div>
    <p class="compact-call-summary">累计 {{ store.total??'未读取' }} 次 · 保留 {{ store.retained??'未读取' }} 条 <InfoTip label="调用分页说明" :text="`每页最多50条，详情最多保留1000条；服务重启清零。总数不等于当前失败筛选数量。${store.sessionId?`会话：${store.sessionId}`:''}`"/></p><el-alert v-if="store.callError" :title="store.callError" type="error" :closable="false"/>
-   <details v-for="record in store.records" :key="record.id" class="companion-call-record"><summary><strong>{{ record.operationNameZh }}</strong> · {{ record.source }} · {{ record.status }} · {{ record.durationMs===undefined?'耗时未结束':`${record.durationMs} ms` }} · {{ displayDate(record.startedAt) }}<code>{{ record.operation }}</code></summary><h4>参数摘要</h4><pre>{{ record.inputSummary }}</pre><template v-if="record.resultSummary"><h4>结果摘要</h4><pre>{{ record.resultSummary }}</pre></template><template v-if="record.errorSummary"><h4>错误摘要</h4><pre>{{ record.errorSummary }}</pre></template></details>
+   <details v-for="record in store.records" :key="record.id" class="companion-call-record"><summary><strong>{{ record.operationNameZh }}</strong> · {{ record.source }} · {{ callStatusLabel(record.status) }} · {{ record.durationMs===undefined?'耗时未结束':`${record.durationMs} ms` }} · {{ displayDate(record.startedAt) }}<code>{{ record.operation }}</code></summary><h4>参数摘要</h4><pre>{{ record.inputSummary }}</pre><template v-if="record.resultSummary"><h4>结果摘要</h4><pre>{{ record.resultSummary }}</pre></template><template v-if="record.errorSummary"><h4>错误摘要</h4><pre>{{ record.errorSummary }}</pre></template></details>
    <el-empty v-if="!store.records.length" :description="store.callRead?'本次查询没有匹配调用':'尚未读取当前工程与筛选的调用记录'"/><el-button v-if="store.nextBefore!==undefined" :disabled="store.callLoading" @click="store.loadCalls(true)">加载更多（50 条）</el-button>
   </section>
  </section>
