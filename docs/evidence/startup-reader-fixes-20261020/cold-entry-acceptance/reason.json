@@ -1,0 +1,9 @@
+{
+  "validationOnly": true,
+  "codeOrRuntimeFilesToChange": 0,
+  "previousColdEntryExitCodes": "UNKNOWN_PIPE_OBSERVER",
+  "existingOwnerReuseExitCode": 0,
+  "reuseElapsedMs": 578.0,
+  "scope": "One controlled cold acceptance under existing exact application restart authorization; output file + process wait; no repeated command on uncertainty",
+  "servicePidUnchanged": 600
+}

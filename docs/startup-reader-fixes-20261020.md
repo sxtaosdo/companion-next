@@ -1,3 +1,7 @@
+当前补充：完整CLI候选已部署，后台18408/OPEN，原reader再次限定实读8步全200、auth/keyword verified，保护核对通过。修正取证为临时文件输出+process.wait后，现有实例的原正常入口578ms exit0/PASSED，PID/epoch不变。前两次communicate管道观察仍记UNKNOWN，未追认冷启动退出码。现保存无代码变化的受控冷启动验收检查点，按既有精确应用重启授权，只验证一次完整正常入口退出，不重启WeKnora/电脑、不改任何运行文件。
+
+21项结果见[清晰逐项矩阵](parity-matrix-20261020.md)。
+
 阶段更新：首轮4产物已安装，Companion10940/32180/OPEN，原reader六个有界只读POST及两个状态GET均200，原文2235B同SHA、auth/keyword verified；共享22修改、9业务表、KB状态/公开权限及UI哈希保持。首轮正常入口55秒未取得退出回执，随后原entry/CLI均确认消失，但退出码仍UNKNOWN，不追认为成功。原回执完整保留。
 
 完整调用复查发现既有实例初检和成功后的第二次status仍可能无界。新候选增加初检10秒上限、直接复用已验证status，普通启动逻辑最坏约50秒；端口占用仍零spawn，停止守卫不变。26项测试含旧完整命令60秒仍挂起反例、新完整execute验证及原18项。独立复审无P1/P2，当前安装3b9f基线再次逐字节重建，依赖及其余45源保持。该补修候选尚未部署，下一步仅替换CLI/map，再按既有授权精确应用重启验证。它是新候选部署，不是盲重发首次操作。[第二轮证据](evidence/startup-reader-fixes-20261020/full-entry/round2-reason.json)。

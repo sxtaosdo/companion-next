@@ -1,0 +1,13 @@
+{
+  "atUtc": "2026-10-20T02:49:24.803861+00:00",
+  "identity": {
+    "pid": 18408,
+    "startupEpoch": "a1c50fec-d199-4f31-a821-5562ae607879",
+    "startedAt": "2026-10-20T02:45:34.340Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "purpose": "IDEMPOTENT_EXISTING_OWNER_REUSE_ONLY",
+  "coldStartNotRepeated": true
+}
