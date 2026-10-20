@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { RouteLocationNormalizedLoaded } from 'vue-router'
-import { DataBoard, Box, Picture, Connection, ArrowDown, ArrowLeft, Refresh, Close, Menu, List } from '@element-plus/icons-vue'
+import type { LocationQueryValue, RouteLocationNormalizedLoaded } from 'vue-router'
+import { ArrowDown, ArrowLeft, Refresh, Close, Menu } from '@element-plus/icons-vue'
 import { useWorkspaceStore } from './stores/workspace'
 import { liveProvider } from './integration'
 import { companionBrowserProvider } from './companion-browser-integration'
@@ -20,25 +20,34 @@ const usesLegacySnapshot = computed(() => legacyWorkspace.value && store.mode !=
 const showRegisteredContext = computed(() => !usesLegacySnapshot.value && ['/overview', '/resources'].includes(route.path))
 const showProjectContext = computed(() => !showRegisteredContext.value && legacyWorkspace.value && route.path !== '/image-assets' && !route.meta.workspaceIndependent)
 watch(legacyWorkspace, allowed => { if (!allowed && store.mode !== 'disconnected') store.disconnect() }, { immediate: true, flush: 'sync' })
-function projectLink(path: string) { return ['/resources','/ai-icons'].includes(path) && registered.project ? { path, query: { project: registered.project.id } } : path }
+// Remember explicit route intent across unrelated pages, including invalid or
+// empty IDs. This only builds links; actual project access still requires the
+// registered store's source/path-bound project and never trusts this query.
+const registeredRouteIntent = ref<LocationQueryValue | LocationQueryValue[] | undefined>()
+watch(() => route.fullPath, () => {
+  if (['/overview', '/resources', '/ai-icons'].includes(route.path)) registeredRouteIntent.value = route.query.project
+}, { immediate: true, flush: 'sync' })
+function projectLink(path: string) {
+  if (!['/overview', '/resources', '/ai-icons'].includes(path)) return path
+  const intent = registered.project?.id ?? (registered.requestedId || registeredRouteIntent.value)
+  return intent !== undefined ? { path, query: { project: intent } } : path
+}
 function selectRegisteredProject(id: string) {
   registered.restoreRouteProject(id)
   void router.push({ path: route.path, query: { ...route.query, project: id } })
 }
 // Keep one destination per task; the original four Companion domains stay together.
 const nav = [
-  { path: '/overview', label: '项目概览', icon: DataBoard },
-  { path: '/ai-icons', label: 'AI 图标', icon: Picture },
-  { path: '/projects', label: '工程', icon: List },
-  { path: '/knowledge', label: '知识库', icon: Box },
-  { path: '/knowledge?tab=models', label: '模型服务', icon: Connection },
+  { path: '/overview', label: '项目概览' },
+  { path: '/ai-icons', label: 'AI 图标' },
+  { path: '/projects', label: '工程' },
+  { path: '/knowledge', label: '知识库' },
+  { path: '/knowledge?tab=models', label: '模型服务' },
 ]
 const resourceNav = [
   { path: '/resources', label: '游戏资源' },
   { path: '/image-assets', label: '图片素材' },
   { path: '/services', label: '服务状态' },
-  { path: '/history', label: '版本与边界' },
-  { path: '/migration', label: '功能对照' },
 ]
 function isNavActive(path: string) {
   if (path === '/knowledge?tab=models') return route.path === '/knowledge' && route.query.tab === 'models'
@@ -105,9 +114,8 @@ const dateLabel = computed(() => {
     <button v-if="menuOpen" class="sidebar-scrim" aria-label="关闭导航" @click="menuOpen = false"></button>
     <aside class="sidebar" :class="{ 'is-open': menuOpen }">
       <RouterLink to="/about" class="brand" aria-label="关于 Companion" @click="menuOpen = false"><span class="brand-mark">C</span><span>Companion</span></RouterLink>
-      <div class="workspace-label">项目工作区 <span>01</span></div>
-      <nav class="nav-list" aria-label="主导航"><RouterLink v-for="item in nav" :key="item.path" :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><el-icon :size="19"><component :is="item.icon" /></el-icon><span>{{ item.label }}</span></RouterLink></nav>
-      <nav class="legacy-nav supplementary-nav" aria-label="资源与状态"><h2>资源与状态</h2><RouterLink v-for="item in resourceNav" :key="item.path" :to="projectLink(item.path)" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false">{{ item.label }}</RouterLink></nav>
+      <nav class="nav-list" aria-label="主导航"><RouterLink v-for="item in nav" :key="item.path" :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><span>{{ item.label }}</span></RouterLink></nav>
+      <nav class="legacy-nav supplementary-nav" aria-label="补充入口"><RouterLink v-for="item in resourceNav" :key="item.path" :to="projectLink(item.path)" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false">{{ item.label }}</RouterLink></nav>
       <div class="sidebar-footer">前端 v{{ frontendIdentity.version }}</div>
     </aside>
     <div class="main-shell">
@@ -130,7 +138,7 @@ const dateLabel = computed(() => {
 </template>
 <style scoped>
 .sidebar { overflow-y: auto; }
-.workspace-label { padding-top: 24px; }
+.nav-list { margin-top: 24px; }
 .nav-list { gap: 3px; }
 .nav-item { padding: 10px 14px; }
 .supplementary-nav .is-active { color: #fff; font-weight: 600; }
