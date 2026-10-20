@@ -220,7 +220,7 @@ defineExpose({openForProject:show,close})
     <el-alert type="info" :closable="false" :title="strictOptions?'Bridge 必选；Creator 与 Codex 可独立选择。服务须支持严格选项合同，否则不会发送安装请求。':'仅支持完整接入。严格只装 Bridge 或保证不配置 Codex 暂不可提交：后台复用任务时不核对新选项。'"/>
     <el-button :disabled="!projects.connected||!selected||!allConsented||lane.locked" @click="prepareFull">{{ strictOptions?'核对所选安装步骤':'核对完整安装接入' }}</el-button>
     <div v-if="store.preparedSetup" class="setup-confirm" data-testid="full-setup-confirm"><strong>{{ store.preparedSetup.project.name }} · {{ store.preparedSetup.project.id }}</strong><p>{{ store.preparedSetup.project.path }}</p><p>来源：{{ store.preparedSetup.sourceLabel }}</p><p>将请求安装 Bridge；Creator {{ store.preparedSetup.effectiveOptions ? (store.preparedSetup.effectiveOptions.startCreator?'启动及验证':'不启动') : '启动及验证' }}；Codex {{ store.preparedSetup.effectiveOptions ? (store.preparedSetup.effectiveOptions.configureCodex?'配置':'不配置') : '配置' }}。202 仅表示任务已接受；关闭 / 停止等待不取消后台。刷新页面会丢失本页任务记录和互斥保护；本页不能锁定其他标签页或客户端。</p><el-button type="warning" @click="submitFull">{{ strictOptions?'确认执行所选安装步骤':'确认完整安装并接入 Codex' }}</el-button></div>
-  <section v-show="hasReceipt&&step===3" class="setup-step setup-receipts" aria-label="登记与接入回执">
+  <section v-if="store.setupReceipt" v-show="step===3" class="setup-step setup-receipts" aria-label="登记与接入回执">
    <h3>当前回执</h3>
    <article v-if="store.setupReceipt" class="setup-result" data-testid="setup-receipt" role="status">
     <strong>安装接入 · {{ store.setupReceipt.project.name }}</strong><p>{{ store.setupReceipt.project.id }} · {{ store.setupReceipt.project.path }}</p>

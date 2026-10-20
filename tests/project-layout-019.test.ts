@@ -123,7 +123,7 @@ describe('019 compact project card structure and safe controls', () => {
     previewActionsProvider.value=preview
     const {actions}=await setup()
     const toolbar=card(readyId).get('.project-toolbar')
-    expect(toolbar.find('.preview-toolbar').findAll('button').map(b=>b.text()).filter(Boolean)).toEqual(['预览','聚焦','停止','重启','探针','状态','刷新','Profiler 采集'])
+    expect(toolbar.find('.preview-toolbar').findAll('button').map(b=>b.text()).filter(Boolean)).toEqual(['预览','聚焦','停止','重启','探针','状态','刷新','取证'])
     expect(toolbar.findAll('button').filter(b=>b.text()==='聚焦')).toHaveLength(1)
     await button('聚焦 Creator',card(readyId)).trigger('click');await flushPromises()
     expect(actions.run).toHaveBeenCalledExactlyOnceWith({projectId:readyId,action:'focus'},expect.any(AbortSignal))

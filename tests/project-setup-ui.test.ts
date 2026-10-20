@@ -283,3 +283,14 @@ describe('wizard explicit registered-project selection',()=>{
   expect(api.register).not.toHaveBeenCalled();expect(api.start).not.toHaveBeenCalled();expect(api.status).not.toHaveBeenCalled()
  })
 })
+
+
+describe('launch step receipt empty state',()=>{
+ it('does not show an installation receipt heading before installation dispatch',async()=>{
+  const {api,store}=await setup();await openFull()
+  const panel=body().get('[data-testid="setup-launch-step"]');expect(panel.isVisible()).toBe(true)
+  expect(store.setupReceipt).toBeNull();expect(panel.find('.setup-receipts').exists()).toBe(false)
+  expect(panel.text()).not.toContain('当前回执');expect(panel.text()).not.toContain('回执仅保存在本页')
+  expect(api.start).not.toHaveBeenCalled();expect(api.register).not.toHaveBeenCalled()
+ })
+})

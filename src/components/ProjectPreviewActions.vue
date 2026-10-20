@@ -11,7 +11,7 @@ onBeforeUnmount(()=>{if(store.activeId===props.projectId)store.invalidate()})
 </script>
 <template>
  <section v-if="previewActionsProvider" class="project-preview-actions" data-testid="project-preview-actions">
-  <div class="preview-toolbar"><template v-for="action in actions" :key="action"><el-button size="small" :disabled="!store.canRun(projectId)" @click="store.run(projectId,action)">{{ action==='probe'?'探针':previewActionLabel(action) }}</el-button><slot v-if="action==='start'" name="creator-actions"/></template><span role="status">Profiler {{ result?.profilerPhase?({capturing:'采集中',ok:'采集成功',fail:'采集失败'})[result.profilerPhase]:'待命' }}</span></div>
+  <div class="preview-toolbar"><template v-for="action in actions" :key="action"><el-button size="small" :title="action==='profiler'?'Profiler 采集取证':undefined" :disabled="!store.canRun(projectId)" @click="store.run(projectId,action)">{{ action==='probe'?'探针':action==='profiler'?'取证':previewActionLabel(action) }}</el-button><slot v-if="action==='start'" name="creator-actions"/></template><span role="status">Profiler {{ result?.profilerPhase?({capturing:'采集中',ok:'采集成功',fail:'采集失败'})[result.profilerPhase]:'待命' }}</span></div>
   <p v-if="store.isUnknown(projectId)" role="status">上次操作结果未知，请重新连接工程服务核对后再操作。</p>
   <p v-if="result?.message" role="status">{{ result.message }}</p>
   <section v-for="kind in (['preview','profiler'] as const)" v-show="result?.[kind]" :key="kind" class="preview-result-panel"><div>{{ kind==='preview'?'Preview 结果':'Profiler 结果' }} <el-button size="small" @click="store.hide(projectId,kind)">隐藏</el-button></div><pre>{{ result?.[kind] }}</pre></section>
