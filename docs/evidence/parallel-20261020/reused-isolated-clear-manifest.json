@@ -1,0 +1,42 @@
+[
+  {
+    "file": "FINAL-RESULT.json",
+    "bytes": 1897,
+    "sha256": "fa97b97135b8e389a500848ef9937fee2a95ef3772068a15736d108574142e31"
+  },
+  {
+    "file": "RESULT.md",
+    "bytes": 3169,
+    "sha256": "492303af8234066c85e44d3d73fef5e2dd1248d7b6265d3970b1d60fb4db5daa"
+  },
+  {
+    "file": "result.json",
+    "bytes": 4706,
+    "sha256": "3614c16d894f1cea38aa86e346352257acba83c15e546b06169b64859d78ad90"
+  },
+  {
+    "file": "supplement.json",
+    "bytes": 2917,
+    "sha256": "4deded605dfd90b2fa61bf0d9cfe5b2cdabe0d96c3e2a73f480700fe4b0b6f3d"
+  },
+  {
+    "file": "rejection-only.json",
+    "bytes": 3239,
+    "sha256": "410cea5d26fb43d6e60f10918b1841ec6c1efbd0e75f6e798275af4363d3b14f"
+  },
+  {
+    "file": "source-manifest.json",
+    "bytes": 24922,
+    "sha256": "bbf318d457e91d9c7a3d0764fa220f428fd52a417830b5ec196b89d911adcc5c"
+  },
+  {
+    "file": "isolated-clear-readback.png",
+    "bytes": 73700,
+    "sha256": "312dcae39660c2136aeb6e1051c2f829bfa6d8df8e966690a7970909ab4cbd26"
+  },
+  {
+    "file": "isolated-clear-rejected.png",
+    "bytes": 73197,
+    "sha256": "651e158ce2f8ba4083f21feb915701ffaaece1cd2e3ecf091ab84145c8570255"
+  }
+]

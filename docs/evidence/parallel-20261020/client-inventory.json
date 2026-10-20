@@ -1,0 +1,482 @@
+{
+  "observedAt": "2026-10-20T00:46:10.054565+00:00",
+  "scope": "read-only configured structure and dedicated MCP server log markers; no raw content, credentials, command strings or environment values retained",
+  "gitRoot": "D:/code/shidai3/P8000/companion-next",
+  "gitStatusClean": true,
+  "configs": [
+    {
+      "configFile": "C:\\Users\\33272\\.codex\\config.toml",
+      "exists": true,
+      "sha256": "53a35f734e2a1f16863306bccb8b1787d388b628e18dfa142226eb26ab21c60e",
+      "serverCount": 3,
+      "companionRelated": [
+        {
+          "serverName": "cocos-creator-ant-cook-04c4cde2",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "da3f4d3e9979fe02e18979f4498f8e7c1a132d55939a7a3a5f7b283cd3f40c4b",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": true,
+          "commandExists": true,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": true,
+          "resolvedEntrypointHash": "da3f4d3e9979fe02e18979f4498f8e7c1a132d55939a7a3a5f7b283cd3f40c4b"
+        },
+        {
+          "serverName": "cocos-creator-p1060-c16c7137",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "da3f4d3e9979fe02e18979f4498f8e7c1a132d55939a7a3a5f7b283cd3f40c4b",
+          "argumentCount": 3,
+          "excludedPausedEntry": true
+        }
+      ],
+      "unchangedAfterRead": true
+    },
+    {
+      "configFile": "C:\\Users\\33272\\.cursor\\mcp.json",
+      "exists": true,
+      "sha256": "904a8a96c98e30537baf7a4bf19831fd476a7e3834a2f33008a8c2c3a393babb",
+      "serverCount": 11,
+      "companionRelated": [
+        {
+          "serverName": "cocos-creator-creator-3-8-8-test-project-e99c4def",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "d807b02b9b86c479eba360f139debed4166bc0c06b1adfcf9b4d5241a5f68723",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": false,
+          "commandExists": null,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": false,
+          "resolvedEntrypointHash": null
+        },
+        {
+          "serverName": "cocos-creator-tile-ylgy-9577195d",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "d807b02b9b86c479eba360f139debed4166bc0c06b1adfcf9b4d5241a5f68723",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": false,
+          "commandExists": null,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": false,
+          "resolvedEntrypointHash": null
+        },
+        {
+          "serverName": "cocos-creator-tile388-6ac745e1",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "d807b02b9b86c479eba360f139debed4166bc0c06b1adfcf9b4d5241a5f68723",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": false,
+          "commandExists": null,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": false,
+          "resolvedEntrypointHash": null
+        },
+        {
+          "serverName": "cocos-creator-test123-3969da01",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "d807b02b9b86c479eba360f139debed4166bc0c06b1adfcf9b4d5241a5f68723",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": false,
+          "commandExists": null,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": false,
+          "resolvedEntrypointHash": null
+        },
+        {
+          "serverName": "cocos-creator-colony-flow-food-hunt-194cec61",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "b75f6b888f65785b88f9a00738473d4c8b4d621a7d4c6c5b856906239f867c59",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": false,
+          "commandExists": null,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": false,
+          "resolvedEntrypointHash": null
+        },
+        {
+          "serverName": "cocos-creator-cook-c6c61564",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "b75f6b888f65785b88f9a00738473d4c8b4d621a7d4c6c5b856906239f867c59",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": false,
+          "commandExists": null,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": false,
+          "resolvedEntrypointHash": null
+        },
+        {
+          "serverName": "cocos-creator-cocos-6f2ef9ab",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "b75f6b888f65785b88f9a00738473d4c8b4d621a7d4c6c5b856906239f867c59",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": false,
+          "commandExists": null,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": false,
+          "resolvedEntrypointHash": null
+        },
+        {
+          "serverName": "cocos-creator-cocos-64d6e48e",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "b75f6b888f65785b88f9a00738473d4c8b4d621a7d4c6c5b856906239f867c59",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": false,
+          "commandExists": null,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": false,
+          "resolvedEntrypointHash": null
+        },
+        {
+          "serverName": "cocos-creator-cocos-214a2184",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "da3f4d3e9979fe02e18979f4498f8e7c1a132d55939a7a3a5f7b283cd3f40c4b",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": true,
+          "commandExists": true,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": true,
+          "resolvedEntrypointHash": "da3f4d3e9979fe02e18979f4498f8e7c1a132d55939a7a3a5f7b283cd3f40c4b"
+        },
+        {
+          "serverName": "cocos-creator-cook-cdc0709d",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "da3f4d3e9979fe02e18979f4498f8e7c1a132d55939a7a3a5f7b283cd3f40c4b",
+          "argumentCount": 3,
+          "excludedPausedEntry": false,
+          "commandAbsolute": true,
+          "commandExists": true,
+          "projectFlagPresent": true,
+          "scriptEntrypoints": [],
+          "currentWorkerPathResolves": true,
+          "resolvedEntrypointHash": "da3f4d3e9979fe02e18979f4498f8e7c1a132d55939a7a3a5f7b283cd3f40c4b"
+        },
+        {
+          "serverName": "cocos-creator-p1060-c16c7137",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "transport": "stdio",
+          "entryHash": "da3f4d3e9979fe02e18979f4498f8e7c1a132d55939a7a3a5f7b283cd3f40c4b",
+          "argumentCount": 3,
+          "excludedPausedEntry": true
+        }
+      ],
+      "unchangedAfterRead": true
+    },
+    {
+      "configFile": "C:\\Users\\33272\\.trae\\mcp.json",
+      "exists": false
+    },
+    {
+      "configFile": "C:\\Users\\33272\\.kiro\\settings\\mcp.json",
+      "exists": false
+    }
+  ],
+  "cursorLatestLogDirectory": "20261019T110512",
+  "cursorDedicatedLogs": [
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-cocos-214a2184.log",
+      "sha256": "80935a5705952fbe41704f4ea7a349de41cba25de7c11f2d8ffabfa7b9c9a7c5",
+      "lineCount": 11,
+      "literalMarkers": {
+        "MCP error -32000": [
+          4,
+          10
+        ],
+        "failed": [
+          4,
+          5,
+          10,
+          11
+        ],
+        "closed": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-cocos-64d6e48e.log",
+      "sha256": "6a0642dfa4dd4c18f1160198d63a8c024ad742dc4586bbfc3bd8deddd66dd2bb",
+      "lineCount": 15,
+      "literalMarkers": {
+        "MCP error -32000": [
+          6,
+          14
+        ],
+        "failed": [
+          6,
+          7,
+          14,
+          15
+        ],
+        "closed": [
+          6,
+          14
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-cocos-6f2ef9ab.log",
+      "sha256": "60dcaeb8ac39ef26117d8a1a521bab8af8b88ecfce38b4a3d7c55de1f8128d1a",
+      "lineCount": 15,
+      "literalMarkers": {
+        "MCP error -32000": [
+          6,
+          14
+        ],
+        "failed": [
+          6,
+          7,
+          14,
+          15
+        ],
+        "closed": [
+          6,
+          14
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-colony-flow-food-hunt-194cec61.log",
+      "sha256": "30498658d04da1dd0c44296c68c3bf263d91681c71b50717bc6718ad282e6388",
+      "lineCount": 15,
+      "literalMarkers": {
+        "MCP error -32000": [
+          6,
+          14
+        ],
+        "failed": [
+          6,
+          7,
+          14,
+          15
+        ],
+        "closed": [
+          6,
+          14
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-cook-c6c61564.log",
+      "sha256": "b0e979223a995e3da6057eaf3e0e47751330897fe71fa3ff2c387e7a19f1e3ab",
+      "lineCount": 15,
+      "literalMarkers": {
+        "MCP error -32000": [
+          6,
+          14
+        ],
+        "failed": [
+          6,
+          7,
+          14,
+          15
+        ],
+        "closed": [
+          6,
+          14
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-cook-cdc0709d.log",
+      "sha256": "2d5678a993212a92b97a9f9f7a7d1b8f62909456bfa1bf4c4ae78f7d0c5ac300",
+      "lineCount": 9,
+      "literalMarkers": {
+        "MCP error -32000": [
+          8
+        ],
+        "failed": [
+          8,
+          9
+        ],
+        "closed": [
+          8
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-creator-3-8-8-test-project-e99c4def.log",
+      "sha256": "54b6d277aba547c387d22662f77f15c43484da68790eb4990e14495477f76ad8",
+      "lineCount": 15,
+      "literalMarkers": {
+        "MCP error -32000": [
+          6,
+          14
+        ],
+        "failed": [
+          6,
+          7,
+          14,
+          15
+        ],
+        "closed": [
+          6,
+          14
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-test123-3969da01.log",
+      "sha256": "dc392416d45f56a99ccb4adaecb567b4ca5200f8cba50487a9fb43a8fcd7d895",
+      "lineCount": 15,
+      "literalMarkers": {
+        "MCP error -32000": [
+          6,
+          14
+        ],
+        "failed": [
+          6,
+          7,
+          14,
+          15
+        ],
+        "closed": [
+          6,
+          14
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-tile-ylgy-9577195d.log",
+      "sha256": "655ed048cedb45ddb0bc5cec975b1654fc47be5a1af5b98dd01d9ff8a303f5b7",
+      "lineCount": 15,
+      "literalMarkers": {
+        "MCP error -32000": [
+          6,
+          14
+        ],
+        "failed": [
+          6,
+          7,
+          14,
+          15
+        ],
+        "closed": [
+          6,
+          14
+        ]
+      }
+    },
+    {
+      "file": "C:\\Users\\33272\\AppData\\Roaming\\Cursor\\logs\\20261019T110512\\mcp-server-user-cocos-creator-tile388-6ac745e1.log",
+      "sha256": "952f33f40fd3d835fc2f59decdb2456f940f3bf06f934ccd33bd641f28dbcfda",
+      "lineCount": 15,
+      "literalMarkers": {
+        "MCP error -32000": [
+          6,
+          14
+        ],
+        "failed": [
+          6,
+          7,
+          14,
+          15
+        ],
+        "closed": [
+          6,
+          14
+        ]
+      }
+    }
+  ],
+  "currentProcesses": {
+    "codex.exe": [
+      16804,
+      13528
+    ],
+    "ChatGPT.exe": "present",
+    "Cursor.exe": "not present at successful CIM snapshot",
+    "Trae.exe": "not present at successful CIM snapshot",
+    "Kiro.exe": "not present at successful CIM snapshot"
+  },
+  "conclusion": {
+    "configured": [
+      "Codex",
+      "Cursor"
+    ],
+    "runningClientShell": [
+      "Codex/ChatGPT"
+    ],
+    "companionSuccessfulMcpHandshake": "unproven; no matching success evidence retained in inspected dedicated Cursor logs; Codex configuration is not a handshake",
+    "actualBusinessUse": "unproven",
+    "registrationFeaturePreserved": "isolated contract evidence exists; no real registration or business call was executed",
+    "excluded": [
+      "VS Code deployment",
+      "P1060 execution/probing",
+      "models",
+      "Creator",
+      "desktop operations",
+      "configuration writes"
+    ]
+  }
+}

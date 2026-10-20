@@ -1,0 +1,20 @@
+{
+  "reuseOnly": true,
+  "allPriorEvidenceManifestHashesMatched": true,
+  "modules": [
+    {
+      "name": "companion/http-server",
+      "priorSha256": "70e73fe0328d7670291d49cf35087324674584ae8beaf7848fcb518ed6efde32",
+      "currentSha256": "70e73fe0328d7670291d49cf35087324674584ae8beaf7848fcb518ed6efde32",
+      "unchanged": true
+    },
+    {
+      "name": "companion/log-store",
+      "priorSha256": "64e30327d0108366563ca56d5aa7c04a555885439ea28090a47f1b2f72d7502d",
+      "currentSha256": "64e30327d0108366563ca56d5aa7c04a555885439ea28090a47f1b2f72d7502d",
+      "unchanged": true
+    }
+  ],
+  "productionClearVerified": false,
+  "sourceScope": "HTTP and LogStore exact source unchanged; originalUI fixture limits retained"
+}

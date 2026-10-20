@@ -1,0 +1,64 @@
+{
+  "installedMap": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js.map",
+  "installedMapSha256": "212ba55f65e4216c11fd896433ac275c764061ae26de2cb6b62687b47d4e19ea",
+  "priorHostSourcesUnchanged": false,
+  "hostSources": [
+    {
+      "name": "codex-configurator.ts",
+      "priorSha256": "ca451af9431f0cda32fa762946fa4094289233b44bdd203b51a42a37859cf648",
+      "installedSha256": "962dc7cc307ed0f32ee3049cf5772a3b2750dfe0478aa3329d85be5237bec498",
+      "unchanged": false
+    },
+    {
+      "name": "bridge-installer.ts",
+      "priorSha256": "a58a32e6d49f1d2af5c4752f8f21819fdc465b78de33b5c0851289f55b447b7e",
+      "installedSha256": "a58a32e6d49f1d2af5c4752f8f21819fdc465b78de33b5c0851289f55b447b7e",
+      "unchanged": true
+    },
+    {
+      "name": "dashboard-errors.ts",
+      "priorSha256": "c192df6018393bcbfe8f0c33c9e41d54c6f0080d83141136380f122412fba356",
+      "installedSha256": "c192df6018393bcbfe8f0c33c9e41d54c6f0080d83141136380f122412fba356",
+      "unchanged": true
+    },
+    {
+      "name": "setup-service.ts",
+      "priorSha256": "20710dfaed6d66f4650d1091d7a654bfd401a6e625189d1f4e775d47d1e99e20",
+      "installedSha256": "20710dfaed6d66f4650d1091d7a654bfd401a6e625189d1f4e775d47d1e99e20",
+      "unchanged": true
+    },
+    {
+      "name": "project-registry.ts",
+      "priorSha256": "1ffbb881498c754f5ec4a7dde690957af407b1268104d82d54dcf9d11b96e943",
+      "installedSha256": "1ffbb881498c754f5ec4a7dde690957af407b1268104d82d54dcf9d11b96e943",
+      "unchanged": true
+    }
+  ],
+  "testedNextSources": [
+    {
+      "path": "src/adapters/project-setup.ts",
+      "sha256": "bf4aa497d2ef8ff69ff3c1b53552ca805d241d3c9b53c92bfc97b0091ef6cc07"
+    },
+    {
+      "path": "src/stores/project-setup.ts",
+      "sha256": "318b01fef5bf3794e3659756f23b66033f959e092c803496cfcbeb55b4fd256b"
+    },
+    {
+      "path": "src/domain/project-setup.ts",
+      "sha256": "243997e7e0769d776b08c6ecdb7dc46e6394962c86fb095376f7f6e6b63cc98b"
+    },
+    {
+      "path": "src/project-setup-integration.ts",
+      "sha256": "3ee86c42c2356aa9e10f53e09ef671be9430ce14b9eebe45bfee04f53d0787bf"
+    },
+    {
+      "path": "src/stores/companion-browser.ts",
+      "sha256": "f45ed697e4fca18406571e93ca38f533f09686bafd22dcab95be45959b18fa2e"
+    },
+    {
+      "path": "src/stores/project-operation-lane.ts",
+      "sha256": "163f50a2f614d8298f3bb360af320862f3bbb66c80c4f7355a897d6fb80022b9"
+    }
+  ],
+  "scope": "read-only source hashes; no process/HTTP/config writes"
+}

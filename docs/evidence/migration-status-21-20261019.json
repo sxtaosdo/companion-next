@@ -42,7 +42,7 @@
       "id": 5,
       "name": "五步安装与完成用法",
       "status": "部分完成",
-      "evidenceAndRemaining": "00/10真实通过，01/11仅隔离合同，真实客户端配置未验",
+      "evidenceAndRemaining": "00/10真实通过，01/11仅隔离合同，真实客户端配置未验；2026-10-20新增9条恢复/回执隔离通过，仍无真实配置写入",
       "remainingKind": "实机/真实写入范围"
     },
     {
@@ -77,14 +77,14 @@
       "id": 10,
       "name": "清空、导出、诊断",
       "status": "部分完成",
-      "evidenceAndRemaining": "真实导出诊断及本机583B文件已复核复用；本轮不重复诊断、不外发、DELETE0。清空仅原隔离语义/模拟UI通过，没有真实API清除回执；本轮明确禁止清空真实日志/业务记录，不要求删除用户真实日志",
+      "evidenceAndRemaining": "真实导出诊断及本机583B文件已复核复用；本轮不重复诊断、不外发、DELETE0。清空仅原隔离语义/模拟UI通过，没有真实API清除回执；本轮明确禁止清空真实日志/业务记录，不要求删除用户真实日志；2026-10-20已复核完整隔离清空链SHA与当前HTTP/LogStore源一致，复用不重跑，生产清空仍未执行",
       "remainingKind": "本轮清空禁止；诊断导出已真实验收"
     },
     {
       "id": 11,
       "name": "调用记录、筛选、详情、分页",
       "status": "部分完成",
-      "evidenceAndRemaining": "此前只读验收时真实fixture6条success，列表顺序/累计保留6、成功详情摘要、失败筛选0、切回及刷新与API一致，调用数不变。6<50且无游标，真实分页/失败详情缺数据未验；132/66仍仅模拟；本轮Creator验收新产生成功/失败记录，尚未用于补验失败详情/分页",
+      "evidenceAndRemaining": "此前只读验收时真实fixture6条success，列表顺序/累计保留6、成功详情摘要、失败筛选0、切回及刷新与API一致，调用数不变。6<50且无游标，真实分页/失败详情缺数据未验；132/66仍仅模拟；本轮Creator验收新产生成功/失败记录，尚未用于补验失败详情/分页；2026-10-20新增真实安装Store/原路由投影→Next5项隔离，1032/1000及500失败跨页无重漏；开机后实例未启动，未补生产分页/失败详情",
       "remainingKind": "真实分页仍缺自然足量数据；本轮已有自然失败记录可另做只读详情补验"
     },
     {
@@ -98,14 +98,14 @@
       "id": 13,
       "name": "CLI使用、IDE交接",
       "status": "部分完成",
-      "evidenceAndRemaining": "原CLI只读inflight与交接预览已验，真实外部客户端接收/执行未验",
+      "evidenceAndRemaining": "原CLI只读inflight与交接预览已验，真实外部客户端接收/执行未验；2026-10-20已有配置/运行进程/专属日志只读清单完成，未找到当前成功Companion握手证明，未改配置",
       "remainingKind": "实机"
     },
     {
       "id": 14,
       "name": "五客户端MCP登记",
       "status": "部分完成",
-      "evidenceAndRemaining": "五客户端旧功能合同保留；用户明确未使用VS Code，已撤销其候选部署及专属锁交接开发，保留隔离代码但不作为当前迁移验收阻塞。其余实际使用客户端按原范围验收",
+      "evidenceAndRemaining": "五客户端旧功能合同保留；用户明确未使用VS Code，已撤销其候选部署及专属锁交接开发，保留隔离代码但不作为当前迁移验收阻塞。其余实际使用客户端按原范围验收；2026-10-20已有配置/运行进程/专属日志只读清单完成，未找到当前成功Companion握手证明，未改配置",
       "remainingKind": "实际使用客户端实机；VS Code候选排除当前阻塞"
     },
     {
@@ -185,5 +185,24 @@
       "countsAfter": "13/6/2"
     }
   },
-  "callsReadonlyUpdate": "Six real existing success records: UI list/order, success detail hashes, zero-result failed filter, reset and explicit refresh exact; count remains6. No cursor under50, real pagination/failure detail unverified. Reused actual583B diagnostic without new POST/download. Counts12/7/2 unchanged."
+  "callsReadonlyUpdate": "Six real existing success records: UI list/order, success detail hashes, zero-result failed filter, reset and explicit refresh exact; count remains6. No cursor under50, real pagination/failure detail unverified. Reused actual583B diagnostic without new POST/download. Counts12/7/2 unchanged.",
+  "bootReadiness20261020": {
+    "status": "BLOCKED_BEFORE_LISTEN",
+    "reason": "Kernel identity is inconsistent with the anchor",
+    "bootIdEqual": true,
+    "systemProcessCreatedAtEqual": false,
+    "service32180Listening": false,
+    "knowledgeReferenceExists": true,
+    "knowledgeAuthenticationVerifiedToday": false,
+    "hostChangesOutsideApprovedCreatorException": false,
+    "newDeployment": false,
+    "report": "parallel-closeout-20261020.md"
+  },
+  "incrementalOfflineVerification20261020": {
+    "callsInstalledStoreAndRouteProjection": 5,
+    "setupRecoveryBoundaries": 9,
+    "realClientConfigurationWrites": 0,
+    "productionClearRequests": 0,
+    "countsUnchanged": "13/6/2"
+  }
 }

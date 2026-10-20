@@ -1,0 +1,56 @@
+{
+  "mode": "OFFLINE_ISOLATED_PRODUCT_CLEAR_CHAIN_COMPLETED_IN_BOUNDED_SEGMENTS",
+  "isolatedFlowPassed": true,
+  "productionClearPassed": false,
+  "targetClear": {
+    "status": 200,
+    "cleared": 3,
+    "visibleBefore": 1,
+    "allThreeTargetCategoriesRemoved": true,
+    "otherProjectCategoriesAndBackgroundExact": true,
+    "remainingIds": [
+      "offline-b1",
+      "offline-b2",
+      "offline-bg1"
+    ],
+    "pageAutoRefreshEmpty": true
+  },
+  "cancel": {
+    "beforeCount": 6,
+    "afterCount": 6,
+    "deletes": 0
+  },
+  "refresh": {
+    "renderedRemaining": 3,
+    "otherCategoriesVisible": true,
+    "removedTargetAbsent": true
+  },
+  "failure": {
+    "status": 403,
+    "mechanism": "Omit Origin only in isolated transport; unchanged original HTTP guard rejects before clear",
+    "failureShown": true,
+    "noSuccessReceipt": true,
+    "memoryUnchanged": true,
+    "refreshRetainsTargetRows": 2,
+    "deleteAttemptsTotal": 1,
+    "autoRetry": false
+  },
+  "totalIsolatedDeleteRequests": 2,
+  "successfulClearRequests": 1,
+  "rejectedBeforeClearRequests": 1,
+  "successfulClearReplayed": false,
+  "productionNetworkRequests": 0,
+  "productionLogOrConfigurationReads": 0,
+  "productionWrites": 0,
+  "listenerAttempts": 0,
+  "newPersistentPermissions": 0,
+  "allOwnedBrowsersClosed": true,
+  "productSourceChanged": false,
+  "countStatus": "12 passed / 7 partial / 2 paused or blocked; item10 remains partial",
+  "harnessLimitations": {
+    "result.json": "Target clear and cancellation passed; readback selector clicked selected tag and timed out. Original accepted=false preserved.",
+    "supplement.json": "Remaining-row refresh passed; local dialog variable missing before rejection dispatch. Original accepted=false preserved.",
+    "rejection-only.json": "Only remaining403 rejection and post-failure refresh executed; passed."
+  },
+  "sourceManifest": "source-manifest.json"
+}

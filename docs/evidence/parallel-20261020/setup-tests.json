@@ -1,0 +1,44 @@
+{
+  "numTotalTests": 9,
+  "numPassedTests": 9,
+  "numFailedTests": 0,
+  "success": true,
+  "tests": [
+    {
+      "name": "failed strict {\"startCreator\":false,\"configureCodex\":true} retains partial-effects warning and requires fresh confirmation for a second POST",
+      "status": "passed"
+    },
+    {
+      "name": "failed strict {\"startCreator\":true,\"configureCodex\":true} retains partial-effects warning and requires fresh confirmation for a second POST",
+      "status": "passed"
+    },
+    {
+      "name": "strict {\"startCreator\":false,\"configureCodex\":true} read failure permits only explicit same-ID GET recovery, never POST replay",
+      "status": "passed"
+    },
+    {
+      "name": "strict {\"startCreator\":true,\"configureCodex\":true} read failure permits only explicit same-ID GET recovery, never POST replay",
+      "status": "passed"
+    },
+    {
+      "name": "unselected step effect {\"startCreator\":false,\"configureCodex\":true} is UNKNOWN and retains write barrier",
+      "status": "passed"
+    },
+    {
+      "name": "unselected step effect {\"startCreator\":true,\"configureCodex\":false} is UNKNOWN and retains write barrier",
+      "status": "passed"
+    },
+    {
+      "name": "complete plus backend error suppresses completion usage and never displays raw error",
+      "status": "passed"
+    },
+    {
+      "name": "invalid MCP identity suppresses usage even after matching strict completion",
+      "status": "passed"
+    },
+    {
+      "name": "strict conflict is rejected with no GET tracking; a fresh approval is required",
+      "status": "passed"
+    }
+  ]
+}

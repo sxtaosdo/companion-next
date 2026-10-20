@@ -1,0 +1,19 @@
+{
+  "mode": "READ_ONLY_EXISTING_OS_SAMPLER",
+  "atUtc": "2026-10-20T00:49:03.291Z",
+  "samplerSourceSha256": "5ebbe8c80e7fddee0d2e8e196c76e7de51dbeddd2c421236cdb2149162d24e67",
+  "machineMatchesAnchor": true,
+  "bootIdMatchesAnchor": true,
+  "systemProcessCreatedAtMatchesAnchor": false,
+  "current": {
+    "bootId": "a49be189-172d-11f0-8a7d-8c9774127e68",
+    "systemProcessCreatedAt": "2026-10-20T00:39:52.8919050Z",
+    "lastBootUpTime": "2026-10-20T00:39:45.5000000Z"
+  },
+  "anchor": {
+    "bootId": "a49be189-172d-11f0-8a7d-8c9774127e68",
+    "systemProcessCreatedAt": "2026-10-19T09:37:39.8830320Z"
+  },
+  "guardConditionFails": true,
+  "writesToAuthorityOrHistory": false
+}

@@ -1,0 +1,28 @@
+{
+  "numTotalTests": 5,
+  "numPassedTests": 5,
+  "numFailedTests": 0,
+  "success": true,
+  "tests": [
+    {
+      "name": "installed host store and verbatim call-route projection to Next, no listener retains only newest 1000 of 1032 and traverses 20 exclusive pages while total remains 1032",
+      "status": "passed"
+    },
+    {
+      "name": "installed host store and verbatim call-route projection to Next, no listener filters retained failures before pagination and preserves unfiltered total and retained summaries",
+      "status": "passed"
+    },
+    {
+      "name": "installed host store and verbatim call-route projection to Next, no listener preserves generated success/failure detail and sanitizes raw input, result and error before Next retention",
+      "status": "passed"
+    },
+    {
+      "name": "installed host store and verbatim call-route projection to Next, no listener retains a running call and refuses to resurrect an evicted in-flight row on late finish",
+      "status": "passed"
+    },
+    {
+      "name": "installed host store and verbatim call-route projection to Next, no listener uses the exact installed route schema to reject invalid cursors, limits and filters before querying",
+      "status": "passed"
+    }
+  ]
+}

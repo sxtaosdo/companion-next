@@ -1,0 +1,22 @@
+{
+  "installedJsSha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
+  "installedMapSha256": "212ba55f65e4216c11fd896433ac275c764061ae26de2cb6b62687b47d4e19ea",
+  "routeProjectionSha256": "7831ed2da32cb2af25aeab454ae20eee213ea0037c1c8c559f8653bfcf1fde35",
+  "sources": [
+    {
+      "path": "companion/call-history.ts",
+      "sha256": "2464e1f8a1769b4fab98b24c224a71e5e5f8a0f9ad6fc3f2c4ad974a4cc43e81"
+    },
+    {
+      "path": "companion/tool-names.ts",
+      "sha256": "505688fd1584e779d1f8ed735aeb74dd4ebc592937fd068303e438b090adb602"
+    },
+    {
+      "path": "companion/http-server.ts",
+      "sha256": "70e73fe0328d7670291d49cf35087324674584ae8beaf7848fcb518ed6efde32"
+    }
+  ],
+  "listenerStarted": false,
+  "productionHistoryRead": false,
+  "fullHttpAuthenticationTested": false
+}

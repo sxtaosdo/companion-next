@@ -1,0 +1,16 @@
+{
+  "boot-anchor-comparison.json": "6d6c44237d18a7b650ed852b10bcb09f73efd26e8030267044005ef22f453f2b",
+  "boot-preflight.json": "c4085630287a949844ce543a1dc96348768bb6d2dfc018e8037af88f11714c6e",
+  "calls-source-binding.json": "96ba087b2cb64c05b9094cdcf41100483d9d1d7f28e5768a4708d5ee03a4ec91",
+  "calls-tests.json": "f5c4e5a4ecf67362b2bebf09ec1403fa3eef98c310af564da4ef3fff481a4e2c",
+  "client-inventory.json": "c201e023f520c6b48c050271fe7ac6d8a3432a2a34d7097ec01052a7a78c2ac5",
+  "diagnostic-start-error.txt": "ebb46d18787facf680dbc5ef6624e8c477dfff13d4e38b30833e17c8cf348d86",
+  "diagnostic-start-issued.json": "52b25172516a028f85016820d67f096f294153b60166d2b11c6c28ccf636b905",
+  "diagnostic-start-result.json": "00a551be392f5ba97e3559014e935bf947594436e602143062ca079f352263dc",
+  "log-clear-source-binding.json": "b5d77011ce9d98b908344a84972b650c72e3413257943010473b7cebb85dd3c7",
+  "preservation-final.json": "ba41a350a71f54b5e8821ea5559072f09d3f75716a6fda6daf3e8c284e0fefed",
+  "reused-isolated-clear-manifest.json": "3e05c2cbdb705e0760c9f8c1031bd0b45012da21215ae77dc6b10a6a7e1945f9",
+  "reused-isolated-clear-result.json": "fa97b97135b8e389a500848ef9937fee2a95ef3772068a15736d108574142e31",
+  "setup-source-binding.json": "8cb517665ff3a449c91f0e7b55d8465f6d9a3bc2ef97d4fe19d7d3360185cb1e",
+  "setup-tests.json": "541d96f0d043f1af82055e4b2ec482b6f3ab33ba5eb8de890d37eba256a7a639"
+}

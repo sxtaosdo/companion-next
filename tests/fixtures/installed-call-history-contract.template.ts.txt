@@ -1,0 +1,49 @@
+// Materialized only by the explicit installed-map verification script.
+import {beforeEach,describe,expect,it} from 'vitest'
+import {createPinia,setActivePinia} from 'pinia'
+import {CallHistoryStore} from './installed-call-history.mjs'
+import {route} from './installed-call-routes.mjs'
+import {createCompanionBrowserProvider} from '@next/companion-browser-adapter'
+import {useCompanionBrowserStore} from '@next/companion-browser-store'
+const projectId='isolated-project'
+function seed(n:number){const host=new CallHistoryStore();for(let sequence=1;sequence<=n;sequence++){
+ const id=host.begin(projectId,'scene_get',sequence%3===0?'mcp':sequence%3===1?'cli':'web',{name:`input-${sequence}`,token:'INPUT_SECRET'});
+ host.finish(projectId,id,{value:`result-${sequence}`,password:'RESULT_SECRET'},sequence%2===0?new Error(`failure-${sequence} Bearer ERROR_SECRET`):undefined)
+}return host}
+async function connect(host:CallHistoryStore){const requests:string[]=[];const store=useCompanionBrowserStore();const fetch=async(path:string,init:any)=>{
+ expect(init.method).toBe('GET');requests.push(path);
+ if(path==='/api/projects')return new Response(JSON.stringify([{id:projectId,name:'Isolated',path:'/synthetic-only'}]),{headers:{'content-type':'application/json'}});
+ const result=route(host,path);if(!result)throw Error('Unexpected path '+path);
+ return new Response(JSON.stringify(result.body),{status:result.status,headers:{'content-type':'application/json'}})
+};await store.connect(createCompanionBrowserProvider({fetch,runtimeProbes:false}));expect(store.projectError).toBe('');expect(store.connected).toBe(true);store.setCallContext(projectId,false);return {store,requests}}
+beforeEach(()=>setActivePinia(createPinia()))
+describe('installed host store and verbatim call-route projection to Next, no listener',()=>{
+ it('retains only newest 1000 of 1032 and traverses 20 exclusive pages while total remains 1032',async()=>{
+  const host=seed(1032),{store,requests}=await connect(host);await store.loadCalls();let pages=1;while(store.nextBefore!==undefined){expect(pages++).toBeLessThan(20);await store.loadCalls(true)}
+  expect(store.records.map(x=>x.sequence)).toEqual(Array.from({length:1000},(_,i)=>1032-i));
+  expect(new Set(store.records.map(x=>x.id)).size).toBe(1000);expect(store.total).toBe(1032);expect(store.retained).toBe(1000);
+  expect(requests.filter(x=>x.includes('/calls?'))).toHaveLength(20);expect(store.records.at(-1)?.sequence).toBe(33);
+ });
+ it('filters retained failures before pagination and preserves unfiltered total and retained summaries',async()=>{
+  const {store,requests}=await connect(seed(1032));store.setCallContext(projectId,true);await store.loadCalls();let pages=1;while(store.nextBefore!==undefined){expect(pages++).toBeLessThan(10);await store.loadCalls(true)}
+  expect(store.records.map(x=>x.sequence)).toEqual(Array.from({length:500},(_,i)=>1032-i*2));
+  expect(store.total).toBe(1032);expect(store.retained).toBe(1000);expect(requests.filter(x=>x.includes('/calls?'))).toHaveLength(10);
+ });
+ it('preserves generated success/failure detail and sanitizes raw input, result and error before Next retention',async()=>{
+  const {store}=await connect(seed(2));await store.loadCalls();expect(store.records).toHaveLength(2);
+  expect(store.records[0]).toMatchObject({sequence:2,status:'failed',source:'web'});
+  expect(store.records[0].errorSummary).toContain('failure-2');expect(store.records[0].errorSummary).toContain('[redacted]');
+  expect(store.records[1]).toMatchObject({sequence:1,status:'success',source:'cli'});expect(store.records[1].errorSummary).toBeUndefined();
+  expect(store.records[1].inputSummary).toContain('input-1');expect(store.records[1].resultSummary).toContain('result-1');
+  expect(JSON.stringify(store.records)).not.toMatch(/INPUT_SECRET|RESULT_SECRET|ERROR_SECRET/);
+ });
+ it('retains a running call and refuses to resurrect an evicted in-flight row on late finish',async()=>{
+  const host=new CallHistoryStore(),first=host.begin(projectId,'scene_get','mcp',{});for(let i=0;i<1000;i++)host.begin(projectId,'scene_get','web',{});
+  expect(host.finish(projectId,first,{late:true})).toBe(false);const {store}=await connect(host);await store.loadCalls();
+  expect(store.records).toHaveLength(50);expect(store.records.every(x=>x.status==='running')).toBe(true);expect(store.total).toBe(1001);expect(store.retained).toBe(1000);
+ });
+ it('uses the exact installed route schema to reject invalid cursors, limits and filters before querying',()=>{
+  const host=seed(1);for(const query of ['before=0','before=1.5','limit=51','status=success','unknown=1'])expect(()=>route(host,`/api/projects/${projectId}/calls?${query}`)).toThrow();
+  expect(route(host,`/api/projects/${projectId}/calls?limit=1&before=1`).body.records).toEqual([]);
+ });
+});

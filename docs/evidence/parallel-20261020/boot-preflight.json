@@ -1,0 +1,88 @@
+{
+  "atUtc": "2026-10-20T00:45:14.797488+00:00",
+  "os": {
+    "processes": [
+      {
+        "pid": 18320,
+        "parentPid": 15592,
+        "name": "node.exe",
+        "createdAt": "2026-10-20T00:41:34.5797930Z",
+        "isCompanionDaemon": false,
+        "isCompanionNext": false,
+        "executablePath": "C:\\Users\\33272\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe"
+      },
+      {
+        "pid": 3576,
+        "parentPid": 3132,
+        "name": "node.exe",
+        "createdAt": "2026-10-20T00:43:05.9138180Z",
+        "isCompanionDaemon": false,
+        "isCompanionNext": false,
+        "executablePath": "C:\\Users\\33272\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\78fb63cda1a9e2b2\\bin\\node.exe"
+      },
+      {
+        "pid": 8424,
+        "parentPid": 7348,
+        "name": "node.exe",
+        "createdAt": "2026-10-20T00:44:08.5832960Z",
+        "isCompanionDaemon": false,
+        "isCompanionNext": false,
+        "executablePath": "C:\\Users\\33272\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\78fb63cda1a9e2b2\\bin\\node.exe"
+      },
+      {
+        "pid": 9580,
+        "parentPid": 6608,
+        "name": "node.exe",
+        "createdAt": "2026-10-20T00:44:22.2609270Z",
+        "isCompanionDaemon": false,
+        "isCompanionNext": false,
+        "executablePath": "C:\\Users\\33272\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\78fb63cda1a9e2b2\\bin\\node.exe"
+      },
+      {
+        "pid": 7780,
+        "parentPid": 13944,
+        "name": "node.exe",
+        "createdAt": "2026-10-20T00:44:33.1592000Z",
+        "isCompanionDaemon": false,
+        "isCompanionNext": false,
+        "executablePath": "C:\\Users\\33272\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\78fb63cda1a9e2b2\\bin\\node.exe"
+      }
+    ],
+    "knowledgeReference": {
+      "processReferenceMatchesUser": true,
+      "path": "D:/services/weknora/cli/private/pilot-recovery-reader.dpapi",
+      "userReferencePresent": true,
+      "fileExists": true,
+      "fileBytes": 620
+    },
+    "edgeProcessCount": 0,
+    "listeners": [],
+    "bootAtUtc": "2026-10-20T00:39:45.5000000Z"
+  },
+  "locatorIdentityOnDisk": {
+    "pid": 3860,
+    "startupEpoch": "2d198c64-75c0-4e6b-b3b5-2eac2015bf78",
+    "startedAt": "2026-10-19T17:31:10.011Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
+    "nodeVersion": "v25.2.1"
+  },
+  "locatorPidIsCurrentCompanion": false,
+  "locatorPidOwns32180": false,
+  "actualEntrySha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
+  "actualMapSha256": "212ba55f65e4216c11fd896433ac275c764061ae26de2cb6b62687b47d4e19ea",
+  "nextStaticJsSha256": "b2b29887dbc1e62e9f25fd1856afac8dc49dc0d6232de12346b2e00e90b5eda9",
+  "nextHead": "ac5b756f97e8c5c8ec167f2367d51a2bdcb1571f",
+  "nextStatus": "",
+  "shared": {
+    "head": "6ff44f5574ed2f1b81741e86c3ca1210c6c0085a",
+    "status": " M AGENTS.md\n M mcp/README.md\n M mcp/docs/icons.md\n M mcp/scripts/build-companion.mjs\n M mcp/src/companion-cli.ts\n M mcp/src/companion-daemon.ts\n M mcp/src/companion/edge-session.ts\n M mcp/src/companion/http-server.ts\n M mcp/src/companion/icon-adapter.ts\n M mcp/src/companion/lifecycle-drain.ts\n M mcp/tests/daemon-cli-drain.test.ts\n M mcp/tests/daemon-drain.test.ts\n M mcp/tests/daemon-shutdown-failure.test.ts\n M mcp/tests/icon-http.test.ts\n M mcp/tests/web-changelog.test.ts\n M web/src/changelog.ts\n?? mcp/docs/resource-studio-phase1.md\n?? mcp/scripts/stop-previous-daemon.mjs\n?? mcp/src/companion/resource-plan.ts\n?? mcp/tests/resource-plan.test.ts\n?? mcp/tests/stop-previous-daemon.test.ts\n?? node_modules/\n",
+    "workDiffSha256": "ec4c01b56d5433c3941bfae94277fbcc5f9bd98db2f09b74a683ecfea138eebf",
+    "indexDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "protectedFilesMatching": 21,
+    "sameAsPriorBaseline": true
+  },
+  "credentialFileContentRead": false,
+  "networkRequests": 0,
+  "startOrStopActions": 0
+}
