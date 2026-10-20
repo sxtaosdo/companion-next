@@ -1,0 +1,114 @@
+{
+  "atUtc": "2026-10-20T07:36:00.728Z",
+  "error": "Scope layers missing",
+  "requests": [
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/projects/04c4cde24ee76d83/calls"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/projects/04c4cde24ee76d83/calls"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/next/index.html"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/next/assets/index-DpQQM2sD.js"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/next/assets/index-BfTnAjG_.css"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/tools"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/tools"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/tool-presets"
+    }
+  ],
+  "blocked": [
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/status"
+    }
+  ],
+  "pageErrors": []
+}

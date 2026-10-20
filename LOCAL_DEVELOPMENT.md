@@ -1,3 +1,5 @@
+2026-10-20 Vue迁移阶段核对：目标是页面/交互/API合同，外部Cursor、宿主writer和模型业务不作前置条件。本轮源码3438b08/内部1.3.173.175已本机静态交付，产品仍1.3.173；三处上下文/状态缺陷已修，六HTTP SHA/已部署页面通过，daemon6564未重启。312旧运行文件仅Next index变化、其余311保持，新增2静态资源，9表/配置/共享修改保持。后续运行文件基线应读取docs/evidence/vue-root-20261020-0718/post-static-baseline.json，旧cold-entry基线早于这次合法index变更，不可将差异误报新宿主故障。每阶段先核目标/改动层/验收层，结束核真实剩余；只改既有MD，不以测试数量代替目标。
+
 # Windows本地开发交接
 
 2026-10-18 工程展示恢复仅Next view+纯formatter；缺耗时保留未知，不冒充0。67项定向、strict/一次构建通过，等待静态与Edge验收，见docs/project-empty-call-meta-20261018.md。

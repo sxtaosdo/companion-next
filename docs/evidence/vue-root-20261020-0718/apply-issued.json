@@ -1,0 +1,14 @@
+{
+  "atUtc": "2026-10-20T07:35:36.346231+00:00",
+  "sourceCommit": "3438b089949d0466641b61daa95412edad8f4758",
+  "oldIndexSha256": "31a4f48cef4ec0711741330a1b5bc31c7760c9bd0ebc1d5436829b7d478c5d65",
+  "files": [
+    "next/assets/about-icon-BaVeClOr.svg",
+    "next/assets/donation-qr-D7kdLLAm.png",
+    "next/assets/index-BfTnAjG_.css",
+    "next/assets/index-DpQQM2sD.js",
+    "next/favicon.svg",
+    "next/index.html"
+  ],
+  "scope": "Next static assets and atomic index only; no process restart"
+}

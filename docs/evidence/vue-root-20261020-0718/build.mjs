@@ -1,0 +1,18 @@
+import {execFileSync} from 'node:child_process';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {join} from 'node:path';
+import {createHash} from 'node:crypto';
+import {inspectStaticCandidate} from 'file:///D:/code/shidai3/P8000/companion-next/scripts/prepare-companion-static.mjs';
+const W=import.meta.dirname,R='D:/code/shidai3/P8000/companion-next',git='C:/Program Files/Git/cmd/git.exe';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const run=(...args)=>execFileSync(git,['-C',R,...args],{encoding:'utf8'}).trim();
+if(run('status','--porcelain'))throw Error('Source tree changed before candidate build');
+const commit=run('rev-parse','HEAD');
+const parent=join(W,'static-candidate');await mkdir(parent);
+const next=join(parent,'next');
+execFileSync(process.execPath,[join(R,'node_modules/vite/bin/vite.js'),'build','--mode','companion-workspace','--base','./','--outDir',next],{cwd:R,stdio:'inherit'});
+const inspected=await inspectStaticCandidate(next);
+if(run('rev-parse','HEAD')!==commit||run('status','--porcelain'))throw Error('Source tree changed while building candidate');
+const result={atUtc:new Date().toISOString(),sourceCommit:commit,sourceClean:true,buildMode:'companion-workspace',base:'./',productVersion:'1.3.173',internalCheckpoint:(await readFile(join(R,'VERSION'),'utf8')).trim(),sourceDomainSha256:sha(await readFile(join(R,'src/domain/product-information.ts'))),...inspected,deployed:false};
+await writeFile(join(W,'candidate.json'),JSON.stringify(result,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({candidateReady:true,sourceCommit:commit,files:inspected.files.length,bytes:inspected.files.reduce((a,f)=>a+f.size,0)}));

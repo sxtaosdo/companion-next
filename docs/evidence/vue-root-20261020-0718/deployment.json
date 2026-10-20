@@ -1,0 +1,55 @@
+{
+  "atUtc": "2026-10-20T07:35:36.635575+00:00",
+  "sourceCommit": "3438b089949d0466641b61daa95412edad8f4758",
+  "internalCheckpoint": "1.3.173.175",
+  "productVersion": "1.3.173",
+  "kind": "Next static only",
+  "files": [
+    {
+      "path": "next/assets/about-icon-BaVeClOr.svg",
+      "size": 230,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "next/assets/donation-qr-D7kdLLAm.png",
+      "size": 106967,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "next/assets/index-BfTnAjG_.css",
+      "size": 430581,
+      "sha256": "1c9918fd27a9d415f69eb662d45f62914da006cdd4c6c11bdefd432462483856"
+    },
+    {
+      "path": "next/assets/index-DpQQM2sD.js",
+      "size": 1902078,
+      "sha256": "8f0ffc2dc2b0a9e712085f2697e340d72663fe14ad040e77411c0bab6ec53f89"
+    },
+    {
+      "path": "next/favicon.svg",
+      "size": 245,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "next/index.html",
+      "size": 573,
+      "sha256": "d348370ddb475bb8aecfbb3b9010fd105769e05bdf7e06fedaaf30f8d67148bf"
+    }
+  ],
+  "changedOriginalRuntimeNames": [
+    "web/next/index.html"
+  ],
+  "newRuntimeNames": [
+    "web/next/assets/index-BfTnAjG_.css",
+    "web/next/assets/index-DpQQM2sD.js"
+  ],
+  "oldIndexSha256": "31a4f48cef4ec0711741330a1b5bc31c7760c9bd0ebc1d5436829b7d478c5d65",
+  "newIndexSha256": "d348370ddb475bb8aecfbb3b9010fd105769e05bdf7e06fedaaf30f8d67148bf",
+  "oldResourcesRetained": true,
+  "rollback": "Restore backup-index.html atomically only if current index still matches this receipt; retain content-addressed assets",
+  "daemonRestarted": false,
+  "cursorActions": 0,
+  "creatorActions": 0,
+  "modelActions": 0,
+  "configurationWrites": 0
+}

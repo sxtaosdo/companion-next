@@ -1,0 +1,61 @@
+{
+  "atUtc": "2026-10-20T07:32:44.197Z",
+  "sourceCommit": "3438b089949d0466641b61daa95412edad8f4758",
+  "sourceClean": true,
+  "buildMode": "companion-workspace",
+  "base": "./",
+  "productVersion": "1.3.173",
+  "internalCheckpoint": "1.3.173.175",
+  "sourceDomainSha256": "cc117463f4740cc7779c04090ce5d6259ff9a5ac1808c8c1b0182298dac2c5cd",
+  "files": [
+    {
+      "path": "next/assets/about-icon-BaVeClOr.svg",
+      "size": 230,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "next/assets/donation-qr-D7kdLLAm.png",
+      "size": 106967,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "next/assets/index-BfTnAjG_.css",
+      "size": 430581,
+      "sha256": "1c9918fd27a9d415f69eb662d45f62914da006cdd4c6c11bdefd432462483856"
+    },
+    {
+      "path": "next/assets/index-DpQQM2sD.js",
+      "size": 1902078,
+      "sha256": "8f0ffc2dc2b0a9e712085f2697e340d72663fe14ad040e77411c0bab6ec53f89"
+    },
+    {
+      "path": "next/favicon.svg",
+      "size": 245,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "next/index.html",
+      "size": 573,
+      "sha256": "d348370ddb475bb8aecfbb3b9010fd105769e05bdf7e06fedaaf30f8d67148bf"
+    }
+  ],
+  "references": [
+    {
+      "from": "next/assets/index-DpQQM2sD.js",
+      "to": "next/assets/about-icon-BaVeClOr.svg"
+    },
+    {
+      "from": "next/assets/index-DpQQM2sD.js",
+      "to": "next/assets/donation-qr-D7kdLLAm.png"
+    },
+    {
+      "from": "next/index.html",
+      "to": "next/assets/index-BfTnAjG_.css"
+    },
+    {
+      "from": "next/index.html",
+      "to": "next/assets/index-DpQQM2sD.js"
+    }
+  ],
+  "deployed": false
+}

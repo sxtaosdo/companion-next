@@ -1,0 +1,173 @@
+{
+  "atUtc": "2026-10-20T07:37:39.770Z",
+  "sourceCommit": "3438b089949d0466641b61daa95412edad8f4758",
+  "staticHttp": [
+    {
+      "path": "next/assets/about-icon-BaVeClOr.svg",
+      "status": 200,
+      "sha256": "09a1630732db59daab65a89c7636f7a5f2350c20052446c479306e61797b8228"
+    },
+    {
+      "path": "next/assets/donation-qr-D7kdLLAm.png",
+      "status": 200,
+      "sha256": "1f6aa2f20c8375196cdd61e30fc2bbc75e8b98fa41f7a28a36e8671c53a1b1e1"
+    },
+    {
+      "path": "next/assets/index-BfTnAjG_.css",
+      "status": 200,
+      "sha256": "1c9918fd27a9d415f69eb662d45f62914da006cdd4c6c11bdefd432462483856"
+    },
+    {
+      "path": "next/assets/index-DpQQM2sD.js",
+      "status": 200,
+      "sha256": "8f0ffc2dc2b0a9e712085f2697e340d72663fe14ad040e77411c0bab6ec53f89"
+    },
+    {
+      "path": "next/favicon.svg",
+      "status": 200,
+      "sha256": "7171f2df1f7fafc0c4f6d2ac7ebf833ba11b1083522c1e1f28af821b76d6c715"
+    },
+    {
+      "path": "next/index.html",
+      "status": 200,
+      "sha256": "d348370ddb475bb8aecfbb3b9010fd105769e05bdf7e06fedaaf30f8d67148bf"
+    }
+  ],
+  "actualRead": {
+    "failedDetails": [
+      {
+        "operation": "playtest_run",
+        "statusLabel": "失败",
+        "errorSummarySha256": "0530776c35d5cbb7d4bcb2bdf0e228205569fbad9c7d2c4c2393dd15f8f6add6"
+      },
+      {
+        "operation": "script_wait_compile",
+        "statusLabel": "失败",
+        "errorSummarySha256": "d1c8e03a51c4bd39630316de749db45963f1b587721b743af987aa4fa7970a6b"
+      }
+    ],
+    "countsBeforeAfterEqual": true
+  },
+  "isolatedDeployedUi": {
+    "cardBPath": "D:/VueFixture/B",
+    "helpProjectPreserved": "cdc0709d4eaaa8a2",
+    "scopeLayersPresent": true,
+    "registryAndStatusFixture": true
+  },
+  "pageErrors": [],
+  "requests": [
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/projects/04c4cde24ee76d83/calls"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/projects/04c4cde24ee76d83/calls"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/next/index.html"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/next/assets/index-DpQQM2sD.js"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/next/assets/index-BfTnAjG_.css"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/projects"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/calls/counts"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/tools"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/tool-presets"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/tools"
+    },
+    {
+      "phase": "isolated-ui",
+      "method": "GET",
+      "path": "/api/tool-presets"
+    }
+  ],
+  "blocked": [
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/status"
+    },
+    {
+      "phase": "actual-read",
+      "method": "GET",
+      "path": "/api/status"
+    }
+  ],
+  "productionMutationRequests": 0,
+  "cursorActions": 0,
+  "creatorActions": 0,
+  "modelActions": 0,
+  "userWindowsUntouched": true,
+  "browserClosed": true
+}

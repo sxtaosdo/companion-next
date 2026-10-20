@@ -1,0 +1,37 @@
+{
+  "atUtc": "2026-10-20T07:41:29.113544+00:00",
+  "sourceCommit": "3438b089949d0466641b61daa95412edad8f4758",
+  "internalCheckpoint": "1.3.173.175",
+  "productVersion": "1.3.173",
+  "deployed": true,
+  "staticHttpFilesVerified": 6,
+  "originalRuntimeFiles": 312,
+  "originalFilesPreserved": 311,
+  "changedOriginalFiles": [
+    "web/next/index.html"
+  ],
+  "newStaticAssets": 2,
+  "currentRuntimeBaselineFiles": 314,
+  "daemonRestarted": false,
+  "hostWriterCandidatesApplied": false,
+  "cursorActions": 0,
+  "creatorActions": 0,
+  "modelActions": 0,
+  "configurationWrites": 0,
+  "productionMutationRequests": 0,
+  "actualPageErrors": 0,
+  "isolatedUiChecks": [
+    "card project path",
+    "help project context",
+    "migration scope layers"
+  ],
+  "actualReadonlyChecks": [
+    "static HTTP SHA",
+    "Chinese failure statuses",
+    "unchanged error summaries",
+    "unchanged call counts"
+  ],
+  "scope": "Vue migration only; independent host/client/model execution excluded from frontend gate",
+  "reviewRemainingP1P2": 0,
+  "firstBrowserScriptFailure": "Expected title omitted the actual Chinese conjunction; corrected exact heading and completed browser acceptance. Not a product failure."
+}
