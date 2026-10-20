@@ -6,6 +6,7 @@ import OverviewServiceSummary from '../src/components/OverviewServiceSummary.vue
 import { OVERVIEW_SERVICE_INTERVAL, useOverviewServiceStatus } from '../src/composables/use-overview-service-status'
 import { companionBrowserProvider, companionProjectEntryProvider, registerCompanionBrowserProvider } from '../src/companion-browser-integration'
 import { knowledgeReadProvider } from '../src/knowledge-read-integration'
+import { useRegisteredProjectStore } from '../src/stores/registered-project'
 import { useCompanionBrowserStore } from '../src/stores/companion-browser'
 import { useCreatorOperationsStore } from '../src/stores/creator-operations'
 import { creatorOperationsProvider } from '../src/creator-operations-integration'
@@ -170,15 +171,15 @@ describe('overview service status lifecycle', () => {
     await enter(); await state.refresh(); await vi.advanceTimersByTimeAsync(60_000)
     expect(knowledge.loadServiceStates).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
   })
-  it('shows compact separate service states, evidence times and five existing management links', async () => {
+  it('shows independent global service cards with evidence times and existing management links', async () => {
     knowledge.loadServiceStates = vi.fn(async () => ({ knowledge: { running: true, frameable: false }, warnings: ['模型启动器响应缺失'] }))
     wrapper = mount(OverviewServiceSummary, { global: { stubs: { RouterLink: { props: ['to'], template: '<a :href="to"><slot/></a>' } } } }); await flushPromises()
     expect(wrapper.get('[data-service="模型启动器"]').text()).toContain('异常')
     expect(wrapper.get('[data-service="模型启动器"]').text()).not.toContain('未连接')
-    expect(wrapper.findAll('time')).toHaveLength(2); expect(wrapper.get('details').attributes('open')).toBeUndefined()
-    expect(wrapper.get('details').text()).toContain('ComfyUI：未知'); expect(wrapper.get('details').text()).toContain('不代表模型已加载')
+    expect(wrapper.findAll('time')).toHaveLength(3); expect(wrapper.find('details').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('状态说明'); expect(wrapper.text()).not.toContain('工程详情')
     expect(wrapper.get('[data-service="模型启动器"]').attributes('href')).toBe('/knowledge?tab=models')
-    expect(wrapper.findAll('.summary-state')).toHaveLength(5)
+    expect(wrapper.findAll('.global-service-card')).toHaveLength(3); expect(wrapper.findAll('[data-project-id]')).toHaveLength(0)
     expect(wrapper.findAll('button').map(button => button.text())).toEqual(['刷新服务状态', '暂停服务更新'])
     expect(knowledge.status).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
   })
@@ -187,7 +188,7 @@ describe('overview service status lifecycle', () => {
 
 describe('dashboard honest service labels', () => {
   const mountSummary = async () => {
-    wrapper = mount(OverviewServiceSummary, { props: { embedded: true }, global: { stubs: { RouterLink: { props: ['to'], template: '<a :href="to"><slot/></a>' } } } })
+    wrapper = mount(OverviewServiceSummary, { global: { stubs: { RouterLink: { props: ['to'], template: '<a :href="to"><slot/></a>' } } } })
     await flushPromises()
   }
   it.each([['unauthorized','鉴权失败'],['forbidden','鉴权失败'],['timeout','超时'],['network-error','异常']] as const)('preserves %s from a service failure without turning it into offline', async (code, label) => {
@@ -198,15 +199,18 @@ describe('dashboard honest service labels', () => {
       expect(row.text()).toContain(label); expect(row.text()).not.toContain('未连接')
     }
     expect(wrapper!.classes()).not.toContain('panel')
-    expect(wrapper!.get('details').attributes('open')).toBeUndefined()
+    expect(wrapper!.find('details').exists()).toBe(false)
   })
-  it.each([['unauthorized','鉴权失败'],['forbidden','鉴权失败'],['timeout','超时'],['network-error','异常']] as const)('classifies Bridge status %s without claiming it was unchecked or offline', async (code, label) => {
-    directory.warnings = [`运行状态未取得有效数据：[${code}]。空状态列表不能证明服务为 0 或工程已停止；所有缺少状态的工程须显示为未知。`]
+  it('stays globally scoped when a project is selected and never appends its context to service links',async()=>{
+    directory.projects=[{id:'aaaaaaaaaaaaaaaa',name:'ant-cook',path:'/offline/ant-cook'}]
+    const selection=useRegisteredProjectStore();selection.restoreRouteProject('aaaaaaaaaaaaaaaa')
     await mountSummary()
-    const bridge = wrapper!.get('[data-service="Creator Bridge"]')
-    expect(bridge.text()).toContain(label)
-    expect(bridge.text()).not.toContain('未检查'); expect(bridge.text()).not.toContain('未连接')
-    expect(fetch).not.toHaveBeenCalled()
+    expect(wrapper!.text()).not.toContain('ant-cook');expect(wrapper!.text()).not.toContain('Creator Bridge')
+    expect(wrapper!.findAll('.global-service-card')).toHaveLength(3)
+    expect(wrapper!.get('[data-service="知识库"]').attributes('href')).toBe('/knowledge')
+    expect(wrapper!.get('[data-service="模型启动器"]').attributes('href')).toBe('/knowledge?tab=models')
+    expect(selection.requestedId).toBe('aaaaaaaaaaaaaaaa')
+    expect(wrapper!.find('select,[role="combobox"]').exists()).toBe(false)
   })
   it('keeps partial authentication failure separate from an independently reachable service', async () => {
     knowledge.loadServiceStates = vi.fn(async () => ({ knowledge: { running: true, frameable: false }, warnings: ['模型启动器状态未知：[unauthorized]；不能据此判定已停止。'] }))

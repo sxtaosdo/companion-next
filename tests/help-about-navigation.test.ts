@@ -311,7 +311,7 @@ describe('help, about and visible frontend identity', () => {
   })
   it('keeps unconnected, demo and failed live-source states explicit in the compact shell', async () => {
     const { workspace } = await setup('/overview')
-    expect(wrapper!.get('[data-testid="overview-status-card"]').text()).toContain('未连接')
+    expect(wrapper!.get('[data-service="Companion"]').text()).toContain('未连接')
     expect(wrapper!.find('.source-banner').exists()).toBe(false)
     await workspace.openDemo(); await flushPromises()
     expect(wrapper!.find('.topbar').text()).toContain('示例模式')

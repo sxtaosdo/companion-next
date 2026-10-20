@@ -1,55 +1,54 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { ArrowRight, Refresh, Close } from '@element-plus/icons-vue'
+import { Refresh, Close } from '@element-plus/icons-vue'
 import { useRegisteredProjectStore } from '../stores/registered-project'
 import { companionBrowserProvider } from '../companion-browser-integration'
-import OverviewServiceSummary from './OverviewServiceSummary.vue'
 import { useWorkspaceStore } from '../stores/workspace'
 import { allowsLegacyWorkspace } from '../domain/project-workspace'
-const selection = useRegisteredProjectStore(), route = useRoute(), router = useRouter()
-const directory = selection.directory, workspace = useWorkspaceStore()
+import { runtimeStateLabel, type ManagedProject } from '../domain/companion-browser'
+import { recentProjects } from '../domain/recent-projects'
+import { useOverviewRecentProjects } from '../composables/use-overview-recent-projects'
+const selection = useRegisteredProjectStore(), directory = selection.directory, workspace = useWorkspaceStore()
+const recent = useOverviewRecentProjects()
+const cards = computed(() => recentProjects(selection.projects, recent.data.value))
 const legacyWorkspace = computed(() => allowsLegacyWorkspace(import.meta.env.MODE, Boolean(companionBrowserProvider.value)))
-const projectProblem = computed(() => directory.projectError ? `工程读取失败：${directory.projectError}` : selection.project && selection.status?.lastError ? selection.status.lastError : '')
-const shortProblem = computed(() => projectProblem.value.length > 140 ? `${projectProblem.value.slice(0, 140)}…` : projectProblem.value)
-function selectId(id: string) {
-  if (!selection.projects.some(project => project.id === id)) return
-  selection.restoreRouteProject(id)
-  void router.push({ path: '/overview', query: { ...route.query, project: id } })
+function bridge(project: ManagedProject) {
+  const runtime = directory.statuses.find(item => item.projectId === project.id)
+  if (directory.provider?.runtimeProbesEnabled === false) return { label: '未检查', detail: '运行状态未探测', version: undefined, error: '' }
+  const warning = directory.warnings.find(item => item.startsWith('运行状态未取得有效数据：['))
+  const code = warning?.split('[')[1]?.split(']')[0]
+  const label = warning ? ['unauthorized','forbidden'].includes(code ?? '') ? '鉴权失败' : code === 'timeout' ? '超时' : '异常' : runtime ? runtimeStateLabel(runtime.state) : directory.projectLoading ? '检查中' : '未知'
+  return { label, detail: warning ? '本次运行状态未核验' : '', version: runtime?.creatorVersion, error: runtime?.lastError || '' }
 }
-function selectProject(event: MouseEvent, id: string, navigate: (event?: MouseEvent) => unknown) {
+function selectProject(event: MouseEvent, id: string) {
   if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return
   selection.restoreRouteProject(id)
-  void navigate(event)
 }
+function summary(text: string) { return text.length > 110 ? text.slice(0,110) + '…' : text }
 </script>
 <template>
-  <section class="registered-overview panel" data-testid="overview-status-card" aria-label="看板">
-    <header class="overview-card-header">
-      <h1>看板</h1>
-      <el-select v-if="selection.projects.length" :model-value="selection.project?.id ?? ''" class="overview-project-select" aria-label="当前登记工程" placeholder="请选择工程" @update:model-value="selectId"><el-option v-for="project in selection.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select>
-      <span class="overview-project-count">{{ selection.currentSource ? `${selection.projects.length} 个工程` : '工程数量未读取' }}</span>
+  <section class="registered-overview" aria-label="工程看板">
+    <header class="overview-card-header"><h1>看板</h1><span>{{ selection.currentSource ? `${selection.projects.length} 个工程` : '工程数量未读取' }}</span><RouterLink to="/projects" class="all-projects">全部工程</RouterLink>
       <div class="overview-connect-actions"><el-button v-if="companionBrowserProvider" size="small" :loading="directory.projectLoading && !directory.backgroundProjectRead" :disabled="directory.projectLoading" @click="directory.connect(companionBrowserProvider)">{{ selection.currentSource ? '重新连接工程' : '连接工程服务' }}</el-button><el-button v-if="directory.provider" size="small" :icon="Refresh" text aria-label="刷新登记工程" :disabled="directory.projectLoading" @click="directory.refreshProjects()"/><el-button v-if="directory.provider" size="small" :icon="Close" text aria-label="断开工程服务" @click="directory.disconnect()"/></div>
     </header>
-    <section v-if="selection.project" class="registered-project-detail" data-testid="registered-project-overview">
-      <div class="selected-project-line"><h2>{{ selection.project.name }}</h2><div class="project-destinations"><RouterLink :to="{ path: '/resources', query: { project: selection.project.id } }" class="hero-link">进入游戏资源<el-icon><ArrowRight/></el-icon></RouterLink><RouterLink :to="{ path: '/resources', query: { project: selection.project.id, step: 1 } }">查看工程规范</RouterLink></div></div>
-      <p class="selected-project-path">{{ selection.project.path }}</p>
-    </section>
-    <p v-else class="selection-unavailable" role="status">{{ directory.projectLoading ? '正在读取登记工程…' : !companionBrowserProvider ? '当前宿主未接入 Companion 工程读取接口' : !selection.currentSource ? '连接工程服务后选择真实工程' : !selection.projects.length ? '尚无已登记工程' : '所选工程尚未读取、已被移除或登记来源已改变，请重新选择工程。' }}</p>
-    <p v-if="shortProblem" class="overview-problem" role="status">{{ shortProblem }}</p>
-    <OverviewServiceSummary embedded/>
-    <details class="overview-project-details">
-      <summary>工程详情与登记列表</summary>
-      <el-button v-if="legacyWorkspace" size="small" @click="workspace.openDemo">查看示例工作台</el-button>
-      <dl v-if="selection.project"><dt>工程 ID</dt><dd>{{ selection.project.id }}</dd><dt>要求 Creator 版本</dt><dd>{{ selection.project.requiredCreatorVersion || '未返回' }}</dd></dl>
-      <p>工程来源：{{ selection.currentSource?.label || '未连接' }}。{{ selection.currentSource?.runtimeProbesEnabled === false ? '运行状态未探测。' : '状态来自原 Bridge 查询；不启动 Creator。' }}</p>
-      <p v-if="projectProblem && projectProblem !== shortProblem">{{ projectProblem }}</p>
-      <ul v-if="directory.warnings.length" class="overview-warnings"><li v-for="warning in directory.warnings" :key="warning">{{ warning }}</li></ul>
-      <nav v-if="selection.projects.length" class="registered-project-links" aria-label="已登记工程"><RouterLink v-for="project in selection.projects" :key="project.id" :to="{ path: '/overview', query: { project: project.id } }" custom v-slot="{ href, navigate }"><a :href="href" class="registered-project-card" :class="{ selected: selection.project?.id === project.id }" :aria-current="selection.project?.id === project.id ? 'true' : undefined" :data-project-id="project.id" @click="selectProject($event, project.id, navigate)">{{ project.name }}</a></RouterLink></nav>
-    </details>
+    <div class="overview-live"><span>工程更新：<time v-if="directory.observedAt" :datetime="directory.observedAt">{{ directory.observedAt }}</time><span v-else>未检查</span></span><button type="button" class="realtime-toggle" :disabled="!directory.livePreferred && !recent.canRealtime.value" @click="recent.toggleRealtime">{{ directory.livePreferred ? '暂停工程实时' : '恢复工程实时' }}</button><el-button v-if="legacyWorkspace" size="small" @click="workspace.openDemo">查看示例工作台</el-button></div>
+    <p v-if="directory.projectError" class="overview-problem" role="status">工程读取失败：{{ directory.projectError }}</p>
+    <p v-if="recent.error.value" class="recent-note">{{ recent.error.value }}</p>
+    <div v-if="cards.length" class="overview-project-grid">
+      <article v-for="item in cards" :key="item.project.id" class="registered-project-card panel" :data-project-id="item.project.id">
+        <RouterLink :to="{ path: '/projects', query: { project: item.project.id } }" class="project-title" @click.capture="selectProject($event, item.project.id)"><h2>{{ item.project.name }}</h2><span>查看工程 →</span></RouterLink>
+        <p class="project-path">{{ item.project.path }}</p>
+        <RouterLink class="project-bridge" @click.capture="selectProject($event, item.project.id)" :to="{ path: '/projects', query: { project: item.project.id } }"><strong>Creator Bridge</strong><span>{{ bridge(item.project).label }}</span><span v-if="bridge(item.project).version">Creator {{ bridge(item.project).version }}</span><span v-else>版本未返回</span></RouterLink>
+        <p v-if="item.project.requiredCreatorVersion" class="project-note">要求 Creator {{ item.project.requiredCreatorVersion }}</p>
+        <p v-if="bridge(item.project).detail" class="project-note">{{ bridge(item.project).detail }}</p>
+        <p v-if="bridge(item.project).error" class="overview-problem" :title="bridge(item.project).error">{{ summary(bridge(item.project).error) }}</p>
+        <p class="recent-note">{{ item.lastOpenedAt === undefined ? '未返回最近使用时间' : '按最近使用排序' }}</p>
+        <nav class="project-destinations" aria-label="工程资源"><RouterLink :to="{ path: '/resources', query: { project: item.project.id } }" class="hero-link">游戏资源</RouterLink><RouterLink :to="{ path: '/resources', query: { project: item.project.id, step: 1 } }">工程规范</RouterLink></nav>
+      </article>
+    </div>
+    <p v-else class="selection-unavailable" role="status">{{ directory.projectLoading ? '正在读取登记工程…' : !companionBrowserProvider ? '当前宿主未接入 Companion 工程读取接口' : !selection.currentSource ? '连接工程服务后读取真实工程' : '尚无已登记工程' }}</p>
   </section>
 </template>
 <style scoped>
-.registered-overview{padding:14px 16px}.overview-card-header,.selected-project-line,.overview-connect-actions,.project-destinations{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}.overview-card-header h1{font-size:17px;line-height:1.4;margin:0}.overview-project-select{width:230px;max-width:100%}.overview-project-count{font-size:12px;color:var(--el-text-color-secondary)}.overview-connect-actions{margin-left:auto;gap:5px}.overview-connect-actions :deep(.el-button+.el-button){margin-left:0}.registered-project-detail{margin-top:12px}.selected-project-line h2{font-size:15px;line-height:1.5;margin:0}.creator-version{font-size:12px;color:var(--el-text-color-secondary)}.project-destinations{margin-left:auto;font-size:12px;gap:8px 16px}.project-destinations .hero-link{font-size:12px;margin:0}.selected-project-path{margin-top:6px;font-size:12px;overflow-wrap:anywhere;color:var(--el-text-color-secondary)}.selection-unavailable,.overview-problem{margin:10px 0 0;font-size:12px;line-height:1.5;overflow-wrap:anywhere}.selection-unavailable{color:var(--el-text-color-secondary)}.overview-problem{color:#a63f44}.overview-project-details{margin-top:10px;font-size:12px;color:var(--el-text-color-secondary);line-height:1.6}.overview-project-details summary{cursor:pointer}.overview-project-details dl{display:flex;flex-wrap:wrap;gap:5px 12px;margin:8px 0}.overview-project-details dd{margin:0;overflow-wrap:anywhere}.overview-project-details p{margin:6px 0;overflow-wrap:anywhere}.overview-warnings{padding-left:18px}.registered-project-links{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px}.registered-project-card{color:var(--el-text-color-regular);text-decoration:underline;text-underline-offset:2px}.registered-project-card.selected{font-weight:600;color:var(--el-color-primary)}.registered-project-card:focus-visible{outline:2px solid var(--el-color-primary);outline-offset:3px}
-@media(max-width:640px){.overview-card-header{align-items:flex-start}.overview-card-header h1{flex-basis:100%}.overview-project-select{flex:1;min-width:0}.overview-connect-actions{margin-left:0;flex-basis:100%}.project-destinations{margin-left:0;flex-basis:100%}.overview-project-details dl{display:grid;grid-template-columns:auto minmax(0,1fr)}}
+.overview-card-header,.overview-connect-actions,.overview-live,.project-title,.project-bridge,.project-destinations{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px}.overview-card-header h1{font-size:18px;margin:0}.overview-card-header>span,.overview-live,.recent-note,.project-note{font-size:12px;color:var(--el-text-color-secondary)}.overview-connect-actions{margin-left:auto;gap:5px}.overview-connect-actions :deep(.el-button+.el-button){margin-left:0}.overview-live{margin:10px 0 14px;justify-content:space-between}.all-projects,.overview-live a{font-size:12px}.realtime-toggle{border:0;background:none;color:var(--el-color-primary);font-size:12px;cursor:pointer}.realtime-toggle:disabled{color:var(--el-text-color-disabled);cursor:default}.overview-project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.registered-project-card{position:relative;padding:14px 16px;min-width:0}.project-title{justify-content:space-between;text-decoration:none;color:var(--el-text-color-primary)}.project-title::after{content:"";position:absolute;inset:0;border-radius:inherit}.project-bridge,.project-destinations{position:relative;z-index:1}.project-title h2{margin:0;font-size:15px}.project-title>span{font-size:12px;color:var(--el-color-primary)}.project-path{font-size:12px;color:var(--el-text-color-secondary);overflow-wrap:anywhere;margin:8px 0 12px}.project-bridge{color:var(--el-text-color-regular);font-size:12px;text-decoration:none}.project-bridge:hover,.project-title:hover{color:var(--el-color-primary)}.overview-problem{font-size:12px;color:#a63f44;overflow-wrap:anywhere;margin:8px 0}.project-note,.recent-note{margin:7px 0}.project-destinations{font-size:12px;margin-top:12px}.project-destinations .hero-link{font-size:12px;margin:0}.selection-unavailable{font-size:13px;color:var(--el-text-color-secondary);padding:16px 0}a:focus-visible{outline:2px solid var(--el-color-primary);outline-offset:3px}@media(max-width:640px){.overview-project-grid{grid-template-columns:1fr}.overview-connect-actions{margin-left:0;flex-basis:100%}.overview-live{align-items:flex-start}}
 </style>

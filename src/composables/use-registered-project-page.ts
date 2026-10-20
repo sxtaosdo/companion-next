@@ -11,7 +11,7 @@ export function useRegisteredProjectPage() {
   // unmounted. Only this page's route may replace its registered-project intent.
   const ownerPath = route.path
   watch(() => route.query.project, value => {
-    if (route.path === ownerPath) selection.restoreRouteProject(value, ownerPath === '/overview')
+    if (route.path === ownerPath && !(ownerPath === '/overview' && value === undefined)) selection.restoreRouteProject(value)
   }, { immediate: true, flush: 'sync' })
   watch(companionBrowserProvider, source => {
     if (directory.provider && directory.provider !== source) directory.disconnect()
