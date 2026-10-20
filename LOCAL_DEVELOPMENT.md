@@ -1,3 +1,13 @@
+2026-10-20 知识库三页已实际部署 **5ae52d0 / 1.3.173.191**（产品版本1.3.173）：左侧“知识库”下为检索与文档、问答、连接与同步，默认检索页；问答页内切换普通/Agent，模型服务旧链接独立保留。选库、检索条件、完成结果、草稿和返回滚动在三页间保留；换源、改条件或默认库改变会清旧结果。未发送确认离页撤销，UNKNOWN及实际在途锁不因缓存而清除。
+
+全仓4556项通过；最后旧服务锚点兼容修正后，受影响47项通过，其余4510项保持。严格类型、独立只读审查和本地OCR规则已核。最终候选47项、部署后47项实际隔离浏览器检查通过，页面错误/拦截写请求均0；知识库列表、文档列表/详情/分块/原文及纯关键词检索实际读取通过，三页切换不重复请求。6静态HTTP文件SHA一致。模型启动、推理问答、Agent执行、同步/演练均未真实执行，不能据入口存在称业务验收通过。
+
+只替换Next index并新增2哈希资源，保留326原文件中的其余内容，最新328文件基线。PID20252/22932、9业务表、旧后台共享修改/暂存指纹保持，无服务重启、无用户标签操作。Codex配置在任务期间独立变化：保留当前指纹和原始基线，不读取配置值、不恢复旧值、不推断修改者。详见configuration-observation.json。
+
+已补6张此前已部署页面截图（188/6cc9c28，旧知识页明确historical）和3张新知识页截图（1.3.173.191/5ae52d0），含哈希清单且未见认证秘密。Library官方附件助手此前tools/list返回403，尚无恢复证据，本轮未重试、无上传和Library ID；截图源保留本机。**自检完成、已部署、待用户验收**。证据：C:/Users/33272/AppData/Local/Temp/companion-knowledge-subpages-20261020-1451（delivery-summary.json、source-validation.json、candidate-browser.json、deployed-browser.json、deployment.json、http-verification.json、final-protection.json、post-static-baseline.json，以及两个截图manifest）。后续文档提交不改变实际部署源5ae52d0。下方旧交付/只读评估按其历史时点阅读；“等待批准拆页”已由本轮批准与实施取代。
+
+生命周期实现约束：仅知识三页在当前visit内KeepAlive；独立models/出族销毁缓存。KB选择进入普通问答目标，Agent旧请求仍只有原agent/session/query参数，选库仅本地会话隔离；没有伪造新增Agent KB字段。源watch位于store，缓存页未显示时换源仍会失效。scope所有权和实际transport waitForIdle保留，禁止为视觉跳页提前解锁。
+
 2026-10-20 服务状态已合并项目概览：实际部署源码 **7261a35 / 1.3.173.184**，产品页面1.3.173。概览紧凑摘要显示Companion、知识服务及模型启动器的响应与更新时间，异常可展开；移除独立服务状态导航，旧/services保留query并转至overview#service-status。工程沿用原单例事件流与3秒状态轮询；服务status GET完成后15秒再读，失败显示未知/待核对，可达不代表模型或ComfyUI就绪。暂停会话、隐藏/离页取消、代际、UNKNOWN/互斥及有界恢复已核。183项受影响用例已覆盖（最终修复后定向51通过，其余132不变通过）、严格类型/构建/独立审查；候选27项、部署后29项实际浏览器检查和6HTTP SHA通过。**自检完成／已部署／待用户看图验收**。实际截图保留本机；此前Library工具发现阶段403未获新访问证据，本轮未重试、无Library ID。当前322文件保护基线与全部回执位于 `C:/Users/33272/AppData/Local/Temp/companion-overview-services-20261020`；下方7261a35之前的部署与基线均按历史时点阅读。 后续执行前使用本轮 `C:/Users/33272/AppData/Local/Temp/companion-overview-services-20261020/post-static-baseline.json`（322文件）；320/318基线均为历史。
 
 2026-10-20 美术资源分组交付：源码与实际部署 **3b96bad / 1.3.173.181**，页面产品版本1.3.173。一级“美术资源”下为AI图标／游戏资源／图片素材；父项仅开合，原三个路由和业务保持，进入子页自动展开且仅子项高亮。概览首项及模型服务／服务状态保持。89项相关测试、严格类型、构建、独立只读审查通过；候选36项和部署后38项实际浏览器检查通过，6静态HTTP SHA一致，7完整工程卡及无横向溢出已核。**自检完成／已部署／待用户看图验收**，不称全部迁移验收完成。两张实际部署高清截图保留本机，授权Library保存因当前官方批量助手在tools/list阶段返回403而未能开始上传，未创建Library ID。证据目录：`C:/Users/33272/AppData/Local/Temp/companion-art-navigation-20261020`。下方338e759/.179为上一轮交付时点。 上一轮320文件基线（现已被322文件基线替代） `C:/Users/33272/AppData/Local/Temp/companion-art-navigation-20261020/post-static-baseline.json`；下方navigation-followup/318文件基线及“最新”指令仅为上一轮历史，不再作为当前基线。
