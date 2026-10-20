@@ -1,0 +1,7 @@
+{
+  "reviewer": "/root/lifecycle_read_review",
+  "result": "No remaining P1/P2",
+  "scope": "Full daemon start Promise chain; existing instance10s + preflight10s + postspawn30s; verified status reused; original restart stop guard preserved",
+  "realFirstEntryExitCode": "UNKNOWN",
+  "noncancellableUnderlyingIoExitNotProven": true
+}

@@ -1,0 +1,50 @@
+{
+  "atUtc": "2026-10-20T02:37:45.236241+00:00",
+  "oldPid": 7156,
+  "newIdentity": {
+    "pid": 10940,
+    "startupEpoch": "b08c062d-b4e0-47d4-b51d-f730eaad0020",
+    "startedAt": "2026-10-20T02:37:01.510Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "phase": "OPEN",
+  "counts": {
+    "http": 0,
+    "mcp": 0,
+    "nativeAwaiting": 0,
+    "nativeUncertain": 0,
+    "maintenanceObservations": 0,
+    "projectActions": 0,
+    "globalActions": 0,
+    "recovery": 0,
+    "setup": 0,
+    "builds": 0,
+    "observedBuilds": 0,
+    "sidecars": 0,
+    "nativeEpochUnproven": 2,
+    "ownerStarting": 0,
+    "ownerRequests": 0,
+    "ownerHandlers": 0,
+    "ownerBusy": 0,
+    "ownerWorker": 0,
+    "setupPolls": 0,
+    "setupTimers": 0,
+    "icons": 0,
+    "maintenanceVerifications": 0
+  },
+  "unknown": 2,
+  "canonicalSingleWriterLockSchema": 2,
+  "oldLockSameBytesAndFileObjectRetained": true,
+  "quiescenceEvidence": 0,
+  "shared22Preserved": true,
+  "business9TablesPreserved": true,
+  "otherRuntime308Preserved": true,
+  "knowledgeService": {
+    "path": "D:\\services\\weknora\\normal-reader-recovery-v0.8.2\\weknora.exe",
+    "pid": 600,
+    "created": "2026-10-20T02:03:09.5395770Z"
+  },
+  "computerRestarted": false
+}

@@ -1,0 +1,523 @@
+import { spawn } from "node:child_process";
+import { performance } from "node:perf_hooks";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { basename, dirname, resolve } from "node:path";
+import { CompanionApiClient } from "./companion-api-client.js";
+import type { JsonValue } from "./protocol.js";
+import {
+  DEFAULT_COMPANION_DAEMON_PORT,
+  listTcpListeners,
+} from "./companion/daemon-port.js";
+import { daemonLocatorPath } from "./companion/paths.js";
+import { openExternalUrl } from "./companion/platform.js";
+import { COMPANION_TOOL_SPECS, runCompanionMcp } from "./companion-mcp.js";
+import { cliExitCode, failedCliResult, materializeScreenshot, passedCliResult, printCliResult } from "./companion/cli-output.js";
+import { McpDaemonClient } from "./companion/mcp-daemon-client.js";
+import {
+  executeSemanticCommand,
+  isScreenshotCommand,
+  parseSemanticCommand,
+  semanticUsage,
+  type SemanticCliCommand,
+} from "./companion/semantic-cli.js";
+import { loadLockedTaskPolicy } from "./companion/task-policy.js";
+import { ToolExecutionSession, normalizeToolError } from "./companion/tool-execution.js";
+import type { ToolPreset } from "./companion/tool-preset-store.js";
+import { ICON_OPERATIONS, type IconOperation } from "./companion/icon-adapter.js";
+
+/** creator-ai CLI 解析后的结构化命令。 */
+export type CompanionCommand =
+  | { group: "setup"; path: string; startCreator: boolean; repair: boolean; codexPath?: string; json: boolean }
+  | { group: "doctor"; json: boolean }
+  | { group: "daemon"; action: "start" | "stop" | "status" | "inflight"; restart?: boolean; killPort?: boolean }
+  | { group: "ui" }
+  | { group: "icon"; action: IconOperation; projectId: string; inputFile?: string; json: boolean }
+  | { group: "project"; action: "add"; path: string }
+  | { group: "project"; action: "create" | "initialize"; path: string; creatorVersion: string }
+  | { group: "project"; action: "list" }
+  | { group: "project"; action: "remove"; projectId: string }
+  | { group: "creator"; action: "start" | "focus" | "stop" | "restart"; projectId: string }
+  | { group: "mcp"; projectId: string; policyPath?: string; locked?: true; coordinated?: true };
+
+/** creator-ai CLI 用法说明文本。 */
+export const COMPANION_USAGE = `Usage:
+  creator-ai setup <projectPath> [--no-start] [--repair] [--codex <path>] [--json]
+  creator-ai doctor [--json]
+  creator-ai daemon start [--restart]|stop|status|inflight
+  creator-ai ui
+  creator-ai icon jobs|resource-config|resource-config-save|resource-plan-preview|reference-upload|reference-preview|reference-crop|reference-crop-status|export-variant|import-variant|variant-import-status|handoff|inspect|enqueue|adopt|status|run-next|resume|select|candidate|import --project <projectId> [--input-file <json>] [--json]
+  creator-ai project add <path>|create <path>|initialize <emptyPath>|list|remove <projectId>
+  creator-ai creator start|focus|stop|restart --project <projectId>
+  creator-ai mcp --project <projectId> [--policy <jsonPath> --locked [--coordinated]]
+
+${semanticUsage(COMPANION_TOOL_SPECS)}`;
+
+function required(value: string | undefined, message: string): string {
+  if (!value) throw new Error(`${message}\n${COMPANION_USAGE}`);
+  return value;
+}
+
+function projectOption(args: string[]): string {
+  const index = args.indexOf("--project");
+  if (index < 0 || index + 2 !== args.length) throw new Error(`Expected --project <projectId>\n${COMPANION_USAGE}`);
+  return required(args[index + 1], "Missing project id");
+}
+
+function mcpCommand(args: string[]): Extract<CompanionCommand, { group: "mcp" }> {
+  let projectId: string | undefined;
+  let policyPath: string | undefined;
+  let locked = false;
+  let coordinated = false;
+  for (let index = 0; index < args.length; index++) {
+    const option = args[index];
+    if (option === "--locked") {
+      if (locked) throw new Error(`Duplicate --locked\n${COMPANION_USAGE}`);
+      locked = true;
+      continue;
+    }
+    if (option === "--coordinated") {
+      if (coordinated) throw new Error(`Duplicate --coordinated\n${COMPANION_USAGE}`);
+      coordinated = true;
+      continue;
+    }
+    if (option !== "--project" && option !== "--policy") throw new Error(`Unknown mcp option: ${option ?? ""}\n${COMPANION_USAGE}`);
+    const next = args[index + 1];
+    if (!next || next.startsWith("--")) throw new Error(`Missing value for ${option}\n${COMPANION_USAGE}`);
+    const value = next;
+    index++;
+    if (option === "--project") {
+      if (projectId) throw new Error(`Duplicate --project\n${COMPANION_USAGE}`);
+      projectId = value;
+    } else {
+      if (policyPath) throw new Error(`Duplicate --policy\n${COMPANION_USAGE}`);
+      policyPath = value;
+    }
+  }
+  if (!projectId) throw new Error(`Expected --project <projectId>\n${COMPANION_USAGE}`);
+  if (locked && !policyPath) throw new Error(`--locked requires --policy <jsonPath>\n${COMPANION_USAGE}`);
+  if (policyPath && !locked) throw new Error(`--policy requires --locked\n${COMPANION_USAGE}`);
+  if (coordinated && !locked) throw new Error(`--coordinated requires --locked\n${COMPANION_USAGE}`);
+  return locked
+    ? { group: "mcp", projectId, policyPath: policyPath!, locked: true, ...(coordinated ? { coordinated: true as const } : {}) }
+    : { group: "mcp", projectId };
+}
+
+/** 将 argv 解析为 CompanionCommand；非法参数时抛出用法错误。 */
+export function parseCompanionCommand(args: string[]): CompanionCommand {
+  const json = args.includes("--json");
+  args = args.filter((arg) => arg !== "--json");
+  const [group, action, value] = args;
+  if (group === "icon") {
+    if (!(ICON_OPERATIONS as readonly (string | undefined)[]).includes(action)) throw new Error(COMPANION_USAGE);
+    const flags = new Map<string, string>();
+    for (let i = 2; i < args.length; i += 2) {
+      const key = args[i]!;
+      if (!["--project", "--input-file"].includes(key) || flags.has(key) || !args[i + 1] || args[i + 1]!.startsWith("--")) throw new Error(COMPANION_USAGE);
+      flags.set(key, args[i + 1]!);
+    }
+    const projectId = flags.get("--project");
+    const inputFile = flags.get("--input-file");
+    if (!projectId || !/^[a-f0-9]{16}$/.test(projectId) || (action === "jobs" ? Boolean(inputFile) : !inputFile)) throw new Error(COMPANION_USAGE);
+    return { group, action: action as IconOperation, projectId, ...(inputFile ? { inputFile } : {}), json };
+  }
+  if (group === "doctor" && args.length === 1) return { group, json };
+  if (group === "setup") {
+    const path = required(action, "Missing project path");
+    const rest = args.slice(2);
+    const allowed = new Set(["--no-start", "--repair", "--codex"]);
+    for (let index = 0; index < rest.length; index++) {
+      const option = rest[index];
+      if (!option || !allowed.has(option)) throw new Error(`Unknown setup option: ${option ?? ""}\n${COMPANION_USAGE}`);
+      if (option === "--codex") index++;
+    }
+    const codexIndex = rest.indexOf("--codex");
+    const codexPath = codexIndex < 0 ? undefined : required(rest[codexIndex + 1], "Missing Codex executable path");
+    return { group, path, startCreator: !rest.includes("--no-start"), repair: rest.includes("--repair"), ...(codexPath ? { codexPath } : {}), json };
+  }
+  if (group === "daemon" && (action === "start" || action === "stop" || action === "status" || action === "inflight")) {
+    const rest = args.slice(2);
+    if (action === "start") {
+      const allowed = new Set(["--restart"]);
+      for (const option of rest) {
+        if (!allowed.has(option)) throw new Error(COMPANION_USAGE);
+      }
+      return {
+        group,
+        action,
+        ...(rest.includes("--restart") ? { restart: true } : {}),
+      };
+    }
+    if (rest.length !== 0) throw new Error(COMPANION_USAGE);
+    return { group, action };
+  }
+  if (group === "ui" && args.length === 1) return { group };
+  if (group === "project" && action === "list" && args.length === 2) return { group, action };
+  if (group === "project" && action === "add" && args.length === 3) return { group, action, path: required(value, "Missing path") };
+  if (group === "project" && (action === "create" || action === "initialize") && args.length === 3) {
+    return { group, action, path: required(value, "Missing path"), creatorVersion: "3.8.8" };
+  }
+  if (group === "project" && action === "remove" && args.length === 3) {
+    return { group, action, projectId: required(value, "Missing project id") };
+  }
+  if (group === "creator" && (action === "start" || action === "focus" || action === "stop" || action === "restart")) {
+    return { group, action, projectId: projectOption(args.slice(2)) };
+  }
+  if (group === "mcp") return mcpCommand(args.slice(1));
+  throw new Error(COMPANION_USAGE);
+}
+
+function printLegacy(tool: string, value: JsonValue, json: boolean, projectId = ""): void {
+  printCliResult(passedCliResult(tool, value, projectId), json);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function observeProcessState(pid: number, probe: (pid: number, signal: 0) => unknown = process.kill): "alive" | "exited" | "unknown" {
+  try {
+    probe(pid, 0);
+    return "alive";
+  } catch (error) {
+    return (error as NodeJS.ErrnoException | null)?.code === "ESRCH" ? "exited" : "unknown";
+  }
+}
+
+/** A restart may start a new daemon only when the previous one is already gone. */
+export function previousDaemonIsGone(error: unknown, pidState: "alive" | "exited" | "unknown" | "missing"): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  if (message.includes("DAEMON_EXIT_UNCONFIRMED") || message.includes("DAEMON_PROCESS_OBSERVATION_UNCONFIRMED")) return false;
+  if (message.includes("Cannot securely read Creator AI Companion daemon state")) return true;
+  const cause = error instanceof Error ? error.cause : undefined;
+  const code = cause && typeof cause === "object" && "code" in cause ? String((cause as { code?: unknown }).code) : "";
+  const unreachable = code === "ECONNREFUSED" || code === "ECONNRESET" || message.includes("ECONNREFUSED") || message.includes("fetch failed");
+  return unreachable && (pidState === "exited" || pidState === "missing");
+}
+
+function processAlive(pid: number): boolean {
+  const state = observeProcessState(pid);
+  if (state === "unknown") throw new Error("DAEMON_PROCESS_OBSERVATION_UNCONFIRMED");
+  return state === "alive";
+}
+
+async function readLocatorPid(): Promise<number | undefined> {
+  try {
+    const locator = JSON.parse(await readFile(daemonLocatorPath(), "utf8")) as { pid?: unknown };
+    return typeof locator.pid === "number" && locator.pid > 0 ? locator.pid : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function waitUntilDead(pid: number, timeoutMs = 5_000): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (!processAlive(pid)) return true;
+    await sleep(100);
+  }
+  return !processAlive(pid);
+}
+
+function describeImmediateDaemonExit(port = DEFAULT_COMPANION_DAEMON_PORT): string {
+  return `Creator AI Companion daemon exited immediately; startup did not complete (port ${port})`;
+}
+
+/** 后台拉起守护进程并轮询直到 API 可发现且 status 成功。 */
+async function daemonStartPreflight(): Promise<number | undefined> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10_000);
+  let onAbort: (() => void) | undefined;
+  let occupied = false;
+  try {
+    const timedOut = new Promise<never>((_, reject) => {
+      onAbort = () => reject(new Error("DAEMON_PREFLIGHT_DEADLINE"));
+      controller.signal.addEventListener("abort", onAbort, { once: true });
+    });
+    const checks = (async () => {
+      const listeners = await listTcpListeners(DEFAULT_COMPANION_DAEMON_PORT);
+      controller.signal.throwIfAborted();
+      occupied = listeners.length > 0;
+      if (occupied) throw new Error("DAEMON_PORT_OCCUPIED");
+      const previousPid = await readLocatorPid();
+      controller.signal.throwIfAborted();
+      return previousPid;
+    })();
+    return await Promise.race([checks, timedOut]);
+  } catch {
+    throw new Error(occupied
+      ? `DAEMON_PORT_OCCUPIED: port ${DEFAULT_COMPANION_DAEMON_PORT}; use the authenticated stop guard before starting`
+      : "Creator AI Companion daemon is temporarily unavailable: startup preflight could not be verified within its 10-second budget; no process was started.");
+  } finally {
+    clearTimeout(timer);
+    if (onAbort) controller.signal.removeEventListener("abort", onAbort);
+  }
+}
+
+async function runningDaemonStatus(suppliedClient?: CompanionApiClient): Promise<JsonValue> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10_000);
+  let onAbort: (() => void) | undefined;
+  try {
+    const timedOut = new Promise<never>((_, reject) => {
+      onAbort = () => reject(new Error("DAEMON_RUNNING_PROBE_DEADLINE"));
+      controller.signal.addEventListener("abort", onAbort, { once: true });
+    });
+    const probe = (async () => {
+      const client = suppliedClient ?? await CompanionApiClient.discover();
+      controller.signal.throwIfAborted();
+      return client.request("GET", "/v1/status", undefined, controller.signal);
+    })();
+    return await Promise.race([probe, timedOut]);
+  } catch {
+    throw new Error("Creator AI Companion daemon is temporarily unavailable: existing daemon readiness could not be verified.");
+  } finally {
+    clearTimeout(timer);
+    if (onAbort) controller.signal.removeEventListener("abort", onAbort);
+  }
+}
+
+async function startDaemonAndDiscover(): Promise<{ client: CompanionApiClient; pid?: number; status: JsonValue }> {
+  const previousPid = await daemonStartPreflight();
+  const daemonPath = resolve(dirname(fileURLToPath(import.meta.url)), "companion-daemon.js");
+  const child = spawn(process.execPath, [daemonPath], { detached: true, stdio: "ignore" });
+  child.unref();
+  const childPid = child.pid;
+  const startupWaitMs = 30_000;
+  const deadline = performance.now() + startupWaitMs;
+  while (performance.now() < deadline) {
+    await sleep(Math.min(100, Math.max(0, deadline - performance.now())));
+    if (performance.now() >= deadline) break;
+    if (childPid && !processAlive(childPid)) {
+      throw new Error(describeImmediateDaemonExit());
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), Math.max(1, deadline - performance.now()));
+    let onAbort: (() => void) | undefined;
+    try {
+      // Bound discovery as well as fetch; a stalled probe must not outlive the wait.
+      const timedOut = new Promise<never>((_, reject) => {
+        onAbort = () => reject(new Error("DAEMON_READINESS_DEADLINE"));
+        controller.signal.addEventListener("abort", onAbort, { once: true });
+      });
+      const probe = (async () => {
+        const client = await CompanionApiClient.discover();
+        controller.signal.throwIfAborted();
+        const locatorPid = await readLocatorPid();
+        controller.signal.throwIfAborted();
+        // Ignore a stale locator that still points at the previous daemon.
+        if (previousPid && locatorPid === previousPid && processAlive(previousPid)) return undefined;
+        const status = await client.request("GET", "/v1/status", undefined, controller.signal);
+        return { client, status };
+      })();
+      const ready = await Promise.race([probe, timedOut]);
+      if (ready && performance.now() < deadline) return { ...ready, ...(childPid ? { pid: childPid } : {}) };
+    } catch {
+      // Discovery/network diagnostics may contain local paths or credentials.
+      // The bounded startup result below deliberately includes no raw probe error.
+    } finally {
+      clearTimeout(timer);
+      if (onAbort) controller.signal.removeEventListener("abort", onAbort);
+    }
+  }
+  throw new Error(`Creator AI Companion daemon did not become ready within ${startupWaitMs / 1000} seconds; background startup may still be running${childPid ? ` (PID ${childPid})` : ""}. Check daemon status before starting again.`);
+}
+
+interface CompanionClientResolutionDependencies {
+  discover(): Promise<CompanionApiClient>;
+  start(): Promise<{ client: CompanionApiClient }>;
+}
+
+/** Resolve the daemon client; setup self-heals a missing daemon. MCP uses its lazy client. */
+export async function resolveCompanionClient(
+  command: CompanionCommand,
+  suppliedClient?: CompanionApiClient,
+  dependencies: CompanionClientResolutionDependencies = {
+    discover: () => CompanionApiClient.discover(),
+    start: () => startDaemonAndDiscover(),
+  },
+): Promise<CompanionApiClient> {
+  if (suppliedClient) return suppliedClient;
+  try {
+    return await dependencies.discover();
+  } catch (error) {
+    if (command.group !== "setup") throw error;
+    return (await dependencies.start()).client;
+  }
+}
+
+/** Guarded API stop only. Never kill a process, remove its locator, or retry an unknown stop. */
+async function stopRunningDaemon(client: CompanionApiClient): Promise<void> {
+  const receipt = await client.stopDaemon();
+  const pid = receipt.identity.pid;
+  if (!(await waitUntilDead(pid, 30_000))) throw new Error("DAEMON_EXIT_UNCONFIRMED");
+  await sleep(200);
+}
+
+/**
+ * 执行已解析的 Companion CLI 命令。
+ * 必要时自动发现或启动守护进程，并通过 CompanionApiClient 完成操作。
+ */
+export async function executeCompanionCommand(command: CompanionCommand, suppliedClient?: CompanionApiClient, json = false): Promise<void> {
+  if (command.group === "daemon" && command.action === "start") {
+    if (command.killPort) throw new Error("UNGUARDED_PORT_KILL_DISABLED");
+    if (command.restart) {
+      try {
+        await stopRunningDaemon(suppliedClient ?? await CompanionApiClient.discover());
+      } catch (error) {
+        const pid = await readLocatorPid();
+        const pidState = pid === undefined ? "missing" : observeProcessState(pid);
+        if (!previousDaemonIsGone(error, pidState)) throw error;
+      }
+      const started = await startDaemonAndDiscover();
+      printLegacy("daemon_restart", { restarted: true, ...(started.pid ? { pid: started.pid } : {}), status: started.status }, json);
+      return;
+    }
+    try {
+      printLegacy("daemon_start", await runningDaemonStatus(suppliedClient), json);
+      return;
+    } catch {
+      const started = await startDaemonAndDiscover();
+      printLegacy("daemon_start", { started: true, ...(started.pid ? { pid: started.pid } : {}), status: started.status }, json);
+      return;
+    }
+  }
+  if (command.group === "mcp") {
+    let initialClient: CompanionApiClient | undefined;
+    try { initialClient = suppliedClient ?? await CompanionApiClient.discover(); } catch { /* Lazy MCP startup resolves it after initialize. */ }
+    return runCompanionMcp(command.projectId, initialClient, {
+      ...(command.locked ? { policyPath: command.policyPath!, locked: true, coordinationRequired: command.coordinated === true } : {}),
+      resolveClient: async () => {
+        try { return await CompanionApiClient.discover(); }
+        catch { return (await startDaemonAndDiscover()).client; }
+      },
+    });
+  }
+  const client = await resolveCompanionClient(command, suppliedClient);
+  if (command.group === "daemon" && command.action === "inflight") {
+    return printLegacy("daemon_inflight", await client.daemonInFlight(), json);
+  }
+  if (command.group === "icon") {
+    const text = command.inputFile ? await readFile(command.inputFile, "utf8") : "{}";
+    if (Buffer.byteLength(text) > (["reference-upload", "reference-crop"].includes(command.action) ? 6 * 1024 * 1024 : 128 * 1024)) throw new Error("Icon input exceeds budget");
+    const body = JSON.parse(text) as JsonValue;
+    const result = await client.request(command.action === "jobs" ? "GET" : "POST", `/v1/icons/${command.projectId}/${command.action}`, command.action === "jobs" ? undefined : body);
+    return printLegacy(`icon_${command.action.replaceAll("-", "_")}`, result, command.json || json, command.projectId);
+  }
+  if (command.group === "setup") {
+    const started = await client.setupProject(command.path, {
+      startCreator: command.startCreator,
+      configureCodex: true,
+      repair: command.repair,
+      ...(command.codexPath ? { codexPath: command.codexPath } : {}),
+    });
+    if (!started || typeof started !== "object" || Array.isArray(started) || typeof started.operationId !== "string") {
+      throw new Error("Daemon did not return a setup operation id");
+    }
+    const deadline = Date.now() + 120_000;
+    let result: Awaited<ReturnType<CompanionApiClient["setupStatus"]>> = started;
+    while (Date.now() < deadline) {
+      result = await client.setupStatus(started.operationId);
+      if (result && typeof result === "object" && !Array.isArray(result) && (result.stage === "complete" || result.stage === "failed")) break;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    if (!result || typeof result !== "object" || Array.isArray(result) || (result.stage !== "complete" && result.stage !== "failed")) {
+      throw new Error(`Setup operation ${started.operationId} did not finish within 120 seconds`);
+    }
+    if (result.stage === "failed") throw new Error(typeof result.error === "string" ? result.error : "Creator AI setup failed");
+    printLegacy("setup", result, command.json || json);
+    return;
+  }
+  if (command.group === "doctor") return printLegacy("doctor", await client.doctor(), command.json || json);
+  if (command.group === "daemon") {
+    if (command.action === "status") return printLegacy("daemon_status", await client.status(), json);
+    if (command.action === "stop") {
+      await stopRunningDaemon(client);
+      return printLegacy("daemon_stop", { stopping: true }, json);
+    }
+    throw new Error("Unexpected daemon action");
+  }
+  if (command.group === "ui") {
+    const result = await client.request("POST", "/v1/ui/session", {});
+    if (!result || typeof result !== "object" || Array.isArray(result) || typeof result.url !== "string") {
+      throw new Error("Daemon did not return a UI URL");
+    }
+    openExternalUrl(result.url);
+    printLegacy("ui", { opened: true }, json);
+    return;
+  }
+  if (command.group === "project") {
+    if (command.action === "list") return printLegacy("project_list", await client.listProjects(), json);
+    if (command.action === "add") return printLegacy("project_add", await client.addProject(command.path), json);
+    if (command.action === "create" || command.action === "initialize") {
+      return printLegacy(`project_${command.action}`, await client.scaffoldProject(command.action, command.path, command.creatorVersion), json);
+    }
+    if (command.action === "remove") return printLegacy("project_remove", await client.removeProject(command.projectId), json, command.projectId);
+    throw new Error("Unexpected project action");
+  }
+  printLegacy(`creator_${command.action}`, await client.creatorAction(command.projectId, command.action), json, command.projectId);
+}
+
+async function executeSemantic(
+  command: SemanticCliCommand,
+  suppliedClient?: CompanionApiClient,
+): Promise<void> {
+  const localDiscovery = command.kind === "tool-list" || command.kind === "tool-describe";
+  const client = suppliedClient ?? (localDiscovery ? new CompanionApiClient() : await CompanionApiClient.discover());
+  const executionClient = new McpDaemonClient(client, () => CompanionApiClient.discover());
+  const result = await executeSemanticCommand(command, executionClient, {
+    toolSpecs: COMPANION_TOOL_SPECS,
+    execute: async (projectId, toolName, input, options) => {
+      const tool = COMPANION_TOOL_SPECS.find((item) => item.name === toolName);
+      if (!tool) throw new Error(`Unknown MCP tool: ${toolName}`);
+      const lockedPolicy = options.policyPath
+        ? await loadLockedTaskPolicy(options.policyPath, new Set(COMPANION_TOOL_SPECS.map((item) => item.name)))
+        : undefined;
+      let preset: ToolPreset | undefined;
+      if (!lockedPolicy) {
+        try { preset = await executionClient.managementCall(projectId, "tools.getPreset") as unknown as ToolPreset; }
+        catch { /* Full profile is the safe compatibility fallback. */ }
+      }
+      const session = new ToolExecutionSession(projectId, executionClient, COMPANION_TOOL_SPECS, preset, {
+        entrypoint: "cli",
+        ...(lockedPolicy ? { lockedPolicy } : {}),
+        ...(options.coordinated ? { coordinationRequired: true } : {}),
+      });
+      return session.execute(tool, input);
+    },
+  });
+  const rendered = isScreenshotCommand(command) ? await materializeScreenshot(result, command.outputPath) : result;
+  printCliResult(rendered, command.json);
+  process.exitCode = cliExitCode(rendered);
+}
+
+function invalidCliResult(error: unknown) {
+  const normalized = normalizeToolError(error);
+  return failedCliResult("creator_ai_cli", {
+    ...normalized,
+    code: normalized.code === "INTERNAL_ERROR" ? "INVALID_REQUEST" : normalized.code,
+  });
+}
+
+/** CLI 入口：处理帮助开关后解析并执行命令。 */
+export async function main(args = process.argv.slice(2)): Promise<void> {
+  if (args.includes("--help") || args.includes("-h")) {
+    process.stdout.write(`${COMPANION_USAGE}\n`);
+    return;
+  }
+  const json = args.includes("--json");
+  const filtered = args.filter((arg) => arg !== "--json");
+  const semantic = parseSemanticCommand(filtered, json);
+  if (semantic) return executeSemantic(semantic);
+  await executeCompanionCommand(parseCompanionCommand(args), undefined, json);
+}
+
+const invokedPath = process.argv[1] ?? "";
+if (import.meta.url === pathToFileURL(invokedPath).href || basename(invokedPath) === "creator-ai") {
+  void main().catch((error) => {
+    const json = process.argv.slice(2).includes("--json");
+    const result = invalidCliResult(error);
+    printCliResult(result, json);
+    process.exitCode = cliExitCode(result);
+  });
+}

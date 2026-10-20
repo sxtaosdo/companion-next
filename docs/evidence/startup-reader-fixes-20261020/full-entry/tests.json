@@ -1,0 +1,112 @@
+{
+  "success": true,
+  "numTotalTests": 26,
+  "numPassedTests": 26,
+  "numFailedTests": 0,
+  "tests": [
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only reproduces previous full-command unbounded status at readiness 0 ms despite a bounded private start",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only reproduces previous full-command unbounded status at readiness 13769 ms despite a bounded private start",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only completes the full daemon start command after slow startup using the verified status without another status call",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only completes full start for a healthy existing daemon without any spawn or legacy status call",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only bounds initial full-command discover hang and preserves occupied-port refusal with no duplicate spawn",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only bounds initial full-command request hang and preserves occupied-port refusal with no duplicate spawn",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only bounds full start when initial and new readiness response bodies never complete, with one spawn only",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only does not send a late existing-daemon request after its full-command initial discovery budget expires",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only refuses a hanging initial listeners preflight after 10 seconds with zero spawn",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only refuses a hanging initial locator preflight after 10 seconds with zero spawn",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only keeps the 30-second budget across a wall-clock jump of -86400000 ms",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only keeps the 30-second budget across a wall-clock jump of 86400000 ms",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only never spawns when a preflight completes after its deadline",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only does not read a locator or request status when discovery completes after the startup deadline",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only gives startup its own 30 seconds after a successful slow preflight",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only accepts observed 13.769-second slow startup with one spawn and no process control",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only accepts immediate readiness and cleans up its deadline timer",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only detects an early child exit before the next discovery and exposes no process command",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only bounds continuously failing readiness without raw errors: {\"readyAt\":null}",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only bounds continuously failing readiness without raw errors: {\"failRequest\":true}",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only bounds a hanging discover without depending on probe cancellation",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only bounds a hanging locator without depending on probe cancellation",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only bounds a hanging request without depending on probe cancellation",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only does not accept a still-live previous locator and does not spawn again",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only accepts readiness before the budget and refuses readiness first available at the deadline",
+      "status": "passed"
+    },
+    {
+      "name": "installed-source CLI startup wait narrow repair, fake process and clock only preserves occupied-port rejection before spawning without raw listener diagnostics",
+      "status": "passed"
+    }
+  ]
+}

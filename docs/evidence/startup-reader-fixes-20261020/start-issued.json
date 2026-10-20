@@ -1,0 +1,6 @@
+{
+  "atUtc": "2026-10-20T02:37:00.464817+00:00",
+  "entry": "connect-knowledge-reader.ps1 -StartOnly -NoBrowser",
+  "invocations": 1,
+  "computerRestart": false
+}

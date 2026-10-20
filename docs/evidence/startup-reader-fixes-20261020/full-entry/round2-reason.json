@@ -1,0 +1,15 @@
+{
+  "previousStartInvocations": 1,
+  "originalEntryAndCliNowAbsent": true,
+  "originalExitCode": "UNKNOWN",
+  "currentDaemon": {
+    "pid": 10940,
+    "startupEpoch": "b08c062d-b4e0-47d4-b51d-f730eaad0020",
+    "startedAt": "2026-10-20T02:37:01.510Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "reason": "New reviewed fix removes additional unbounded full-command status awaits; this is a new candidate deployment, not a blind retry",
+  "servicePid": 600
+}

@@ -1,0 +1,57 @@
+{
+  "atUtc": "2026-10-20T02:40:44.842629+00:00",
+  "process": {
+    "knowledgeChildren": [
+      {
+        "ProcessId": 21212,
+        "Name": "conhost.exe",
+        "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe"
+      }
+    ],
+    "matchingDaemonProcesses": 1,
+    "pid": 10940,
+    "port32180Owner": 10940,
+    "creatorProcesses": 0,
+    "created": "2026-10-20T02:37:01.0717520Z",
+    "executable": "C:\\Program Files\\nodejs\\node.exe"
+  },
+  "companionPhase": "OPEN",
+  "knowledgeService": {
+    "path": "D:\\services\\weknora\\normal-reader-recovery-v0.8.2\\weknora.exe",
+    "pid": 600,
+    "created": "2026-10-20T02:03:09.5395770Z"
+  },
+  "shared22And21ProtectedSourcesPreserved": true,
+  "business9TablesUnchanged": true,
+  "otherRuntime308Unchanged": true,
+  "canonicalLockAndUnknown2Preserved": true,
+  "knowledgeStateGuardAndCountsUnchanged": true,
+  "knowledgeCounts": {
+    "knowledges": 1650,
+    "chunks": 59433,
+    "lite_embeddings": 2272,
+    "auth_tokens": 38,
+    "users": 2,
+    "tenants": 2
+  },
+  "knowledgeEmptyTriggerCounts": {
+    "task_pending_ops": 0,
+    "data_sources": 0,
+    "im_channels": 0,
+    "mcp_services": 0,
+    "sync_logs": 0,
+    "tenant_sandbox_configs": 0,
+    "temporary_documents": 0,
+    "fork_snapshot_leases": 0,
+    "tenant_skills": 0,
+    "sessions_with_fork_bootstrap": 0
+  },
+  "readerPublicPermissionMetadataUnchanged": true,
+  "readerSecretInspectedOrReplaced": false,
+  "modelCreatorInferenceActions": 0,
+  "nextStaticHttp200": true,
+  "nextAssetSha256": "b2b29887dbc1e62e9f25fd1856afac8dc49dc0d6232de12346b2e00e90b5eda9",
+  "nextUiDeployedRevision": "1.3.173.146",
+  "docsCheckpoint": "bee060e / 1.3.173.163",
+  "noComputerRestart": true
+}

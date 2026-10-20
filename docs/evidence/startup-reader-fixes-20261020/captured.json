@@ -1,0 +1,26 @@
+{
+  "identity": {
+    "pid": 7156,
+    "startupEpoch": "71435334-0e9a-4c1c-a31b-ae563c76dc39",
+    "startedAt": "2026-10-20T01:33:36.825Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "canonicalName": "native-epochs.jsonl.boot-a49be189-172d-11f0-8a7d-8c9774127e68.lock",
+  "canonicalSha256": "c4d9b6938d8e263b4092d148a5ecbb90cefb6803ca8281c09eccee17d5004d28",
+  "canonicalInode": 6755399442754690,
+  "os": {
+    "pid": 7156,
+    "executablePath": "C:\\Program Files\\nodejs\\node.exe",
+    "creationFileTime": "134369336162865957",
+    "cimCreationTime": "2026-10-20T01:33:36.2865950Z",
+    "terminated": false
+  },
+  "atUtc": "2026-10-20T02:35:32.456799+00:00",
+  "service": {
+    "path": "D:\\services\\weknora\\normal-reader-recovery-v0.8.2\\weknora.exe",
+    "pid": 600,
+    "created": "2026-10-20T02:03:09.5395770Z"
+  }
+}
