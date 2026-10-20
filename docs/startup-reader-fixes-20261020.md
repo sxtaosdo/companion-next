@@ -1,3 +1,19 @@
+# 当前结果（2026-10-20 02:54 UTC）
+
+两处已批准窄修已部署，完整CLI普通冷启动入口返回exit0/PASSED，耗时11171ms；已运行实例幂等复用另有578ms exit0回执。最终Companion PID6564，32180，OPEN；daemon SHA70df42a8…不变，Nodev25.2.1。CLI最终SHA8ba06c76…，worker SHA9a02abcd…。UI仍为已部署a8e88ac/内部1.3.173.146、页面1.3.173；本轮文档检查点1.3.173.166不是UI重部署。WeKnora PID600/8081、EXE b05899bc…及创建时间保持，未重启电脑。
+
+原reader通过六个有界只读POST和两个状态GET：KB元数据、limit1文档列表、固定文档详情、limit1分片、2235B完整原文和limit1关键词检索。原文SHA3f232d48…与此前一致，auth/keyword verified，writer/scheduler仍false。未归档正文、未替换凭据或扩大权限、无模型/Creator动作。[最终实读](evidence/startup-reader-fixes-20261020/cold-entry-acceptance/reader-result.json)。
+
+完整CLI26项、worker64项、Next受影响合同115项通过，worker严格tsc通过，独立审查无剩余P1/P2；每轮从实际安装map重建基线JS逐字节相同，候选只改各自一处源码，依赖保持。第二轮仅CLI/map两文件变化，worker、daemon、静态等310文件保持；相对任务起点只CLI/worker及maps四文件变化。最终冷验收无代码变化，312运行文件全部保持。共享22项修改、21个受保护源、9业务表、KB状态/计数/公开key3权限保持。canonical同一路径v2锁，旧锁原字节及file object保留；UNKNOWN2、quiescence0，未放宽启动重采样。[最终保护](evidence/startup-reader-fixes-20261020/cold-entry-acceptance/final-protection.json)。
+
+前两次communicate管道观察分别55/110秒未取得退出回执，原entry/CLI之后消失，但退出码仍UNKNOWN，记录没有被覆盖。后续代码复查修复了额外的无界完整调用点；隔离反例不能反推真实等待唯一原因。取证修正为临时文件输出及process.wait后，原正常入口幂等复用exit0，另存检查点的无代码变化冷验收取得新exit0/PASSED回执。不能由新回执追认前两次退出码；底层不可取消文件IO的Promise超时也不构成该IO已退出证明。
+
+整体旧功能仍未全部对齐：13通过/6部分/2暂停，只代表限定主流程历史验收。见[21项逐项矩阵](parity-matrix-20261020.md)，不能把本轮回归项数当整体功能通过率。
+
+---
+
+以下为按时间保存的候选及首轮过程，当前状态以上文及最终回执为准。
+
 当前补充：完整CLI候选已部署，后台18408/OPEN，原reader再次限定实读8步全200、auth/keyword verified，保护核对通过。修正取证为临时文件输出+process.wait后，现有实例的原正常入口578ms exit0/PASSED，PID/epoch不变。前两次communicate管道观察仍记UNKNOWN，未追认冷启动退出码。现保存无代码变化的受控冷启动验收检查点，按既有精确应用重启授权，只验证一次完整正常入口退出，不重启WeKnora/电脑、不改任何运行文件。
 
 21项结果见[清晰逐项矩阵](parity-matrix-20261020.md)。

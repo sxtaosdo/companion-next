@@ -1,0 +1,72 @@
+diff --git a/src/companion-cli.ts b/src/companion-cli.ts
+index d794449..5c3a6c3 100644
+--- a/src/companion-cli.ts
++++ b/src/companion-cli.ts
+@@ -254,7 +254,30 @@ async function daemonStartPreflight(): Promise<number | undefined> {
+   }
+ }
+ 
+-async function startDaemonAndDiscover(): Promise<{ client: CompanionApiClient; pid?: number }> {
++async function runningDaemonStatus(suppliedClient?: CompanionApiClient): Promise<JsonValue> {
++  const controller = new AbortController();
++  const timer = setTimeout(() => controller.abort(), 10_000);
++  let onAbort: (() => void) | undefined;
++  try {
++    const timedOut = new Promise<never>((_, reject) => {
++      onAbort = () => reject(new Error("DAEMON_RUNNING_PROBE_DEADLINE"));
++      controller.signal.addEventListener("abort", onAbort, { once: true });
++    });
++    const probe = (async () => {
++      const client = suppliedClient ?? await CompanionApiClient.discover();
++      controller.signal.throwIfAborted();
++      return client.request("GET", "/v1/status", undefined, controller.signal);
++    })();
++    return await Promise.race([probe, timedOut]);
++  } catch {
++    throw new Error("Creator AI Companion daemon is temporarily unavailable: existing daemon readiness could not be verified.");
++  } finally {
++    clearTimeout(timer);
++    if (onAbort) controller.signal.removeEventListener("abort", onAbort);
++  }
++}
++
++async function startDaemonAndDiscover(): Promise<{ client: CompanionApiClient; pid?: number; status: JsonValue }> {
+   const previousPid = await daemonStartPreflight();
+   const daemonPath = resolve(dirname(fileURLToPath(import.meta.url)), "companion-daemon.js");
+   const child = spawn(process.execPath, [daemonPath], { detached: true, stdio: "ignore" });
+@@ -284,11 +307,11 @@ async function startDaemonAndDiscover(): Promise<{ client: CompanionApiClient; p
+         controller.signal.throwIfAborted();
+         // Ignore a stale locator that still points at the previous daemon.
+         if (previousPid && locatorPid === previousPid && processAlive(previousPid)) return undefined;
+-        await client.request("GET", "/v1/status", undefined, controller.signal);
+-        return client;
++        const status = await client.request("GET", "/v1/status", undefined, controller.signal);
++        return { client, status };
+       })();
+-      const client = await Promise.race([probe, timedOut]);
+-      if (client && performance.now() < deadline) return { client, ...(childPid ? { pid: childPid } : {}) };
++      const ready = await Promise.race([probe, timedOut]);
++      if (ready && performance.now() < deadline) return { ...ready, ...(childPid ? { pid: childPid } : {}) };
+     } catch {
+       // Discovery/network diagnostics may contain local paths or credentials.
+       // The bounded startup result below deliberately includes no raw probe error.
+@@ -347,16 +370,15 @@ export async function executeCompanionCommand(command: CompanionCommand, supplie
+         if (!previousDaemonIsGone(error, pidState)) throw error;
+       }
+       const started = await startDaemonAndDiscover();
+-      printLegacy("daemon_restart", { restarted: true, ...(started.pid ? { pid: started.pid } : {}), status: await started.client.status() }, json);
++      printLegacy("daemon_restart", { restarted: true, ...(started.pid ? { pid: started.pid } : {}), status: started.status }, json);
+       return;
+     }
+     try {
+-      const runningClient = suppliedClient ?? await CompanionApiClient.discover();
+-      printLegacy("daemon_start", await runningClient.status(), json);
++      printLegacy("daemon_start", await runningDaemonStatus(suppliedClient), json);
+       return;
+     } catch {
+       const started = await startDaemonAndDiscover();
+-      printLegacy("daemon_start", { started: true, ...(started.pid ? { pid: started.pid } : {}), status: await started.client.status() }, json);
++      printLegacy("daemon_start", { started: true, ...(started.pid ? { pid: started.pid } : {}), status: started.status }, json);
+       return;
+     }
+   }

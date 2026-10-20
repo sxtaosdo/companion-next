@@ -1,0 +1,127 @@
+{
+  "atUtc": "2026-10-20T02:53:57.618Z",
+  "daemonIdentity": {
+    "pid": 6564,
+    "startupEpoch": "15e6f683-4962-40de-965d-8984805da96b",
+    "startedAt": "2026-10-20T02:53:04.716Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "servicePid": 600,
+  "scope": {
+    "kbId": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+    "documentId": "97c5935f-6114-43e9-8ead-d0319f61ab9a",
+    "documentsRequested": 1,
+    "globalCorpusTraversed": false
+  },
+  "steps": [
+    {
+      "path": "/api/knowledge/status",
+      "status": 200,
+      "backendCode": null
+    },
+    {
+      "path": "/api/knowledge/kb/view",
+      "status": 200,
+      "backendCode": null
+    },
+    {
+      "path": "/api/knowledge/doc/list",
+      "status": 200,
+      "backendCode": null
+    },
+    {
+      "path": "/api/knowledge/doc/view",
+      "status": 200,
+      "backendCode": null
+    },
+    {
+      "path": "/api/knowledge/chunk/list",
+      "status": 200,
+      "backendCode": null
+    },
+    {
+      "path": "/api/knowledge/doc/download",
+      "status": 200,
+      "backendCode": null
+    },
+    {
+      "path": "/api/knowledge/search",
+      "status": 200,
+      "backendCode": null
+    },
+    {
+      "path": "/api/knowledge/status",
+      "status": 200,
+      "backendCode": null
+    }
+  ],
+  "ok": true,
+  "rawContentArchived": false,
+  "readerCredentialInspected": false,
+  "readerCredentialReplaced": false,
+  "permissionsChanged": false,
+  "loginSessionPosts": 1,
+  "writeOrIndexRequests": 0,
+  "searchRequests": 1,
+  "askOrChatRequests": 0,
+  "modelOrCreatorActions": 0,
+  "browserLaunched": false,
+  "statusBefore": {
+    "auth": "configured",
+    "keyword": "unverified",
+    "kbIdMatches": true
+  },
+  "kb": {
+    "idMatch": true
+  },
+  "documentList": {
+    "count": 1,
+    "truncated": true
+  },
+  "document": {
+    "idMatch": true,
+    "reportedBytes": 2235
+  },
+  "chunks": {
+    "count": 1,
+    "truncated": true,
+    "items": [
+      {
+        "id": "7d464fcf-6e06-4beb-8814-9a73d6ceeaed",
+        "index": 0,
+        "contentSha256": "a4fbcdb29be9027a89194a47a2499ad574234658c23d99116240b6240c55e422"
+      }
+    ]
+  },
+  "original": {
+    "verified": true,
+    "bytes": 2235,
+    "truncated": false,
+    "isBase64": false,
+    "contentSha256": "3f232d48e83e4cc64752ab234b5065362d5f88aa5d68ccba8440e94c46a6624f",
+    "matchesYesterdayOriginal": true
+  },
+  "search": {
+    "query": "shidai3",
+    "limit": 1,
+    "count": 1,
+    "items": [
+      {
+        "id": "e57620f3-5ac3-469b-b318-df408752ad38",
+        "knowledgeId": "414accf7-0803-4eca-8abe-4121c64e3f67",
+        "contentSha256": "4e0788c38d74a6f24ab3afd993802195be62f121777f9c6f9b39b6169d7d8ec6",
+        "titleSha256": "a9a87d7c6dc267898adaa5739a7fc7f4ebcdaa07fcd9c154bbed88084bd1b9a3"
+      }
+    ],
+    "keywordOnlySourceVerified": true
+  },
+  "statusAfter": {
+    "auth": "verified",
+    "keyword": "verified",
+    "kbIdMatches": true,
+    "writerEnabled": false,
+    "schedulerEnabled": false
+  }
+}

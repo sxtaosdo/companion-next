@@ -1,3 +1,5 @@
+2026-10-20 02:54 UTC：已批准两处窄修完成。完整CLI正常入口exit0/PASSED，耗时11171ms；Companion PID6564/32180/OPEN，WeKnora PID600/8081持续运行。原reader限定KB/文档/分片/2235B原文与关键词检索全200，auth/keyword verified；UNKNOWN2、原权限、共享22修改与9业务表保持。总体仍13通过/6部分/2暂停，不等于全部对齐。详见[本轮实证](startup-reader-fixes-20261020.md)和[当前逐项矩阵](parity-matrix-20261020.md)。
+
 2026-10-20 02:07 UTC：按授权经独立启动门禁后，原WeKnora一次恢复PID600/8081/health200；原reader同KB的6只读POST+2状态GET全部200，原文2235B同SHA，auth/keyword verified。Companion7156/OPEN及全部保护保持，CLI/worker代码仍未改。#19限定只读可用性已恢复；历史13/6/2不增加。见[服务恢复与复验](knowledge-service-resume-20261020.md)。
 
 2026-10-20 01:52 UTC后续只读结论：CLI固定8秒及无probe截止属于旧宿主；13.769405ms只代表OS创建→locator对象时间。当前8081无监听/健康连接拒绝，旧worker会误归AUTH_DENIED403；真实403首分支和DPAPI加载仍未验证，不代表原权限已被拒。PID7156仍OPEN，未部署/重启/改权限。见[两问题确证、隔离与最小方案](postboot-two-blockers-diagnosis-20261020.md)。

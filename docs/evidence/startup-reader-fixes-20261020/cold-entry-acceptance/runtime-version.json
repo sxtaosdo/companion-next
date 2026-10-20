@@ -1,0 +1,7 @@
+{
+  "actualStatusVersionFields": {},
+  "node": "v25.2.1",
+  "daemonSha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+  "cliSha256": "8ba06c7629b666980b9c998baa76223cdc8129b660824f5e007f8cc89aa8a6a9",
+  "workerSha256": "9a02abcd0d885053e45a4d5a91a07f197582a7451d619e094090967d68e4eb9c"
+}

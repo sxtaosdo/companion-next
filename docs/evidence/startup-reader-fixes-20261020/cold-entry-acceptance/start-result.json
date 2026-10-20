@@ -1,0 +1,24 @@
+{
+  "atUtc": "2026-10-20T02:53:14.849305+00:00",
+  "entryPid": 8344,
+  "entryExitCode": 0,
+  "elapsedMs": 11171.0,
+  "passedReceipt": true,
+  "stdoutBytes": 1116,
+  "stderrBytes": 0,
+  "stdoutSha256": "62e230e3243ebf1f3381591520ff919910dac77d0c62903cb8881a1e078c9776",
+  "newIdentity": {
+    "pid": 6564,
+    "startupEpoch": "15e6f683-4962-40de-965d-8984805da96b",
+    "startedAt": "2026-10-20T02:53:04.716Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "newOwnerObserved": true,
+  "startInvocations": 1,
+  "codeOrRuntimeChanges": 0,
+  "processKilled": false,
+  "rawOutputArchived": false,
+  "observerWaitsForExactEntryExit": true
+}

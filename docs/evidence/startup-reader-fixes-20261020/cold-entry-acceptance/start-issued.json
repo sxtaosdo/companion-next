@@ -1,0 +1,8 @@
+{
+  "atUtc": "2026-10-20T02:53:03.678769+00:00",
+  "entry": "connect-knowledge-reader.ps1 -StartOnly -NoBrowser",
+  "invocations": 1,
+  "scope": "NO_CODE_CHANGE_CONTROLLED_COLD_ACCEPTANCE",
+  "observer": "process.wait + temporary files; no pipe EOF",
+  "computerRestart": false
+}
