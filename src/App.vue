@@ -52,7 +52,6 @@ const artExpanded = ref(false)
 watch(() => route.fullPath, () => {
   if (artNav.some(item => item.path === route.path)) artExpanded.value = true
 }, { immediate: true })
-const resourceNav = [{ path: '/services', label: '服务状态' }]
 function isNavActive(path: string) {
   if (path === '/knowledge?tab=models') return route.path === '/knowledge' && route.query.tab === 'models'
   if (path === '/knowledge') return route.path === '/knowledge' && route.query.tab !== 'models'
@@ -129,7 +128,7 @@ const dateLabel = computed(() => {
           </div>
         </template>
       </nav>
-      <nav class="legacy-nav supplementary-nav" aria-label="补充入口"><RouterLink v-for="item in resourceNav" :key="item.path" :to="projectLink(item.path)" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false">{{ item.label }}</RouterLink></nav>
+
       <div class="sidebar-footer">前端 v{{ frontendIdentity.version }}</div>
     </aside>
     <div class="main-shell">

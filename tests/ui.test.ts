@@ -5,14 +5,15 @@ import { createPinia } from 'pinia'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import ElementPlus from 'element-plus'
 import App from '../src/App.vue'
+import ServicesView from '../src/views/ServicesView.vue'
 import { routes } from '../src/router'
 import { useWorkspaceStore } from '../src/stores/workspace'
 let wrapper: VueWrapper | undefined
 beforeEach(() => { localStorage.clear(); Object.defineProperty(navigator, 'locks', { configurable: true, value: { request: async (_key: string, callback: () => unknown) => callback() } }) })
 afterEach(() => { wrapper?.unmount(); wrapper = undefined; document.body.innerHTML = ''; Reflect.deleteProperty(navigator, 'locks') })
-async function setup(path = '/resources') {
+async function setup(path = '/resources', retainedLegacyServices = false) {
   const pinia = createPinia()
-  const router = createRouter({ history: createMemoryHistory(), routes })
+  const router = createRouter({ history: createMemoryHistory(), routes: retainedLegacyServices ? routes.map(route => route.path === '/services' ? { path: '/services', component: ServicesView } : route) : routes })
   await router.push(path)
   wrapper = mount(App, { attachTo: document.body, global: { plugins: [pinia, router, ElementPlus] } })
   await flushPromises()
@@ -85,8 +86,8 @@ describe('mounted UI boundaries (jsdom, not browser rendering)', () => {
     expect(wrapper!.text()).toContain('只读数据源中暂无可展示项目')
     expect(wrapper!.text()).not.toContain('当前没有读取任何真实项目或服务')
   })
-  it('shows unverified service states in demo and discloses revision boundaries', async () => {
-    const { store, router } = await setup('/services'); await store.openDemo(); await flushPromises()
+  it('retains unverified service states in the legacy component demo and discloses revision boundaries', async () => {
+    const { store, router } = await setup('/services', true); await store.openDemo(); await flushPromises()
     expect(wrapper!.findAll('.service-card')).toHaveLength(3)
     expect(wrapper!.findAll('.service-card .el-tag').every((tag) => tag.text().includes('未验证'))).toBe(true)
     await router.push('/history'); await flushPromises()
@@ -97,7 +98,7 @@ describe('mounted UI boundaries (jsdom, not browser rendering)', () => {
 
 describe('review regression cases', () => {
   it('does not label fallback services as real responses after a live failure', async () => {
-    const { store } = await setup('/services')
+    const { store } = await setup('/services', true)
     await store.connect({ mode: 'live', label: 'test', loadSnapshot: async () => { throw new Error('401') } }); await flushPromises()
     expect(wrapper!.findAll('.service-card')).toHaveLength(3)
     expect(wrapper!.findAll('.service-bottom').every((row) => row.text().includes('未取得有效响应'))).toBe(true)

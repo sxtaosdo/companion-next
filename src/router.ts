@@ -5,7 +5,6 @@ import KnowledgeReadView from './views/KnowledgeReadView.vue'
 import CompanionBrowserView from './views/CompanionBrowserView.vue'
 import OverviewView from './views/OverviewView.vue'
 import ResourcesView from './views/ResourcesView.vue'
-import ServicesView from './views/ServicesView.vue'
 import HistoryView from './views/HistoryView.vue'
 import ImageAssetsView from './views/ImageAssetsView.vue'
 import HelpView from './views/HelpView.vue'
@@ -20,7 +19,7 @@ export const routes: RouteRecordRaw[] = [
   { path: '/overview', component: OverviewView, meta: { title: '项目概览', description: '从规范开始，让每次交付都有据可循。' } },
   { path: '/resources', component: ResourcesView, meta: { title: '游戏资源', description: '一个入口，按步骤做好每一份资源。' } },
   { path: '/image-assets', component: ImageAssetsView, meta: { title: '图片素材', description: '导入候选，在页内审阅并核对真实保存结果。' } },
-  { path: '/services', component: ServicesView, meta: { title: '服务状态', description: '明确连接边界，保留真实读取证据。' } },
+  { path: '/services', redirect: to => ({ path: '/overview', query: to.query, hash: '#service-status' }) },
   { path: '/history', component: HistoryView, meta: { title: '版本与边界', description: '让已知基线、当前能力和待验证事项保持清晰。' } },
   { path: '/help', component: HelpView, meta: { title: '帮助', description: '找到用法、原有功能和当前实际边界。', workspaceIndependent: true } },
   { path: '/about', component: AboutView, meta: { title: '关于', description: '区分前端、旧版参考与真实服务版本。', workspaceIndependent: true } },
@@ -28,4 +27,4 @@ export const routes: RouteRecordRaw[] = [
   { path: '/migration', component: MigrationView, meta: { title: '旧功能保留', description: '保留旧能力，逐项核对迁移完成情况。', workspaceIndependent: true } },
   { path: '/:pathMatch(.*)*', redirect: '/overview' },
 ]
-export const router = createRouter({ history: createWebHashHistory(), routes })
+export const router = createRouter({ history: createWebHashHistory(), routes, scrollBehavior(to, _from, saved) { return saved ?? (to.hash === '#service-status' ? { el: '#service-status', top: 16 } : undefined) } })

@@ -49,6 +49,17 @@ describe('registered project overview and resource context', () => {
       await router.push(path); await flushPromises(); expect(router.currentRoute.value.fullPath).toBe(path)
     }
   })
+  it('merges the old services deep link into overview without losing explicit project context or history', async () => {
+    const { router, selection } = await setup(`/overview?project=${other}`)
+    await router.push('/help'); await router.push(`/services?project=${other}&filter=local`); await flushPromises()
+    expect(router.currentRoute.value.fullPath).toBe(`/overview?project=${other}&filter=local#service-status`)
+    expect(selection.project?.id).toBe(other)
+    expect(wrapper!.find('.sidebar a[href="/services"]').exists()).toBe(false)
+    expect(wrapper!.find('[data-testid="overview-service-summary"]').exists()).toBe(true)
+    router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/help')); await flushPromises()
+    router.forward(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/overview')); await flushPromises()
+    expect(selection.project?.id).toBe(other); expect(router.currentRoute.value.hash).toBe('#service-status')
+  })
   it('selects the first real overview project after the entry read, preserves it on reorder and invalidates removal', async () => {
     let finish!: (value: ProjectRead) => void
     const api = source(); api.loadProjects = vi.fn(() => new Promise<ProjectRead>(resolve => finish = resolve))
