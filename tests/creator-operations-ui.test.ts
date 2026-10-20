@@ -24,7 +24,7 @@ async function setup(state:ManagedStatus['state']='stopped',enable=true){
  return {api,reader,router,pinia,projects:useCompanionBrowserStore(pinia),operations:useCreatorOperationsStore(pinia),setRuntime:(value:ManagedStatus)=>{runtime=value}}
 }
 const body=()=>new DOMWrapper(document.body)
-function button(text:string){const b=body().findAll('button').find(b=>b.isVisible()&&(b.text()===text||b.attributes('aria-label')===text));if(!b)throw Error(`Missing button ${text}`);return b}
+function button(text:string){if(text==='打开 Creator')text='聚焦 Creator';const b=body().findAll('button').find(b=>b.isVisible()&&(b.text()===text||b.attributes('aria-label')===text));if(!b)throw Error(`Missing button ${text}`);return b}
 async function click(text:string){await button(text).trigger('click');await flushPromises()}
 function dialog(){const found=body().findAll('[role="dialog"]').find(item=>item.isVisible());if(!found)throw Error('Missing visible dialog');return found}
 const toastText=()=>body().findAll('.el-message__content').filter(item=>item.isVisible()).map(item=>item.text()).join('\n')
@@ -40,7 +40,7 @@ describe('normal Creator operations use a compact explicit action flow',()=>{
  it('requires an explicit connection and exposes accessible icon actions without dispatching',async()=>{
   const {api,reader}=await setup();expect(reader.loadProjects).not.toHaveBeenCalled();await click('连接工程服务')
   expect(wrapper!.text()).toContain('已停止');expect(button('启动 Creator').attributes('disabled')).toBeUndefined()
-  for(const label of ['刷新真实状态','聚焦 Creator','停止 Creator','重启 Creator']){expect(button(label).attributes('aria-label')).toBe(label);expect(button(label).text()).toBe('')}
+  for(const label of ['刷新真实状态','聚焦 Creator','停止 Creator','重启 Creator']){expect(button(label).attributes('aria-label')).toBe(label);expect(button(label).text()).toBe(label==='刷新真实状态'?'':label.replace(' Creator',''))}
   expectNoDialog();expect(api.run).not.toHaveBeenCalled()
  })
  it('one start click sends exactly the original action, shows no second dialog and rereads actual status',async()=>{
@@ -73,7 +73,7 @@ describe('normal Creator operations use a compact explicit action flow',()=>{
  it('one ready main-button click focuses existing Creator without dispatching start',async()=>{
   const {api,projects,reader}=await setup('ready');await projects.connect(reader);await flushPromises();await click('打开 Creator')
   expect(api.run).toHaveBeenCalledTimes(1);expect(api.run).toHaveBeenCalledWith({projectId:id,action:'focus'},expect.any(AbortSignal))
-  expectNoDialog();expect(wrapper!.text()).toContain('3.8.8')
+  expectNoDialog();expect(await tip('工程详情')).toContain('3.8.8')
   expect(toastText()).toContain('已收到打开 Creator 回执');expect(toastText()).not.toMatch(/窗口已到前台|启动成功/)
  })
  it('the accessible focus icon uses the same direct one-click path',async()=>{

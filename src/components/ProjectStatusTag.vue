@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 import { runtimeStateLabel } from '../domain/companion-browser'
+import { projectStateTone } from '../domain/companion-project-display'
 import type { ManagedStatus } from '../domain/companion-browser'
 const props = defineProps<{ status?: ManagedStatus; passive?: boolean; stopAcknowledged?: boolean }>()
 // Original app.ts:1364 uses two independent conditions. Progress is not
@@ -20,7 +21,7 @@ function escape(event: KeyboardEvent) { if (visible.value) { visible.value = fal
   <el-tooltip :visible="visible && !!detail" :disabled="!detail" placement="top" :show-after="0" :hide-after="0" popper-class="project-status-tooltip">
     <template #content><span :id="id">{{ detail }}</span></template>
     <span class="project-status-trigger" :tabindex="detail ? 0 : undefined" :aria-describedby="visible && detail ? id : undefined" @mouseenter="visible=!!detail" @mouseleave="!focused&&(visible=false)" @focus="focused=true;visible=!!detail" @blur="focused=false;visible=false" @keydown.esc="escape">
-      <el-tag size="small" :type="status?.state === 'ready' ? 'success' : 'info'">{{ passive ? '运行状态未探测' : expectedStop ? '已请求停止' : runtimeStateLabel(status?.state ?? 'unknown') }}</el-tag>
+      <el-tag size="small" :type="projectStateTone(status,passive,expectedStop)">{{ passive ? '运行状态未探测' : expectedStop ? '已请求停止' : runtimeStateLabel(status?.state ?? 'unknown') }}</el-tag>
     </span>
   </el-tooltip>
 </template>

@@ -1,6 +1,6 @@
 /* Only the setup dialog and its teleported select. Palette: original v148 web/app.css
    858–885 controls, 1139/1154–1155 muted/confirmation, 1192–1193 selection,
-   1239–1245 labels/select, 1530–1544 modal. No global theme or flow changes. */
+   1239–1245 labels/select, 1530–1544 modal. No global theme changes. */
 .project-setup-dialog,
 .project-setup-select-popper {
   color-scheme: dark;
@@ -89,3 +89,25 @@
 .project-setup-dialog .dashboard-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 .project-setup-dialog .dashboard-meta,
 .project-setup-dialog .dashboard-path { color: #9299a6; overflow-wrap: anywhere; }
+
+/* Original progressive five-step timeline; only the current panel expands. */
+.project-setup-dialog .setup-timeline{display:grid;gap:0}
+.project-setup-dialog .setup-timeline-item{position:relative;padding:0 0 16px 30px;min-width:0}
+.project-setup-dialog .setup-timeline-item:not(:last-child)::before{content:'';position:absolute;top:18px;bottom:0;left:11px;width:1px;background:#4a4f5a}
+.project-setup-dialog .setup-timeline-item.done::before{background:#537ef7}
+.project-setup-dialog .setup-timeline-heading{position:relative;display:flex;align-items:center;width:100%;min-height:24px;padding:0;border:0;background:transparent;color:#e7e9ed;font:inherit;font-size:14px;font-weight:600;text-align:left;cursor:pointer}
+.project-setup-dialog .setup-timeline-heading:disabled{opacity:.65;cursor:default}
+.project-setup-dialog .setup-timeline-heading:focus-visible{outline:2px solid #537ef7;outline-offset:4px}
+.project-setup-dialog .setup-timeline-node{position:absolute;left:-26px;width:14px;height:14px;border:2px solid #4a4f5a;border-radius:50%;background:#202329}
+.project-setup-dialog .active>.setup-timeline-heading .setup-timeline-node{border-color:#7e9cff;background:#3d6df2;box-shadow:0 0 0 3px #243056}
+.project-setup-dialog .done>.setup-timeline-heading .setup-timeline-node{border-color:#537ef7;background:#537ef7}
+.project-setup-dialog .setup-timeline-panel{margin-top:10px;padding:14px 12px;border:1px solid #537ef7;border-radius:7px;background:#191c21}
+.project-setup-dialog .setup-source-options{display:grid;gap:10px;width:100%;margin-top:12px}
+.project-setup-dialog .setup-source-options .el-radio{display:flex;align-items:flex-start;width:100%;height:auto;margin:0;padding:12px;border-color:#383c45;background:#191c21}
+.project-setup-dialog .setup-source-options .el-radio.is-checked{background:#243056;border-color:#537ef7}
+.project-setup-dialog .setup-source-options .el-radio__input{padding-top:2px}
+.project-setup-dialog .setup-source-options .el-radio__label{white-space:normal;line-height:1.5}
+.project-setup-dialog .setup-source-options small{display:block;margin-top:3px;color:#9299a6;font-size:13px}
+.project-setup-dialog .setup-step-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.project-setup-dialog .setup-step-actions .el-button+.el-button{margin-left:0}
+.project-setup-dialog .setup-step+.setup-step{margin-top:12px;padding-top:12px}

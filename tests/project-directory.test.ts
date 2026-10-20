@@ -62,7 +62,7 @@ async function setup(pick:()=>Promise<string|undefined>=async()=>chosen){
 }
 const body=()=>new DOMWrapper(document.body)
 function button(text:string){const value=body().findAll('button').find(b=>b.text()===text||b.attributes('aria-label')===text);if(!value)throw Error('Missing '+text);return value}
-async function click(text:string){await button(text).trigger('click');await flushPromises()}
+async function click(text:string){await button(text).trigger('click');await flushPromises();if(text==='添加已有工程'){await button('下一步').trigger('click');await flushPromises()}}
 const input=()=>body().get('input[aria-label="已有工程绝对路径"]')
 const pathValue=()=>(input().element as HTMLInputElement).value
 

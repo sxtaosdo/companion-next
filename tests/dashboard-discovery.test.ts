@@ -96,7 +96,7 @@ async function setupUi(source=reader()){
  await store.connect(source);await flushPromises();return {store,setup,source,router}
 }
 function button(text:string){const found=new DOMWrapper(document.body).findAll('button').find(b=>b.text()===text||b.attributes('aria-label')===text);if(!found)throw Error('Missing button '+text);return found}
-async function click(text:string){await button(text).trigger('click');await flushPromises()}
+async function click(text:string){await button(text).trigger('click');await flushPromises();if(text==='添加已有工程'){await body().get('input[value="dashboard"]').setValue(true);await button('下一步').trigger('click');await flushPromises()}}
 const body=()=>new DOMWrapper(document.body)
 
 describe('original Dashboard select-to-registration interaction',()=>{
@@ -107,7 +107,7 @@ describe('original Dashboard select-to-registration interaction',()=>{
   const items=body().findAll('.dashboard-item');expect(items).toHaveLength(3)
   expect(items[0]!.text()).toContain('Dashboard 已启动 · PID 1234');expect(items[0]!.text()).toContain('Creator 3.8.8');expect(items[0]!.text()).toContain('状态 open')
   const missing=items.find(b=>b.text().includes('已移走工程'))!;expect(missing.attributes('disabled')).toBeDefined();expect(missing.text()).toContain('路径不存在')
-  const registered=items.find(b=>b.text().includes('Dashboard 已登记'))!;expect(registered.text()).toContain('已接入 · ready')
+  const registered=items.find(b=>b.text().includes('Dashboard 已登记'))!;expect(registered.text()).toContain('已接入 · 已就绪')
   await items[0]!.trigger('click');await flushPromises()
   expect((body().get('input[aria-label="已有工程绝对路径"]').element as HTMLInputElement).value).toBe(discovered[1]!.path)
   expect(setup.register).not.toHaveBeenCalled();expect(setup.start).not.toHaveBeenCalled();expect(store.projects).toEqual([target])

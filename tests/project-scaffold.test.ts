@@ -92,7 +92,7 @@ describe('scaffold approval and same-session uncertainty',()=>{
 const body=()=>new DOMWrapper(document.body)
 function button(text:string){const found=body().findAll('button').find(node=>node.text()===text);if(!found)throw Error('Missing '+text);return found}
 async function click(text:string){await button(text).trigger('click');await flushPromises()}
-async function chooseSource(mode:string){await body().get(`input[value="${mode}"]`).setValue(true);await flushPromises()}
+async function chooseSource(mode:string){await body().get(`input[value="${mode}"]`).setValue(true);await flushPromises();await click('下一步')}
 const pathInput=()=>body().get('input[aria-label="已有工程绝对路径"]')
 async function prepareCreate(){await click('添加已有工程');await chooseSource('create');await body().get('input[aria-label="新工程父目录"]').setValue(parent);await body().get('input[aria-label="新工程名称"]').setValue('新工程');await click('核对创建工程')}
 describe('four original source choices and explicit continuation',()=>{
@@ -113,11 +113,11 @@ describe('four original source choices and explicit continuation',()=>{
  })
  it('keeps a late result as history after close and never fills a reopened form',async()=>{
   const held=deferred<typeof reply>(),{api,lane}=await setup(()=>held.promise,true);await prepareCreate();await click('确认创建工程');expect(lane.locked).toBe(true);await click('关闭向导')
-  held.resolve(reply);await flushPromises();expect(lane.locked).toBe(false);await click('添加已有工程');expect((pathInput().element as HTMLInputElement).value).not.toBe(created);expect(body().get('[data-testid="scaffold-receipt"]').text()).toContain(created);expect(api.scaffold).toHaveBeenCalledOnce();expect(api.register).not.toHaveBeenCalled()
+  held.resolve(reply);await flushPromises();expect(lane.locked).toBe(false);await click('添加已有工程');await click('下一步');expect((pathInput().element as HTMLInputElement).value).not.toBe(created);expect(body().get('[data-testid="scaffold-receipt"]').text()).toContain(created);expect(api.scaffold).toHaveBeenCalledOnce();expect(api.register).not.toHaveBeenCalled()
  })
  it('keeps exclusion across navigation until the original response and never applies its old path',async()=>{
   const held=deferred<typeof reply>(),{router,lane,api}=await setup(()=>held.promise,true);await prepareCreate();await click('确认创建工程');await router.push('/elsewhere');await flushPromises();expect(lane.locked).toBe(true)
-  held.resolve(reply);await flushPromises();expect(lane.locked).toBe(false);await router.push('/projects');await flushPromises();await click('添加已有工程');expect((pathInput().element as HTMLInputElement).value).not.toBe(created);expect(api.scaffold).toHaveBeenCalledOnce()
+  held.resolve(reply);await flushPromises();expect(lane.locked).toBe(false);await router.push('/projects');await flushPromises();await click('添加已有工程');await click('下一步');expect((pathInput().element as HTMLInputElement).value).not.toBe(created);expect(api.scaffold).toHaveBeenCalledOnce()
  })
  it('never applies a result after replacing the reader source',async()=>{
   const held=deferred<typeof reply>(),{projects,source,api}=await setup(()=>held.promise,true);await prepareCreate();await click('确认创建工程');projects.disconnect();await projects.connect({...source,label:'different source'});held.resolve(reply);await flushPromises()

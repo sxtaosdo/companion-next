@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { RouteLocationNormalizedLoaded } from 'vue-router'
-import { DataBoard, Box, Picture, Connection, Clock, ArrowDown, ArrowLeft, Refresh, Close, Menu, List } from '@element-plus/icons-vue'
+import { DataBoard, Box, Picture, Connection, ArrowDown, ArrowLeft, Refresh, Close, Menu, List } from '@element-plus/icons-vue'
 import { useWorkspaceStore } from './stores/workspace'
 import { liveProvider } from './integration'
 import { companionBrowserProvider } from './companion-browser-integration'
@@ -25,8 +25,26 @@ function selectRegisteredProject(id: string) {
   registered.restoreRouteProject(id)
   void router.push({ path: route.path, query: { ...route.query, project: id } })
 }
-const nav = [{ path: '/overview', label: '项目概览', icon: DataBoard }, {path:'/projects',label:'工程 / 日志',icon:List}, { path: '/resources', label: '游戏资源', icon: Box }, { path: '/image-assets', label: '图片素材', icon: Picture }, { path: '/services', label: '服务状态', icon: Connection }, { path: '/history', label: '版本与边界', icon: Clock }, { path: '/migration', label: '旧功能保留', icon: List }]
-const legacyNav = [{ label: 'AI 图标', feature: 'ai-icons' }, { label: '工程', feature: 'projects' }, { label: '知识库', feature: 'knowledge' }, { label: '模型服务', feature: 'models' }]
+// Keep one destination per task; the original four Companion domains stay together.
+const nav = [
+  { path: '/overview', label: '项目概览', icon: DataBoard },
+  { path: '/ai-icons', label: 'AI 图标', icon: Picture },
+  { path: '/projects', label: '工程', icon: List },
+  { path: '/knowledge', label: '知识库', icon: Box },
+  { path: '/knowledge?tab=models', label: '模型服务', icon: Connection },
+]
+const resourceNav = [
+  { path: '/resources', label: '游戏资源' },
+  { path: '/image-assets', label: '图片素材' },
+  { path: '/services', label: '服务状态' },
+  { path: '/history', label: '版本与边界' },
+  { path: '/migration', label: '功能对照' },
+]
+function isNavActive(path: string) {
+  if (path === '/knowledge?tab=models') return route.path === '/knowledge' && route.query.tab === 'models'
+  if (path === '/knowledge') return route.path === '/knowledge' && route.query.tab !== 'models'
+  return route.path === path
+}
 function titleFor(target: Pick<RouteLocationNormalizedLoaded, 'path' | 'query' | 'meta'>) {
   return target.path === '/projects' ? '工程' : target.path === '/ai-icons' ? 'AI 图标' : target.path === '/knowledge' ? (target.query.tab === 'models' ? '模型服务' : '知识库') : String(target.meta.title ?? '页面')
 }
@@ -88,9 +106,8 @@ const dateLabel = computed(() => {
     <aside class="sidebar" :class="{ 'is-open': menuOpen }">
       <RouterLink to="/about" class="brand" aria-label="关于 Companion" @click="menuOpen = false"><span class="brand-mark">C</span><span>Companion</span></RouterLink>
       <div class="workspace-label">项目工作区 <span>01</span></div>
-      <nav class="nav-list" aria-label="主导航"><RouterLink v-for="item in nav" :key="item.path" :to="projectLink(item.path)" class="nav-item" active-class="is-active" @click="menuOpen = false"><el-icon :size="19"><component :is="item.icon" /></el-icon><span>{{ item.label }}</span><i v-if="item.path === '/resources'" class="nav-dot"></i></RouterLink></nav>
-      <nav class="legacy-nav" aria-label="旧版功能入口"><h2>原有功能</h2><RouterLink v-for="item in legacyNav" :key="item.feature" :to="item.feature==='projects'?'/projects':item.feature==='knowledge'?'/knowledge':item.feature==='models'?'/knowledge?tab=models':item.feature==='ai-icons'?projectLink('/ai-icons'):`/migration?feature=${item.feature}`" @click="menuOpen = false">{{ item.label }}</RouterLink></nav>
-      <div class="sidebar-utility"><RouterLink to="/help" @click="menuOpen = false">帮助</RouterLink><RouterLink to="/about" @click="menuOpen = false">关于</RouterLink><RouterLink to="/changelog" @click="menuOpen = false">更新记录</RouterLink></div>
+      <nav class="nav-list" aria-label="主导航"><RouterLink v-for="item in nav" :key="item.path" :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><el-icon :size="19"><component :is="item.icon" /></el-icon><span>{{ item.label }}</span></RouterLink></nav>
+      <nav class="legacy-nav supplementary-nav" aria-label="资源与状态"><h2>资源与状态</h2><RouterLink v-for="item in resourceNav" :key="item.path" :to="projectLink(item.path)" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false">{{ item.label }}</RouterLink></nav>
       <div class="sidebar-footer">前端 v{{ frontendIdentity.version }}</div>
     </aside>
     <div class="main-shell">
@@ -113,6 +130,10 @@ const dateLabel = computed(() => {
 </template>
 <style scoped>
 .sidebar { overflow-y: auto; }
+.workspace-label { padding-top: 24px; }
+.nav-list { gap: 3px; }
+.nav-item { padding: 10px 14px; }
+.supplementary-nav .is-active { color: #fff; font-weight: 600; }
 .registered-source-note,.registered-read-warnings { display:flex; align-items:center; flex-wrap:wrap; gap:6px; color:var(--text-secondary,#637187); font-size:12px; margin-bottom:16px; overflow-wrap:anywhere; }
 .page-heading { margin-bottom: 18px; }
 .page-title { display: flex; align-items: center; gap: 9px; }

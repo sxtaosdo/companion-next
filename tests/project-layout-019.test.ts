@@ -7,6 +7,7 @@ import CompanionBrowserView from '../src/views/CompanionBrowserView.vue'
 import browserViewSource from '../src/views/CompanionBrowserView.vue?raw'
 import ProjectSetupWizard from '../src/components/ProjectSetupWizard.vue'
 import { useCompanionBrowserStore } from '../src/stores/companion-browser'
+import { previewActionsProvider } from '../src/preview-actions-integration'
 import { useProjectSetupStore } from '../src/stores/project-setup'
 import { companionBrowserProvider, companionEventProvider, registerCompanionBrowserProvider } from '../src/companion-browser-integration'
 import { creatorOperationsProvider, registerCreatorOperationsProvider } from '../src/creator-operations-integration'
@@ -89,6 +90,8 @@ function card(id: string) {
   return result
 }
 function button(label: string, root: Pick<DOMWrapper<Element>, 'findAll'> = wrapper!) {
+  if(label==='打开 Creator')label='聚焦 Creator'
+  if(label==='连接工程服务'&&root.findAll('button').some(b=>b.text()==='重新连接'))label='重新连接'
   const result = root.findAll('button').find(candidate => candidate.text() === label || candidate.attributes('aria-label') === label)
   if (!result) throw new Error(`Missing button ${label}`)
   return result
@@ -109,12 +112,24 @@ function scrollMetrics(pane: HTMLElement, height = 1000, client = 200, top = 0) 
 afterEach(() => {
   wrapper?.unmount(); wrapper = undefined
   ElMessage.closeAll()
-  projectSetupProvider.value = null; creatorOperationsProvider.value = null
+  projectSetupProvider.value = null; creatorOperationsProvider.value = null; previewActionsProvider.value=null
   companionBrowserProvider.value = null; companionEventProvider.value = null
   vi.restoreAllMocks(); vi.useRealTimers(); sessionStorage.clear(); document.body.innerHTML = ''; document.documentElement.scrollTop = 0
 })
 
 describe('019 compact project card structure and safe controls', () => {
+  it('keeps the old ready toolbar DOM and keyboard order with one focus action and no preview side effect', async () => {
+    const preview={label:'OFFLINE preview',run:vi.fn(async()=>({projectId:readyId,action:'start' as const,text:'fixture'})),waitForIdle:async()=>{}}
+    previewActionsProvider.value=preview
+    const {actions}=await setup()
+    const toolbar=card(readyId).get('.project-toolbar')
+    expect(toolbar.find('.preview-toolbar').findAll('button').map(b=>b.text()).filter(Boolean)).toEqual(['预览','聚焦','停止','重启','探针','状态','刷新','Profiler 采集'])
+    expect(toolbar.findAll('button').filter(b=>b.text()==='聚焦')).toHaveLength(1)
+    await button('聚焦 Creator',card(readyId)).trigger('click');await flushPromises()
+    expect(actions.run).toHaveBeenCalledExactlyOnceWith({projectId:readyId,action:'focus'},expect.any(AbortSignal))
+    expect(preview.run).not.toHaveBeenCalled()
+  })
+
   it('keeps name, state, full identity, main action, and icon toggle in one header', async () => {
     const { actions, setupApi } = await setup()
     const stopped = card(stoppedId), header = stopped.get('.companion-project-header')
@@ -142,8 +157,10 @@ describe('019 compact project card structure and safe controls', () => {
     for (const label of ['聚焦 Creator', '停止 Creator', '重启 Creator', '安装 / 更新接入', '打开目录', '移除登记', '复制路径', '复制工程 ID', '使用 CLI', '查看调用记录']) {
       expect(button(label, stopped).exists()).toBe(true)
     }
-    for (const text of ['D:\\Fixture\\Stopped', '当前 Creator', '未读取', '工程要求版本', '3.8.7', 'Creator 权限', 'unknown', '最近打开', '调用总数', '未记录', '原始状态', 'stopped']) expect(stopped.text()).toContain(text)
-    expect(stopped.findAll('.companion-project-details dt')).toHaveLength(6)
+    expect(stopped.text()).toContain('D:\\Fixture\\Stopped')
+    const detailsTip=stopped.findAllComponents({name:'InfoTip'}).find((t:VueWrapper)=> (t.props() as Record<string,unknown>).label==='工程详情')!
+    for(const text of ['当前 Creator：未读取','工程要求版本：3.8.7','Creator 权限：未连接','最近打开：未读取','调用总数：未记录','状态：已停止'])expect(detailsTip.props('text')).toContain(text)
+    expect(stopped.text()).not.toContain('unknown');expect(stopped.text()).not.toContain('stopped')
     expect(reader.loadLogs).not.toHaveBeenCalled(); expect(reader.loadCalls).not.toHaveBeenCalled()
     expect(actions.run).not.toHaveBeenCalled(); expect(setupApi.start).not.toHaveBeenCalled()
   })
@@ -157,7 +174,7 @@ describe('019 compact project card structure and safe controls', () => {
       const unknown = card(id), header = unknown.get('.companion-project-header')
       expect(header.text()).toContain('未知')
       expect(header.text()).not.toContain('已停止'); expect(header.text()).not.toContain('已就绪')
-      expect(unknown.text()).toContain('调用总数'); expect(unknown.text()).toContain('未记录')
+      expect(unknown.text()).toContain('调用：未记录')
       expect(button('启动 Creator', unknown).attributes('disabled')).toBeDefined()
       await button('启动 Creator', unknown).trigger('click')
     }
@@ -339,7 +356,7 @@ async function enableFakeLive() {
   const subscribe = vi.fn<CompanionEventProvider['subscribe']>(received => { handlers = received; return close })
   companionEventProvider.value = { label: 'OFFLINE live callbacks', subscribe }
   await flushPromises()
-  await button('启用实时更新').trigger('click')
+  if(!useCompanionBrowserStore().liveEnabled)await button('启用实时更新').trigger('click')
   handlers.onOpen(); await flushPromises()
   return { handlers, subscribe, close }
 }
@@ -347,7 +364,7 @@ async function enableFakeLive() {
 describe('019 reported title spacing and continuous live refresh regressions', () => {
   it('keeps the project title and explanation in the same compact inline-flex group', async () => {
     await setup()
-    const heading = wrapper!.findAll('h2').find(item => item.text() === '工程')!
+    const heading = wrapper!.findAll('h2').find(item => item.text() === '工程列表')!
     const group = heading.element.parentElement!
     expect(group).not.toBe(group.closest('.section-heading'))
     expect(group.contains(button('工程操作说明').element)).toBe(true)
@@ -449,6 +466,7 @@ describe('019 reported title spacing and continuous live refresh regressions', (
     const filters = JSON.parse(JSON.stringify(store.logFilter))
     const finish: Array<() => void> = []
     let active = 0, maximumActive = 0, sequence = 1
+    const initialLogReads=vi.mocked(reader.loadLogs).mock.calls.length
     vi.mocked(reader.loadLogs).mockImplementation(() => new Promise(resolve => {
       active++; maximumActive = Math.max(active, maximumActive)
       finish.push(() => { active--; resolve(Array.from({ length: ++sequence }, (_, index) => log(index + 1))) })
@@ -477,7 +495,7 @@ describe('019 reported title spacing and continuous live refresh regressions', (
       expect(router.currentRoute.value.fullPath).toBe('/projects?tab=logs')
       expect(push).not.toHaveBeenCalled(); expect(replace).not.toHaveBeenCalled()
     }
-    expect(maximumActive).toBe(1); expect(reader.loadLogs).toHaveBeenCalledTimes(4)
+    expect(maximumActive).toBe(1); expect(reader.loadLogs).toHaveBeenCalledTimes(initialLogReads+3)
     expect(subscribe).toHaveBeenCalledTimes(1); expect(reader.loadCalls).not.toHaveBeenCalled()
     expect(actions.run).not.toHaveBeenCalled(); expect(setupApi.register).not.toHaveBeenCalled(); expect(setupApi.start).not.toHaveBeenCalled()
   })

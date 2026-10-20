@@ -195,7 +195,7 @@ describe('normal project entry in the actual BrowserView', () => {
     const source = reader(), mutations = actions(); register(source); creatorOperationsProvider.value = mutations
     const router = await mountView()
     expect(wrapper!.get('.companion-project-card').text()).toContain('已就绪')
-    expect(wrapper!.get('.companion-project-card').text()).toContain('打开 Creator')
+    expect(wrapper!.get('.companion-project-card').text()).toContain('聚焦')
     expect(source.loadProjects).toHaveBeenCalledTimes(1); expect(source.loadCounts).toHaveBeenCalledTimes(1)
     await router.push('/other'); await flushPromises(); vi.mocked(source.loadProjects).mockResolvedValue(snapshot('stopped'))
     await router.push('/projects'); await flushPromises()

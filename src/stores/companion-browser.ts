@@ -14,6 +14,8 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  const counts=shallowRef<CallCounts|null>(null),countsLoading=ref(false),countsError=ref('')
  const callProjectId=ref(''),failedOnly=ref(false),records=shallowRef<CallRecord[]>([]),callLoading=ref(false),callError=ref(''),callRead=ref(false)
  const total=ref<number|null>(null),retained=ref<number|null>(null),nextBefore=ref<number|undefined>(),sessionId=ref('')
+ // Default normal-workspace intent; transport remains gated by the page and providers.
+ const livePreferred=ref(true)
  const liveEnabled=ref(false),liveVisible=ref(true),livePageActive=ref(true),logsPaused=ref(false),projectPollingPaused=ref(false),liveRetries=ref(0)
  const liveState=ref<'off'|'connecting'|'open'|'retrying'|'suspended'|'failed'>('off'),liveError=ref('')
  let epoch=0,sessionEpoch=0,callEventVersion=0,liveEpoch=0,streamEpoch=0
@@ -24,12 +26,12 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  function cancel(key:keyof typeof versions){versions[key]++;controllers[key]?.abort();delete controllers[key]}
  function resetCalls(){records.value=[];total.value=null;retained.value=null;nextBefore.value=undefined;callRead.value=false}
  function cancelQueries(){for(const key of Object.keys(versions) as Array<keyof typeof versions>)cancel(key);projectLoading.value=false;backgroundProjectRead.value=false;logsLoading.value=false;countsLoading.value=false;callLoading.value=false;dashboardLoading.value=false}
- function cancelReads(){stopLive()}
+ function cancelReads(){stopLiveTransport()}
  /** Navigation suspends transport without changing the explicit realtime choice. */
  function suspendReads(){setLivePageActive(false);cancelQueries()}
- function reconcileLiveProvider(next:CompanionEventProvider|null){if(liveEnabled.value&&next!==eventProvider)stopLive()}
+ function reconcileLiveProvider(next:CompanionEventProvider|null){if(liveEnabled.value&&next!==eventProvider)stopLiveTransport()}
  function clearData(){connected.value=false;projects.value=[];statuses.value=[];dashboard.value=[];dashboardRead.value=false;dashboardError.value='';dashboardObservedAt.value='';warnings.value=[];observedAt.value='';logs.value=[];logsRead.value=false;counts.value=null;sessionId.value='';sessionEpoch++;callProjectId.value='';resetCalls()}
- function disconnect(){epoch++;cancelReads();provider.value=null;clearData();logsPaused.value=false;projectPollingPaused.value=false;projectError.value='';logsError.value='';countsError.value='';callError.value=''}
+ function disconnect(){epoch++;cancelReads();provider.value=null;clearData();projectPollingPaused.value=false;projectError.value='';logsError.value='';countsError.value='';callError.value=''}
  async function connect(next:CompanionBrowserProvider){disconnect();const identity=epoch;provider.value=next;const pending=refreshProjects(),projectVersion=versions.projects;await pending;if(identity===epoch&&versions.projects===projectVersion&&provider.value===next&&connected.value)await refreshCounts()}
  /** A bounded page-entry read, separate from manual reconnect and live polling.
   * Cancellation owns only the versions started here, never a later manual read. */
@@ -165,7 +167,14 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  function liveCurrent(identity:number){return liveEnabled.value&&liveVisible.value&&livePageActive.value&&connected.value&&identity===liveEpoch&&provider.value===boundReadProvider}
  function closeStream(){streamEpoch++;clearTimeout(openTimer);openTimer=undefined;eventAbort?.abort();eventAbort=undefined;unsubscribe?.();unsubscribe=undefined}
  function clearLiveWork(){liveEpoch++;closeStream();clearTimeout(pollTimer);clearTimeout(retryTimer);clearTimeout(logTimer);pollTimer=retryTimer=logTimer=undefined;logDirty=false;cancelQueries()}
- function stopLive(){clearLiveWork();networkRecovering=false;networkRecoveryAttempts=0;liveEnabled.value=false;liveState.value='off';liveError.value='';liveRetries.value=0;eventStopped=false;eventProvider=null;boundReadProvider=null}
+ function stopLiveTransport(){clearLiveWork();networkRecovering=false;networkRecoveryAttempts=0;liveEnabled.value=false;liveState.value='off';liveError.value='';liveRetries.value=0;eventStopped=false;eventProvider=null;boundReadProvider=null}
+ /** Only an explicit user stop changes intent; teardown and reconnect do not. */
+ function stopLive(){livePreferred.value=false;stopLiveTransport()}
+ function ensureLive(next:CompanionEventProvider){
+  if(!livePreferred.value||!connected.value||!provider.value)return
+  if(liveEnabled.value&&eventProvider===next&&boundReadProvider===provider.value)return
+  beginLive(next)
+ }
  function scheduleProjectPoll(identity:number,delay=3000){
   clearTimeout(pollTimer);pollTimer=undefined
   if(projectPollingPaused.value||!liveCurrent(identity))return
@@ -224,14 +233,15 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
   pollTimer=setTimeout(()=>{pollTimer=undefined;if(!projectPollingPaused.value&&networkRecovering&&liveEnabled.value&&liveVisible.value&&livePageActive.value&&identity===liveEpoch&&provider.value===boundReadProvider)void refreshProjects(true)},delay)
  }
  function resumeLive(){const identity=liveEpoch;if(networkRecovering){liveState.value='retrying';scheduleNetworkRecovery(identity,0);return}scheduleProjectPoll(identity,0);if(eventStopped)liveState.value='failed';else openLiveStream(identity)}
- function startLive(next:CompanionEventProvider){
+ function startLive(next:CompanionEventProvider){livePreferred.value=true;beginLive(next)}
+ function beginLive(next:CompanionEventProvider){
   if(!connected.value||!provider.value)return
-  stopLive();eventProvider=next;boundReadProvider=provider.value;liveEnabled.value=true
+  stopLiveTransport();eventProvider=next;boundReadProvider=provider.value;liveEnabled.value=true
   if(liveVisible.value&&livePageActive.value)resumeLive();else liveState.value='suspended'
  }
  function setLivePageActive(active:boolean){if(livePageActive.value===active)return;livePageActive.value=active;if(!liveEnabled.value)return;clearLiveWork();if(active&&liveVisible.value)resumeLive();else liveState.value='suspended'}
  function setLiveVisibility(visible:boolean){if(liveVisible.value===visible)return;liveVisible.value=visible;if(!liveEnabled.value)return;clearLiveWork();if(visible&&livePageActive.value)resumeLive();else liveState.value='suspended'}
- watch(provider,next=>{if(liveEnabled.value&&next!==boundReadProvider)stopLive()},{flush:'sync'})
+ watch(provider,next=>{if(liveEnabled.value&&next!==boundReadProvider)stopLiveTransport()},{flush:'sync'})
  watch(logFilter,()=>{cancel('logs');logsLoading.value=false;logsRead.value=false;logs.value=[];logsError.value='';if(liveEnabled.value)queueLiveLogs(liveEpoch)},{deep:true,flush:'sync'})
- return {provider,connected,projects,statuses,dashboard,dashboardLoading,dashboardError,dashboardRead,dashboardObservedAt,refreshDashboard,cancelDashboardRead,warnings,projectLoading,backgroundProjectRead,projectError,observedAt,projectSnapshotRevision,logs,logsLoading,logsError,logsRead,logFilter,counts,countsLoading,countsError,callProjectId,failedOnly,records,callLoading,callError,callRead,total,retained,nextBefore,sessionId,liveEnabled,liveVisible,livePageActive,liveState,liveError,liveRetries,logsPaused,projectPollingPaused,startLive,stopLive,setLiveVisibility,setLivePageActive,pauseLogs,pauseProjectPolling,readProjectEntry,connect,disconnect,cancelReads,suspendReads,reconcileLiveProvider,refreshProjects,refreshLogs,refreshCounts,setCallContext,loadCalls}
+ return {provider,connected,projects,statuses,dashboard,dashboardLoading,dashboardError,dashboardRead,dashboardObservedAt,refreshDashboard,cancelDashboardRead,warnings,projectLoading,backgroundProjectRead,projectError,observedAt,projectSnapshotRevision,logs,logsLoading,logsError,logsRead,logFilter,counts,countsLoading,countsError,callProjectId,failedOnly,records,callLoading,callError,callRead,total,retained,nextBefore,sessionId,livePreferred,liveEnabled,liveVisible,livePageActive,liveState,liveError,liveRetries,logsPaused,projectPollingPaused,startLive,stopLive,ensureLive,setLiveVisibility,setLivePageActive,pauseLogs,pauseProjectPolling,readProjectEntry,connect,disconnect,cancelReads,suspendReads,reconcileLiveProvider,refreshProjects,refreshLogs,refreshCounts,setCallContext,loadCalls}
 })

@@ -89,3 +89,44 @@ describe('cross-project navigation during paused reconnect',()=>{
   s.stopLive();expect(vi.getTimerCount()).toBe(0);
  })
 })
+
+
+describe('legacy default realtime with session-only user choices',()=>{
+ it('starts once when a connected normal page requests its default, without implicit read-store subscriptions',async()=>{
+  const e=stream(),s=useCompanionBrowserStore();s.ensureLive(e.provider);
+  expect(s.livePreferred).toBe(true);expect(e.channels).toHaveLength(0);
+  const p=fixture();await s.connect(p);expect(e.channels).toHaveLength(0);
+  s.ensureLive(e.provider);s.ensureLive(e.provider);
+  expect(s.liveEnabled).toBe(true);expect(e.channels).toHaveLength(1);
+  await vi.advanceTimersByTimeAsync(0);expect(p.loadProjects).toHaveBeenCalledTimes(2);
+ })
+ it('preserves explicit realtime stop across route return and manual reconnect until explicit resume',async()=>{
+  const {p,e,s}=await setup();s.ensureLive(e.provider);s.stopLive();
+  s.suspendReads();s.setLivePageActive(true);s.ensureLive(e.provider);
+  expect(s.livePreferred).toBe(false);expect(e.channels).toHaveLength(1);
+  await s.connect(p);s.ensureLive(e.provider);
+  expect(s.liveEnabled).toBe(false);expect(e.channels).toHaveLength(1);
+  s.startLive(e.provider);expect(s.livePreferred).toBe(true);expect(e.channels).toHaveLength(2);
+ })
+ it('retains log-only pause through reconnect, while project polling and call events continue',async()=>{
+  const {p,e,s}=await setup();s.ensureLive(e.provider);s.pauseLogs(true);
+  s.suspendReads();s.setLivePageActive(true);s.ensureLive(e.provider);
+  await s.connect(p);s.ensureLive(e.provider);e.latest().onOpen();await settle();
+  e.latest().onLog();e.latest().onCall({sessionId:'s1',total:2,record:record()});
+  await vi.advanceTimersByTimeAsync(3500);
+  expect(s.logsPaused).toBe(true);expect(s.liveEnabled).toBe(true);
+  expect(p.loadLogs).not.toHaveBeenCalled();expect(p.loadProjects).toHaveBeenCalledTimes(4);
+  expect(s.counts?.counts.p1).toBe(2);
+  s.pauseLogs(false);await vi.advanceTimersByTimeAsync(400);
+  expect(p.loadLogs).toHaveBeenCalledTimes(1);
+ })
+ it('keeps defaults and choices independent of unavailable browser storage',async()=>{
+  const local=vi.spyOn(window,'localStorage','get').mockImplementation(()=>{throw new Error('denied')});
+  const session=vi.spyOn(window,'sessionStorage','get').mockImplementation(()=>{throw new Error('denied')});
+  const {p,e,s}=await setup();s.ensureLive(e.provider);s.pauseLogs(true);s.stopLive();
+  await s.connect(p);s.ensureLive(e.provider);
+  expect(s.liveEnabled).toBe(false);expect(s.logsPaused).toBe(true);
+  expect(local).not.toHaveBeenCalled();expect(session).not.toHaveBeenCalled();
+  s.startLive(e.provider);expect(s.liveEnabled).toBe(true);
+ })
+})

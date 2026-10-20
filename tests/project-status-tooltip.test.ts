@@ -18,6 +18,18 @@ async function reveal(event = 'focus') {
 }
 afterEach(() => { wrapper?.unmount(); wrapper = undefined; document.body.innerHTML = '' })
 describe('original Dashboard status tooltip parity', () => {
+  it.each([['ready','success'],['error','danger'],['crashed','danger'],['incompatible','danger'],['launching','warning'],['bridge-wait','warning'],['stopping','warning'],['stopped','info'],['unknown','info']] as const)('restores semantic state colour for %s without changing the state', (state,tone) => {
+    const status={...base,state};setup(status)
+    expect(wrapper!.get('.el-tag').classes()).toContain(`el-tag--${tone}`)
+    expect(status.state).toBe(state)
+  })
+  it('keeps passive and acknowledged stop states neutral instead of showing a false failure', async () => {
+    setup({...base,state:'error'},true)
+    expect(wrapper!.get('.el-tag').classes()).toContain('el-tag--info')
+    await wrapper!.setProps({passive:false,stopAcknowledged:true})
+    expect(wrapper!.text()).toBe('已请求停止')
+    expect(wrapper!.get('.el-tag').classes()).toContain('el-tag--info')
+  })
   it.each([
     [{ ...base, launchSource: 'dashboard', dashboardVersion: '2.4.0' }, 'Dashboard 2.4.0'],
     [{ ...base, launchSource: 'dashboard' }, 'Dashboard 已接管'],
