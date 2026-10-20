@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onActivated, onBeforeUnmount, onDeactivated, ref, watch } from 'vue'
 import { useKnowledgeReadStore } from '../stores/knowledge-read'
 import { useKnowledgeConversationStore } from '../stores/knowledge-conversation'
 import { useWorkspaceStore } from '../stores/workspace'
@@ -11,6 +11,8 @@ import { knowledgeReadProvider } from '../knowledge-read-integration'
 import { knowledgeConversationProvider } from '../knowledge-conversation-integration'
 import { companionBrowserProvider } from '../companion-browser-integration'
 import { isKnowledgeRequestId } from '../domain/knowledge-read'
+const props=withDefaults(defineProps<{active?:boolean}>(),{active:true}),pageActive=ref(true)
+const enabled=computed(()=>props.active&&pageActive.value)
 const read=useKnowledgeReadStore(),chat=useKnowledgeConversationStore(),workspace=useWorkspaceStore(),browser=useCompanionBrowserStore(),registered=useRegisteredProjectStore()
 const confirmed=ref(false),resetConfirmed=ref(false),clearConfirmed=ref(false)
 const lastReadDefault=ref('')
@@ -19,7 +21,7 @@ watch(()=>read.status, status=>{if(status&&isKnowledgeRequestId(status.retrieval
 const kbId=computed(()=>read.kbId.trim() || read.status?.retrieval.kbId || lastReadDefault.value)
 // Local isolation only. The v148 wire contract has no Cocos project field.
 const scopeKey=computed(()=>JSON.stringify({workspace:{mode:workspace.mode,id:workspace.selectedProjectId,name:workspace.project?.name??''},companion:{connected:browser.connected,project:browser.projects.find(p=>p.id===browser.callProjectId)??null},registered:{requestedId:registered.requestedId,project:registered.project,invalidated:registered.invalidated}}))
-function sync(){chat.syncContext({provider:knowledgeConversationProvider.value,readIdentity:read.provider===knowledgeReadProvider.value?read.provider:null,kbId:kbId.value,scopeKey:scopeKey.value,ready:Boolean(read.provider&&read.provider===knowledgeReadProvider.value&&!read.statusLoading&&(read.kbId.trim()||read.status)&&isKnowledgeRequestId(kbId.value))})}
+function sync(){chat.syncContext({provider:knowledgeConversationProvider.value,readIdentity:read.provider===knowledgeReadProvider.value?read.provider:null,kbId:kbId.value,scopeKey:scopeKey.value,ready:Boolean(enabled.value&&read.provider&&read.provider===knowledgeReadProvider.value&&!read.statusLoading&&(read.kbId.trim()||read.status)&&isKnowledgeRequestId(kbId.value))})}
 watch([knowledgeConversationProvider,knowledgeReadProvider,()=>read.provider,kbId,()=>read.statusLoading,()=>read.status,()=>read.kbId,scopeKey],sync,{immediate:true,flush:'sync'})
 watch(companionBrowserProvider,()=>{chat.leave();sync()},{flush:'sync'})
 watch(()=>chat.revision,()=>{confirmed.value=false;resetConfirmed.value=false;clearConfirmed.value=false},{flush:'sync'})
@@ -28,6 +30,9 @@ function prepare(){confirmed.value=false;chat.prepareSend()}
 async function send(){const prepared=chat.prepared;if(!prepared||!confirmed.value)return;await chat.send(prepared,confirmed.value);confirmed.value=false}
 function reset(){chat.newConversation(resetConfirmed.value);resetConfirmed.value=false}
 function clear(){chat.clearCompleted(clearConfirmed.value);clearConfirmed.value=false}
+watch(enabled,value=>{if(!value)chat.suspend();sync()},{flush:'sync'})
+onActivated(()=>{pageActive.value=true;sync()})
+onDeactivated(()=>{pageActive.value=false;chat.suspend();sync()})
 onBeforeUnmount(()=>chat.leave())
 </script>
 <template>

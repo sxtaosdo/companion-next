@@ -1,13 +1,18 @@
-import { ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { defineStore } from 'pinia'
+import { knowledgeReadProvider } from '../knowledge-read-integration'
+import { clearKnowledgeScrollPositions } from '../domain/knowledge-navigation'
 import { KnowledgeReadError } from '../adapters/knowledge-read'
 import { isKnowledgeRequestId } from '../domain/knowledge-read'
-import type { KnowledgeReadProvider, KnowledgeStatus, KnowledgeServiceStates } from '../domain/knowledge-read'
+import type { KnowledgeReadProvider, KnowledgeStatus, KnowledgeServiceStates, KnowledgeAgent } from '../domain/knowledge-read'
 export type KnowledgeReadAction = 'search' | 'bases' | 'base' | 'documents' | 'document' | 'original' | 'chunks' | 'agents'
 type Result<K extends KnowledgeReadAction, M extends keyof KnowledgeReadProvider> = KnowledgeReadProvider[M] extends (...args: never[]) => infer R ? { kind: K; data: Awaited<R> } : never
 export type KnowledgeReadResult = Result<'search','search'> | Result<'bases','listKnowledgeBases'> | Result<'base','viewKnowledgeBase'> | Result<'documents','listDocuments'> | Result<'document','viewDocument'> | Result<'original','downloadDocument'> | Result<'chunks','listChunks'> | Result<'agents','listAgents'>
 export const useKnowledgeReadStore = defineStore('knowledge-read', () => {
   const provider = shallowRef<KnowledgeReadProvider | null>(null)
+  const selectedBase = shallowRef<{id:string;name:string}|null>(null)
+  const selectedBaseLabel = computed(() => selectedBase.value?.id === kbId.value ? selectedBase.value.name : kbId.value ? '已选择知识库' : '默认知识库')
+  const agentCatalog = shallowRef<KnowledgeAgent[]|null>(null), agentCatalogError = ref(''), agentCatalogLoading = ref(false)
   const status = shallowRef<KnowledgeStatus | null>(null)
   const services = shallowRef<KnowledgeServiceStates | null>(null)
   const statusError = ref(''), serviceError = ref(''), error = ref('')
@@ -16,21 +21,32 @@ export const useKnowledgeReadStore = defineStore('knowledge-read', () => {
   const searchLimit = ref(10), documentLimit = ref(20), chunkLimit = ref(50)
   const result = shallowRef<KnowledgeReadResult | null>(null)
   const action = ref<KnowledgeReadAction | null>(null), invalidated = ref(false)
-  let epoch = 0, actionVersion = 0, statusVersion = 0
-  let actionAbort: AbortController | null = null, statusAbort: AbortController | null = null
+  let epoch = 0, actionVersion = 0, statusVersion = 0, lastConfirmedDefault = ''
+  let actionAbort: AbortController | null = null, statusAbort: AbortController | null = null, catalogAbort: AbortController | null = null, catalogVersion = 0
   function cancelAction() { actionVersion++; actionAbort?.abort(); actionAbort = null; loading.value = false }
-  function invalidate() { cancelAction(); invalidated.value = result.value !== null || hasAttempted.value; result.value = null; error.value = ''; hasAttempted.value = false }
+  function invalidate() { clearKnowledgeScrollPositions('read'); cancelAction(); invalidated.value = result.value !== null || hasAttempted.value; result.value = null; error.value = ''; hasAttempted.value = false }
   watch([query,kbId,documentId,documentKeyword,searchLimit,documentLimit,chunkLimit], invalidate, { flush: 'sync' })
-  function cancelReads() { cancelAction(); statusVersion++; statusAbort?.abort(); statusAbort=null; statusLoading.value=false }
-  function disconnect() { epoch++; cancelReads(); provider.value=null; status.value=null; services.value=null; result.value=null; statusError.value=''; serviceError.value=''; error.value=''; hasAttempted.value=false; action.value=null; invalidated.value=false; query.value=''; kbId.value=''; documentId.value=''; documentKeyword.value='' }
-  async function connect(next: KnowledgeReadProvider) { disconnect(); provider.value=next; await refreshStatus() }
+  function cancelReads() { cancelAction(); catalogVersion++; catalogAbort?.abort(); catalogAbort=null; agentCatalogLoading.value=false; statusVersion++; statusAbort?.abort(); statusAbort=null; statusLoading.value=false }
+  function disconnect() { lastConfirmedDefault=''; clearKnowledgeScrollPositions(); selectedBase.value=null; agentCatalog.value=null; agentCatalogError.value=''; epoch++; cancelReads(); provider.value=null; status.value=null; services.value=null; result.value=null; statusError.value=''; serviceError.value=''; error.value=''; hasAttempted.value=false; action.value=null; invalidated.value=false; query.value=''; kbId.value=''; documentId.value=''; documentKeyword.value='' }
+  async function connect(next: KnowledgeReadProvider) { if(provider.value!==next){disconnect();provider.value=next} await refreshStatus() }
+  watch(knowledgeReadProvider,next=>{if(provider.value&&provider.value!==next)disconnect()},{flush:'sync'})
+  function selectKnowledgeBase(id:string,name?:string){if(isKnowledgeRequestId(id)){kbId.value=id;documentId.value='';selectedBase.value={id,name:name||id}}}
+  async function loadAgentCatalog(){
+    const p=provider.value;if(!p||statusLoading.value||loading.value||agentCatalogLoading.value)return
+    const version=++catalogVersion,currentEpoch=epoch,controller=new AbortController();catalogAbort=controller;agentCatalogLoading.value=true;agentCatalog.value=null;agentCatalogError.value=''
+    const current=()=>provider.value===p&&epoch===currentEpoch&&catalogVersion===version&&!controller.signal.aborted
+    try{const value=await p.listAgents(controller.signal);if(current())agentCatalog.value=value.items}
+    catch(cause){if(current())agentCatalogError.value=cause instanceof KnowledgeReadError?cause.message:'Agent 列表未读取，请重试。'}
+    finally{if(current()){agentCatalogLoading.value=false;catalogAbort=null}}
+  }
   async function refreshStatus() {
     const p=provider.value; if(!p) return
+    const previousDefault=lastConfirmedDefault
     cancelReads(); const version=++statusVersion, currentEpoch=epoch, controller=new AbortController(); statusAbort=controller
     status.value=null; services.value=null; statusError.value=''; serviceError.value=''; statusLoading.value=true
     const current=()=>provider.value===p&&epoch===currentEpoch&&statusVersion===version&&!controller.signal.aborted
     await Promise.all([
-      p.status(controller.signal).then(value=>{if(current())status.value=value},cause=>{if(current())statusError.value=cause instanceof KnowledgeReadError ? cause.message : '知识状态读取失败；CLI、认证与检索验证均未知。'}),
+      p.status(controller.signal).then(value=>{if(current()){if(!kbId.value.trim()&&previousDefault&&previousDefault!==value.retrieval.kbId)invalidate();lastConfirmedDefault=value.retrieval.kbId;status.value=value}},cause=>{if(current())statusError.value=cause instanceof KnowledgeReadError ? cause.message : '知识状态读取失败；CLI、认证与检索验证均未知。'}),
       p.loadServiceStates(controller.signal, 'knowledge').then(value=>{if(current())services.value=value},()=>{if(current())serviceError.value='知识服务状态未读取。'}),
     ])
     if(current()){statusLoading.value=false; statusAbort=null}
@@ -58,5 +74,5 @@ export const useKnowledgeReadStore = defineStore('knowledge-read', () => {
     } catch(cause) { if(current())error.value=cause instanceof KnowledgeReadError ? cause.message : '本次读取失败。请检查输入与服务认证后重试；没有使用旧结果。' }
     finally {if(current()){loading.value=false;actionAbort=null}}
   }
-  return {provider,status,services,statusError,serviceError,error,statusLoading,loading,hasAttempted,query,kbId,documentId,documentKeyword,searchLimit,documentLimit,chunkLimit,result,action,invalidated,connect,disconnect,refreshStatus,run,cancelReads,invalidate}
+  return {provider,selectedBaseLabel,selectKnowledgeBase,agentCatalog,agentCatalogError,agentCatalogLoading,loadAgentCatalog,status,services,statusError,serviceError,error,statusLoading,loading,hasAttempted,query,kbId,documentId,documentKeyword,searchLimit,documentLimit,chunkLimit,result,action,invalidated,connect,disconnect,refreshStatus,run,cancelReads,invalidate}
 })

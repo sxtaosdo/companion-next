@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { computed, onActivated, onBeforeUnmount, onDeactivated, ref, shallowRef, watch } from 'vue'
 import { useKnowledgeReadStore } from '../stores/knowledge-read'
 import { useKnowledgeAgentStore } from '../stores/knowledge-agent'
 import { useKnowledgeConversationStore } from '../stores/knowledge-conversation'
@@ -12,34 +12,44 @@ import { knowledgeSyncPending } from '../knowledge-sync-integration'
 import { companionBrowserProvider } from '../companion-browser-integration'
 import { isKnowledgeRequestId } from '../domain/knowledge-read'
 import type { KnowledgeAgent as AgentListItem } from '../domain/knowledge-read'
+const props=withDefaults(defineProps<{active?:boolean}>(),{active:true}),pageActive=ref(true)
+const enabled=computed(()=>props.active&&pageActive.value)
 const read=useKnowledgeReadStore(),agent=useKnowledgeAgentStore(),chat=useKnowledgeConversationStore(),workspace=useWorkspaceStore(),browser=useCompanionBrowserStore(),registered=useRegisteredProjectStore()
 const agents=shallowRef<AgentListItem[]>([]),selected=ref(''),catalogError=ref(''),catalogLoaded=ref(false)
 const connected=computed(()=>Boolean(read.provider&&read.provider===knowledgeReadProvider.value))
 const accessReady=computed(()=>Boolean(connected.value&&read.status?.cli.available&&read.status.cli.compatible&&['configured','verified'].includes(read.status.retrieval.auth)))
-const blocked=computed(()=>read.loading||read.statusLoading||knowledgeAgentPending.value||knowledgeSyncPending.value||chat.transportPending)
-const scopeKey=computed(()=>JSON.stringify({workspace:{mode:workspace.mode,id:workspace.selectedProjectId,name:workspace.project?.name??''},companion:{connected:browser.connected,project:browser.projects.find(p=>p.id===browser.callProjectId)??null},registered:{requestedId:registered.requestedId,project:registered.project,invalidated:registered.invalidated}}))
+const blocked=computed(()=>!enabled.value||read.loading||read.statusLoading||read.agentCatalogLoading||knowledgeAgentPending.value||knowledgeSyncPending.value||chat.transportPending)
+const lastReadDefault=ref('')
+watch(()=>read.provider,()=>{lastReadDefault.value=''},{flush:'sync'})
+watch(()=>read.status,status=>{if(status&&isKnowledgeRequestId(status.retrieval.kbId))lastReadDefault.value=status.retrieval.kbId},{immediate:true,flush:'sync'})
+const selectedKnowledgeBase=computed(()=>read.kbId.trim()||read.status?.retrieval.kbId||lastReadDefault.value)
+const scopeKey=computed(()=>JSON.stringify({knowledgeBase:selectedKnowledgeBase.value,workspace:{mode:workspace.mode,id:workspace.selectedProjectId,name:workspace.project?.name??''},companion:{connected:browser.connected,project:browser.projects.find(p=>p.id===browser.callProjectId)??null},registered:{requestedId:registered.requestedId,project:registered.project,invalidated:registered.invalidated}}))
 let catalogRevision=0,leaving=false
 function clearCatalog(){catalogRevision++;agents.value=[];selected.value='';catalogError.value='';catalogLoaded.value=false}
 watch([()=>read.provider,knowledgeReadProvider],clearCatalog,{immediate:true,flush:'sync'})
 function applyCatalog(items:AgentListItem[]){agents.value=items.filter(item=>isKnowledgeRequestId(item.id));if(!agents.value.some(item=>item.id===selected.value))selected.value=agents.value[0]?.id??'';catalogLoaded.value=true;catalogError.value=''}
 // The existing read-only Agent list action can populate the original selector too.
 watch(()=>read.result,value=>{if(connected.value&&value?.kind==='agents')applyCatalog(value.data.items)},{immediate:true,flush:'sync'})
-function sync(){agent.syncContext({provider:knowledgeAgentProvider.value,readIdentity:connected.value?read.provider:null,agentId:selected.value,scopeKey:scopeKey.value,ready:Boolean(accessReady.value&&!read.statusLoading&&agents.value.some(item=>item.id===selected.value))})}
-watch([knowledgeAgentProvider,knowledgeReadProvider,()=>read.provider,()=>read.status,()=>read.statusLoading,selected,agents,scopeKey],sync,{immediate:true,flush:'sync'})
+watch(()=>read.agentCatalog,value=>{if(connected.value&&value)applyCatalog(value)},{immediate:true,flush:'sync'})
+function sync(){agent.syncContext({provider:knowledgeAgentProvider.value,readIdentity:connected.value?read.provider:null,agentId:selected.value,scopeKey:scopeKey.value,ready:Boolean(enabled.value&&accessReady.value&&!read.statusLoading&&!read.agentCatalogLoading&&agents.value.some(item=>item.id===selected.value))})}
+watch([knowledgeAgentProvider,knowledgeReadProvider,()=>read.provider,()=>read.status,()=>read.statusLoading,()=>read.agentCatalogLoading,selected,agents,scopeKey],sync,{immediate:true,flush:'sync'})
 watch(companionBrowserProvider,()=>{agent.leave();sync()},{flush:'sync'})
 async function refresh(){
   if(blocked.value||!accessReady.value)return
   const p=read.provider,revision=++catalogRevision
   knowledgeAgentPending.value=true;catalogError.value=''
   try{
-    await read.run('agents')
+    await read.loadAgentCatalog()
     if(leaving||revision!==catalogRevision||p!==read.provider)return
-    if(read.result?.kind==='agents')applyCatalog(read.result.data.items)
-    else{agents.value=[];selected.value='';catalogLoaded.value=false;catalogError.value=read.error||'Agent 列表未读取，不能使用旧选项。'}
+    if(read.agentCatalog)applyCatalog(read.agentCatalog)
+    else{agents.value=[];selected.value='';catalogLoaded.value=false;catalogError.value=read.agentCatalogError||'Agent 列表未读取，不能使用旧选项。'}
   }finally{knowledgeAgentPending.value=false}
 }
 async function send(){if(blocked.value||!accessReady.value)return;const prepared=agent.prepareSend();if(prepared)await agent.send(prepared,true)}
 function reset(){agent.newConversation(true)}
+watch(enabled,value=>{if(!value)agent.suspend();sync()},{flush:'sync'})
+onActivated(()=>{pageActive.value=true;sync()})
+onDeactivated(()=>{pageActive.value=false;agent.suspend();sync()})
 onBeforeUnmount(()=>{leaving=true;catalogRevision++;agent.leave()})
 const last=computed(()=>{const value=agent.turns.at(-1);return value&&(!value.detached||value.status==='unknown')?value:null})
 const answerJson=computed(()=>last.value?.status==='succeeded'?JSON.stringify({schemaVersion:'companion-knowledge-v1',agentId:last.value.agentId,sessionId:last.value.sessionId,answer:last.value.answer,references:last.value.references},null,2):'')

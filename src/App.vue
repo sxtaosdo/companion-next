@@ -10,6 +10,7 @@ import { useRegisteredProjectStore } from './stores/registered-project'
 import { allowsLegacyWorkspace } from './domain/project-workspace'
 import { frontendIdentity } from './domain/product-information'
 import InfoTip from './components/InfoTip.vue'
+import { knowledgeNavigation, knowledgePageFor } from './domain/knowledge-navigation'
 const store = useWorkspaceStore()
 const route = useRoute()
 const router = useRouter()
@@ -50,17 +51,29 @@ const artNav = [
   { path: '/resources', label: '游戏资源' },
   { path: '/image-assets', label: '图片素材' },
 ]
+const knowledgeExpanded = ref(false)
+const knowledgeActive = computed(() => Boolean(knowledgePageFor(route)))
+const knowledgeCacheEpoch = ref(0)
+// Cache only this knowledge visit. The independent model page keeps its own lifecycle.
+watch(knowledgeActive, (active, previous) => {
+  if (!active && previous) knowledgeCacheEpoch.value++
+}, { flush: 'sync' })
+watch(() => route.fullPath, () => {
+  if (knowledgeActive.value) knowledgeExpanded.value = true
+}, { immediate: true })
 const artExpanded = ref(false)
 watch(() => route.fullPath, () => {
   if (artNav.some(item => item.path === route.path)) artExpanded.value = true
 }, { immediate: true })
 function isNavActive(path: string) {
   if (path === '/knowledge?tab=models') return route.path === '/knowledge' && route.query.tab === 'models'
-  if (path === '/knowledge') return route.path === '/knowledge' && route.query.tab !== 'models'
+  if (knowledgeNavigation.some(item => item.path === path)) return knowledgePageFor(route) === knowledgeNavigation.find(item => item.path === path)?.page
   return route.path === path
 }
 function titleFor(target: Pick<RouteLocationNormalizedLoaded, 'path' | 'query' | 'meta'>) {
-  return target.path === '/projects' ? '工程' : target.path === '/ai-icons' ? 'AI 图标' : target.path === '/knowledge' ? (target.query.tab === 'models' ? '模型服务' : '知识库') : String(target.meta.title ?? '页面')
+  const knowledgePage = knowledgePageFor(target)
+  if (knowledgePage) return knowledgeNavigation.find(item => item.page === knowledgePage)!.label
+  return target.path === '/projects' ? '工程' : target.path === '/ai-icons' ? 'AI 图标' : target.path === '/knowledge' && target.query.tab === 'models' ? '模型服务' : String(target.meta.title ?? '页面')
 }
 const pageTitle = computed(() => titleFor(route))
 // Only entries observed by this mounted app can authorize a browser-history return.
@@ -100,13 +113,15 @@ function returnWithinApp() {
 const pageDescriptions: Record<string, string> = {
   '/projects': '查看工程、日志、调用记录和工具。工程操作的结果以服务回执为准。',
   '/ai-icons': '管理工程规范和参考图片。保存、生成和导入分别确认。',
-  '/knowledge': '查询知识库、发起问答和查看模型状态。连接状态以实际读取结果为准。',
+  '/knowledge': '选择知识库，检索关键词并阅读文档、原文和分块。',
+  '/knowledge/qa': '对当前知识库提问，或使用已有 Agent 进行问答。',
+  '/knowledge/manage': '管理知识连接、服务和同步来源，查看执行回执。',
   '/overview': '查看所有已登记工程，点击进入所选工程概览。',
   '/resources': '查看所选工程的已保存规范与资源读取状态。',
   '/image-assets': '导入候选图片、审阅并保存。保存结果以服务回执为准。',
   '/services': '查看服务连接状态和最近读取结果。',
 }
-const pageInfo = computed(() => pageDescriptions[route.path] ?? String(route.meta.description ?? ''))
+const pageInfo = computed(() => route.path === '/knowledge' && route.query.tab === 'models' ? '查看模型服务状态和已有服务操作。' : pageDescriptions[route.path] ?? String(route.meta.description ?? ''))
 const dateLabel = computed(() => {
   const observed = store.snapshot.source.observedAt
   if (!observed) return '尚无真实读取记录'
@@ -121,7 +136,13 @@ const dateLabel = computed(() => {
       <RouterLink to="/about" class="brand" aria-label="关于 Companion" @click="menuOpen = false"><span class="brand-mark">C</span><span>Companion</span></RouterLink>
       <nav class="nav-list" aria-label="主导航">
         <template v-for="(item, index) in nav" :key="item.path">
-          <RouterLink :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><span>{{ item.label }}</span></RouterLink>
+          <div v-if="item.path === '/knowledge'" class="knowledge-nav-group">
+            <button class="nav-item knowledge-nav-toggle" type="button" :aria-expanded="knowledgeExpanded" aria-controls="knowledge-navigation" @click="knowledgeExpanded = !knowledgeExpanded"><span>知识库</span><el-icon aria-hidden="true" :class="{ 'is-expanded': knowledgeExpanded }"><ArrowDown/></el-icon></button>
+            <div v-show="knowledgeExpanded" id="knowledge-navigation" class="knowledge-nav-children">
+              <RouterLink v-for="child in knowledgeNavigation" :key="child.path" :to="child.path" class="nav-item knowledge-nav-child" :class="{ 'is-active': isNavActive(child.path) }" active-class="" :aria-current="isNavActive(child.path) ? 'page' : undefined" @click="menuOpen = false">{{ child.label }}</RouterLink>
+            </div>
+          </div>
+          <RouterLink v-else :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><span>{{ item.label }}</span></RouterLink>
           <div v-if="index === 0" class="art-nav-group">
             <button class="nav-item art-nav-toggle" type="button" :aria-expanded="artExpanded" aria-controls="art-navigation" @click="artExpanded = !artExpanded"><span>美术资源</span><el-icon aria-hidden="true" :class="{ 'is-expanded': artExpanded }"><ArrowDown/></el-icon></button>
             <div v-show="artExpanded" id="art-navigation" class="art-nav-children">
@@ -146,7 +167,12 @@ const dateLabel = computed(() => {
         <el-alert v-if="showRegisteredChrome && !companionBrowserProvider" type="info" :closable="false" title="当前宿主未接入 Companion 工程读取接口" description="请通过原 Companion 同源工程服务打开。没有加载示例工程。"/>
         <el-alert v-if="showRegisteredChrome && registered.directory.projectError" type="error" :closable="false" title="工程读取失败" :description="registered.directory.projectError"/>
         <div v-if="showRegisteredChrome && registered.directory.warnings.length" class="registered-read-warnings"><InfoTip label="工程读取限制" :text="registered.directory.warnings.join('；')"/><span>部分状态或发现信息未读取</span></div>
-        <RouterView />
+        <RouterView v-slot="{ Component }">
+          <KeepAlive :key="knowledgeCacheEpoch">
+            <component :is="Component" v-if="knowledgeActive" :key="route.path" />
+          </KeepAlive>
+          <component :is="Component" v-if="!knowledgeActive" />
+        </RouterView>
       </main>
     </div>
   </div>
@@ -156,12 +182,12 @@ const dateLabel = computed(() => {
 .nav-list { margin-top: 24px; }
 .nav-list { gap: 3px; }
 .nav-item { padding: 10px 14px; }
-.art-nav-toggle { width: 100%; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; text-align: left; cursor: pointer; justify-content: space-between; }
-.art-nav-toggle .el-icon { transform: rotate(-90deg); transition: transform .15s; }
-.art-nav-toggle .el-icon.is-expanded { transform: rotate(0); }
-.art-nav-children { display: grid; gap: 3px; margin-top: 3px; }
-.art-nav-child { padding-left: 30px; }
-.art-nav-toggle:focus-visible { outline: 2px solid #cfc3ff; outline-offset: 2px; }
+.art-nav-toggle, .knowledge-nav-toggle { width: 100%; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; text-align: left; cursor: pointer; justify-content: space-between; }
+.art-nav-toggle .el-icon, .knowledge-nav-toggle .el-icon { transform: rotate(-90deg); transition: transform .15s; }
+.art-nav-toggle .el-icon.is-expanded, .knowledge-nav-toggle .el-icon.is-expanded { transform: rotate(0); }
+.art-nav-children, .knowledge-nav-children { display: grid; gap: 3px; margin-top: 3px; }
+.art-nav-child, .knowledge-nav-child { padding-left: 30px; }
+.art-nav-toggle:focus-visible, .knowledge-nav-toggle:focus-visible { outline: 2px solid #cfc3ff; outline-offset: 2px; }
 .supplementary-nav .is-active { color: #fff; font-weight: 600; }
 .registered-source-note,.registered-read-warnings { display:flex; align-items:center; flex-wrap:wrap; gap:6px; color:var(--text-secondary,#637187); font-size:12px; margin-bottom:16px; overflow-wrap:anywhere; }
 .projects-main { padding-top: 18px; }

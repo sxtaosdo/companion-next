@@ -216,6 +216,10 @@ export const useKnowledgeConversationStore = defineStore('knowledge-conversation
     if (error.value === capacityMessage) error.value = ''
     return true
   }
+  function suspend() {
+    cancel(); revoke()
+    if (phase.value === 'prepared') phase.value = 'idle'
+  }
   function leave() {
     detachCurrent(); binding.value = null; phase.value = 'invalidated'; error.value = contextMessage
   }
@@ -224,6 +228,6 @@ export const useKnowledgeConversationStore = defineStore('knowledge-conversation
     transportPending: computed(() => pending.value), activeSessionId: computed(() => session.value),
     turns: computed(() => records.value), prepared: computed(() => preview.value), revision: computed(() => revision.value),
     requiresNewConversation: computed(() => blocked.value), canPrepare, retainedBytes, completedCount,
-    syncContext, prepareSend, send, cancel, newConversation, clearCompleted, leave,
+    syncContext, prepareSend, send, cancel, newConversation, clearCompleted, suspend, leave,
   }
 })

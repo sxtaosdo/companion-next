@@ -155,11 +155,12 @@ export const useLocalServiceOperationsStore = defineStore('local-service-operati
     }
     return succeeded
   }
-  function leave() { detach(); binding.value = null }
+  function suspend(scopeKey?: string) { if(scopeKey!==undefined&&binding.value?.scopeKey!==scopeKey)return;cancel();cancelRead();revoke() }
+  function leave(scopeKey?: string) { if(scopeKey!==undefined&&binding.value?.scopeKey!==scopeKey)return;detach();binding.value = null }
   return {
     states: computed(() => snapshot.value), prepared: computed(() => preview.value), records: computed(() => records.value),
     revision: computed(() => revision.value), reading: computed(() => reading.value), transportPending: computed(() => transportPending.value),
     blockedUnknown: computed(() => unknown.value), error: computed(() => error.value), busy, canRead,
-    syncContext, refresh, canPrepare, prepare, execute, cancel, leave,
+    syncContext, refresh, canPrepare, prepare, execute, cancel, suspend, leave,
   }
 })

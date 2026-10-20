@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onActivated, onBeforeUnmount, onDeactivated, ref, watch } from 'vue'
 import InfoTip from './InfoTip.vue'
 import { useRoute } from 'vue-router'
 import { knowledgeReadProvider } from '../knowledge-read-integration'
@@ -9,30 +9,35 @@ import type { LocalService, LocalServiceAction } from '../domain/local-service-o
 import { useLocalServiceOperationsStore } from '../stores/local-service-operations'
 import { useWorkspaceStore } from '../stores/workspace'
 const props = defineProps<{ modelsOnly?: boolean; knowledgeOnly?: boolean }>()
-const store = useLocalServiceOperationsStore(), workspace = useWorkspaceStore(), route = useRoute(), confirmed = ref(false)
+const store = useLocalServiceOperationsStore(), workspace = useWorkspaceStore(), route = useRoute(), confirmed = ref(false), active = ref(true)
 const services = computed<LocalService[]>(() => props.modelsOnly ? ['model'] : props.knowledgeOnly ? ['knowledge'] : ['knowledge', 'model'])
-const scope = computed(() => JSON.stringify({ route: route.fullPath, tab: props.modelsOnly === true, knowledgeOnly: props.knowledgeOnly === true, mode: workspace.mode, project: workspace.selectedProjectId }))
+const scope = computed(() => JSON.stringify({ route: props.knowledgeOnly ? 'knowledge-manage' : route.fullPath, tab: props.modelsOnly === true, knowledgeOnly: props.knowledgeOnly === true, mode: workspace.mode, project: workspace.selectedProjectId }))
+let boundScope: string | undefined
 let entryGeneration = 0, stopPendingProbe: (() => void) | undefined
 function modelEntryProbe() {
   const generation = ++entryGeneration; stopPendingProbe?.(); stopPendingProbe = undefined
-  if (!props.modelsOnly || !localServiceOperationsProvider.value || !knowledgeReadProvider.value) return
-  const read = () => { if (generation === entryGeneration && props.modelsOnly) void store.refresh() }
+  if (!active.value || !props.modelsOnly || !localServiceOperationsProvider.value || !knowledgeReadProvider.value) return
+  const read = () => { if (active.value && generation === entryGeneration && props.modelsOnly) void store.refresh() }
   if (store.reading) stopPendingProbe = watch(() => store.reading, reading => {
     if (reading) return
     stopPendingProbe?.(); stopPendingProbe = undefined; read()
   }, { flush: 'post' })
   else read()
 }
-watch([localServiceOperationsProvider, knowledgeReadProvider, scope], () => {
+function sync(){
+  if(!active.value)return
   store.syncContext({ provider: localServiceOperationsProvider.value, readProvider: knowledgeReadProvider.value, scopeKey: scope.value, service: props.modelsOnly ? 'model' : props.knowledgeOnly ? 'knowledge' : undefined })
-  modelEntryProbe()
-}, { immediate: true, flush: 'sync' })
+  boundScope=scope.value;modelEntryProbe()
+}
+watch([localServiceOperationsProvider, knowledgeReadProvider, scope],sync,{immediate:true,flush:'sync'})
+onActivated(()=>{if(!active.value){active.value=true;sync()}})
+onDeactivated(()=>{active.value=false;entryGeneration++;stopPendingProbe?.();stopPendingProbe=undefined;confirmed.value=false;store.suspend(boundScope)})
 watch(() => store.revision, () => { confirmed.value = false }, { flush: 'sync' })
 const receipt = computed(() => store.records.filter(record => services.value.includes(record.service)).at(-1) ?? null)
 const warnings = computed(() => (store.states?.warnings ?? []).filter(message => props.knowledgeOnly ? !message.startsWith('模型') : props.modelsOnly ? !message.startsWith('知识库') : true))
-const canOpenKnowledge = computed(() => !props.modelsOnly && !!localServiceOperationsProvider.value && store.canRead && store.states?.knowledge?.running === true && store.states.knowledge.frameable === false)
-const canEmbedKnowledge = computed(() => !props.modelsOnly && route.query.tab !== 'models' && !!localServiceOperationsProvider.value && store.canRead && !store.blockedUnknown && store.states?.knowledge?.running === true && store.states.knowledge.frameable === true)
-const canEmbedModel = computed(() => props.modelsOnly && !!localServiceOperationsProvider.value && store.canRead && !store.prepared && !store.blockedUnknown && store.states?.model?.running === true)
+const canOpenKnowledge = computed(() => active.value && !props.modelsOnly && !!localServiceOperationsProvider.value && store.canRead && store.states?.knowledge?.running === true && store.states.knowledge.frameable === false)
+const canEmbedKnowledge = computed(() => active.value && !props.modelsOnly && !(route.path === '/knowledge' && route.query.tab === 'models') && !!localServiceOperationsProvider.value && store.canRead && !store.blockedUnknown && store.states?.knowledge?.running === true && store.states.knowledge.frameable === true)
+const canEmbedModel = computed(() => active.value && props.modelsOnly && !!localServiceOperationsProvider.value && store.canRead && !store.prepared && !store.blockedUnknown && store.states?.model?.running === true)
 const receiptLabel = computed(() => { const action = receipt.value?.action === 'start' ? '启动' : '关闭'; return { sending: `等待${action}回执`, acknowledged: `已收到${action}回执`, 'not-dispatched': '未发出', rejected: '明确拒绝', 'reported-failure': `后台报告未${action}`, unknown: '结果未知' } })
 function prepare(service: LocalService, action: LocalServiceAction = 'stop') { confirmed.value = false; store.prepare(service, action) }
 async function operateModel(action: LocalServiceAction) {
@@ -40,7 +45,7 @@ async function operateModel(action: LocalServiceAction) {
   if (prepared && await store.execute(prepared, true) && props.modelsOnly) await store.refresh()
 }
 async function execute() { const prepared = store.prepared; const succeeded = prepared && confirmed.value ? await store.execute(prepared, confirmed.value) : false; confirmed.value = false; if (succeeded && props.modelsOnly && prepared?.service === 'model') await store.refresh() }
-onBeforeUnmount(() => { entryGeneration++; stopPendingProbe?.(); stopPendingProbe = undefined; store.leave() })
+onBeforeUnmount(() => { entryGeneration++; stopPendingProbe?.(); stopPendingProbe = undefined; store.leave(boundScope) })
 </script>
 <template>
   <section class="section-card local-service-controls" aria-label="本机服务控制">

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onDeactivated, ref, shallowRef, watch } from 'vue'
 import { useKnowledgeReadStore } from '../stores/knowledge-read'
 import { useKnowledgeConversationStore } from '../stores/knowledge-conversation'
 import { knowledgeAgentPending } from '../knowledge-agent-integration'
 import { knowledgeReadProvider } from '../knowledge-read-integration'
 import { hasUnknownKnowledgeSync, markUnknownKnowledgeSync, knowledgeSyncPending, knowledgeSyncProvider } from '../knowledge-sync-integration'
 import { canKnowledgeSync, formatKnowledgeSyncPlan, KnowledgeSyncError, syncPolicyText } from '../domain/knowledge-sync'
-import type { KnowledgeSyncOperation, KnowledgeSyncReply } from '../domain/knowledge-sync'
+import type { KnowledgeSyncOperation, KnowledgeSyncReply, KnowledgeSyncProvider } from '../domain/knowledge-sync'
 import type { KnowledgeSource } from '../domain/knowledge-read'
 const read=useKnowledgeReadStore(),chat=useKnowledgeConversationStore()
 const selected=ref(''),busy=ref(false),notice=ref(''),failed=ref(false)
@@ -17,7 +17,7 @@ const currentRead=computed(()=>Boolean(read.provider&&read.provider===knowledgeR
 const blocked=computed(()=>!currentRead.value||!knowledgeSyncProvider.value||read.loading||read.statusLoading||busy.value||knowledgeSyncPending.value||knowledgeAgentPending.value||chat.busy||chat.transportPending)
 const canDry=computed(()=>!blocked.value&&canKnowledgeSync(read.status,source.value,false))
 const canRun=computed(()=>!blocked.value&&canKnowledgeSync(read.status,source.value,true)&&!hasUnknownKnowledgeSync(knowledgeSyncProvider.value,selected.value))
-let revision=0,controller:AbortController|undefined
+let revision=0,controller:AbortController|undefined,pendingSync:{provider:KnowledgeSyncProvider;sourceKey:string;operation:KnowledgeSyncOperation}|undefined
 function invalidate(){revision++;controller?.abort();if(receipt.value)receipt.value={...receipt.value,detached:true};notice.value='';failed.value=false}
 watch([()=>read.status,()=>read.provider,knowledgeReadProvider,knowledgeSyncProvider],()=>{
   invalidate()
@@ -28,7 +28,7 @@ async function execute(operation:KnowledgeSyncOperation){
   const p=knowledgeSyncProvider.value,s=source.value
   if(!p||!s||(operation==='run'?!canRun.value:!canDry.value))return
   const frozen={sourceId:s.id,channel:s.channel},sourceKey=selected.value,version=revision
-  const active=new AbortController();controller=active;busy.value=true;knowledgeSyncPending.value=true;failed.value=false
+  const active=new AbortController();controller=active;pendingSync={provider:p,sourceKey,operation};busy.value=true;knowledgeSyncPending.value=true;failed.value=false
   receipt.value={...frozen,operation,unknown:false,detached:false}
   notice.value=operation==='run'?'正在按批准来源同步；等待排队回执。':'正在生成同步演练计划。'
   const current=()=>revision===version&&p===knowledgeSyncProvider.value&&read.provider===knowledgeReadProvider.value&&selected.value===sourceKey
@@ -44,12 +44,18 @@ async function execute(operation:KnowledgeSyncOperation){
     if(receipt.value?.sourceId===frozen.sourceId&&receipt.value.channel===frozen.channel)receipt.value={...frozen,operation,unknown,detached:!current()}
     if(current()){notice.value=error.message;failed.value=true}
   }finally{
-    busy.value=false;if(controller===active)controller=undefined
+    busy.value=false;if(controller===active){controller=undefined;pendingSync=undefined}
     // Keep all UI controls locked until an abort-unaware fetch/stream actually settles.
     await p.waitForIdle();knowledgeSyncPending.value=false
   }
 }
 function cancel(){controller?.abort()}
+onDeactivated(()=>{
+  revision++;controller?.abort()
+  const unknown=busy.value&&pendingSync?.operation==='run'
+  if(unknown&&pendingSync)markUnknownKnowledgeSync(pendingSync.provider,pendingSync.sourceKey)
+  if(busy.value&&receipt.value)receipt.value={...receipt.value,unknown:receipt.value.unknown||unknown,detached:true}
+})
 onBeforeUnmount(invalidate)
 const flag=(v:boolean|undefined)=>v===true?'是':v===false?'否':'未知'
 </script>
