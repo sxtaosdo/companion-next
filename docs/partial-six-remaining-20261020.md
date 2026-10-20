@@ -1,3 +1,5 @@
+2026-10-20日常Cursor后续：已在原用户窗口分别单条Reload cocos/cook，各1次，均Connected/117工具，原来源及配置SHA保持。Cursor业务工具调用0：正常MCP面板仅Reload/Done及开关，没有无推理Run/Test入口，未新发Agent回合。详见[日常连接与剩余一步](cursor-daily-acceptance-20261020.md)。
+
 2026-10-20三条配置修复：用户批准的Codex ant-cook及Cursor cocos/cook已备份并修为Node+原JS，其他条目/权限保持。实际codex.exe发现117工具并只读调用PASSED；Cursor隔离实际客户端目标未创建，日常Cursor定向重载/回执仍未验证，不能报全通过。详见[修复与精确剩余](three-client-repair-20261020.md)。
 
 # 六项部分完成的精确剩余条件（2026-10-20）

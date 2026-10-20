@@ -1,0 +1,14 @@
+{
+  "connected": true,
+  "readonlyStatusListed": true,
+  "atUtc": "2026-10-20T04:14:59.1846612Z",
+  "sourcePresent": true,
+  "visibleActions": [
+    "Reload",
+    "Done"
+  ],
+  "target": "cocos-creator-cook-cdc0709d",
+  "toolCount": 117,
+  "pid": 23912,
+  "dialogTitleVerified": true
+}

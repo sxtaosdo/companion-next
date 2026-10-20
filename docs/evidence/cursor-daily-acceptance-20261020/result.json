@@ -1,0 +1,92 @@
+{
+  "atUtc": "2026-10-20T04:19:29.683320+00:00",
+  "actualDailyProfile": true,
+  "dailyCursorWindowName": "Cursor Agents",
+  "connections": [
+    {
+      "serverName": "cocos-creator-cocos-214a2184",
+      "connected": true,
+      "toolCount": 117,
+      "readonlyStatusListed": true,
+      "reloadInvocations": 1,
+      "sourceOriginal": true,
+      "cursorPid": 23912,
+      "reloadIssuedAt": "2026-10-20T04:15:36.8767575Z",
+      "verifiedAt": "2026-10-20T04:15:39.8387559Z",
+      "manualInvocationControls": [
+        "Reload",
+        "Done"
+      ]
+    },
+    {
+      "serverName": "cocos-creator-cook-cdc0709d",
+      "connected": true,
+      "toolCount": 117,
+      "readonlyStatusListed": true,
+      "reloadInvocations": 1,
+      "sourceOriginal": true,
+      "cursorPid": 23912,
+      "reloadIssuedAt": "2026-10-20T04:14:59.3006095Z",
+      "verifiedAt": "2026-10-20T04:15:02.1617828Z",
+      "manualInvocationControls": [
+        "Reload",
+        "Done"
+      ]
+    }
+  ],
+  "actualCursorBusinessToolCallsByThisTask": 0,
+  "businessToolCallPendingReason": "Normal MCP UI exposes Reload/Done and tool enablement only, no Run/Test/Invoke control; no Agent or generation turn submitted",
+  "configurationBytesStillMatchThreeApprovedRepairs": true,
+  "newConfigWrites": 0,
+  "otherServerUiActions": 0,
+  "permissionOrToolTogglesChanged": false,
+  "appClosed": false,
+  "loginOrNewCredentialOrExtensionInstall": false,
+  "modelOrCreatorOrP1060ActionsByThisTask": 0,
+  "daemonIdentity": {
+    "pid": 6564,
+    "startupEpoch": "15e6f683-4962-40de-965d-8984805da96b",
+    "startedAt": "2026-10-20T02:53:04.716Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "phase": "OPEN",
+  "unknown": 2,
+  "all312RuntimeFilesUnchanged": true,
+  "sharedWorktree": {
+    "head": "6ff44f5574ed2f1b81741e86c3ca1210c6c0085a",
+    "dirtyEntryCount": 22,
+    "statusSha256": "dcc2e12b57e746e00a45187a46b9b1b7f2ef642d51b45dc16af7ed2546e10739",
+    "diffSha256": "ec4c01b56d5433c3941bfae94277fbcc5f9bd98db2f09b74a683ecfea138eebf",
+    "indexDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "taskSharedSourceWrites": 0,
+    "priorExactBaselineAvailable": false,
+    "limitation": "Historical Temp baseline.json is now missing; exact protected21 per-file comparison cannot be repeated this round. Prior verified receipt remains archived; current HEAD/count/fingerprints are observations, not a replacement baseline."
+  },
+  "business9TablesUnchanged": true,
+  "knowledgeService": {
+    "path": "D:\\services\\weknora\\normal-reader-recovery-v0.8.2\\weknora.exe",
+    "pid": 600,
+    "created": "2026-10-20T02:03:09.5395770Z"
+  },
+  "processMetadata": {
+    "targetMcpProcesses": [
+      {
+        "pid": 29768,
+        "parent": 18840,
+        "projectId": "cdc0709d4eaaa8a2",
+        "created": "2026-10-20T04:15:01.3905360Z",
+        "parentName": "Cursor.exe"
+      },
+      {
+        "pid": 30708,
+        "parent": 18840,
+        "projectId": "214a2184be887306",
+        "created": "2026-10-20T04:15:38.9556390Z",
+        "parentName": "Cursor.exe"
+      }
+    ],
+    "dailyCursorProcesses": 14
+  }
+}
