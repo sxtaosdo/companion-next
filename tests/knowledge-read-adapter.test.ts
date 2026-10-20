@@ -53,6 +53,18 @@ describe('v148 knowledge-only fixed operation surface', () => {
       if (index < 3) expect(init.body).toBeUndefined()
     }
   })
+  it.each(['knowledge','model'] as const)('scopes %s reads to its own GET without probing the other service',async service=>{
+    const fetch=fixture(),p=createKnowledgeReadProvider({fetch}),signal=new AbortController().signal
+    const result=await p.loadServiceStates(signal,service)
+    expect(fetch.mock.calls.map(([path])=>path)).toEqual([service==='knowledge'?'/api/knowledge-service/status':'/api/model-service/status'])
+    expect(result).toEqual(service==='knowledge'?{knowledge:{running:true,frameable:false},warnings:[]}:{model:{running:true},warnings:[]})
+    expect(fetch.mock.calls[0]![1]).toMatchObject({method:'GET',credentials:'same-origin',mode:'same-origin'})
+  })
+  it('does not request or report failure for the excluded model service',async()=>{
+    const fetch=fixture({'/api/model-service/status':new Response('',{status:503})}),p=createKnowledgeReadProvider({fetch})
+    expect(await p.loadServiceStates(undefined,'knowledge')).toEqual({knowledge:{running:true,frameable:false},warnings:[]})
+    expect(fetch).toHaveBeenCalledOnce()
+  })
   it('keeps source registration, retrieval verification and service reachability independent', async () => {
     const fetch = fixture({ '/api/knowledge/status': { ...status, sync: { ...status.sync, sources: [source], error: { code: 'POLICY_DENIED', reason: 'prior_batch', message: 'password=PRIVATE' } } }, '/api/knowledge-service/status': { running: true, frameable: false, error: 'PRIVATE' }, '/api/model-service/status': { running: false, models: [{ running: true }], token: 'PRIVATE' } })
     const provider = createKnowledgeReadProvider({ fetch }), result = await provider.status(), services = await provider.loadServiceStates()

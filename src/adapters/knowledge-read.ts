@@ -273,13 +273,13 @@ export function createKnowledgeReadProvider(options: { fetch: KnowledgeFetch; ti
   return Object.freeze({
     label: 'Companion 同源知识库只读接口（v148 契约）',
     status(signal?: AbortSignal) { return read('status', decodeStatus, signal) },
-    async loadServiceStates(signal?: AbortSignal): Promise<KnowledgeServiceStates> {
+    async loadServiceStates(signal?: AbortSignal, service?: 'knowledge' | 'model'): Promise<KnowledgeServiceStates> {
       const [knowledge, model] = await Promise.allSettled([
-        read('knowledgeService', (value) => { const raw = record(value, 'knowledgeService'); const running = bool(raw.running, 'knowledgeService'), frameable = bool(raw.frameable, 'knowledgeService'); if (!running && frameable) throw fail('knowledgeService', 'invalid-shape'); return { running, frameable } }, signal),
-        read('modelService', (value) => ({ running: bool(record(value, 'modelService').running, 'modelService') }), signal),
+        service === 'model' ? Promise.resolve(undefined) : read('knowledgeService', (value) => { const raw = record(value, 'knowledgeService'); const running = bool(raw.running, 'knowledgeService'), frameable = bool(raw.frameable, 'knowledgeService'); if (!running && frameable) throw fail('knowledgeService', 'invalid-shape'); return { running, frameable } }, signal),
+        service === 'knowledge' ? Promise.resolve(undefined) : read('modelService', (value) => ({ running: bool(record(value, 'modelService').running, 'modelService') }), signal),
       ])
       if (signal?.aborted) throw fail('knowledgeService', 'aborted')
-      return { ...(knowledge.status === 'fulfilled' ? { knowledge: knowledge.value } : {}), ...(model.status === 'fulfilled' ? { model: model.value } : {}), warnings: [
+      return { ...(knowledge.status === 'fulfilled' && knowledge.value ? { knowledge: knowledge.value } : {}), ...(model.status === 'fulfilled' && model.value ? { model: model.value } : {}), warnings: [
         ...(knowledge.status === 'rejected' ? [`知识库服务状态未知：[${(knowledge.reason as KnowledgeReadError).code}]；不能据此判定已停止。`] : []),
         ...(model.status === 'rejected' ? [`模型启动器状态未知：[${(model.reason as KnowledgeReadError).code}]；不能据此判定已停止。`] : []),
       ] }

@@ -2,6 +2,7 @@ import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, ref, 
 import { defineStore, storeToRefs } from 'pinia'
 import { companionBrowserProvider, companionProjectEntryProvider } from '../companion-browser-integration'
 import { knowledgeReadProvider } from '../knowledge-read-integration'
+import { KnowledgeReadError, type KnowledgeReadCode } from '../adapters/knowledge-read'
 import type { KnowledgeServiceStates } from '../domain/knowledge-read'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
 import { useCreatorOperationsStore } from '../stores/creator-operations'
@@ -19,7 +20,7 @@ export function useOverviewServiceStatus() {
   const active = ref(false), visible = ref(document.visibilityState === 'visible')
   const { paused: localPaused } = storeToRefs(useOverviewServicePreferences())
   const services = shallowRef<KnowledgeServiceStates | null>(null)
-  const observedAt = ref(''), evidenceSource = ref(''), error = ref(''), loading = ref(false), clock = ref(Date.now())
+  const observedAt = ref(''), evidenceSource = ref(''), error = ref(''), errorCode = ref<KnowledgeReadCode | ''>(''), loading = ref(false), clock = ref(Date.now())
   let disposed = false, generation = 0, timer: ReturnType<typeof setTimeout> | undefined
   let controller: AbortController | null = null, pending: Promise<void> | null = null, nextDue = 0
   const source = computed(() => companionBrowserProvider.value)
@@ -72,11 +73,11 @@ export function useOverviewServiceStatus() {
         const result = await reader.loadServiceStates(request.signal)
         if (current()) {
           services.value = result
-          if (result.knowledge || result.model) { error.value = ''; observedAt.value = new Date().toISOString() }
-          else error.value = '本次未取得有效服务响应，当前情况未知。'
+          if (result.knowledge || result.model) { error.value = ''; errorCode.value = ''; observedAt.value = new Date().toISOString() }
+          else { error.value = '本次未取得有效服务响应，当前情况未知。'; errorCode.value = '' }
         }
-      } catch {
-        if (current()) error.value = '本次服务状态读取失败，当前情况未知。'
+      } catch (cause) {
+        if (current()) { error.value = '本次服务状态读取失败，当前情况未知。'; errorCode.value = cause instanceof KnowledgeReadError ? cause.code : '' }
       }
     }).finally(() => {
       if (identity !== generation || controller !== request) return
@@ -92,7 +93,7 @@ export function useOverviewServiceStatus() {
     localPaused.value = !localPaused.value
   }
   watch([source, knowledgeReadProvider], () => {
-    cancel(); services.value = null; observedAt.value = ''; evidenceSource.value = ''; error.value = ''; nextDue = 0
+    cancel(); services.value = null; observedAt.value = ''; evidenceSource.value = ''; error.value = ''; errorCode.value = ''; nextDue = 0
     reconcile()
   }, { flush: 'sync' })
   watch([automatic, blockedReason, companionProjectEntryProvider, () => directory.provider, () => directory.connected], reconcile, { flush: 'sync' })
@@ -103,5 +104,5 @@ export function useOverviewServiceStatus() {
   onActivated(activate)
   onDeactivated(deactivate)
   onBeforeUnmount(() => { disposed = true; deactivate(); document.removeEventListener('visibilitychange', visibilityChanged) })
-  return { directory, services, loading, observedAt, evidenceSource, error, stale, blockedReason, approved, connected, canRefresh, paused, localPaused, refresh, togglePaused }
+  return { directory, services, loading, observedAt, evidenceSource, error, errorCode, stale, blockedReason, approved, connected, canRefresh, paused, localPaused, refresh, togglePaused }
 }

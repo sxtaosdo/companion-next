@@ -13,7 +13,7 @@ import { CreatorOperationError, type CreatorOperationsProvider } from '../src/do
 import { useProjectOperationLaneStore } from '../src/stores/project-operation-lane'
 import type { CompanionBrowserProvider } from '../src/domain/companion-browser'
 import type { KnowledgeReadProvider, KnowledgeServiceStates } from '../src/domain/knowledge-read'
-import { createKnowledgeReadProvider, type KnowledgeFetch } from '../src/adapters/knowledge-read'
+import { createKnowledgeReadProvider, KnowledgeReadError, type KnowledgeFetch } from '../src/adapters/knowledge-read'
 
 const good = (): KnowledgeServiceStates => ({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
 function source(): CompanionBrowserProvider { return { label: '登记来源', runtimeProbesEnabled: true, loadProjects: vi.fn(async () => ({ projects: [{ id: 'aaaaaaaaaaaaaaaa', name: '隔离工程', path: '/offline/project' }], statuses: [{ projectId: 'aaaaaaaaaaaaaaaa', state: 'ready' as const, capabilityProfile: 'authoring' as const }], dashboard: [], warnings: [] })), loadCounts: vi.fn(), loadLogs: vi.fn(), loadCalls: vi.fn() } }
@@ -170,14 +170,60 @@ describe('overview service status lifecycle', () => {
     await enter(); await state.refresh(); await vi.advanceTimersByTimeAsync(60_000)
     expect(knowledge.loadServiceStates).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
   })
-  it('shows a compact summary with unknown failure, evidence times, expandable detail and only a management link', async () => {
+  it('shows compact separate service states, evidence times and five existing management links', async () => {
     knowledge.loadServiceStates = vi.fn(async () => ({ knowledge: { running: true, frameable: false }, warnings: ['模型启动器响应缺失'] }))
     wrapper = mount(OverviewServiceSummary, { global: { stubs: { RouterLink: { props: ['to'], template: '<a :href="to"><slot/></a>' } } } }); await flushPromises()
-    expect(wrapper.get('[aria-label="服务摘要"]').text()).toContain('模型启动器：未知')
+    expect(wrapper.get('[data-service="模型启动器"]').text()).toContain('异常')
+    expect(wrapper.get('[data-service="模型启动器"]').text()).not.toContain('未连接')
     expect(wrapper.findAll('time')).toHaveLength(2); expect(wrapper.get('details').attributes('open')).toBeUndefined()
     expect(wrapper.get('details').text()).toContain('ComfyUI：未知'); expect(wrapper.get('details').text()).toContain('不代表模型已加载')
-    expect(wrapper.get('a').attributes('href')).toBe('/knowledge?tab=models')
+    expect(wrapper.get('[data-service="模型启动器"]').attributes('href')).toBe('/knowledge?tab=models')
+    expect(wrapper.findAll('.summary-state')).toHaveLength(5)
     expect(wrapper.findAll('button').map(button => button.text())).toEqual(['刷新服务状态', '暂停服务更新'])
     expect(knowledge.status).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('dashboard honest service labels', () => {
+  const mountSummary = async () => {
+    wrapper = mount(OverviewServiceSummary, { props: { embedded: true }, global: { stubs: { RouterLink: { props: ['to'], template: '<a :href="to"><slot/></a>' } } } })
+    await flushPromises()
+  }
+  it.each([['unauthorized','鉴权失败'],['forbidden','鉴权失败'],['timeout','超时'],['network-error','异常']] as const)('preserves %s from a service failure without turning it into offline', async (code, label) => {
+    knowledge.loadServiceStates = vi.fn(async () => { throw new KnowledgeReadError(code) })
+    await mountSummary()
+    for (const key of ['知识库','模型启动器']) {
+      const row = wrapper!.get(`[data-service="${key}"]`)
+      expect(row.text()).toContain(label); expect(row.text()).not.toContain('未连接')
+    }
+    expect(wrapper!.classes()).not.toContain('panel')
+    expect(wrapper!.get('details').attributes('open')).toBeUndefined()
+  })
+  it.each([['unauthorized','鉴权失败'],['forbidden','鉴权失败'],['timeout','超时'],['network-error','异常']] as const)('classifies Bridge status %s without claiming it was unchecked or offline', async (code, label) => {
+    directory.warnings = [`运行状态未取得有效数据：[${code}]。空状态列表不能证明服务为 0 或工程已停止；所有缺少状态的工程须显示为未知。`]
+    await mountSummary()
+    const bridge = wrapper!.get('[data-service="Creator Bridge"]')
+    expect(bridge.text()).toContain(label)
+    expect(bridge.text()).not.toContain('未检查'); expect(bridge.text()).not.toContain('未连接')
+    expect(fetch).not.toHaveBeenCalled()
+  })
+  it('keeps partial authentication failure separate from an independently reachable service', async () => {
+    knowledge.loadServiceStates = vi.fn(async () => ({ knowledge: { running: true, frameable: false }, warnings: ['模型启动器状态未知：[unauthorized]；不能据此判定已停止。'] }))
+    await mountSummary()
+    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('已连接')
+    expect(wrapper!.get('[data-service="模型启动器"]').text()).toContain('鉴权失败')
+  })
+  it('distinguishes unchecked, checking and a verified unreachable service', async () => {
+    directory.livePreferred = false; await mountSummary()
+    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('未检查')
+    const pending = deferred<KnowledgeServiceStates>(); knowledge.loadServiceStates = vi.fn(() => pending.promise)
+    const refresh = wrapper!.findAll('button').find(button => button.text() === '刷新服务状态')!
+    await refresh.trigger('click'); await flushPromises()
+    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('检查中')
+    pending.resolve({ knowledge: { running: false, frameable: false }, model: { running: true }, warnings: [] }); await flushPromises()
+    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('未连接')
+    expect(wrapper!.get('[data-service="模型启动器"]').text()).toContain('仅启动器可达')
+    expect(wrapper!.text()).not.toContain('全部正常')
   })
 })

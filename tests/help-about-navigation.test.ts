@@ -7,9 +7,10 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import App from '../src/App.vue'
 import { routes } from '../src/router'
-import { frontendIdentity, helpTopics, legacyReference, migrationFeatures } from '../src/domain/product-information'
+import { frontendIdentity, frontendChanges, helpTopics, legacyReference, migrationFeatures } from '../src/domain/product-information'
 import legacyHelp from '../src/domain/legacy-v148-help.json'
-import { CHANGELOG } from '../src/domain/legacy-v148-changelog'
+import { CHANGELOG, CHANGELOG_ENTRIES } from '../src/domain/legacy-v148-changelog'
+import { groupProductChangelog } from '../src/domain/changelog-days'
 import packageInfo from '../package.json'
 import lock from '../package-lock.json'
 import { useCompanionBrowserStore } from '../src/stores/companion-browser'
@@ -43,6 +44,14 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.find('.sidebar-footer').text()).toContain(`前端 v${packageInfo.version}`)
     expect(wrapper!.text()).toContain('未读取，不以本前端版本代替')
     expect(wrapper!.find('.frontend-version').attributes('href')).toBe('/changelog')
+  })
+  it('combines product identity while removing the data and compatibility display block',async()=>{
+    await setup('/about')
+    const product=wrapper!.get('.about-identity-next')
+    expect(product.text()).toContain('Creator AI Companion');expect(product.text()).toContain(frontendIdentity.name);expect(product.text()).toContain(`前端 v${frontendIdentity.version}`)
+    expect(product.find('.legacy-about').exists()).toBe(true);expect(product.find('a[href="mailto:332725585@qq.com"]').exists()).toBe(true)
+    expect(wrapper!.text()).not.toContain('数据与兼容边界');expect(wrapper!.text()).not.toContain('图片审阅需要独立审阅服务')
+    expect(wrapper!.findAll('.panel.legacy-about')).toHaveLength(0);expect(wrapper!.text()).toContain('版本与服务身份')
   })
   it.each(['/help', '/about', '/changelog', '/migration'])('opens %s without a project, demo fallback or service request', async (path) => {
     const fetch = vi.fn(); vi.stubGlobal('fetch', fetch)
@@ -257,7 +266,7 @@ describe('help, about and visible frontend identity', () => {
     const writeText = vi.fn(async (_text: string) => {}); Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
     await setup('/about'); await button('复制反馈地址').trigger('click'); await flushPromises()
     expect(writeText).toHaveBeenCalledWith('332725585@qq.com'); expect(wrapper!.text()).toContain('未发送邮件')
-    expect(wrapper!.findAll('img')).toHaveLength(2); expect(wrapper!.text()).toContain('v148 原始图片，字节未修改')
+    expect(wrapper!.findAll('img')).toHaveLength(2); expect(wrapper!.text()).toContain('微信扫码支持开发')
     expect(wrapper!.find('a[href="mailto:332725585@qq.com"]').exists()).toBe(true)
     expect(wrapper!.find('a[href="https://gitee.com/sxtao_admin/cocos-mcp"]').attributes('rel')).toBe('noopener noreferrer')
   })
@@ -302,7 +311,7 @@ describe('help, about and visible frontend identity', () => {
   })
   it('keeps unconnected, demo and failed live-source states explicit in the compact shell', async () => {
     const { workspace } = await setup('/overview')
-    expect(wrapper!.find('.topbar').text()).toContain('未连接')
+    expect(wrapper!.get('[data-testid="overview-status-card"]').text()).toContain('未连接')
     expect(wrapper!.find('.source-banner').exists()).toBe(false)
     await workspace.openDemo(); await flushPromises()
     expect(wrapper!.find('.topbar').text()).toContain('示例模式')
@@ -331,8 +340,8 @@ describe('help, about and visible frontend identity', () => {
   })
   it('shows all legacy changelog groups separately from the real frontend version', async () => {
     await setup('/changelog')
-    expect(wrapper!.findAll('.legacy-changelog')).toHaveLength(CHANGELOG.length)
-    expect(wrapper!.find('.legacy-changelog summary').text()).toContain('0.3.148')
+    expect(wrapper!.findAll('.changelog-entry')).toHaveLength(groupProductChangelog(frontendChanges,CHANGELOG_ENTRIES).length)
+    expect(wrapper!.findAll('.changelog-version-trace').some(trace=>trace.text().includes('Creator AI Companion v0.3.148'))).toBe(true)
     expect(wrapper!.text()).toContain('北京时间日历日')
     expect(wrapper!.text()).toContain('已在本机完成独立启动与HTTP核验')
     expect(wrapper!.text()).toContain('历史UNKNOWN仍保留，完整恢复另行验收')
@@ -414,7 +423,7 @@ describe('restored Companion navigation categories', () => {
   it('keeps the approved art hierarchy, one engineering link and every supplementary route reachable', async () => {
     const fetch = vi.fn(); vi.stubGlobal('fetch', fetch)
     const { router } = await setup('/knowledge?tab=models')
-    expect(wrapper!.findAll('.nav-list .nav-item').map(item => item.text())).toEqual(['项目概览', '美术资源', 'AI 图标', '游戏资源', '图片素材', '工程', '知识库', '模型服务'])
+    expect(wrapper!.findAll('.nav-list .nav-item').map(item => item.text())).toEqual(['看板', '美术资源', 'AI 图标', '游戏资源', '图片素材', '工程', '知识库', '模型服务'])
     const sidebar = wrapper!.get('.sidebar')
     expect(sidebar.findAll('a[href="/projects"]')).toHaveLength(1)
     expect(sidebar.findAll('a[href="/ai-icons"]')).toHaveLength(1)

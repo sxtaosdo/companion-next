@@ -31,7 +31,7 @@ export const useKnowledgeReadStore = defineStore('knowledge-read', () => {
     const current=()=>provider.value===p&&epoch===currentEpoch&&statusVersion===version&&!controller.signal.aborted
     await Promise.all([
       p.status(controller.signal).then(value=>{if(current())status.value=value},cause=>{if(current())statusError.value=cause instanceof KnowledgeReadError ? cause.message : '知识状态读取失败；CLI、认证与检索验证均未知。'}),
-      p.loadServiceStates(controller.signal).then(value=>{if(current())services.value=value},()=>{if(current())serviceError.value='知识服务与模型启动器状态未读取。'}),
+      p.loadServiceStates(controller.signal, 'knowledge').then(value=>{if(current())services.value=value},()=>{if(current())serviceError.value='知识服务状态未读取。'}),
     ])
     if(current()){statusLoading.value=false; statusAbort=null}
   }

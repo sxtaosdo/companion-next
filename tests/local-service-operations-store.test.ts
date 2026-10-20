@@ -17,6 +17,16 @@ function fixture() {
 async function stop(store: ReturnType<typeof useLocalServiceOperationsStore>, service: LocalService = 'model') { await store.refresh(); return store.execute(store.prepare(service), true) }
 beforeEach(() => setActivePinia(createPinia()))
 describe('per-service explicit status and one-use confirmation', () => {
+  it('passes service scope and revokes prepared operations when only the service scope changes',async()=>{
+    const {store,context,readProvider,provider}=fixture()
+    store.syncContext({...context,service:'model'});await store.refresh()
+    expect(readProvider.loadServiceStates).toHaveBeenLastCalledWith(expect.any(AbortSignal),'model')
+    expect(store.states?.knowledge).toBeUndefined();expect(store.states?.warnings).toEqual([])
+    const prepared=store.prepare('model');expect(prepared).not.toBeNull()
+    store.syncContext({...context,service:'knowledge'});expect(store.prepared).toBeNull();expect(await store.execute(prepared,true)).toBe(false)
+    await store.refresh();expect(readProvider.loadServiceStates).toHaveBeenLastCalledWith(expect.any(AbortSignal),'knowledge')
+    expect(store.states?.model).toBeUndefined();expect(provider.run).not.toHaveBeenCalled()
+  })
   it('does no work on creation or context binding and never persists state', async () => {
     const get = vi.spyOn(Storage.prototype, 'getItem'), set = vi.spyOn(Storage.prototype, 'setItem'), { provider, readProvider, store } = fixture()
     expect(readProvider.loadServiceStates).not.toHaveBeenCalled(); expect(readProvider.status).not.toHaveBeenCalled(); expect(provider.run).not.toHaveBeenCalled()

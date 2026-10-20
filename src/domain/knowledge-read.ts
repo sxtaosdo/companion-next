@@ -55,7 +55,7 @@ export interface KnowledgeChunkListInput { id: string; limit?: number }
 export interface KnowledgeReadProvider {
   readonly label: string
   status(signal?: AbortSignal): Promise<KnowledgeStatus>
-  loadServiceStates(signal?: AbortSignal): Promise<KnowledgeServiceStates>
+  loadServiceStates(signal?: AbortSignal, service?: 'knowledge' | 'model'): Promise<KnowledgeServiceStates>
   /** Every logical-read POST below must be triggered by the user's explicit action. */
   search(input: KnowledgeSearchInput, signal?: AbortSignal): Promise<KnowledgeSearchResponse>
   listKnowledgeBases(signal?: AbortSignal): Promise<{ items: KnowledgeBase[] }>

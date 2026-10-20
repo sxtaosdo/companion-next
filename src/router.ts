@@ -16,7 +16,7 @@ export const routes: RouteRecordRaw[] = [
   { path: '/projects', component: CompanionBrowserView, meta: { title: '工程、日志与调用', description: '读取原 Companion 真实记录；管理写操作继续逐项迁移。', workspaceIndependent: true } },
   { path: '/ai-icons', component: AiResourceReadView, meta: { title: 'AI 图标', description: '工程规范、单图任务、候选审阅与导入交付。', workspaceIndependent: true } },
   { path: '/knowledge', component: KnowledgeReadView, meta: { title: '知识库与模型状态', description: '显式查询原服务，保留检索与状态的实际证据。', workspaceIndependent: true } },
-  { path: '/overview', component: OverviewView, meta: { title: '项目概览', description: '从规范开始，让每次交付都有据可循。' } },
+  { path: '/overview', component: OverviewView, meta: { title: '看板', description: '从规范开始，让每次交付都有据可循。' } },
   { path: '/resources', component: ResourcesView, meta: { title: '游戏资源', description: '一个入口，按步骤做好每一份资源。' } },
   { path: '/image-assets', component: ImageAssetsView, meta: { title: '图片素材', description: '导入候选，在页内审阅并核对真实保存结果。' } },
   { path: '/services', redirect: to => ({ path: '/overview', query: to.query, hash: '#service-status' }) },

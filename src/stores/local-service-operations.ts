@@ -9,6 +9,7 @@ export interface LocalServiceContext {
   readProvider: Pick<KnowledgeReadProvider, 'label' | 'loadServiceStates'> | null
   /** Local isolation only; never transmitted or treated as process ownership. */
   scopeKey: string
+  service?: LocalService
 }
 export interface PreparedLocalServiceOperation {
   readonly service: LocalService
@@ -37,10 +38,10 @@ function valid(value: Binding | null): value is Binding & { provider: LocalServi
     && !!value.readProvider && typeof value.readProvider.loadServiceStates === 'function'
     && typeof value.scopeKey === 'string' && value.scopeKey.length > 0 && value.scopeKey.length <= 16_384
 }
-function projectStates(value: unknown): KnowledgeServiceStates {
+function projectStates(value: unknown, requestedService?: LocalService): KnowledgeServiceStates {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw Error('invalid-state')
   const raw = value as Record<string, unknown>, result: KnowledgeServiceStates = { warnings: [] }
-  for (const service of ['knowledge', 'model'] as const) {
+  for (const service of requestedService ? [requestedService] : ['knowledge', 'model'] as const) {
     if (!Object.hasOwn(raw, service)) { result.warnings.push(`${service === 'knowledge' ? '知识库服务' : '模型启动器'}状态未知，不能按已关闭处理。`); continue }
     const state = raw[service]
     if (!state || typeof state !== 'object' || Array.isArray(state)) throw Error('invalid-state')
@@ -80,10 +81,10 @@ export const useLocalServiceOperationsStore = defineStore('local-service-operati
   function syncContext(context: LocalServiceContext) {
     const next: Binding = {
       provider: context.provider ? toRaw(context.provider) : null, readProvider: context.readProvider ? toRaw(context.readProvider) : null,
-      scopeKey: context.scopeKey, label: context.provider?.label ?? '', readLabel: context.readProvider?.label ?? '',
+      scopeKey: context.scopeKey, service: context.service, label: context.provider?.label ?? '', readLabel: context.readProvider?.label ?? '',
     }
     const old = binding.value
-    if (old && old.provider === next.provider && old.readProvider === next.readProvider && old.scopeKey === next.scopeKey && old.label === next.label && old.readLabel === next.readLabel) return
+    if (old && old.provider === next.provider && old.readProvider === next.readProvider && old.scopeKey === next.scopeKey && old.service === next.service && old.label === next.label && old.readLabel === next.readLabel) return
     detach(); binding.value = next
     if (!unknown.value) error.value = ''
   }
@@ -95,8 +96,8 @@ export const useLocalServiceOperationsStore = defineStore('local-service-operati
     readController = controller; reading.value = true
     const isCurrent = () => binding.value === current && epoch === generation && version === readVersion && !controller.signal.aborted
     try {
-      // This capability calls exactly the two service status GETs; never .status() / CLI.
-      const states = projectStates(await current.readProvider.loadServiceStates(controller.signal))
+      // Read only the selected service GET, or both in the unscoped dashboard; never CLI.
+      const states = projectStates(await current.readProvider.loadServiceStates(controller.signal, current.service), current.service)
       if (!isCurrent()) return false
       snapshot.value = states; return true
     } catch {

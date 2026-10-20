@@ -29,7 +29,7 @@ function chooseStep(index: number) { void router.replace({ path: '/resources', q
 <template>
   <section class="registered-resources">
     <template v-if="selection.project">
-      <section class="panel real-resource-identity"><div><span class="field-label">当前工程</span><h2>{{ selection.project.name }}</h2><p>{{ selection.project.path }}</p><small>{{ selection.project.id }}</small></div><RouterLink :to="{ path: '/overview', query: { project: selection.project.id } }">返回项目概览</RouterLink></section>
+      <section class="panel real-resource-identity"><div><span class="field-label">当前工程</span><h2>{{ selection.project.name }}</h2><p>{{ selection.project.path }}</p><small>{{ selection.project.id }}</small></div><RouterLink :to="{ path: '/overview', query: { project: selection.project.id } }">返回看板</RouterLink></section>
       <nav class="resource-steps panel" aria-label="资源生产步骤"><button v-for="(title,index) in steps" :key="title" :class="{ active: step === index }" :aria-current="step === index ? 'step' : undefined" @click="chooseStep(index)"><span>{{ index + 1 }}</span><strong>{{ title }}</strong><i v-if="index < steps.length - 1"></i></button></nav>
       <section v-if="step === 0" class="panel saved-project-spec" data-testid="saved-project-spec">
         <AiResourceReadView embedded/>
@@ -39,7 +39,7 @@ function chooseStep(index: number) { void router.replace({ path: '/resources', q
       <section v-else-if="step === 1" class="panel real-resource-empty" data-testid="real-resource-empty"><el-empty :description="emptyTitles[step]" :image-size="90"/><p>当前构建未启用原单图任务准备；上方库存汇总独立读取，是否可用以该次接口回执为准。</p><p class="form-help">Owner 资产保持保护；没有用草稿或示例代替真实资源。</p></section>
       <AiJobsReadPanel ref="jobsPanel" v-show="step >= 2" :project="selection.project" :source="selection.currentSource" :workflow-step="step + 1"/>
     </template>
-    <section v-else class="panel real-resource-empty"><el-empty :description="selection.directory.projectLoading ? '正在读取登记工程' : selection.requestedId ? '所选工程不可用，请重新选择' : '请先选择已登记工程'" :image-size="90"/><RouterLink to="/overview">前往项目概览</RouterLink></section>
+    <section v-else class="panel real-resource-empty"><el-empty :description="selection.directory.projectLoading ? '正在读取登记工程' : selection.requestedId ? '所选工程不可用，请重新选择' : '请先选择已登记工程'" :image-size="90"/><RouterLink to="/overview">前往看板</RouterLink></section>
   </section>
 </template>
 <style scoped>

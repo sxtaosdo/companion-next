@@ -13,11 +13,11 @@ import { LocalServiceOperationError, type LocalServiceOperationsProvider, type L
 import { knowledgeFixture, deferred } from './knowledge-read-fixture'
 let wrapper: VueWrapper | undefined
 function provider(): LocalServiceOperationsProvider { return { label: 'OFFLINE STOP UI', run: vi.fn(async (input): Promise<LocalServiceOperationReply> => input.action === 'start' ? input.service === 'model' ? { service: 'model', action: 'start', state: { running: true } } : { service: 'knowledge', action: 'start', state: { running: true, frameable: false } } : input.service === 'model' ? { service: 'model', action: 'stop', state: { running: false } } : { service: 'knowledge', action: 'stop', state: { running: false, frameable: false } }), waitForIdle: vi.fn(async () => {}) } }
-async function setup(options: { p?: LocalServiceOperationsProvider | null; modelsOnly?: boolean; r?: ReturnType<typeof knowledgeFixture> } = {}) {
+async function setup(options: { p?: LocalServiceOperationsProvider | null; modelsOnly?: boolean; knowledgeOnly?: boolean; r?: ReturnType<typeof knowledgeFixture> } = {}) {
   const pinia = createPinia(), p = options.p === undefined ? provider() : options.p, r = options.r ?? knowledgeFixture()
   registerKnowledgeReadProvider(r); if (p) registerLocalServiceOperationsProvider(p)
   const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/:pathMatch(.*)*', component: { template: '<div />' } }] }); await router.push('/knowledge'); await router.isReady()
-  wrapper = mount(LocalServiceControls, { props: { modelsOnly: options.modelsOnly }, attachTo: document.body, global: { plugins: [pinia, ElementPlus, router] } }); await flushPromises()
+  wrapper = mount(LocalServiceControls, { props: { modelsOnly: options.modelsOnly, knowledgeOnly: options.knowledgeOnly }, attachTo: document.body, global: { plugins: [pinia, ElementPlus, router] } }); await flushPromises()
   return { p: p!, r, pinia, router, store: useLocalServiceOperationsStore(pinia), workspace: useWorkspaceStore(pinia) }
 }
 function button(text: string) { const found = wrapper!.findAll('button').find(value => value.text() === text); if (!found) throw Error(`missing ${text}`); return found }
@@ -32,6 +32,15 @@ describe('service controls build boundary', () => {
   it('permits only the exact workspace host and registration is passive', () => { const p = provider(); registerLocalServiceOperationsProvider(p); expect(isCompanionLocalServiceHost('companion-workspace', { protocol: 'http:', hostname: '127.0.0.1' })).toBe(true); expect(p.run).not.toHaveBeenCalled() })
 })
 describe('explicit service-control UI and source protection', () => {
+  it('keeps knowledge-only controls free of model and ComfyUI UI',async()=>{
+    const {p}=await setup({knowledgeOnly:true});expect(wrapper!.text()).not.toContain('模型');expect(wrapper!.text()).not.toContain('Comfy')
+    expect(wrapper!.findAll('.service-card')).toHaveLength(1);expect(button('核对关闭知识库服务').exists()).toBe(true);expect(p.run).not.toHaveBeenCalled()
+  })
+  it('does not leak model receipts or missing-model warnings into knowledge controls',async()=>{
+    const {r,p}=await setup({modelsOnly:true});vi.mocked(r.loadServiceStates).mockResolvedValue({knowledge:{running:true,frameable:false},model:{running:false},warnings:[]});await click('读取当前服务状态');await click('启动服务');expect(p.run).toHaveBeenCalledOnce()
+    await wrapper!.setProps({modelsOnly:false,knowledgeOnly:true});vi.mocked(r.loadServiceStates).mockResolvedValue({knowledge:{running:true,frameable:false},warnings:[]});await click('读取当前服务状态')
+    expect(wrapper!.text()).not.toContain('模型');expect(wrapper!.text()).not.toContain('Comfy');expect(wrapper!.find('.service-receipt').exists()).toBe(false)
+  })
   it('restores the original knowledge-only external link after explicit running/unframeable state', async () => {
     const { p, r } = await setup()
     vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: true, frameable: false }, model: { running: true }, warnings: [] })
@@ -119,8 +128,14 @@ describe('explicit service-control UI and source protection', () => {
     expect(wrapper!.text()).toContain('已收到关闭回执'); expect(wrapper!.text()).toContain('不证明所有相关进程均已结束')
     await prepare(service); expect(button('确认并关闭这一次').attributes('disabled')).toBeDefined(); await check(); await click('确认并关闭这一次'); expect(p.run).toHaveBeenCalledTimes(2)
   })
-  it('shows only model controls on model tab and gives precise launcher warning', async () => {
-    await setup({ modelsOnly: true }); expect(wrapper!.text()).toContain('关闭启动器不等于终止已运行的模型'); expect(wrapper!.findAll('button').some(value => value.text() === '核对关闭知识库服务')).toBe(false)
+  it('keeps model guidance in the existing accessible tip', async () => {
+    const {p}=await setup({modelsOnly:true})
+    expect(wrapper!.text()).not.toContain('关闭启动器不等于终止已运行的模型')
+    const tip=wrapper!.get('button[aria-label="模型服务说明"]')
+    await tip.trigger('focus');await flushPromises()
+    expect(document.body.textContent).toContain('关闭启动器不等于终止已运行的模型')
+    await tip.trigger('keydown',{key:'Escape'});await flushPromises()
+    expect(tip.attributes('aria-describedby')).toBeUndefined();expect(p.run).not.toHaveBeenCalled()
   })
   it('invalidates a checked confirmation on route, project or provider changes', async () => {
     const { p, store, workspace, router } = await setup()
@@ -174,17 +189,32 @@ describe('knowledge start UI retains original flow with explicit side-effect rev
     await click('确认并启动这一次'); expect(p.run).toHaveBeenCalledOnce(); expect(vi.mocked(p.run).mock.calls[0]![0]).toEqual({ service: 'knowledge', action: 'start' })
     expect(wrapper!.text()).toContain('已收到启动回执'); expect(wrapper!.text()).toContain('不代表登录、检索或索引就绪'); expect(wrapper!.findAll('iframe,a,object')).toHaveLength(0)
   })
-  it('restores model start after explicitly unreachable launcher state', async () => {
-    const { r } = await setup({ modelsOnly: true }); vi.mocked(r.loadServiceStates).mockResolvedValue({ knowledge: { running: false, frameable: false }, model: { running: false }, warnings: [] }); await click('读取当前服务状态')
-    expect(button('核对启动模型启动器').attributes('disabled')).toBeUndefined(); await click('核对启动模型启动器'); expect(wrapper!.text()).toContain('0.0.0.0:8090'); expect(wrapper!.text()).toContain('8092 局域网代理')
+  it('uses the original one-click model start with no review or checkbox', async () => {
+    const {r,p}=await setup({modelsOnly:true});vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});await click('读取当前服务状态')
+    vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:true},warnings:[]});await click('启动服务')
+    expect(p.run).toHaveBeenCalledOnce();expect(vi.mocked(p.run).mock.calls[0]![0]).toEqual({service:'model',action:'start'})
+    expect(wrapper!.find('.service-confirm').exists()).toBe(false);expect(wrapper!.find('input[type="checkbox"]').exists()).toBe(false)
+    expect(wrapper!.get('iframe').attributes('src')).toBe('http://127.0.0.1:8090/')
   })
 })
 
 
 describe('original model page iframe lifecycle',()=>{
  it('reads status on model entry only, embeds the original page and does not dispatch an operation',async()=>{const {r,p}=await setup({modelsOnly:true});expect(r.loadServiceStates).toHaveBeenCalledOnce();expect(r.status).not.toHaveBeenCalled();expect(p.run).not.toHaveBeenCalled();expect(wrapper!.get('iframe').attributes()).toMatchObject({src:'http://127.0.0.1:8090/',title:'本地 AI 服务启动器',referrerpolicy:'no-referrer'});expect(wrapper!.find('a').exists()).toBe(false)})
- it('removes model frame on refresh failure, confirmation and leaving model tab',async()=>{const {r}=await setup({modelsOnly:true});expect(wrapper!.find('iframe').exists()).toBe(true);const pending=deferred<Awaited<ReturnType<typeof r.loadServiceStates>>>();vi.mocked(r.loadServiceStates).mockReturnValueOnce(pending.promise);await button('读取当前服务状态').trigger('click');expect(wrapper!.find('iframe').exists()).toBe(false);pending.reject(Error('offline'));await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false);await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(true);await click('核对关闭模型启动器');expect(wrapper!.find('iframe').exists()).toBe(false);await wrapper!.setProps({modelsOnly:false});await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false)})
- it('confirms only one model-start and refreshes status without loading a model',async()=>{const {r,p}=await setup({modelsOnly:true});vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});await click('读取当前服务状态');await click('核对启动模型启动器');expect(p.run).not.toHaveBeenCalled();const checkbox=wrapper!.get('[aria-label="确认本次服务启动"]');await (checkbox.element.matches('input')?checkbox:checkbox.get('input')).setValue(true);vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:true},warnings:[]});await click('确认并启动这一次');expect(p.run).toHaveBeenCalledOnce();expect(vi.mocked(p.run).mock.calls[0]![0]).toEqual({service:'model',action:'start'});expect(wrapper!.text()).toContain('不代表模型已加载');expect(wrapper!.get('iframe').attributes('src')).toBe('http://127.0.0.1:8090/')})
+ it('removes model frame on failed reads and while the original stop is pending',async()=>{
+   const p=provider(),result=deferred<LocalServiceOperationReply>(),{r}=await setup({modelsOnly:true,p})
+   vi.mocked(r.loadServiceStates).mockRejectedValueOnce(Error('offline'));await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(false)
+   await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(true)
+   vi.mocked(p.run).mockReturnValueOnce(result.promise);await button('关闭服务').trigger('click');await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false)
+   await button('关闭服务').trigger('click');expect(p.run).toHaveBeenCalledOnce();expect(wrapper!.find('.service-confirm').exists()).toBe(false)
+   vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});result.resolve({service:'model',action:'stop',state:{running:false}});await flushPromises()
+   expect(button('启动服务').exists()).toBe(true);expect(wrapper!.find('iframe').exists()).toBe(false)
+ })
+ it('retains UNKNOWN and prevents a second model dispatch after interrupted waiting',async()=>{
+   const p=provider(),result=deferred<LocalServiceOperationReply>(),{store}=await setup({modelsOnly:true,p});vi.mocked(p.run).mockReturnValueOnce(result.promise)
+   await click('关闭服务');await click('停止等待关闭回执');result.resolve({service:'model',action:'stop',state:{running:false}});await flushPromises();await click('读取当前服务状态')
+   expect(store.blockedUnknown).toBe(true);expect(button('关闭服务').attributes('disabled')).toBeDefined();expect(p.run).toHaveBeenCalledOnce();expect(wrapper!.find('iframe').exists()).toBe(false)
+ })
 })
 
 
