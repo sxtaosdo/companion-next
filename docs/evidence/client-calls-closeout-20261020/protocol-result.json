@@ -1,0 +1,46 @@
+{
+  "atUtc": "2026-10-20T03:00:57.357Z",
+  "scope": "Independent MCP SDK readonly protocol verification; does not claim actual Codex/Cursor connection",
+  "projectId": "04c4cde24ee76d83",
+  "configurationWrites": 0,
+  "credentialChanges": 0,
+  "modelOrCreatorActions": 0,
+  "listenSocketsCreated": 0,
+  "historyInjection": 0,
+  "toolCalls": [
+    {
+      "name": "project_get_status",
+      "isError": false,
+      "status": "PASSED",
+      "projectIdMatches": true,
+      "dataSha256": "ebf0a66f67038593d0921cc000b352bd68f17a70c263026e4767e35f039c9644"
+    },
+    {
+      "name": "debug_get_logs",
+      "isError": false,
+      "status": "PASSED",
+      "projectIdMatches": true,
+      "dataSha256": "03d4752b53558b85c6fdc7e98753f7f9f292c8cb8392579dec328a34da1abeb4"
+    }
+  ],
+  "ok": true,
+  "serverVersion": {
+    "name": "creator-ai-companion:04c4cde24ee76d83",
+    "version": "0.3.142"
+  },
+  "handshake": true,
+  "toolCount": 117,
+  "stderrBytes": 0,
+  "rawOutputArchived": false,
+  "finalIdentity": {
+    "pid": 6564,
+    "startupEpoch": "15e6f683-4962-40de-965d-8984805da96b",
+    "startedAt": "2026-10-20T02:53:04.716Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "phase": "OPEN",
+  "unknown": 2,
+  "activeCountersZero": true
+}

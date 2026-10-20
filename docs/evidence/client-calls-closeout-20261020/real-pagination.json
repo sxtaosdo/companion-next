@@ -1,0 +1,62 @@
+{
+  "atUtc": "2026-10-20T03:02:31.211196+00:00",
+  "projectId": "04c4cde24ee76d83",
+  "realToolsExecuted": 2,
+  "source": "mcp",
+  "pageSizeOneTraversal": true,
+  "distinctRows": 2,
+  "matchesRealLimit50Order": true,
+  "limit50Cursor": null,
+  "total": 2,
+  "retained": 2,
+  "failedCount": 0,
+  "productionUiPageThreshold": 50,
+  "realUiSecondPageProven": false,
+  "realFailureDetailProven": false,
+  "fakeBusinessRecordsInjected": 0,
+  "dangerousFailuresManufactured": 0,
+  "rows": [
+    {
+      "id": "1183118d-53ce-4349-ae79-a00e88c84f87",
+      "sequence": 2,
+      "operation": "debug_get_logs",
+      "status": "success",
+      "source": "mcp",
+      "fields": [
+        "durationMs",
+        "id",
+        "inputSummary",
+        "operation",
+        "operationNameZh",
+        "projectId",
+        "resultSummary",
+        "sequence",
+        "source",
+        "startedAt",
+        "status"
+      ],
+      "detailSha256": "14271deba04dfb434098f44ab166c949bc01093d616a93cbc9cfd11c2b2d42d9"
+    },
+    {
+      "id": "498b6a11-c2af-4a20-9524-ac10e72aa72d",
+      "sequence": 1,
+      "operation": "project_get_status",
+      "status": "success",
+      "source": "mcp",
+      "fields": [
+        "durationMs",
+        "id",
+        "inputSummary",
+        "operation",
+        "operationNameZh",
+        "projectId",
+        "resultSummary",
+        "sequence",
+        "source",
+        "startedAt",
+        "status"
+      ],
+      "detailSha256": "bb0892e48c54108ca9e57b8a42a7189dede7cd3092fba9a4228cf26a14016e29"
+    }
+  ]
+}

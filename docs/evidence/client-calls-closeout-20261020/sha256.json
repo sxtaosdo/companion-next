@@ -1,0 +1,14 @@
+{
+  "client-proof.json": "c1545aa68fb42529317ee910807dbeab58b6614d5921dae150767e7d6a5dcd84",
+  "client-proof.py": "3a0557e1d3432f2261cdf81db44ba4941db83b2a2c0da092e5ea554955c9510f",
+  "configuration-proposal.json": "a85062f81ec5ad19465167ccdc223be5b980a54f6f71a84ff701d514fed80a26",
+  "inventory.json": "7722fb233c6737017df7a25d159015dd70f8570b37fe8fda39de40f76489715a",
+  "inventory.py": "2cfcaeb8415103a85d488e7793d9ed0dd0b9d5b0d28197bbf42e6bd24a4fdba2",
+  "natural-calls.json": "7074b399340ad63cd68cb18098089f7f3e7089edd5bc4bdc3994ee0841b037bd",
+  "page-real.py": "48aee932cc8a6d7354e08a79390b085dc30aa4060dfb731e16d9e33dc837ac78",
+  "protection.json": "f1a0fd2262448fcc37fe74174d14b36a75f417c6ce852b00e5dd127e638687bf",
+  "protocol-result.json": "c12d9f2a7fb59bc16226c6fe41f3baa0799a93ae58e38be6796990c1c62e241d",
+  "protocol.mjs": "f9b569cc8ba1aaaa7871fa0e9cf43af1f51535b580dfce2ee463f84e30a4f104",
+  "read-calls.py": "886b1b704bddccec9079d83c9fd4e898db3341c735a916905dfcb94588f196ea",
+  "real-pagination.json": "6df427434893e6dadf540a6a2ca6449d384470362c82e7f191414da35814d887"
+}

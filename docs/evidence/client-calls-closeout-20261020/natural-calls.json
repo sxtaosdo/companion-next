@@ -1,0 +1,142 @@
+{
+  "atUtc": "2026-10-20T02:59:14.098568+00:00",
+  "identity": {
+    "pid": 6564,
+    "startupEpoch": "15e6f683-4962-40de-965d-8984805da96b",
+    "startedAt": "2026-10-20T02:53:04.716Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "countShape": "dict",
+  "counts": {
+    "sessionId": "519428df-ecb7-449d-8348-bce7e511d13e",
+    "counts": {},
+    "latest": {}
+  },
+  "projects": [
+    {
+      "projectId": "68a5dccc481a8588",
+      "name": "colony-flow-food-hunt",
+      "fields": [
+        "records",
+        "retained",
+        "sessionId",
+        "total"
+      ],
+      "count": 0,
+      "total": 0,
+      "retained": 0,
+      "nextBefore": null,
+      "items": [],
+      "failures": {
+        "count": 0,
+        "nextBefore": null,
+        "items": []
+      }
+    },
+    {
+      "projectId": "214a2184be887306",
+      "name": "cocos",
+      "fields": [
+        "records",
+        "retained",
+        "sessionId",
+        "total"
+      ],
+      "count": 0,
+      "total": 0,
+      "retained": 0,
+      "nextBefore": null,
+      "items": [],
+      "failures": {
+        "count": 0,
+        "nextBefore": null,
+        "items": []
+      }
+    },
+    {
+      "projectId": "cdc0709d4eaaa8a2",
+      "name": "cook",
+      "fields": [
+        "records",
+        "retained",
+        "sessionId",
+        "total"
+      ],
+      "count": 0,
+      "total": 0,
+      "retained": 0,
+      "nextBefore": null,
+      "items": [],
+      "failures": {
+        "count": 0,
+        "nextBefore": null,
+        "items": []
+      }
+    },
+    {
+      "projectId": "04c4cde24ee76d83",
+      "name": "ant-cook",
+      "fields": [
+        "records",
+        "retained",
+        "sessionId",
+        "total"
+      ],
+      "count": 0,
+      "total": 0,
+      "retained": 0,
+      "nextBefore": null,
+      "items": [],
+      "failures": {
+        "count": 0,
+        "nextBefore": null,
+        "items": []
+      }
+    },
+    {
+      "projectId": "87224a1a9dbb5736",
+      "name": "creator-ai-icons-acceptance-20261010",
+      "fields": [
+        "records",
+        "retained",
+        "sessionId",
+        "total"
+      ],
+      "count": 0,
+      "total": 0,
+      "retained": 0,
+      "nextBefore": null,
+      "items": [],
+      "failures": {
+        "count": 0,
+        "nextBefore": null,
+        "items": []
+      }
+    },
+    {
+      "projectId": "a79f4915296f4091",
+      "name": "creator-ai-variant-import-acceptance-20261017",
+      "fields": [
+        "records",
+        "retained",
+        "sessionId",
+        "total"
+      ],
+      "count": 0,
+      "total": 0,
+      "retained": 0,
+      "nextBefore": null,
+      "items": [],
+      "failures": {
+        "count": 0,
+        "nextBefore": null,
+        "items": []
+      }
+    }
+  ],
+  "productionWrites": 0,
+  "injectedRecords": 0,
+  "dangerousFailureRequests": 0
+}

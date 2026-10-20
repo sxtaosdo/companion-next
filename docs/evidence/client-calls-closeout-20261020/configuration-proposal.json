@@ -1,0 +1,65 @@
+{
+  "writesPerformed": 0,
+  "credentialOrPermissionChanges": 0,
+  "newServers": 0,
+  "scope": "Three existing valid-Windows-project entries only; stale Mac/P1060/other entries excluded",
+  "files": [
+    {
+      "path": "C:\\Users\\33272\\.codex\\config.toml",
+      "guardSha256": "3dea588400f47609421d4d7ac351dbb38cdcc996b1c633895437473ad77c3a49",
+      "entries": [
+        {
+          "serverName": "cocos-creator-ant-cook-04c4cde2",
+          "replaceOnlyFields": [
+            "command",
+            "args"
+          ],
+          "command": "C:/Program Files/nodejs/node.exe",
+          "args": [
+            "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js",
+            "mcp",
+            "--project",
+            "04c4cde24ee76d83"
+          ],
+          "unchangedProjectId": "04c4cde24ee76d83"
+        }
+      ]
+    },
+    {
+      "path": "C:\\Users\\33272\\.cursor\\mcp.json",
+      "guardSha256": "904a8a96c98e30537baf7a4bf19831fd476a7e3834a2f33008a8c2c3a393babb",
+      "entries": [
+        {
+          "serverName": "cocos-creator-cocos-214a2184",
+          "replaceOnlyFields": [
+            "command",
+            "args"
+          ],
+          "command": "C:/Program Files/nodejs/node.exe",
+          "args": [
+            "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js",
+            "mcp",
+            "--project",
+            "214a2184be887306"
+          ],
+          "unchangedProjectId": "214a2184be887306"
+        },
+        {
+          "serverName": "cocos-creator-cook-cdc0709d",
+          "replaceOnlyFields": [
+            "command",
+            "args"
+          ],
+          "command": "C:/Program Files/nodejs/node.exe",
+          "args": [
+            "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js",
+            "mcp",
+            "--project",
+            "cdc0709d4eaaa8a2"
+          ],
+          "unchangedProjectId": "cdc0709d4eaaa8a2"
+        }
+      ]
+    }
+  ]
+}

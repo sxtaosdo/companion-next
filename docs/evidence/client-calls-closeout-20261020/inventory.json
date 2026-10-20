@@ -1,0 +1,242 @@
+{
+  "atUtc": "2026-10-20T02:57:35.985607+00:00",
+  "configurationWrites": 0,
+  "credentialFilesRead": 0,
+  "configs": [
+    {
+      "path": "C:\\Users\\33272\\.codex\\config.toml",
+      "exists": true,
+      "sha256": "3dea588400f47609421d4d7ac351dbb38cdcc996b1c633895437473ad77c3a49",
+      "serverCount": 3,
+      "relevant": [
+        {
+          "name": "cocos-creator-ant-cook-04c4cde2",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "resolvedCommand": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "commandFileSha256": "8ba06c7629b666980b9c998baa76223cdc8129b660824f5e007f8cc89aa8a6a9",
+          "args": [
+            "mcp",
+            "--project",
+            "04c4cde24ee76d83"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-p1060-c16c7137",
+          "excludedPaused": true
+        }
+      ],
+      "unchangedAfterRead": true
+    },
+    {
+      "path": "C:\\Users\\33272\\.cursor\\mcp.json",
+      "exists": true,
+      "sha256": "904a8a96c98e30537baf7a4bf19831fd476a7e3834a2f33008a8c2c3a393babb",
+      "serverCount": 11,
+      "relevant": [
+        {
+          "name": "cocos-creator-creator-3-8-8-test-project-e99c4def",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "[omitted]",
+          "resolvedCommand": null,
+          "commandFileSha256": null,
+          "args": [
+            "mcp",
+            "--project",
+            "e99c4defe0320ca8"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-tile-ylgy-9577195d",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "[omitted]",
+          "resolvedCommand": null,
+          "commandFileSha256": null,
+          "args": [
+            "mcp",
+            "--project",
+            "9577195db336e1c9"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-tile388-6ac745e1",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "[omitted]",
+          "resolvedCommand": null,
+          "commandFileSha256": null,
+          "args": [
+            "mcp",
+            "--project",
+            "6ac745e16474e4ae"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-test123-3969da01",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "[omitted]",
+          "resolvedCommand": null,
+          "commandFileSha256": null,
+          "args": [
+            "mcp",
+            "--project",
+            "3969da01208c5831"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-colony-flow-food-hunt-194cec61",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "[omitted]",
+          "resolvedCommand": null,
+          "commandFileSha256": null,
+          "args": [
+            "mcp",
+            "--project",
+            "194cec61f976087e"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-cook-c6c61564",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "[omitted]",
+          "resolvedCommand": null,
+          "commandFileSha256": null,
+          "args": [
+            "mcp",
+            "--project",
+            "c6c615641f6979eb"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-cocos-6f2ef9ab",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "[omitted]",
+          "resolvedCommand": null,
+          "commandFileSha256": null,
+          "args": [
+            "mcp",
+            "--project",
+            "6f2ef9ab7cc3101b"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-cocos-64d6e48e",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "[omitted]",
+          "resolvedCommand": null,
+          "commandFileSha256": null,
+          "args": [
+            "mcp",
+            "--project",
+            "64d6e48e6da0cb06"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-cocos-214a2184",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "resolvedCommand": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "commandFileSha256": "8ba06c7629b666980b9c998baa76223cdc8129b660824f5e007f8cc89aa8a6a9",
+          "args": [
+            "mcp",
+            "--project",
+            "214a2184be887306"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-cook-cdc0709d",
+          "fields": [
+            "args",
+            "command"
+          ],
+          "enabled": true,
+          "command": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "resolvedCommand": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "commandFileSha256": "8ba06c7629b666980b9c998baa76223cdc8129b660824f5e007f8cc89aa8a6a9",
+          "args": [
+            "mcp",
+            "--project",
+            "cdc0709d4eaaa8a2"
+          ],
+          "environmentNames": [],
+          "transport": "stdio",
+          "excludedPaused": false
+        },
+        {
+          "name": "cocos-creator-p1060-c16c7137",
+          "excludedPaused": true
+        }
+      ],
+      "unchangedAfterRead": true
+    }
+  ]
+}

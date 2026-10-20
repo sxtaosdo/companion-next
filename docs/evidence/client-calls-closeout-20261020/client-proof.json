@@ -1,0 +1,164 @@
+{
+  "atUtc": "2026-10-20T03:03:25.773079+00:00",
+  "configWrites": 0,
+  "secretOrCredentialFilesRead": 0,
+  "actualClientConnectionEstablished": false,
+  "workspaceConfigs": [
+    {
+      "projectId": "68a5dccc481a8588",
+      "path": "D:\\code\\shidai3\\P4000\\colony-flow-food-hunt\\.cursor\\mcp.json",
+      "exists": false
+    },
+    {
+      "projectId": "68a5dccc481a8588",
+      "path": "D:\\code\\shidai3\\P4000\\colony-flow-food-hunt\\.codex\\config.toml",
+      "exists": false
+    },
+    {
+      "projectId": "214a2184be887306",
+      "path": "D:\\code\\shidai3\\P3000\\cocos\\.cursor\\mcp.json",
+      "exists": false
+    },
+    {
+      "projectId": "214a2184be887306",
+      "path": "D:\\code\\shidai3\\P3000\\cocos\\.codex\\config.toml",
+      "exists": false
+    },
+    {
+      "projectId": "cdc0709d4eaaa8a2",
+      "path": "D:\\code\\shidai3\\P4000\\cook\\.cursor\\mcp.json",
+      "exists": false
+    },
+    {
+      "projectId": "cdc0709d4eaaa8a2",
+      "path": "D:\\code\\shidai3\\P4000\\cook\\.codex\\config.toml",
+      "exists": false
+    },
+    {
+      "projectId": "04c4cde24ee76d83",
+      "path": "D:\\code\\shidai3\\P4000\\ant-cook\\.cursor\\mcp.json",
+      "exists": false
+    },
+    {
+      "projectId": "04c4cde24ee76d83",
+      "path": "D:\\code\\shidai3\\P4000\\ant-cook\\.codex\\config.toml",
+      "exists": false
+    },
+    {
+      "projectId": "87224a1a9dbb5736",
+      "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-icons-acceptance-20261010\\.cursor\\mcp.json",
+      "exists": false
+    },
+    {
+      "projectId": "87224a1a9dbb5736",
+      "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-icons-acceptance-20261010\\.codex\\config.toml",
+      "exists": false
+    },
+    {
+      "projectId": "a79f4915296f4091",
+      "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\.cursor\\mcp.json",
+      "exists": false
+    },
+    {
+      "projectId": "a79f4915296f4091",
+      "path": "D:\\code\\shidai3\\P8000\\local-tests\\creator-ai-variant-import-acceptance-20261017\\.codex\\config.toml",
+      "exists": false
+    }
+  ],
+  "directConfiguredLaunch": {
+    "created": false,
+    "winerror": 193,
+    "errno": 8,
+    "rawErrorArchived": false,
+    "shell": false,
+    "toolRequests": 0
+  },
+  "cursorLatestDedicatedLogDirectory": "20261019T110512",
+  "cursorDedicatedLogs": [
+    {
+      "filename": "mcp-server-user-cocos-creator-cocos-214a2184.log",
+      "bytes": 1688,
+      "sha256": "80935a5705952fbe41704f4ea7a349de41cba25de7c11f2d8ffabfa7b9c9a7c5",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-cocos-64d6e48e.log",
+      "bytes": 1872,
+      "sha256": "6a0642dfa4dd4c18f1160198d63a8c024ad742dc4586bbfc3bd8deddd66dd2bb",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-cocos-6f2ef9ab.log",
+      "bytes": 1872,
+      "sha256": "60dcaeb8ac39ef26117d8a1a521bab8af8b88ecfce38b4a3d7c55de1f8128d1a",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-colony-flow-food-hunt-194cec61.log",
+      "bytes": 1952,
+      "sha256": "30498658d04da1dd0c44296c68c3bf263d91681c71b50717bc6718ad282e6388",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-cook-c6c61564.log",
+      "bytes": 1867,
+      "sha256": "b0e979223a995e3da6057eaf3e0e47751330897fe71fa3ff2c387e7a19f1e3ab",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-cook-cdc0709d.log",
+      "bytes": 1464,
+      "sha256": "2d5678a993212a92b97a9f9f7a7d1b8f62909456bfa1bf4c4ae78f7d0c5ac300",
+      "failedMarkers": 3,
+      "closedMarkers": 1,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-creator-3-8-8-test-project-e99c4def.log",
+      "bytes": 1977,
+      "sha256": "54b6d277aba547c387d22662f77f15c43484da68790eb4990e14495477f76ad8",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-test123-3969da01.log",
+      "bytes": 1882,
+      "sha256": "dc392416d45f56a99ccb4adaecb567b4ca5200f8cba50487a9fb43a8fcd7d895",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-tile-ylgy-9577195d.log",
+      "bytes": 1892,
+      "sha256": "655ed048cedb45ddb0bc5cec975b1654fc47be5a1af5b98dd01d9ff8a303f5b7",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    },
+    {
+      "filename": "mcp-server-user-cocos-creator-tile388-6ac745e1.log",
+      "bytes": 1882,
+      "sha256": "952f33f40fd3d835fc2f59decdb2456f940f3bf06f934ccd33bd641f28dbcfda",
+      "failedMarkers": 6,
+      "closedMarkers": 2,
+      "successMarkers": 0
+    }
+  ],
+  "configBytesUnchanged": true,
+  "clientProcessCounts": {
+    "Name": "codex.exe",
+    "Count": 2
+  }
+}
