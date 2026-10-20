@@ -1,0 +1,18 @@
+{
+  "codex-actual-issued.json": "66fd3715c58983bbc19c95c89b4ffc8ba604b760820cf50097b39d08ab612511",
+  "codex-actual-result.json": "79f3cca5f58bf4e6c9c831b720426d83ea9d8ad310455b2d64e6a327b2c6bcaf",
+  "codex-actual.py": "86abf5ad4c3436ab0ca8fcc70e48bb412dbc585a8e97135bfb1ec2063acaa926",
+  "final-protection.json": "828b6bc54702195abef7868d998ba7a6aa0289d8c6cf4b9b8a523eb77128fec6",
+  "plan.json": "21252b31809cd48399e1facb7505e337fab149ac0a3c00054fee47d64ae7282a",
+  "repair.py": "b60d8847ee5100949230cb79d8686b47d75608759018c52ca49519a418286c46",
+  "write-issued.json": "fef30a3ce74db3a26e60ab37fbef5a4db994b791d21058b054d585a4ee840337",
+  "write-result.json": "c6d9abba96d9eae8b0eac8a8be6dc2382648a7a7d10883e3774135cf35a6494a",
+  "cursor/launch-issued-first.json": "cf7b4233ca13cc4cea050d17318bfa295bfedaafc052bb532530bb7240b0c0f9",
+  "cursor/launch-issued.json": "8f20916d4beeba8be9847c50c10fe1e481b61ce1a851b3d1acf7a69a33a712d0",
+  "cursor/launch-result-first.json": "aacfa4b982121f83b5a18298f19288957dc27564b36251d50875d123a7096bb8",
+  "cursor/launch-result.json": "a6b2d3c566b100fcf4f8ff6f9fb093f9c4ce9ebc8b9e1fb3ad7c494a3643d998",
+  "cursor/result-first.json": "0dcd7c0f2d9362e3dbfe017ce35615d3012280c864fa43aba209d579d79f5dbc",
+  "cursor/result.json": "4ad08aa8c9349303c7f4db839a4a33e1e1a35df81414f2aa3439741edd558196",
+  "cursor/source-bindings.json": "630ef9e51e8b8bb6ae77f6f70b032056b1ef29a58b1a26cc9b24e2458121a34f",
+  "cursor/tests.cjs": "b96a7f4fc1862abb46a84f73ace07fb2bd07d22dbe83d6f2a0e5e1bd3e17dbd6"
+}

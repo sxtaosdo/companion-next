@@ -1,3 +1,5 @@
+2026-10-20三条配置修复：用户批准的Codex ant-cook及Cursor cocos/cook已备份并修为Node+原JS，其他条目/权限保持。实际codex.exe发现117工具并只读调用PASSED；Cursor隔离实际客户端目标未创建，日常Cursor定向重载/回执仍未验证，不能报全通过。详见[修复与精确剩余](three-client-repair-20261020.md)。
+
 2026-10-20后续只读收尾：Codex/Cursor配置存在但未正确证明接通；3个Windows条目直接启动JS（OS193），Cursor另8条旧Mac路径。独立Node+MCP SDK握手117工具及2次真实只读调用通过；真实limit1游标通过，正式50条第二页/失败详情仍缺自然数据。两文件三条目的具体改法与6项分类见[精确剩余条件](partial-six-remaining-20261020.md)。没有写配置/凭据、刷51次、清空日志或启模型/Creator。
 
 2026-10-20 02:54 UTC：已批准两处窄修完成。完整CLI正常入口exit0/PASSED，耗时11171ms；Companion PID6564/32180/OPEN，WeKnora PID600/8081持续运行。原reader限定KB/文档/分片/2235B原文与关键词检索全200，auth/keyword verified；UNKNOWN2、原权限、共享22修改与9业务表保持。总体仍13通过/6部分/2暂停，不等于全部对齐。详见[本轮实证](startup-reader-fixes-20261020.md)和[当前逐项矩阵](parity-matrix-20261020.md)。

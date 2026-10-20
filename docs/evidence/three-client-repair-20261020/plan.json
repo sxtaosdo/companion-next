@@ -1,0 +1,78 @@
+{
+  "atUtc": "2026-10-20T03:50:39.772748+00:00",
+  "files": [
+    {
+      "path": "C:\\Users\\33272\\.codex\\config.toml",
+      "kind": "toml",
+      "sha256Before": "3dea588400f47609421d4d7ac351dbb38cdcc996b1c633895437473ad77c3a49",
+      "sha256After": "82d8f17513797fe33de35c332cecc797ab13160999d159c22931e2aa7cb79fe2",
+      "unchangedSinceReadOnlyProposal": true,
+      "changes": [
+        {
+          "serverName": "cocos-creator-ant-cook-04c4cde2",
+          "oldCommand": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "oldArgs": [
+            "mcp",
+            "--project",
+            "04c4cde24ee76d83"
+          ],
+          "command": "C:/Program Files/nodejs/node.exe",
+          "args": [
+            "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js",
+            "mcp",
+            "--project",
+            "04c4cde24ee76d83"
+          ]
+        }
+      ],
+      "candidateBytes": 3742,
+      "originalBytes": 3706
+    },
+    {
+      "path": "C:\\Users\\33272\\.cursor\\mcp.json",
+      "kind": "json",
+      "sha256Before": "904a8a96c98e30537baf7a4bf19831fd476a7e3834a2f33008a8c2c3a393babb",
+      "sha256After": "b9ee6000736a75b663c6b70c130aa214c60acc76e2a24af740f90deb33d69434",
+      "unchangedSinceReadOnlyProposal": true,
+      "changes": [
+        {
+          "serverName": "cocos-creator-cocos-214a2184",
+          "oldCommand": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "oldArgs": [
+            "mcp",
+            "--project",
+            "214a2184be887306"
+          ],
+          "command": "C:/Program Files/nodejs/node.exe",
+          "args": [
+            "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js",
+            "mcp",
+            "--project",
+            "214a2184be887306"
+          ]
+        },
+        {
+          "serverName": "cocos-creator-cook-cdc0709d",
+          "oldCommand": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+          "oldArgs": [
+            "mcp",
+            "--project",
+            "cdc0709d4eaaa8a2"
+          ],
+          "command": "C:/Program Files/nodejs/node.exe",
+          "args": [
+            "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js",
+            "mcp",
+            "--project",
+            "cdc0709d4eaaa8a2"
+          ]
+        }
+      ],
+      "candidateBytes": 2559,
+      "originalBytes": 2567
+    }
+  ],
+  "targetEntries": 3,
+  "nonTargetSemanticChanges": 0,
+  "permissionsOrCredentialsChanges": 0
+}

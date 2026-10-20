@@ -1,0 +1,20 @@
+{
+  "atUtc": "2026-10-20T03:57:19.770Z",
+  "actualClient": "Installed Cursor extension host with built-in anysphere.cursor-mcp",
+  "isolatedInstance": true,
+  "dailyUserWindowReloaded": false,
+  "extensionInstalled": false,
+  "modelRequests": 0,
+  "profileConfigWrites": 0,
+  "servers": [],
+  "ok": false,
+  "appName": "Cursor",
+  "appVersion": "1.128.0",
+  "executable": "C:\\Users\\33272\\AppData\\Local\\Programs\\cursor\\Cursor.exe",
+  "homeMatchesIsolated": true,
+  "availableMcpCommands": [
+    "mcp.reloadClient"
+  ],
+  "failureCode": "TARGET_MCP_COMMAND_NOT_EXPOSED",
+  "rawResultArchived": false
+}

@@ -1,0 +1,27 @@
+{
+  "atUtc": "2026-10-20T03:58:45.673Z",
+  "actualClient": "Installed Cursor extension host with built-in anysphere.cursor-mcp",
+  "isolatedInstance": true,
+  "dailyUserWindowReloaded": false,
+  "extensionInstalled": false,
+  "modelRequests": 0,
+  "profileConfigWrites": 0,
+  "servers": [
+    {
+      "name": "cocos-creator-cocos-214a2184",
+      "reloadReturned": false
+    }
+  ],
+  "ok": false,
+  "appName": "Cursor",
+  "appVersion": "1.128.0",
+  "executable": "C:\\Users\\33272\\AppData\\Local\\Programs\\cursor\\Cursor.exe",
+  "homeMatchesIsolated": true,
+  "availableMcpCommands": [
+    "mcp.reloadClient"
+  ],
+  "builtinLeaseUsed": true,
+  "failureCode": "CURSOR_TARGET_CLIENT_UNAVAILABLE",
+  "ownedClientsDisposedByTestInstanceExit": true,
+  "rawResultArchived": false
+}

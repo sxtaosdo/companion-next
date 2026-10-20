@@ -1,0 +1,27 @@
+{
+  "atUtc": "2026-10-20T03:50:52.850587+00:00",
+  "ok": true,
+  "files": [
+    {
+      "path": "C:\\Users\\33272\\.codex\\config.toml",
+      "sha256": "82d8f17513797fe33de35c332cecc797ab13160999d159c22931e2aa7cb79fe2"
+    },
+    {
+      "path": "C:\\Users\\33272\\.cursor\\mcp.json",
+      "sha256": "b9ee6000736a75b663c6b70c130aa214c60acc76e2a24af740f90deb33d69434"
+    }
+  ],
+  "entries": 3,
+  "sameFileHandlesAndPermissionsPreserved": true,
+  "nonTargetSemanticChanges": 0,
+  "backups": [
+    {
+      "path": "C:\\Users\\33272\\.codex\\config.toml.companion-three-20261020-3dea588400f4.bak",
+      "sha256": "3dea588400f47609421d4d7ac351dbb38cdcc996b1c633895437473ad77c3a49"
+    },
+    {
+      "path": "C:\\Users\\33272\\.cursor\\mcp.json.companion-three-20261020-904a8a96c98e.bak",
+      "sha256": "904a8a96c98e30537baf7a4bf19831fd476a7e3834a2f33008a8c2c3a393babb"
+    }
+  ]
+}

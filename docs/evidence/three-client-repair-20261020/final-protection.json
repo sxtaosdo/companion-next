@@ -1,0 +1,40 @@
+{
+  "atUtc": "2026-10-20T04:02:05.550693+00:00",
+  "identity": {
+    "pid": 6564,
+    "startupEpoch": "15e6f683-4962-40de-965d-8984805da96b",
+    "startedAt": "2026-10-20T02:53:04.716Z",
+    "entryPath": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "nodeVersion": "v25.2.1"
+  },
+  "phase": "OPEN",
+  "unknown": 2,
+  "all312RuntimeFilesUnchanged": true,
+  "shared22And21SourcesPreserved": true,
+  "business9TablesUnchanged": true,
+  "knowledgeService": {
+    "path": "D:\\services\\weknora\\normal-reader-recovery-v0.8.2\\weknora.exe",
+    "pid": 600,
+    "created": "2026-10-20T02:03:09.5395770Z"
+  },
+  "onlyApprovedConfigChanges": 3,
+  "files": 2,
+  "backupsVerified": 2,
+  "cursorOther8MacAndP1060EntriesUnchanged": true,
+  "configurationServerSetUnchanged": true,
+  "credentialsOrPermissionsChanged": false,
+  "modelOrCreatorOrP1060ActionsByThisTask": 0,
+  "observedExternalCreatorProcesses": 12,
+  "externalCreatorRootObserved": {
+    "pid": 21060,
+    "parentPid": 14212,
+    "createdAtUtc": "2026-10-20T03:50:06.9234420Z",
+    "taskStartedOrStopped": false
+  },
+  "userApplicationsClosed": false,
+  "ownedCursorTestProcessesRemaining": 0,
+  "actualCodexReadonlyCallPassed": true,
+  "actualCursorConnected": false,
+  "cursorPendingReason": "CURSOR_TARGET_CLIENT_UNAVAILABLE"
+}

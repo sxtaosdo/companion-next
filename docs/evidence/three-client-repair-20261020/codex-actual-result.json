@@ -1,0 +1,41 @@
+{
+  "atUtc": "2026-10-20T03:52:48.268213+00:00",
+  "actualClient": "Installed codex.exe app-server",
+  "target": "cocos-creator-ant-cook-04c4cde2",
+  "modelTurnsRequested": 0,
+  "configurationWrites": 0,
+  "tools": [],
+  "ok": true,
+  "initialized": true,
+  "statusResponseShape": [
+    "data",
+    "nextCursor"
+  ],
+  "targetStatusFields": [
+    "authStatus",
+    "httpOrigin",
+    "name",
+    "pluginId",
+    "resourceTemplates",
+    "resources",
+    "runtimeStatus",
+    "serverCapabilities",
+    "serverInfo",
+    "tools",
+    "toolsError"
+  ],
+  "toolCount": 117,
+  "authStatus": "unsupported",
+  "ephemeralThreadId": "01a15770-befd-7d53-b6ca-15225b88ac0c",
+  "threadTargetToolCount": 117,
+  "toolResponseFields": [
+    "content",
+    "structuredContent"
+  ],
+  "toolStatus": "PASSED",
+  "isError": null,
+  "toolResultSha256": "2ae6198d73aa067c237c8e0c7da4dfe0b4deae7598658264b3cffe14957675ae",
+  "appServerExitCode": 0,
+  "stderrBytes": 348700,
+  "rawOutputArchived": false
+}
