@@ -1,0 +1,110 @@
+import childProcess from "node:child_process";
+import { win32 } from "node:path";
+
+export interface WindowsBootSession {
+  readonly machineId: string;
+  readonly bootId: string;
+  readonly systemProcessCreatedAt: string;
+  readonly lastBootUpTime: string;
+}
+export type BootSessionSampler = () => Promise<WindowsBootSession>;
+
+export class WindowsBootSessionFault extends Error {
+  readonly code = "WINDOWS_BOOT_SESSION_UNVERIFIED";
+  constructor() { super("WINDOWS_BOOT_SESSION_UNVERIFIED"); }
+}
+
+// NtQuerySystemInformation is an internal API: Microsoft explicitly warns that it
+// may change or disappear. Class 90 and this 32-byte layout are not a documented
+// Win32 compatibility guarantee. Reject unsupported ABI/status/metadata; never
+// fall back to wall-clock times as a boot identity.
+// https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntquerysysteminformation
+const SCRIPT = String.raw`$ErrorActionPreference='Stop'
+[Console]::OutputEncoding=New-Object System.Text.UTF8Encoding $false
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class CompanionBootSession {
+  [StructLayout(LayoutKind.Sequential, Pack=8)]
+  private struct BootEnvironment {
+    public Guid BootIdentifier;
+    public UInt32 FirmwareType;
+    public UInt64 BootFlags;
+  }
+  [DllImport("ntdll.dll", ExactSpelling=true)]
+  private static extern Int32 NtQuerySystemInformation(Int32 informationClass,
+    out BootEnvironment information, UInt32 informationLength, out UInt32 returnLength);
+  public static string Read() {
+    UInt32 size=checked((UInt32)Marshal.SizeOf(typeof(BootEnvironment)));
+    if(size != 32) throw new InvalidOperationException("Unsupported boot ABI");
+    BootEnvironment value;
+    UInt32 returned;
+    Int32 status=NtQuerySystemInformation(90, out value, size, out returned);
+    if(status != 0 || returned != size || value.BootIdentifier == Guid.Empty)
+      throw new InvalidOperationException("Unverified boot identity");
+    return value.BootIdentifier.ToString("D");
+  }
+}
+'@
+$first=[CompanionBootSession]::Read()
+$base=$null
+$key=$null
+try {
+  $base=[Microsoft.Win32.RegistryKey]::OpenBaseKey([Microsoft.Win32.RegistryHive]::LocalMachine,[Microsoft.Win32.RegistryView]::Registry64)
+  $key=$base.OpenSubKey('SOFTWARE\Microsoft\Cryptography',$false)
+  if($null -eq $key) {throw 'Machine identity unavailable'}
+  $machine=$key.GetValue('MachineGuid',$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+  if($machine -isnot [string]) {throw 'Machine identity unavailable'}
+} finally {
+  if($null -ne $key) {$key.Dispose()}
+  if($null -ne $base) {$base.Dispose()}
+}
+$os=@(Get-CimInstance Win32_OperatingSystem -Property LastBootUpTime -ErrorAction Stop)
+$system=@(Get-CimInstance Win32_Process -Filter 'ProcessId = 4' -Property ProcessId,Name,CreationDate -ErrorAction Stop)
+if($os.Count -ne 1 -or -not $os[0].LastBootUpTime -or $system.Count -ne 1 -or $system[0].ProcessId -ne 4 -or $system[0].Name -ine 'System' -or -not $system[0].CreationDate) {throw 'Incomplete boot metadata'}
+$last=[CompanionBootSession]::Read()
+if($first -cne $last) {throw 'Boot changed during observation'}
+[pscustomobject]@{machineId=$machine;bootId=$first;finalBootId=$last;systemProcessCreatedAt=$system[0].CreationDate.ToUniversalTime().ToString('o');lastBootUpTime=$os[0].LastBootUpTime.ToUniversalTime().ToString('o');capturedAt=[DateTime]::UtcNow.ToString('o')}|ConvertTo-Json -Compress`;
+
+const UUID = /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i;
+function bootId(value: unknown): string {
+  if (typeof value !== "string" || !UUID.test(value) || /^0{8}-(?:0{4}-){3}0{12}$/.test(value)) throw new WindowsBootSessionFault();
+  return value.toLowerCase();
+}
+function utc(value: unknown): string {
+  const parts = typeof value === "string" && /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.(\d{7})Z$/.exec(value);
+  if (!parts || !Number.isFinite(Date.parse(`${parts[1]}Z`)) || new Date(`${parts[1]}Z`).toISOString().slice(0, 19) !== parts[1]) throw new WindowsBootSessionFault();
+  return value as string;
+}
+function parse(stdout: string): WindowsBootSession {
+  const raw: unknown = JSON.parse(stdout.replace(/^\uFEFF/, ""));
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw)
+    || Object.keys(raw).sort().join("|") !== "bootId|capturedAt|finalBootId|lastBootUpTime|machineId|systemProcessCreatedAt") throw new WindowsBootSessionFault();
+  const value = raw as Record<string, unknown>;
+  const id = bootId(value.bootId), machineId = bootId(value.machineId);
+  if (id !== bootId(value.finalBootId)) throw new WindowsBootSessionFault();
+  const systemProcessCreatedAt = utc(value.systemProcessCreatedAt), lastBootUpTime = utc(value.lastBootUpTime), capturedAt = utc(value.capturedAt);
+  // Consistency only: a clock rollback or unavailable PID 4 metadata must refuse.
+  // There is no unsupported proximity threshold and timestamps alone never prove a reboot.
+  if (lastBootUpTime > systemProcessCreatedAt || systemProcessCreatedAt > capturedAt) throw new WindowsBootSessionFault();
+  return Object.freeze({ machineId, bootId: id, systemProcessCreatedAt, lastBootUpTime });
+}
+
+/** Local read-only OS observation, not quiescence authority or a caller inventory.
+ * MachineGuid helps bind local history; cloned identities/VM rollback are not covered. */
+export async function sampleWindowsBootSession(): Promise<WindowsBootSession> {
+  if (process.platform !== "win32") throw new WindowsBootSessionFault();
+  const systemRoot = process.env.SystemRoot ?? process.env.SYSTEMROOT ?? "C:\\Windows";
+  if (!win32.isAbsolute(systemRoot)) throw new WindowsBootSessionFault();
+  try {
+    const stdout = await new Promise<string>((resolve, reject) => {
+      childProcess.execFile(win32.join(systemRoot, "System32", "WindowsPowerShell", "v1.0", "powershell.exe"),
+        ["-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-Command", SCRIPT],
+        { windowsHide: true, shell: false, timeout: 10_000, maxBuffer: 32_768, encoding: "utf8",
+          env: { SystemRoot: systemRoot, WINDIR: systemRoot } },
+        (error, output) => error ? reject(new WindowsBootSessionFault()) : resolve(output));
+    });
+    return parse(stdout);
+  } catch { throw new WindowsBootSessionFault(); }
+}
+

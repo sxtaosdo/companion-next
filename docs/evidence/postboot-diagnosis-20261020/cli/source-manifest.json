@@ -1,0 +1,104 @@
+{
+  "generatedAtUtc": "2026-10-20T01:48:27.7039328Z",
+  "root": "C:/Users/33272/AppData/Local/Temp/boot-writer-independent-20261020",
+  "installedBindings": [
+    {
+      "Path": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js",
+      "Hash": "BC1E15920A33E388A6D5CDC8347A9BEC93FBE7CC719E7208CC8B112FEEEBCA53"
+    },
+    {
+      "Path": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\creator-ai.js.map",
+      "Hash": "CA9A00E3783398749F4949D3630ADCED8E3D6533E69ABD0DEEB3C2175D4B44F7"
+    },
+    {
+      "Path": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js",
+      "Hash": "70DF42A8F84E6BF9D32C050919FCB91565FF4B53FF9F85A3B1E50664D267CA65"
+    },
+    {
+      "Path": "D:\\code\\shidai3\\P8000\\cocos-mcp\\mcp\\dist\\companion\\companion-daemon.js.map",
+      "Hash": "A37EAB4792D6B9B98365A8B1823513D322701422FF5B860179CC00BA00C1B878"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "CLI-WAIT-INVESTIGATION.md",
+      "bytes": 5912,
+      "sha256": "85c3d5993cf9a9740bd2540165aa06480f095dab61d72f1dd67b17f5f3c31e7f"
+    },
+    {
+      "file": "cli-wait-simulation.mjs",
+      "bytes": 3079,
+      "sha256": "a41aaae800fc6646873a8b8916a554cfaf04d7e18fa561d352c13aa315453c9e"
+    },
+    {
+      "file": "cli-wait-results.json",
+      "bytes": 1799,
+      "sha256": "82eb42026d6b03a198937372522134a9f5a511bf2d949059a497f16d652c5555"
+    },
+    {
+      "file": "open-call-counts.json",
+      "bytes": 151,
+      "sha256": "98512cc01b9c025239e1646f4e97b11002ad82854220779482c4fc6e1ea039b6"
+    },
+    {
+      "file": "open-count-results.json",
+      "bytes": 13883,
+      "sha256": "8f6a7b3e1722c0120a0a62ce744d8b1394c80c3544ae1143e713a366c25711f2"
+    },
+    {
+      "file": "open-installed-source-match.json",
+      "bytes": 403,
+      "sha256": "a6930599e9273c5a18f4f927c653538760c071dc463d39c70a4192dccee6c92f"
+    },
+    {
+      "file": "independent.test.ts",
+      "bytes": 18922,
+      "sha256": "c0d718494abbb74e79c3082e7667c8de05bf8d78e902a1d0040dea71e807c3d7"
+    },
+    {
+      "file": "fixtures.ts",
+      "bytes": 3297,
+      "sha256": "0a310563fe6a51176ca6dfc3368af7b4afe65298a3ec10e9b9890a8a1ebc6efc"
+    },
+    {
+      "file": "vitest.config.mjs",
+      "bytes": 283,
+      "sha256": "62fb645b530a83d699d5aa623d3bc701c5f6d64f838db3116a7231446ef208de"
+    },
+    {
+      "file": "cli-start-source.ts",
+      "bytes": 23026,
+      "sha256": "72380dfb3840163b8b2f813e6b05efaa2653b25a3609f7ed81d0844383df7c70"
+    },
+    {
+      "file": "companion-api-client.ts",
+      "bytes": 11015,
+      "sha256": "312ab5037e505b199e6afef7ed15923d9595d425cb824bbdf79a1689e81421c2"
+    },
+    {
+      "file": "installed-companion-daemon.ts",
+      "bytes": 70160,
+      "sha256": "8e7479b378c97df0b82a3fc5249e5fed6f523ac24d603c5709e2e9c95eb285ca"
+    },
+    {
+      "file": "installed-native-maintenance.ts",
+      "bytes": 7893,
+      "sha256": "99deab26d79f8ece142e64fb095af11f82bee60dfbedea084d232f0978c8a5b9"
+    },
+    {
+      "file": "installed-native-boot-authority.ts",
+      "bytes": 17365,
+      "sha256": "1e7a1670797d882e6e64a86cccb39bf0262ea15a53fecc2011057fbd116c6010"
+    },
+    {
+      "file": "installed-windows-boot-session.ts",
+      "bytes": 6285,
+      "sha256": "329e400500dd4256ad90dcd66db22890f96d70cc3168d015a1938410f381f210"
+    },
+    {
+      "file": "installed-windows-daemon-owner.ts",
+      "bytes": 5202,
+      "sha256": "495373b75bde11f17cdc487546027119d86eb9f9bdc6b434bc15f2219c8492b6"
+    }
+  ]
+}

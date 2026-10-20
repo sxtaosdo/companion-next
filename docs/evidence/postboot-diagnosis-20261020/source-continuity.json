@@ -1,0 +1,47 @@
+{
+  "atUtc": "2026-10-20T01:47:13.796231+00:00",
+  "priorSuccessfulMetadataAtUtc": "2026-10-19T17:31:35.453Z",
+  "priorSuccessfulPid": 3860,
+  "priorMetadataHttp": 200,
+  "currentPid": 7156,
+  "currentMetadataHttp": 403,
+  "currentCode": "AUTH_DENIED",
+  "sameAuthorizedKb": "da1051a5-3fff-4198-ba55-017ea79df9c3",
+  "workerSha256": "07c4861de1716058f79866df3b15e64286b1281da8478e5f8feef192964013d4",
+  "workerUnchangedFromPredeployAndPrecisionFix": true,
+  "modules": [
+    {
+      "path": "src/companion/knowledge-isolation.ts",
+      "beforeSha256": "7de79d71b4b708ee8a63df244660da728abdad07d9d7875c5b9274afb7ccc75f",
+      "currentSha256": "7de79d71b4b708ee8a63df244660da728abdad07d9d7875c5b9274afb7ccc75f",
+      "unchanged": true
+    },
+    {
+      "path": "src/companion/knowledge-adapter.ts",
+      "beforeSha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663",
+      "currentSha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663",
+      "unchanged": true
+    },
+    {
+      "path": "src/companion/knowledge-service-client.ts",
+      "beforeSha256": "991127c8b5e4306f3b148eb799ccc32be8ab8776efc1db3ca04ec6e6eb5727e0",
+      "currentSha256": "991127c8b5e4306f3b148eb799ccc32be8ab8776efc1db3ca04ec6e6eb5727e0",
+      "unchanged": true
+    },
+    {
+      "path": "src/companion/http-server.ts",
+      "beforeSha256": "70e73fe0328d7670291d49cf35087324674584ae8beaf7848fcb518ed6efde32",
+      "currentSha256": "70e73fe0328d7670291d49cf35087324674584ae8beaf7848fcb518ed6efde32",
+      "unchanged": true
+    },
+    {
+      "path": "src/companion-daemon.ts",
+      "beforeSha256": "0cfb7cf74ba4d80d3eb6b1c2d68d2f6b4debb1aff90c57a450696650b08d9664",
+      "currentSha256": "0cfb7cf74ba4d80d3eb6b1c2d68d2f6b4debb1aff90c57a450696650b08d9664",
+      "unchanged": true
+    }
+  ],
+  "knowledgeSourceChangedByBootRepair": false,
+  "credentialBytesRead": false,
+  "authenticationRequested": false
+}

@@ -1,0 +1,65 @@
+{
+  "scope": "reader403 read-only diagnosis; no runtime, credential, permission, or service changes",
+  "upstreamObserved": {
+    "host": "http://127.0.0.1:8081",
+    "healthHttpResponseReceived": false,
+    "healthReasonType": "ConnectionRefusedError",
+    "healthWinerror": 10061,
+    "listen8081Count": 0,
+    "weknoraExeProcessCount": 0,
+    "weknoraNamedWindowsServiceCount": 0,
+    "authenticatedRequests": 0,
+    "responseBodiesRead": false,
+    "whyNotRunning": "unknown; no autostart/crash/stop cause established"
+  },
+  "referenceMetadataOnly": {
+    "userReferencePresent": true,
+    "userReferenceMatchesExistingApprovedPath": true,
+    "regularFile": true,
+    "reparsePoint": false,
+    "bytes": 620,
+    "credentialContentRead": false,
+    "credentialBindingAuthenticatedThisRun": false
+  },
+  "readerPublicMetadata": {
+    "observedAtUtc": "2026-10-20T01:46:20.078248+00:00",
+    "queryOnly": true,
+    "query": "SELECT id,tenant_id,scope_type,full_access,knowledge_base_ids,capabilities,expires_at,revoked_at FROM tenant_api_keys WHERE id=3",
+    "id": 3,
+    "tenant_id": 1,
+    "scope_type": "tenant",
+    "full_access": 0,
+    "knowledge_base_ids": ["da1051a5-3fff-4198-ba55-017ea79df9c3"],
+    "capabilities": ["retrieve"],
+    "expires_at": "2026-11-08T01:25:46.685460+00:00",
+    "revoked_at": null,
+    "matchesYesterdaySafeMetadata": true,
+    "secretOrHashColumnsSelected": false
+  },
+  "sourceEvidence": {
+    "workerSha256": "07c4861de1716058f79866df3b15e64286b1281da8478e5f8feef192964013d4",
+    "workerMapSha256": "8431aff6da611a4d836fa4b34f04e1629e0f1cb00baaa56cdb65e43e84cecb2c",
+    "embeddedCoreSha256": "6de8125b5a45a0fe73767d6fea59589d7402c239d9e76829bf96e7f0d59a698f",
+    "sourceLineConvention": "logical lines after CRCRLF normalization",
+    "verifyReaderFetch": "knowledge-worker-core.ts:16-20, fixed /api/v1/auth/reader-identity endpoint",
+    "httpOrIdentityDenial": "knowledge-worker-core.ts:21,28",
+    "loadBeforeVerify": "knowledge-worker-core.ts:93-94",
+    "genericErrorMisclassification": "knowledge-worker-core.ts:99-100, unknown errors become AUTH_DENIED/403",
+    "parentCache": "knowledge-isolation.ts:75-77, AUTH_DENIED sets readerAuth denied; status merely projects that state",
+    "requestTargetProof": "existing readonly-live.mjs:21 sends {kbId:kb} to /api/knowledge/kb/view"
+  },
+  "isolatedProof": {
+    "file": "mapping-proof.json",
+    "actualMapCoreExecutedWithFakeSeams": true,
+    "actualFsOrNetworkOrProcessOrCredentialUse": false,
+    "cases": ["valid public metadata succeeds", "ECONNREFUSED becomes AUTH_DENIED403 before backend", "HTTP401 also becomes AUTH_DENIED403"]
+  },
+  "conclusion": {
+    "confirmedCurrentAvailabilityBlocker": "WeKnora upstream unavailable: no 8081 listener and public health connection refused",
+    "confirmedClassificationDefect": "old-host reader worker collapses fetch connectivity errors into AUTH_DENIED403",
+    "notProved": ["WeKnora permission rejection", "expired or revoked reader", "why service is not running", "the precise stage of every earlier real403", "current DPAPI-to-key binding without an authenticated request"],
+    "minimalCodeFixOwner": "old host knowledge-worker-core.ts; catch fetch transport/timeout failures distinctly, preserve actual identity/scope rejection checks",
+    "operationalRecoveryBoundary": "existing WeKnora guarded service startup is a separate authorized operation; do not restart Companion, replace keys, extend expiry, or change scope to address this observation",
+    "statusBoundary": "status200/denied is a cached projection, not an independent authenticated health probe"
+  }
+}

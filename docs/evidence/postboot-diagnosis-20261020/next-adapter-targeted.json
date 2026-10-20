@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "numTotalTests": 75,
+  "numPassedTests": 3,
+  "numFailedTests": 0,
+  "numPendingTests": 72,
+  "tests": [
+    {
+      "name": "v148 knowledge-only fixed operation surface is inert until called and uses exactly three GETs and eight logical-read POSTs",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface keeps source registration, retrieval verification and service reachability independent",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation returns static safe HTTP 403 failures without raw diagnostics",
+      "status": "passed"
+    }
+  ]
+}

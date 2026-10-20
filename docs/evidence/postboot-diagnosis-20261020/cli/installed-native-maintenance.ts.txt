@@ -1,0 +1,102 @@
+import { createHash, randomUUID } from "node:crypto";
+import { DaemonDrainError, sameDaemonIdentity, type DaemonIdentity, type DaemonInFlightSnapshot, type NativeQuiescenceReceipt } from "./lifecycle-drain.js";
+import { openNativeEpochJournal, type JournalJson, type NativeEpochHistory, type NativeEpochJournal } from "./native-epoch-journal.js";
+import { NativeBootAuthority } from "./native-boot-authority.js";
+
+export interface NativeMaintenanceOptions { identity: DaemonIdentity; journalPath: string; bootAuthority?: NativeBootAuthority; }
+/** A pending fsync cannot be cancelled: its owner retains the gate until settlement. */
+interface VerificationControl { readonly signal: AbortSignal; readonly deadline: number; }
+function check(control?: VerificationControl): void {
+  if (control && (control.signal.aborted || Date.now() >= control.deadline)) {
+    throw new DaemonDrainError("DAEMON_DRAIN_BLOCKED", "Native verification deadline expired; no quiescence was authorized");
+  }
+}
+
+/** Durable UNKNOWN retention. Only a construction-installed, OS-verified boot boundary
+ * covers precisely anchored prior aggregates; current/same-boot uncertainty stays blocked. */
+export class NativeMaintenance {
+  private constructor(private readonly options: NativeMaintenanceOptions, private readonly journal: NativeEpochJournal,
+    private readonly bootAuthority: NativeBootAuthority | undefined) {}
+  static async open(options: NativeMaintenanceOptions): Promise<NativeMaintenance> {
+    const authority = options.bootAuthority ?? NativeBootAuthority.production(options.journalPath);
+    const writerOwner = authority ? await authority.writerOwnerBinding(options.identity) : undefined;
+    const writerLockPath = authority ? await authority.prepareWriter(options.journalPath, writerOwner) : undefined;
+    const journal = await openNativeEpochJournal({ path: options.journalPath,
+      ...(authority ? { trustedVerifier: authority.verifier } : {}), ...(writerLockPath ? { writerLockPath } : {}), ...(writerOwner ? { writerOwner } : {}) });
+    try {
+      // Recheck the stable bootstrap after obtaining this boot's exclusive writer lock.
+      if (authority && await authority.prepareWriter(options.journalPath, writerOwner) !== writerLockPath) throw new Error("Boot writer identity changed");
+      if (authority) await authority.persistWriterHandoff(options.journalPath, writerOwner);
+      return new NativeMaintenance(options, journal, authority);
+    } catch (error) { await journal.close(); throw error; }
+  }
+  history(): Promise<NativeEpochHistory> { return this.journal.loadHistory(); }
+  async observeHistory(): Promise<{ counts: Record<string, number>; unknown: string[] }> {
+    const h = await this.history();
+    const proved = new Set(h.quiescenceEvidence.map(e => e.binding.aggregateDigest));
+    const count = h.unknownAggregates.filter(r => r.daemonIdentity.startupEpoch !== this.options.identity.startupEpoch && !proved.has(r.aggregateDigest))
+      .reduce((total, r) => total + r.aggregate.count, 0);
+    return { counts: { nativeEpochUnproven: count }, unknown: count ? ["NATIVE_PRIOR_EPOCH_UNVERIFIED"] : [] };
+  }
+  async verifyExit(state: DaemonInFlightSnapshot, nativeObservations?: unknown, control?: VerificationControl): Promise<NativeQuiescenceReceipt> {
+    check(control);
+    if (!sameDaemonIdentity(state.identity, this.options.identity) || state.phase !== "DRAINING") {
+      throw new DaemonDrainError("NATIVE_EXIT_UNVERIFIED", "Native maintenance requires this instance's closed admission gate");
+    }
+    if (!state.unknown.every(r => r === "NATIVE_OUTCOME_UNCONFIRMED" || r === "NATIVE_PRIOR_EPOCH_UNVERIFIED")
+      || !Object.entries(state.counts).every(([k, v]) => k === "nativeUncertain" || k === "nativeEpochUnproven" || v === 0)) {
+      throw new DaemonDrainError("NATIVE_EXIT_UNVERIFIED", "Other work or unknown background activity remains");
+    }
+    const history = await this.history(); check(control);
+    const proved = new Set(history.quiescenceEvidence.map(e => e.binding.aggregateDigest));
+    const priorCount = history.unknownAggregates.filter(r => r.daemonIdentity.startupEpoch !== state.identity.startupEpoch && !proved.has(r.aggregateDigest))
+      .reduce((sum, r) => sum + r.aggregate.count, 0);
+    if (priorCount !== (state.counts.nativeEpochUnproven ?? 0)) throw new DaemonDrainError("NATIVE_EXIT_UNVERIFIED", "Prior epoch history changed");
+    if (state.counts.nativeUncertain > 0) {
+      const existing = history.unknownAggregates.find(r => r.daemonIdentity.startupEpoch === state.identity.startupEpoch);
+      if (existing && (!sameDaemonIdentity(existing.daemonIdentity, state.identity) || existing.aggregate.count !== state.counts.nativeUncertain)) {
+        throw new DaemonDrainError("NATIVE_EXIT_UNVERIFIED", "Persisted current-epoch aggregate conflicts with live uncertainty");
+      }
+      if (!existing) {
+        check(control);
+        // OS proof failure cannot erase the already observed business UNKNOWN.
+        // Retain an unbound aggregate, which future recovery must keep refusing.
+        let bootSession: Awaited<ReturnType<NativeBootAuthority["captureAggregateBoot"]>> | undefined;
+        try { bootSession = this.bootAuthority ? await this.bootAuthority.captureAggregateBoot() : undefined; }
+        catch { check(control); }
+        check(control);
+        await this.journal.recordUnknownAggregate({ daemonIdentity: state.identity, aggregate: {
+          count: state.counts.nativeUncertain, source: "authenticated-daemon-native-observation", observedAt: state.observedAt,
+          // Request identity does not prove worker lifetime coverage.
+          contextCoverage: "UNVERIFIED", identityCoverage: nativeObservations === undefined ? "anonymous-legacy" : "request-identities-only",
+          ...(nativeObservations === undefined ? {} : { observations: JSON.parse(JSON.stringify(nativeObservations)) as JournalJson }),
+          ...(bootSession ? { bootSession } : {}),
+        } });
+        check(control);
+      }
+    }
+    if (state.counts.nativeUncertain > 0 || !this.bootAuthority) {
+      throw new DaemonDrainError("UNKNOWN_CONTEXT_COVERAGE", "Current/same-boot Native workers lack lifetime evidence; UNKNOWN retained and stop refused");
+    }
+    const targets = history.unknownAggregates.filter(r => r.daemonIdentity.startupEpoch !== state.identity.startupEpoch && !proved.has(r.aggregateDigest));
+    const authority = this.bootAuthority;
+    return authority.guarded(() => check(control), async () => {
+    // Collect all coverage before writing any authority; unrelated/unbound epochs refuse.
+    const proofs = [];
+    for (const target of targets) { check(control); proofs.push({ target, proof: await authority.proof(target) }); check(control); }
+    for (const { target, proof } of proofs) {
+      check(control);
+      await this.journal.recordQuiescenceEvidence({ daemonIdentity: target.daemonIdentity, aggregateDigest: target.aggregateDigest, proof, beforeCommit: () => check(control) });
+      check(control);
+    }
+    const after = await this.history(); check(control);
+    const sha = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+    if (after.unprovenInFlightCount !== 0 || priorCount <= 0) throw new DaemonDrainError("NATIVE_EXIT_UNVERIFIED", "Uncovered epoch remains after proof persistence");
+    return { schemaVersion: "native-quiescence-receipt-v1", daemonIdentity: state.identity, receiptId: randomUUID(),
+      observedAt: new Date().toISOString(), coveredNativeUncertain: 0, coveredPriorEpochUnknown: priorCount,
+      retainedUnknownCount: after.historicalUnknownCount, proofHash: sha(proofs.map(row => row.proof)), journalHash: sha(after) };
+    });
+  }
+  close(): Promise<void> { return this.journal.close(); }
+}
+

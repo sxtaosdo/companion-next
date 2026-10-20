@@ -1,3 +1,5 @@
+后续证据校正：13.769405ms为进程创建→locator对象createdAt，非精确首次就绪时长。KB403现确认存在8081不可达和旧worker错误归类，生产首次错误分支未观测；不得直接视为权限拒绝。见[完整只读调查](postboot-two-blockers-diagnosis-20261020.md)。
+
 # 2026-10-20 writer-only 启动修复及真实结果
 
 用户明确批准原 common-host 启动身份/可靠性窄修。隔离代码检查点 `7965c4b`，基线 `5b39b55` 来自原安装 daemon71cb 的82项自有源码；没有在共享 cocos-mcp 源树写入或构建。候选精确覆盖6文件，未改原 quiescence anchor、Windows采样、CLI、旧UI、Next页面、Creator算法或权限。

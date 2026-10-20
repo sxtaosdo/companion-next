@@ -1,3 +1,5 @@
+2026-10-20 01:52 UTC后续只读结论：CLI固定8秒及无probe截止属于旧宿主；13.769405ms只代表OS创建→locator对象时间。当前8081无监听/健康连接拒绝，旧worker会误归AUTH_DENIED403；真实403首分支和DPAPI加载仍未验证，不代表原权限已被拒。PID7156仍OPEN，未部署/重启/改权限。见[两问题确证、隔离与最小方案](postboot-two-blockers-diagnosis-20261020.md)。
+
 2026-10-20 01:38 UTC：已批准writer-only修复7965c4b精确部署，PID7156/32180/OPEN，Next原静态200且hash不变，UNKNOWN2/共享22修改/9业务表保持；但原入口首次8秒超时（实际13.769秒就绪），原reader授权KB元数据403/AUTH_DENIED。历史13/6/2不代表当前可用，#19当前鉴权阻塞；调用新session空，真实分页/失败详情未验。见[修复与真实剩余](boot-writer-recovery-closeout-20261020.md)。
 
 2026-10-19 03:45 UTC: Reader403根因为本机到期常量丢失小数秒，仅修worker复用原配置、无重启；授权KB及3项文档元数据200、auth=verified，keyword仍unverified。Codex此前误读placeholder；真实Next标记完整接收并精确清理，无发送。见[原因与证据](reader-precision-codex-receipt-20261019.md)。

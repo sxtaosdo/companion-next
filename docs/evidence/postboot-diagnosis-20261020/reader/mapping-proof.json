@@ -1,0 +1,63 @@
+{
+  "workerSha256": "07c4861de1716058f79866df3b15e64286b1281da8478e5f8feef192964013d4",
+  "mapSha256": "8431aff6da611a4d836fa4b34f04e1629e0f1cb00baaa56cdb65e43e84cecb2c",
+  "embeddedCoreSource": "../verified-source/mcp/src/companion/knowledge-worker-core.ts",
+  "embeddedCoreSha256": "6de8125b5a45a0fe73767d6fea59589d7402c239d9e76829bf96e7f0d59a698f",
+  "actualCoreExecuted": true,
+  "actualProcess": false,
+  "actualFs": false,
+  "actualHttp": false,
+  "actualCredentialRead": false,
+  "KnowledgeFaultShapeStub": true,
+  "results": [
+    {
+      "scenario": "valid-public-metadata",
+      "reply": {
+        "settled": true,
+        "ok": true,
+        "value": {
+          "id": "da1051a5-3fff-4198-ba55-017ea79df9c3"
+        }
+      },
+      "counts": {
+        "fakeLoad": 1,
+        "backend": 1,
+        "forbiddenFs": 0,
+        "forbiddenProcess": 0,
+        "fakeFetch": 1
+      }
+    },
+    {
+      "scenario": "connection-refused",
+      "reply": {
+        "settled": true,
+        "ok": false,
+        "code": "AUTH_DENIED",
+        "status": 403
+      },
+      "counts": {
+        "fakeLoad": 1,
+        "backend": 0,
+        "forbiddenFs": 0,
+        "forbiddenProcess": 0,
+        "fakeFetch": 1
+      }
+    },
+    {
+      "scenario": "http-401",
+      "reply": {
+        "settled": true,
+        "ok": false,
+        "code": "AUTH_DENIED",
+        "status": 403
+      },
+      "counts": {
+        "fakeLoad": 1,
+        "backend": 0,
+        "forbiddenFs": 0,
+        "forbiddenProcess": 0,
+        "fakeFetch": 1
+      }
+    }
+  ]
+}

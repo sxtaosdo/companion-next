@@ -1,0 +1,217 @@
+import { createHash } from "node:crypto";
+import { lstat, readFile, open } from "node:fs/promises";
+import { resolve } from "node:path";
+import { z } from "zod";
+import { DaemonDrainError, daemonIdentitySchema, type DaemonIdentity } from "./lifecycle-drain.js";
+import type { JournalJson, NativeUnknownRecord, TrustedQuiescenceVerifier } from "./native-epoch-journal.js";
+import { sampleWindowsBootSession, type BootSessionSampler } from "./windows-boot-session.js";
+import compiledAnchor from "./native-boot-anchor.json" with { type: "json" };
+import { sampleWindowsDaemonOwner, type WindowsDaemonOwner } from "./windows-daemon-owner.js";
+import { writerOwnerSchema, legacyWriterRecoverySchema, recoverWriterLock, sameWriterSession, type WriterOwner, type LegacyWriterRecovery } from "./native-writer-recovery.js";
+import compiledWriterRecovery from "./legacy-writer-recovery.json" with { type: "json" };
+
+const hash = z.string().regex(/^[a-f0-9]{64}$/);
+const utc = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{7}Z$/);
+const fileBinding = z.object({ bytes: z.number().int().nonnegative(), sha256: hash }).strict();
+export const bootAnchorSchema = z.object({
+  schemaVersion: z.literal("native-preboot-anchor-v1"), journalPath: z.string(),
+  bootId: z.string().uuid(), machineId: z.string().uuid(), systemProcessCreatedAt: utc,
+  journal: fileBinding, head: fileBinding, legacyLock: fileBinding,
+  aggregateDigests: z.array(hash).min(1),
+  previousOwner: z.object({ daemonIdentity: daemonIdentitySchema,
+    os: z.object({ pid: z.number().int().positive(), creationTime: utc, executablePath: z.string().min(1), commandLineSha256: hash }).strict(),
+    drainGeneration: z.number().int().positive(), drainObservedAt: z.string().datetime(),
+  }).strict().optional(),
+}).strict();
+export type NativeBootAnchor = z.infer<typeof bootAnchorSchema>;
+const persistedProofSchema = z.object({ kind: z.literal("windows-boot-boundary-v1"), anchorDigest: hash,
+  priorBootId: z.string().uuid(), machineId: z.string().uuid(), aggregateBootId: z.string().uuid(),
+  aggregateSystemProcessCreatedAt: utc, currentBootId: z.string().uuid(), currentSystemProcessCreatedAt: utc,
+  aggregateDigest: hash, historicalOutcome: z.literal("UNKNOWN"), nativeCancellationConfirmed: z.literal(false) }).strict();
+const handoffBodySchema = z.object({ kind: z.literal("native-writer-handoff-v1"), anchorDigest: hash, previousOwnerDigest: hash,
+  machineId: z.string().uuid(), bootId: z.string().uuid(), systemProcessCreatedAt: utc,
+  scope: z.literal("WRITER_ONLY"), nativeQuiescenceVerified: z.literal(false), historicalOutcome: z.literal("UNKNOWN") }).strict();
+const handoffReceiptSchema = z.object({ body: handoffBodySchema, sha256: hash }).strict();
+const digest = (value: string | Buffer) => createHash("sha256").update(value).digest("hex");
+const refuse = (reason: string): never => { throw new DaemonDrainError("UNKNOWN_CONTEXT_COVERAGE", reason); };
+async function regularBytes(path: string): Promise<Buffer> {
+  const info = await lstat(path);
+  if (!info.isFile() || info.isSymbolicLink() || info.nlink !== 1 || info.size > 64 * 1024 * 1024) return refuse("Boot anchor requires a regular single-link bounded file");
+  return readFile(path);
+}
+function matches(bytes: Buffer, binding: z.infer<typeof fileBinding>): boolean {
+  return bytes.length === binding.bytes && digest(bytes) === binding.sha256;
+}
+function prefixMatches(bytes: Buffer, binding: z.infer<typeof fileBinding>): boolean {
+  return bytes.length >= binding.bytes && digest(bytes.subarray(0, binding.bytes)) === binding.sha256;
+}
+
+/** Trusted construction only: no HTTP input, env path or caller's boolean selects an anchor.
+ * Host-specific bootstrap authority is frozen into the reviewed daemon build, before restart.
+ * Windows is trusted; malicious administrators/VM rollback are outside this journal's threat model. */
+export class NativeBootAuthority {
+  private verificationCheck: (() => void) | undefined;
+  private readonly issuedTargets = new Map<string, { bootId: string; systemProcessCreatedAt: string; machineId: string }>();
+  private constructor(private readonly anchor: NativeBootAnchor, private readonly sample: BootSessionSampler,
+    private readonly inspectOwner: (pid: number) => Promise<WindowsDaemonOwner | null>, private readonly writerRecovery?: LegacyWriterRecovery) {}
+  static production(journalPath: string): NativeBootAuthority | undefined {
+    const anchor = bootAnchorSchema.parse(compiledAnchor);
+    return resolve(journalPath) === resolve(anchor.journalPath) ? new NativeBootAuthority(anchor, sampleWindowsBootSession, sampleWindowsDaemonOwner, legacyWriterRecoverySchema.parse(compiledWriterRecovery)) : undefined;
+  }
+  /** Service-construction seam for isolated OS/fixture tests; never a request argument. */
+  static forService(anchor: NativeBootAnchor, sample: BootSessionSampler = sampleWindowsBootSession,
+    inspectOwner: (pid: number) => Promise<WindowsDaemonOwner | null> = sampleWindowsDaemonOwner, writerRecovery?: LegacyWriterRecovery): NativeBootAuthority {
+    return new NativeBootAuthority(bootAnchorSchema.parse(anchor), sample, inspectOwner, writerRecovery && legacyWriterRecoverySchema.parse(writerRecovery));
+  }
+  private anchorDigest(): string { return digest(JSON.stringify(this.anchor)); }
+  private handoffPath(path: string): string { return `${path}.handoff-${this.anchorDigest()}.json`; }
+  private handoffBody() {
+    return handoffBodySchema.parse({ kind: "native-writer-handoff-v1", anchorDigest: this.anchorDigest(),
+      previousOwnerDigest: digest(JSON.stringify(this.anchor.previousOwner)), machineId: this.anchor.machineId,
+      bootId: this.anchor.bootId, systemProcessCreatedAt: this.anchor.systemProcessCreatedAt,
+      scope: "WRITER_ONLY", nativeQuiescenceVerified: false, historicalOutcome: "UNKNOWN" });
+  }
+  private async validHandoff(path: string): Promise<boolean> {
+    if (!this.anchor.previousOwner) return false;
+    let bytes: Buffer;
+    try { bytes = await regularBytes(this.handoffPath(path)); }
+    catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return false; throw error; }
+    const receipt = handoffReceiptSchema.parse(JSON.parse(bytes.toString("utf8")));
+    return JSON.stringify(receipt.body) === JSON.stringify(this.handoffBody()) && receipt.sha256 === digest(JSON.stringify(receipt.body));
+  }
+  /** Called only after journal-chain validation and acquiring this boot's unique writer
+   * lock. Durable ownership metadata is distinct from Native quiescence evidence. */
+  async persistWriterHandoff(path: string, writerOwner?: WriterOwner): Promise<void> {
+    const current = await this.currentSession();
+    if (current.bootId !== this.anchor.bootId) return;
+    if (current.systemProcessCreatedAt !== this.anchor.systemProcessCreatedAt) {
+      if (!writerOwner || !sameWriterSession(writerOwner.bootSession, current)) return refuse("Writer-only handoff lacks current OS binding");
+      // The journal holds this exact v2 writer. Do not rewrite the old same-boot
+      // handoff or issue any native quiescence evidence for this ambiguous tuple.
+      return;
+    }
+    await this.verifyPreviousWriterGone();
+    if (await this.validHandoff(path)) return;
+    const body = this.handoffBody(), receipt = { body, sha256: digest(JSON.stringify(body)) };
+    const file = await open(this.handoffPath(path), "wx", 0o600);
+    try { await file.writeFile(`${JSON.stringify(receipt)}\n`); await file.sync(); } finally { await file.close(); }
+    // A failed/partial sidecar is retained and makes later startup fail closed.
+    if (!await this.validHandoff(path)) return refuse("Writer handoff receipt did not persist exactly");
+  }
+  private async currentSession() {
+    const current = await this.sample();
+    if (current.machineId !== this.anchor.machineId) return refuse("Preboot anchor belongs to another Windows installation");
+    return current;
+  }
+  private async newBoot() {
+    const current = await this.currentSession();
+    if (current.bootId === this.anchor.bootId || current.systemProcessCreatedAt === this.anchor.systemProcessCreatedAt) {
+      return refuse("A different kernel boot AND System process lifetime are required; sleep/resume and timestamps alone are insufficient");
+    }
+    return current;
+  }
+  async guarded<T>(check: () => void, operation: () => Promise<T>): Promise<T> {
+    if (this.verificationCheck) return refuse("Boot verification already pending");
+    this.verificationCheck = check;
+    try { check(); return await operation(); } finally { this.verificationCheck = undefined; this.issuedTargets.clear(); }
+  }
+  /** Captured by the server when it freezes a current aggregate; never read from observations. */
+  async captureAggregateBoot(): Promise<{ machineId: string; bootId: string; systemProcessCreatedAt: string }> {
+    const current = await this.currentSession();
+    return { machineId: current.machineId, bootId: current.bootId, systemProcessCreatedAt: current.systemProcessCreatedAt };
+  }
+  /** Preserve legacy .lock bytes forever. Each kernel boot has a distinct wx writer lock;
+   * all instances of this protocol contend on the same boot key. No stale-lock deletion. */
+  async writerOwnerBinding(identity: DaemonIdentity): Promise<WriterOwner | undefined> {
+    const current = await this.currentSession();
+    if (current.bootId !== this.anchor.bootId || current.systemProcessCreatedAt === this.anchor.systemProcessCreatedAt) return undefined;
+    const os = await this.inspectOwner(identity.pid);
+    if (!os || os.pid !== identity.pid) return refuse("Current writer OS identity unavailable");
+    const again = await this.currentSession();
+    if (!sameWriterSession(current, again)) return refuse("Writer session changed during binding");
+    return writerOwnerSchema.parse({ kind: "native-writer-owner-v2", daemonIdentity: identity, os,
+      bootSession: { machineId: current.machineId, bootId: current.bootId, systemProcessCreatedAt: current.systemProcessCreatedAt } });
+  }
+  async prepareWriter(journalPath: string, writerOwner?: WriterOwner): Promise<string> {
+    if (resolve(journalPath) !== resolve(this.anchor.journalPath)) return refuse("Anchor journal path mismatch");
+    const current = await this.currentSession();
+    const sameBoot = current.bootId === this.anchor.bootId;
+    const writerOnly = sameBoot && current.systemProcessCreatedAt !== this.anchor.systemProcessCreatedAt;
+    if (!sameBoot && current.systemProcessCreatedAt === this.anchor.systemProcessCreatedAt) return refuse("Kernel identity is inconsistent with the anchor");
+    if (writerOnly && (!writerOwner || !sameWriterSession(writerOwner.bootSession, current))) return refuse("Inconsistent kernel identity requires a verified writer-only binding");
+    if (sameBoot) await this.verifyPreviousWriterGone();
+    const [data, head, lock] = await Promise.all([regularBytes(journalPath), regularBytes(`${journalPath}.head`), regularBytes(`${journalPath}.lock`)]);
+    if (!matches(lock, this.anchor.legacyLock) || !prefixMatches(data, this.anchor.journal) || !prefixMatches(head, this.anchor.head)) return refuse("Preboot journal/head/legacy lock binding changed");
+    if (sameBoot && this.anchor.previousOwner) {
+      const held = JSON.parse(lock.toString("utf8")) as { pid?: unknown };
+      if (held.pid !== this.anchor.previousOwner.daemonIdentity.pid || held.pid !== this.anchor.previousOwner.os.pid) return refuse("Legacy lock does not bind the captured daemon writer");
+    }
+    // A first migration must match the entire stable snapshot. Once this verifier has
+    // durably archived every anchored aggregate, the journal validates its chain on open.
+    if (!matches(data, this.anchor.journal) || !matches(head, this.anchor.head)) {
+      const rows = data.toString("utf8").trim().split("\n").map(line => JSON.parse(line) as { payload?: { kind?: string; binding?: { aggregateDigest?: string }; proof?: Record<string, unknown> } });
+      const proved = new Set(rows.filter(row => {
+        if (row.payload?.kind !== "quiescence-evidence") return false;
+        const parsed = persistedProofSchema.safeParse(row.payload.proof);
+        if (!parsed.success) return false;
+        const p = parsed.data;
+        return p.anchorDigest === this.anchorDigest() && p.priorBootId === this.anchor.bootId && p.machineId === this.anchor.machineId
+          && p.aggregateBootId === this.anchor.bootId && p.aggregateSystemProcessCreatedAt === this.anchor.systemProcessCreatedAt
+          && p.currentBootId !== p.aggregateBootId && p.currentSystemProcessCreatedAt !== p.aggregateSystemProcessCreatedAt
+          && p.aggregateDigest === row.payload.binding?.aggregateDigest;
+      })
+        .map(row => row.payload?.binding?.aggregateDigest));
+      if (!this.anchor.aggregateDigests.every(target => proved.has(target)) && !await this.validHandoff(journalPath)) return refuse("Initial migration snapshot changed before trusted archival or writer handoff");
+    }
+    const again = await this.currentSession();
+    if (again.bootId !== current.bootId || again.systemProcessCreatedAt !== current.systemProcessCreatedAt) return refuse("Kernel boot changed during writer admission");
+    if (sameBoot) await this.verifyPreviousWriterGone();
+    if (writerOnly) return recoverWriterLock({ journalPath, session: current, owner: writerOwner!, anchorDigest: this.anchorDigest(),
+      legacy: this.writerRecovery, inspectOwner: this.inspectOwner,
+      recheck: async () => { if (!sameWriterSession(current, await this.currentSession())) return refuse("Writer session changed during admission"); } });
+    return `${journalPath}.boot-${current.bootId}.lock`;
+  }
+  /** Writer ownership only. This neither covers Native workers nor archives UNKNOWN.
+   * Old legacy lock remains byte-identical and blocks old binaries. Same-boot crash
+   * locks of new binaries are still refused; this is a single legacy handoff. */
+  private async verifyPreviousWriterGone(): Promise<void> {
+    const previous = this.anchor.previousOwner;
+    if (!previous || previous.os.pid !== previous.daemonIdentity.pid) return refuse("Same-boot startup lacks a captured drained daemon owner");
+    const current = await this.inspectOwner(previous.os.pid);
+    if (current && (current.pid !== previous.os.pid || current.creationTime === previous.os.creationTime)) return refuse("The exact previous journal owner is still running or unverified");
+    // A different creation identity for the same PID is a reused PID, never a reason
+    // to terminate that unrelated process. Sampling errors throw and remain UNKNOWN.
+  }
+  async proof(target: NativeUnknownRecord): Promise<Record<string, JournalJson>> {
+    // Legacy records require the frozen build anchor. New records have a server-owned
+    // boot binding in the immutable aggregate, protected by the verified journal chain.
+    const recorded = z.object({ machineId: z.string().uuid(), bootId: z.string().uuid(), systemProcessCreatedAt: utc }).strict().safeParse(target.aggregate.bootSession);
+    const prior = this.anchor.aggregateDigests.includes(target.aggregateDigest) ? this.anchor
+      : recorded.success ? recorded.data : refuse("Aggregate lacks a trusted boot binding");
+    const current = await this.newBoot();
+    if (prior.machineId !== current.machineId || prior.bootId === current.bootId || prior.systemProcessCreatedAt === current.systemProcessCreatedAt) return refuse("Aggregate's kernel lifetime is not proven ended");
+    this.issuedTargets.set(target.aggregateDigest, prior);
+    return { kind: "windows-boot-boundary-v1", anchorDigest: this.anchorDigest(), priorBootId: this.anchor.bootId,
+      machineId: current.machineId,
+      aggregateBootId: prior.bootId, aggregateSystemProcessCreatedAt: prior.systemProcessCreatedAt,
+      currentBootId: current.bootId, currentSystemProcessCreatedAt: current.systemProcessCreatedAt,
+      aggregateDigest: target.aggregateDigest, historicalOutcome: "UNKNOWN", nativeCancellationConfirmed: false };
+  }
+  readonly verifier: TrustedQuiescenceVerifier = async (binding, proof) => {
+    if (!this.verificationCheck) return refuse("Verification requires an active maintenance deadline");
+    this.verificationCheck();
+    // Independently resample OS identity. Echoing a supplied proof never authorizes a write.
+    const current = await this.newBoot();
+    this.verificationCheck();
+    const prior = this.issuedTargets.get(binding.aggregateDigest);
+    if (!prior || prior.machineId !== current.machineId || prior.bootId === current.bootId || prior.systemProcessCreatedAt === current.systemProcessCreatedAt
+      || proof.aggregateBootId !== prior.bootId || proof.aggregateSystemProcessCreatedAt !== prior.systemProcessCreatedAt || proof.kind !== "windows-boot-boundary-v1"
+      || proof.anchorDigest !== this.anchorDigest() || proof.priorBootId !== this.anchor.bootId || proof.machineId !== current.machineId
+      || proof.currentBootId !== current.bootId || proof.currentSystemProcessCreatedAt !== current.systemProcessCreatedAt
+      || proof.aggregateDigest !== binding.aggregateDigest || proof.historicalOutcome !== "UNKNOWN" || proof.nativeCancellationConfirmed !== false) {
+      return refuse("Independent kernel boot verification rejected the proof binding");
+    }
+    return { kind: "native-quiescence-observed-v1", ...binding };
+  };
+}
+

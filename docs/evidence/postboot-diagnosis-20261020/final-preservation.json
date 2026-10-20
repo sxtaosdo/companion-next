@@ -1,0 +1,24 @@
+{
+  "atUtc": "2026-10-20T01:52:08.986063+00:00",
+  "process": {
+    "creatorProcesses": 0,
+    "pid": 7156,
+    "listen32180OwnerMatches": true,
+    "creationTime": "2026-10-20T01:33:36.2865950Z"
+  },
+  "phase": "OPEN",
+  "identityUnchanged": true,
+  "daemonAndMapUnchanged": true,
+  "otherRuntime310Unchanged": true,
+  "shared22And21ProtectedSourcesUnchanged": true,
+  "business9TablesUnchanged": true,
+  "nativeHistoryAndLegacyLocksUnchanged": true,
+  "priorWriterRetainedBytesAndInodeUnchanged": true,
+  "nativeEpochUnproven": 2,
+  "productionDeployments": 0,
+  "daemonStartsOrRestarts": 0,
+  "creatorOrModelStarts": 0,
+  "readerCredentialBytesRead": false,
+  "readerAuthenticatedRequests": 0,
+  "permissionsOrCredentialsChanged": false
+}

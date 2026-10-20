@@ -1,0 +1,1310 @@
+import { assertNoSharedKnowledgeCredentials, IsolatedKnowledgeAdapter, knowledgeWorkerInFlightCount, knowledgeWorkerUnknownCount } from "./companion/knowledge-isolation.js";
+import { OwnerReviewHost, ownerReviewConfigFromEnv } from "./companion/owner-review-host.js";
+import { randomBytes } from "node:crypto";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { basename, dirname, join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { BridgeClient } from "./bridge-client.js";
+import { NativeMaintenance } from "./companion/native-maintenance.js";
+import { noteBridgeError, noteBridgeSuccess, noteStatusError } from "./companion/bridge-error-log.js";
+import { BridgeFault, RemoteBridgeFault } from "./errors.js";
+import { CoordinationError, digestOperationInput, type DispatchTicket } from "./companion/coordination-store.js";
+import {
+  assertPlaytestSucceeded,
+  AcceptanceFault,
+  AcceptanceStore,
+  acceptanceFault,
+  acceptanceObservation,
+  readAcceptanceParams,
+  stripAcceptanceFields,
+} from "./companion/acceptance-store.js";
+import { PreviewOriginConflict, previewOriginOwner } from "./companion/edge-session.js";
+import {
+  BridgeRouter,
+  BridgeInstaller,
+  CompanionHttpServer,
+  CreatorLifecycle,
+  CoordinationStore,
+  DebugLogStore,
+  DashboardFault,
+  DashboardLauncher,
+  ProjectRegistry,
+  ProjectScaffoldService,
+  SetupService,
+  ToolPresetRepository,
+  assertCocosProject,
+  bridgeInstallRegistryPath,
+  createDefaultCreatorLifecycleAdapter,
+  daemonLocatorPath,
+  companionLogDirectory,
+  coordinationStorePath,
+  detectRequiredCreatorVersion,
+  discoverCreatorInstallations,
+  focusPidBestEffort,
+  isPidAlive,
+  listDashboardProjects,
+  pickDirectory,
+  openPathInFileManager,
+  projectRegistryPath,
+  toolPresetStorePath,
+  DEFAULT_COMPANION_DAEMON_PORT,
+  type CompanionHttpActions,
+  type CreatorLifecycleAdapter,
+  type DebugEvent,
+  type LeaseIdentity,
+  type ProjectRecord,
+  type ProjectRuntimeStatus,
+} from "./companion/index.js";
+import { COMPANION_TOOL_SPECS } from "./companion-mcp.js";
+import { configureCodexMcp, findCodexCli } from "./companion/codex-configurator.js";
+import { configureCursorMcp } from "./companion/cursor-configurator.js";
+import { getTypeScriptLspService } from "./companion/lsp-service.js";
+import { PROTOCOL_VERSION, type BridgeMethod, type JsonValue, type ProjectInfo } from "./protocol.js";
+import { legacyAbandonInput, legacyAbandonSchema, observeCurrentAdoption } from "./companion/legacy-recovery.js";
+import { authorizedDispatchAdoptionInput, authorizedDispatchAdoptionSchema } from "./companion/authorized-dispatch-adoption.js";
+import { AUTHORIZED_4060_ABANDONMENT, authorizedDispatchAbandonmentInput, authorizedDispatchAbandonmentSchema } from "./companion/authorized-dispatch-abandonment.js";
+import { observeTerminatedSession } from "./companion/terminated-session-observation.js";
+import { observeBootTerminatedSession } from "./companion/boot-session-observation.js";
+import { jsonProcessInFlightCount, type KnowledgeBackend } from "./companion/knowledge-adapter.js";
+import { IconAdapter, iconConfigFromEnv, type IconBackend } from "./companion/icon-adapter.js";
+import { createDaemonIdentity, installGuardedShutdownSignals, type DaemonIdentity, type DaemonStopReceipt, type DrainObservation } from "./companion/lifecycle-drain.js";
+
+/** 写入本地的守护进程定位信息，供 CLI/API 客户端发现。 */
+export interface DaemonLocator {
+  baseUrl: string;
+  apiToken: string;
+  pid: number;
+  createdAt: string;
+  identity?: DaemonIdentity;
+}
+
+/** 启动 Companion 守护进程的可选配置。 */
+export interface CompanionDaemonOptions {
+  port?: number;
+  registryPath?: string;
+  toolPresetPath?: string;
+  locatorPath?: string;
+  apiToken?: string;
+  lifecycleAdapter?: CreatorLifecycleAdapter;
+  creatorRoot?: string;
+  bridgeBundlePath?: string;
+  creatorAiPath?: string;
+  coordinationPath?: string;
+  knowledge?: KnowledgeBackend;
+  icons?: IconBackend;
+}
+
+/** 已运行守护进程的句柄与核心子系统引用。 */
+export interface RunningCompanionDaemon {
+  locator: DaemonLocator;
+  registry: ProjectRegistry;
+  router: BridgeRouter;
+  lifecycle: CreatorLifecycle;
+  logs: DebugLogStore;
+  coordination: CoordinationStore;
+  close(): Promise<void>;
+  guardedClose(): Promise<DaemonStopReceipt>;
+}
+
+const VERSION_AGNOSTIC_READS = new Set<string>([
+  "creator.ping", "creator.projectInfo", "creator.hasUnsavedChanges", "scene.getTree", "scene.list", "scene.validate",
+  "asset.list", "asset.search", "asset.getInfo", "asset.resolveReference", "asset.inspectDependencies", "asset.validateDependencies",
+  "script.getErrors", "script.findComponent", "component.listAvailable", "component.getSchema", "debug.sceneLogs",
+  "prefab.probe", "prefab.getTree", "preview.probe", "preview.status",
+  "capture.scene", "capture.editor", "editor.getSelection", "editor.performanceSnapshot", "editor.runtimeState",
+]);
+
+const MANAGEMENT_READS = new Set<string>([
+  "tools.getPreset", "project.getStatus", "debug.getLogs", "debug.exportDiagnostic",
+  "preview.probe", "preview.status", "playtest.probe", "build.getStatus", "build.getLog",
+  "lsp.diagnostics", "lsp.hover", "lsp.definition", "lsp.references",
+]);
+
+/** 预览启停不改工程文档，未带租约时不得被写租约或未收口的历史写操作挡住。 */
+const PREVIEW_CONTROL_METHODS = new Set<string>([
+  "preview.start", "preview.reload", "preview.stop", "preview.setMode",
+]);
+
+/**
+ * 组装注册表、Bridge 路由、生命周期与 HTTP 服务并启动 Companion 守护进程。
+ * 成功后写入 daemon 定位文件，失败则关闭已打开的服务。
+ */
+export async function startCompanionDaemon(options: CompanionDaemonOptions = {}): Promise<RunningCompanionDaemon> {
+  assertNoSharedKnowledgeCredentials(process.env);
+  const identity = createDaemonIdentity(fileURLToPath(import.meta.url));
+  const registry = new ProjectRegistry(options.registryPath ?? projectRegistryPath());
+  const toolPresets = new ToolPresetRepository(options.toolPresetPath ?? toolPresetStorePath(), COMPANION_TOOL_SPECS);
+  const logs = new DebugLogStore(1000, companionLogDirectory());
+  const coordination = new CoordinationStore(options.coordinationPath ?? coordinationStorePath());
+  let acquiredNativeMaintenance: NativeMaintenance | undefined;
+  let server: CompanionHttpServer | undefined;
+  try {
+  const acceptance = new AcceptanceStore();
+  const router = new BridgeRouter(
+    (id) => registry.get(id),
+    async (connection) => await new BridgeClient(connection).call("creator.projectInfo") as unknown as ProjectInfo,
+    PROTOCOL_VERSION,
+  );
+  const dashboard = new DashboardLauncher();
+  const adapter = options.lifecycleAdapter ?? createDefaultCreatorLifecycleAdapter(
+    async (projectId, timeoutMs) => waitForBridge(router, projectId, timeoutMs),
+    async (projectId) => {
+      await router.refresh(projectId);
+      const connection = router.connection(projectId);
+      if (!connection) throw new Error("Creator Bridge is not ready");
+      return Boolean(await new BridgeClient(connection).call("creator.hasUnsavedChanges"));
+    },
+    dashboard,
+  );
+  const lifecycle = new CreatorLifecycle(adapter);
+  const statusErrors = new Map<string, string>();
+  lifecycle.on("status", (status: ProjectRuntimeStatus) => appendStatus(logs, status, statusErrors));
+
+  const locatorFile = options.locatorPath ?? daemonLocatorPath();
+  await mkdir(dirname(locatorFile), { recursive: true, mode: 0o700 });
+  const nativeMaintenance = await NativeMaintenance.open({ identity, journalPath: join(dirname(locatorFile), "native-epochs.jsonl") });
+  acquiredNativeMaintenance = nativeMaintenance;
+  let closing: Promise<void> | undefined;
+  let observeActions: () => Promise<DrainObservation> = async () => ({ counts: {}, unknown: ["ACTION_OBSERVATION_UNAVAILABLE"] });
+  const close = async (): Promise<void> => {
+    if (closing) return closing;
+    closing = (async () => {
+      let stage = "shared-edge";
+      let timer: NodeJS.Timeout | undefined;
+      try {
+        const { closeSharedEdgeSession } = await import("./companion/edge-session.js");
+        await Promise.race([closeSharedEdgeSession(), new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error("DAEMON_EDGE_CLEANUP_UNCONFIRMED")), 5_000);
+        })]);
+        clearTimeout(timer);
+        stage = "http";
+        if (server) await server.close();
+        stage = "coordination";
+        coordination.close();
+        stage = "native-history";
+        await nativeMaintenance.close();
+        stage = "locator";
+        await removeOwnedLocator(locatorFile, process.pid);
+      } catch (error) {
+        server?.abandonUnfinishedStop();
+        const diagnostic = { code: "DAEMON_SHUTDOWN_FAILED", stage, pid: process.pid, startupEpoch: identity.startupEpoch };
+        try { await logs.appendPersisted({ projectId: "daemon", source: "launcher", level: "error", message: JSON.stringify(diagnostic) }); }
+        catch { console.error(JSON.stringify({ ...diagnostic, logPersistence: "unconfirmed" })); }
+        throw error;
+      } finally { clearTimeout(timer); }
+    })();
+    return closing;
+  };
+
+  const actions = createActions({
+    registry, router, lifecycle, dashboard, logs, toolPresets, coordination, acceptance, close,
+    observeInFlight: (observe) => { observeActions = observe; },
+    ...(options.creatorRoot ? { creatorRoot: options.creatorRoot } : {}),
+    bridgeBundlePath: options.bridgeBundlePath ?? join(dirname(fileURLToPath(import.meta.url)), "creator-ai-bridge-bundle"),
+    creatorAiPath: options.creatorAiPath ?? join(dirname(fileURLToPath(import.meta.url)), "creator-ai.js"),
+  });
+  const apiToken = options.apiToken ?? randomBytes(32).toString("hex");
+  const knowledge = options.knowledge ?? new IsolatedKnowledgeAdapter({
+    ...(process.env.COMPANION_KNOWLEDGE_CREDENTIAL_FILE ? { credentialFile: process.env.COMPANION_KNOWLEDGE_CREDENTIAL_FILE } : {}),
+  });
+  const iconConfig = iconConfigFromEnv(process.env);
+  const icons = options.icons ?? new IconAdapter({ project: (id) => registry.get(id), ...(iconConfig ? { config: iconConfig } : {}) });
+  const ownerReview = new OwnerReviewHost(ownerReviewConfigFromEnv(process.env));
+  server = new CompanionHttpServer({ ownerReview, actions, logs, toolPresets, port: options.port ?? DEFAULT_COMPANION_DAEMON_PORT, apiToken, knowledge, icons,
+    daemonIdentity: identity, nativeHistory: () => nativeMaintenance.history(),
+    verifyNativeExit: (state, nativeObservations, control) => nativeMaintenance.verifyExit(state, nativeObservations, control),
+    observeInFlight: async () => {
+      const [current, historical] = await Promise.all([observeActions(), nativeMaintenance.observeHistory()]);
+      return { counts: { ...current.counts, ...historical.counts }, unknown: [...current.unknown, ...historical.unknown] };
+    } });
+  let address: Awaited<ReturnType<CompanionHttpServer["listen"]>>;
+  address = await server.listen();
+  const locator: DaemonLocator = {
+    baseUrl: `http://${address.host}:${address.port}`,
+    apiToken,
+    pid: process.pid,
+    createdAt: new Date().toISOString(),
+    identity,
+  };
+  await writeDaemonLocator(locatorFile, locator);
+  logs.append({ projectId: "daemon", source: "launcher", level: "info", message: `Companion listening at ${locator.baseUrl}` });
+  const guardedClose = async (): Promise<DaemonStopReceipt> => {
+    const snapshot = await server!.daemonInFlight();
+    const receipt = await server!.guardedStop({ identity: snapshot.identity, generation: snapshot.generation, maxWaitMs: 30_000 });
+    await close();
+    return receipt;
+  };
+  return { locator, registry, router, lifecycle, logs, coordination, close, guardedClose };
+  } catch (error) {
+    const cleanup: Promise<unknown>[] = [];
+    const failures: unknown[] = [];
+    if (server) {
+      try { cleanup.push(server.close()); } catch (closeError) { failures.push(closeError); }
+    }
+    if (acquiredNativeMaintenance) {
+      try { cleanup.push(acquiredNativeMaintenance.close()); } catch (closeError) { failures.push(closeError); }
+    }
+    if (coordination) {
+      try { coordination.close(); } catch (closeError) { failures.push(closeError); }
+    }
+    for (const result of await Promise.allSettled(cleanup)) if (result.status === "rejected") failures.push(result.reason);
+    if (failures.length) throw new AggregateError([error, ...failures], "Daemon startup failed and cleanup was not fully confirmed");
+    throw error;
+  }
+}
+
+/** 将注册表、生命周期等子系统绑定为 HTTP/API 可调用的业务动作。 */
+function createActions(context: {
+  registry: ProjectRegistry;
+  router: BridgeRouter;
+  lifecycle: CreatorLifecycle;
+  dashboard: DashboardLauncher;
+  logs: DebugLogStore;
+  toolPresets: ToolPresetRepository;
+  coordination: CoordinationStore;
+  acceptance: AcceptanceStore;
+  close(): Promise<void>;
+  observeInFlight(observe: () => Promise<DrainObservation>): void;
+  creatorRoot?: string;
+  bridgeBundlePath: string;
+  creatorAiPath: string;
+}): CompanionHttpActions {
+  const { registry, router, lifecycle, dashboard, logs, toolPresets, coordination, acceptance } = context;
+  const installer = new BridgeInstaller(context.bridgeBundlePath, bridgeInstallRegistryPath());
+  const scaffold = new ProjectScaffoldService();
+  let setup: SetupService;
+  let actions: CompanionHttpActions;
+  const activeRequests=new Map<string,number>();
+  const recovering=new Set<string>();
+  const bridgeErrors = new Map<string, string>();
+  let globalActions = 0;
+  const guardedAction = async <T>(projectId: string | undefined, action: () => Promise<T>): Promise<T> => {
+    if (projectId ? recovering.has(projectId) : recovering.size > 0) {
+      throw new CoordinationError("OPERATION_IN_FLIGHT", "Recovery is inspecting execution state");
+    }
+    const finish = projectId ? trackRequest(projectId) : (() => { globalActions += 1; return () => { globalActions -= 1; }; })();
+    try { return await action(); } finally { finish(); }
+  };
+  const trackRequest=(projectId:string) => {
+    activeRequests.set(projectId,(activeRequests.get(projectId)??0)+1);
+    return () => { const count=(activeRequests.get(projectId)??1)-1; if(count) activeRequests.set(projectId,count); else activeRequests.delete(projectId); };
+  };
+  actions = {
+    listProjects: () => registry.list(),
+    listDashboardProjects: () => listDashboardProjects(),
+    pickDirectory: async () => {
+      const path = await pickDirectory();
+      return path ? { path } : { cancelled: true };
+    },
+    scaffoldProject: async (input) => {
+      if (input.creatorVersion && input.creatorVersion !== "3.8.8") {
+        throw new Error("Only Cocos Creator 3.8.8 project scaffolding is supported");
+      }
+      if (input.mode === "initialize") {
+        if (!input.path) throw new Error("path is required for initialize");
+        return scaffold.initialize(input.path);
+      }
+      let target = input.path;
+      if (!target) {
+        if (!input.parentPath || !input.projectName) throw new Error("path or parentPath and projectName are required for create");
+        if (basename(input.projectName) !== input.projectName || input.projectName === "." || input.projectName === "..") {
+          throw new Error("projectName must be a single directory name");
+        }
+        target = resolve(input.parentPath, input.projectName);
+      }
+      return scaffold.create(target);
+    },
+    addProject: async (path) => {
+      await assertCocosProject(path);
+      const requiredCreatorVersion = await detectRequiredCreatorVersion(path);
+      return registry.add(path, requiredCreatorVersion ? { requiredCreatorVersion } : {});
+    },
+    removeProject: async (projectId) => {
+      router.remove(projectId);
+      const removed = await registry.remove(projectId);
+      if (removed) await toolPresets.removeProjectSelection(projectId);
+      return removed;
+    },
+    listStatuses: () => guardedAction(undefined, async () => Promise.all((await registry.list()).map((project) => resolvedStatus(project, lifecycle, router)))),
+    projectStatus: (projectId) => guardedAction(projectId, async () => resolvedStatus(await requireProject(registry, projectId), lifecycle, router)),
+    start: async (projectId) => {
+      const project = await requireProject(registry, projectId);
+      const current = await resolvedStatus(project, lifecycle, router);
+      if (current.state === "ready" && current.pid && isPidAlive(current.pid)) {
+        try {
+          await focusPidBestEffort(current.pid);
+          return current;
+        } catch (error) {
+          if (!/已退出/.test(errorMessage(error))) throw error;
+        }
+      }
+      return startCreator(project, lifecycle);
+    },
+    focus: async (projectId) => {
+      try {
+        await lifecycle.focus(projectId);
+        return;
+      } catch (error) {
+        // Companion 未托管该进程时，尝试用 Bridge connection 中的 Creator PID 聚焦。
+        try {
+          const bridge = await router.refresh(projectId);
+          if (bridge.creatorPid && isPidAlive(bridge.creatorPid)) {
+            await focusPidBestEffort(bridge.creatorPid);
+            return;
+          }
+        } catch {
+          const project = await requireProject(registry, projectId);
+          const dashboardStatus = await dashboard.projectStatus(project.path);
+          if (dashboardStatus?.running && dashboardStatus.pid && isPidAlive(dashboardStatus.pid)) {
+            await focusPidBestEffort(dashboardStatus.pid);
+            return;
+          }
+        }
+        throw error;
+      }
+    },
+    stop: async (projectId) => {
+      const project = await requireProject(registry, projectId);
+      try {
+        return await lifecycle.stop(projectId, { projectPath: project.path });
+      } catch (error) {
+        // Recover only a missing PID after daemon startup. Identity/exit failures
+        // must never be retried with a different Bridge PID.
+        if ((error as { code?: unknown })?.code !== "CREATOR_PID_UNAVAILABLE") throw error;
+        const bridge = await router.refresh(projectId);
+        if (!bridge.creatorPid) throw error;
+        return await lifecycle.stop(projectId, { pid: bridge.creatorPid, projectPath: project.path });
+      }
+    },
+    restart: async (projectId) => {
+      const project = await requireProject(registry, projectId);
+      const current = await resolvedStatus(project, lifecycle, router);
+      if (current.state === "ready") {
+        await actions.stop(projectId);
+        await lifecycle.waitForStopped(project.path);
+      } else {
+        const dashboardStatus = await dashboard.projectStatus(project.path);
+        if (dashboardStatus?.running) {
+          throw new DashboardFault(
+            "DASHBOARD_OPEN_WITHOUT_BRIDGE",
+            "Dashboard 显示工程已启动，但 Bridge 不可用，无法确认未保存内容并安全重启",
+            { projectPath: project.path, pid: dashboardStatus.pid },
+          );
+        }
+      }
+      return startCreator(project, lifecycle);
+    },
+    openFolder: async (projectId) => {
+      const project = await requireProject(registry, projectId);
+      await openPathInFileManager(project.path);
+      return { ok: true as const, path: project.path };
+    },
+    registerMcp: async (projectId, target) => {
+      const project = await requireProject(registry, projectId);
+      const input = {
+        projectId: project.id,
+        projectName: project.name,
+        projectPath: project.path,
+        creatorAiPath: context.creatorAiPath,
+      };
+      if (target === "codex") {
+        const result = await configureCodexMcp(input);
+        return {
+          target: "codex",
+          name: result.name,
+          command: result.command,
+          args: result.args,
+          projectId: result.projectId,
+          changed: result.changed,
+        };
+      }
+      let result;
+      if (target === "cursor") {
+        result = await configureCursorMcp(input);
+      } else if (target === "trae") {
+        const { configureTraeMcp } = await import("./companion/trae-configurator.js");
+        result = await configureTraeMcp(input);
+      } else if (target === "kiro") {
+        const { configureKiroMcp } = await import("./companion/kiro-configurator.js");
+        result = await configureKiroMcp(input);
+      } else if (target === "vscode") {
+        const { configureVscodeMcp } = await import("./companion/vscode-configurator.js");
+        result = await configureVscodeMcp(input);
+      } else {
+        throw new Error(`Unsupported MCP register target: ${target}`);
+      }
+      return {
+        target,
+        name: result.name,
+        command: result.command,
+        args: result.args,
+        projectId: result.projectId,
+        configPath: result.configPath,
+        changed: result.changed,
+      };
+    },
+    setupProject: async (input) => {
+      let path = input.projectPath;
+      if (!path && input.projectId) path = (await requireProject(registry, input.projectId)).path;
+      if (!path) throw new Error("projectPath or projectId is required");
+      const operation = setup.start(path, {
+        ...(input.startCreator === undefined ? {} : { startCreator: input.startCreator }),
+        ...(input.configureCodex === undefined ? {} : { configureCodex: input.configureCodex }),
+        ...("codexPath" in input && typeof input.codexPath === "string" ? { codexPath: input.codexPath } : {}),
+      });
+      return { operationId: operation.id, optionsContractVersion: operation.optionsContractVersion, effectiveOptions: operation.effectiveOptions, reused: operation.reused };
+    },
+    setupStatus: async (operationId) => {
+      const operation = setup.get(operationId);
+      if (!operation) throw new Error(`Unknown setup operation: ${operationId}`);
+      return operation;
+    },
+    doctor: async () => {
+      const projects = await registry.list();
+      let codex: string | undefined;
+      try { codex = await findCodexCli(); } catch { /* reported as unavailable */ }
+      return {
+        daemon: "ready",
+        protocolVersion: PROTOCOL_VERSION,
+        projectCount: projects.length,
+        codexAvailable: Boolean(codex),
+        dashboard: await dashboard.appInfo(),
+        creatorInstallations: await discoverCreatorInstallations(context.creatorRoot),
+      };
+    },
+    bridgeCall: async (projectId, method, params) => {
+      if(recovering.has(projectId)) throw new CoordinationError("OPERATION_IN_FLIGHT","Project recovery has reserved its standard read gate");
+      const finishRequest=trackRequest(projectId);
+      let dispatch: DispatchTicket | undefined;
+      let sent=false;
+      const operationId = randomBytes(8).toString("hex");
+      const source: DebugEvent["source"] = method.startsWith("preview.") ? "preview" : method.startsWith("script.") ? "compile" : "bridge";
+      const started = Date.now();
+      try {
+        const effectful=!VERSION_AGNOSTIC_READS.has(method) || (method === "scene.validate" && isRecord(params) && typeof params.url === "string");
+        if(effectful) {
+          if(recovering.has(projectId)) throw new CoordinationError("OPERATION_IN_FLIGHT","Project recovery is inspecting execution state");
+          authorizeProjectWrite(coordination,projectId,params,method);
+          const identity=coordinationIdentity(projectId,params);
+          if(identity && isRecord(params) && typeof params._operationId === "string") {
+            const tool=COMPANION_TOOL_SPECS.find(item=>item.method===method);
+            if(!tool) throw new CoordinationError("OPERATION_JOURNAL_REQUIRED","Unknown coordinated bridge method");
+            dispatch=coordination.beginDispatch({identity,operationId:params._operationId,method,tool:tool.name,inputDigest:digestOperationInput(stripCoordination(params))});
+          }
+        }
+        if(method === "scene.validate" && isRecord(params) && typeof params.url === "string") throw new CoordinationError("UNSUPPORTED","Use coordinated scene.open then scene.validate without url");
+        const acceptanceInput = readAcceptanceParams(params);
+        const bridgeParams = stripAcceptanceFields(stripCoordination(params));
+        await router.refresh(projectId);
+        const connection = router.connection(projectId);
+        if (!connection) throw new Error("Creator Bridge is not ready");
+        if (connection.creatorVersion !== "3.8.8" && effectful) {
+          throw new Error(`Creator ${connection.creatorVersion} is read-only; write and Preview control require 3.8.8`);
+        }
+        if (acceptanceObservation(method)) {
+          acceptance.prepareObservation({ projectId, sessionId: connection.sessionId, context: acceptanceInput });
+        }
+        if (method === "preview.start" || method === "preview.reload") {
+          await assertPreviewOriginAvailable(router, projectId, acceptanceInput.verificationId);
+        }
+        if(dispatch) coordination.markDispatchSent(dispatch,connection);
+        sent=true;
+        const result = await new BridgeClient(connection).call(method as BridgeMethod, bridgeParams,dispatch?{requestId:dispatch.dispatchId,operationId:dispatch.operationId}:{});
+        if(dispatch) coordination.settleDispatch(dispatch,{status:"SUCCEEDED",result});
+        noteBridgeSuccess(bridgeErrors, projectId, method);
+        logs.append({ projectId, sessionId: connection.sessionId, source, level: "info", message: `${method} completed in ${Date.now() - started}ms`, operationId });
+        if (!acceptanceObservation(method)) return result;
+        const project = await registry.get(projectId);
+        const scriptUrl = isRecord(bridgeParams) && typeof bridgeParams.url === "string" ? bridgeParams.url : undefined;
+        return await acceptance.recordObservation({
+          method,
+          projectId,
+          projectPath: project?.path ?? "",
+          sessionId: connection.sessionId,
+          context: acceptanceInput,
+          result,
+          ...(scriptUrl ? { scriptUrl } : {}),
+        });
+      } catch (error) {
+        if(dispatch && coordination.getOperation(projectId,dispatch.operationId)?.dispatch?.state !== "TERMINAL") {
+          if(!sent) coordination.settleDispatch(dispatch,{status:"FAILED",preflightRejected:true,error:{code:"DISPATCH_PREFLIGHT_REJECTED"}});
+          else if(error instanceof RemoteBridgeFault && (error.code === "TIMEOUT" || error.code === "INTERNAL_ERROR") && error.responseId === dispatch.dispatchId)
+            coordination.markDispatchUnknown(dispatch,{schemaVersion:"bridge-remote-response-v1",responseId:error.responseId,responseHash:error.responseHash,code:error.code,effectApplied:"UNKNOWN"});
+          else if(error instanceof BridgeFault && error.code !== "TIMEOUT" && error.code !== "INTERNAL_ERROR") coordination.settleDispatch(dispatch,{status:"FAILED",error:{code:error.code}});
+          else coordination.markDispatchUnknown(dispatch);
+        }
+        const failure = `${method} failed: ${errorMessage(error)}`;
+        if (noteBridgeError(bridgeErrors, projectId, method, failure)) {
+          logs.append({ projectId, source, level: "error", message: failure, operationId });
+        }
+        throw error;
+      } finally { finishRequest(); }
+    },
+    managementCall: async (projectId,method,params) => {
+      const recovery=method === "coordination.operation.reconcile" && isRecord(params) && Boolean(params.observedStatus || params.receiptId || params.recoveryDecision);
+      if(recovery && (activeRequests.has(projectId) || recovering.has(projectId) || globalActions > 0 || setup.hasActiveOperations())) throw new CoordinationError("OPERATION_IN_FLIGHT","Project or setup still has active requests");
+      const coordinationRead=method === "coordination.operation.get" || (method === "coordination.lease" && isRecord(params) && params.action === "status")
+        || (method === "coordination.operation.reconcile" && !recovery);
+      if(!recovery && recovering.has(projectId) && !coordinationRead) throw new CoordinationError("OPERATION_IN_FLIGHT","Project recovery is in progress");
+      if(recovery) recovering.add(projectId);
+      const finishRequest=method.startsWith("coordination.")?()=>undefined:trackRequest(projectId);
+      try {
+        if(recovery) {
+          const project=await requireProject(registry,projectId);
+          const build=await import("./companion/build-runner.js");
+          const state=await build.getStatus(project.path);
+          if(!["idle","passed","passed_with_warning","failed"].includes(state.state)) throw new CoordinationError("OPERATION_IN_FLIGHT","Build is running or its terminal state is unknown");
+          if (globalActions > 0 || setup.hasActiveOperations()) throw new CoordinationError("OPERATION_IN_FLIGHT", "Setup or a global action is active");
+          if(isRecord(params) && params.recoveryDecision !== undefined) {
+            if (params.recoveryDecision === "ABANDON_AUTHORIZED_4060_TERMINATED_SCENE") {
+              const request=authorizedDispatchAbandonmentSchema.parse(params), input=authorizedDispatchAbandonmentInput(projectId,request), grant=AUTHORIZED_4060_ABANDONMENT;
+              coordination.assertAuthorizedDispatchAbandonmentEligible(input);
+              if (resolve(project.path).toLowerCase() !== resolve(grant.projectPath).toLowerCase())
+                throw new CoordinationError("AUTHORIZED_RECOVERY_SCOPE", "The registered project differs from the frozen incident");
+              const source={projectPath:grant.projectPath,sessionId:grant.sessionId,projectFingerprint:grant.projectFingerprint,files:grant.files};
+              const observation=request.acknowledgeGuardContract === "SYSTEM_BOOT_AFTER_LOCAL_DISPATCH"
+                ? await observeBootTerminatedSession({...source,computerName:grant.computerName,originalDispatchUpdatedAt:grant.originalDispatchUpdatedAt})
+                : await observeTerminatedSession(source);
+              const finalBuild=await build.getStatus(project.path);
+              if(!["idle","passed","passed_with_warning","failed"].includes(finalBuild.state) || activeRequests.has(projectId) || globalActions > 0 || setup.hasActiveOperations())
+                throw new CoordinationError("OPERATION_IN_FLIGHT","Build, setup or a global action changed during recovery");
+              return coordination.abandonAuthorizedTerminatedDispatch(input,observation) as unknown as JsonValue;
+            }
+            const authorized=params.recoveryDecision === "ADOPT_AUTHORIZED_4060";
+            const adoption=authorized ? authorizedDispatchAdoptionSchema.parse(params) : legacyAbandonSchema.parse(params);
+            const abandon=authorized ? undefined : legacyAbandonInput(projectId,adoption as Parameters<typeof legacyAbandonInput>[1]);
+            const dispatchAdoption=authorized ? authorizedDispatchAdoptionInput(projectId,adoption as Parameters<typeof authorizedDispatchAdoptionInput>[1]) : undefined;
+            if(dispatchAdoption) coordination.assertAuthorizedDispatchAdoptionEligible(dispatchAdoption);
+            else coordination.assertLegacyAbandonEligible(abandon!);
+            await router.refresh(projectId);
+            const connection=router.connection(projectId);
+            if(!connection) throw new CoordinationError("RECOVERY_OBSERVATION_REQUIRED","Creator Bridge is unavailable");
+            const client=new BridgeClient(connection,{connectTimeoutMs:1000,callTimeoutMs:1000});
+            const observation=await observeCurrentAdoption(adoption,project.path,connection.projectFingerprint,
+              (method,input)=>client.call(method,input),async()=>{
+                await router.refresh(projectId);
+                const current=router.connection(projectId);
+                if(!current || current.sessionId !== connection.sessionId) throw new CoordinationError("RECOVERY_OBSERVATION_REQUIRED","Creator session changed during adoption");
+                return await new BridgeClient(current,{connectTimeoutMs:1000,callTimeoutMs:1000}).call("creator.projectInfo") as unknown as ProjectInfo;
+              });
+            const finalBuild=await build.getStatus(project.path);
+            if(!["idle","passed","passed_with_warning","failed"].includes(finalBuild.state) || activeRequests.has(projectId) || globalActions > 0 || setup.hasActiveOperations())
+              throw new CoordinationError("OPERATION_IN_FLIGHT","Build, setup or a global action changed during recovery");
+            return (dispatchAdoption ? coordination.adoptAuthorizedDispatch(dispatchAdoption,observation) : coordination.abandonLegacyOperation(abandon!,observation)) as unknown as JsonValue;
+          }
+        }
+        return await managementCall(actions, logs, registry, lifecycle, toolPresets, coordination, context.creatorRoot, context.creatorAiPath, acceptance, async (id) => {
+      try { await router.refresh(id); } catch { return undefined; }
+      return router.connection(id)?.sessionId;
+    }, projectId, method, params); } finally { finishRequest(); if(recovery) recovering.delete(projectId); }
+    },
+    stopDaemon: async () => {
+      await context.close();
+      process.exit(0);
+    },
+  };
+  // Direct HTTP routes must enter the same synchronous admission gate as tool routes.
+  const directStart = actions.start;
+  actions.start = (id) => guardedAction(id, () => directStart(id));
+  const directStop = actions.stop;
+  actions.stop = (id) => guardedAction(id, () => directStop(id));
+  const directRestart = actions.restart;
+  actions.restart = (id) => guardedAction(id, () => directRestart(id));
+  const directFocus = actions.focus;
+  actions.focus = (id) => guardedAction(id, () => directFocus(id));
+  const directOpenFolder = actions.openFolder;
+  actions.openFolder = (id) => guardedAction(id, () => directOpenFolder(id));
+  const directRemove = actions.removeProject;
+  actions.removeProject = (id) => guardedAction(id, () => directRemove(id));
+  const directRegister = actions.registerMcp;
+  actions.registerMcp = (id, target) => guardedAction(undefined, () => directRegister(id, target));
+  const directSetup = actions.setupProject;
+  actions.setupProject = (input) => guardedAction(undefined, () => directSetup(input));
+  const directAdd = actions.addProject;
+  actions.addProject = (path) => guardedAction(undefined, () => directAdd(path));
+  const directScaffold = actions.scaffoldProject;
+  actions.scaffoldProject = (input) => guardedAction(undefined, () => directScaffold(input));
+  setup = new SetupService({
+    addProject: actions.addProject,
+    installBridge: (project) => installer.install(project),
+    startCreator: async (projectId) => {
+      const current = await actions.projectStatus(projectId);
+      return current.state === "ready" ? current : actions.start(projectId);
+    },
+    configureCodex: async (project, codexPath) => configureCodexMcp({
+      projectId: project.id,
+      projectName: project.name,
+      projectPath: project.path,
+      creatorAiPath: context.creatorAiPath,
+      ...(codexPath ? { codexPath } : {}),
+    }),
+    verify: async (projectId) => {
+      const info = await actions.bridgeCall(projectId, "creator.projectInfo") as Record<string, JsonValue>;
+      if (info.projectFingerprint !== projectId && typeof info.projectFingerprint === "string" && !info.projectFingerprint.startsWith(projectId)) {
+        throw new Error("Creator project identity verification failed");
+      }
+      await actions.bridgeCall(projectId, "creator.ping");
+    },
+  });
+  context.observeInFlight(async () => {
+    const build = await import("./companion/build-runner.js");
+    const projects = await registry.list();
+    const states = await Promise.all(projects.map((project) => build.maintenanceState(project.path)));
+    return { counts: { projectActions: [...activeRequests.values()].reduce((sum, value) => sum + value, 0),
+      globalActions, recovery: recovering.size, setup: setup.hasActiveOperations() ? 1 : 0,
+      builds: build.inFlightCount(), observedBuilds: states.filter((state) => state === "busy").length,
+      sidecars: jsonProcessInFlightCount() + knowledgeWorkerInFlightCount() },
+      unknown: [...(states.includes("unknown") ? ["BUILD_STATE_UNVERIFIED"] : []), ...(knowledgeWorkerUnknownCount() ? ["KNOWLEDGE_WORKER_EXIT_UNCONFIRMED"] : [])] };
+  });
+  return actions;
+}
+
+/** 在超时内轮询 Bridge 连接直至就绪。 */
+async function waitForBridge(router: BridgeRouter, projectId: string, timeoutMs: number) {
+  const deadline = Date.now() + timeoutMs;
+  let lastError: unknown;
+  while (Date.now() < deadline) {
+    try {
+      const connection = await router.refresh(projectId);
+      return { creatorVersion: connection.creatorVersion, sessionId: connection.sessionId };
+    } catch (error) {
+      lastError = error;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  }
+  throw new Error(`Timed out waiting for Creator Bridge: ${errorMessage(lastError)}`);
+}
+
+/** 合并生命周期状态与已存在 Bridge 连接，得到工程运行时状态。 */
+async function resolvedStatus(project: ProjectRecord, lifecycle: CreatorLifecycle, router: BridgeRouter): Promise<ProjectRuntimeStatus> {
+  const current = lifecycle.status(project.id);
+  try {
+    const bridge = await router.refresh(project.id);
+    const connection = router.connection(project.id);
+    if (!connection) throw new Error("Creator Bridge is not ready");
+    const projectInfo = await new BridgeClient(connection).call("creator.projectInfo") as unknown as ProjectInfo;
+    return {
+      projectId: project.id,
+      state: bridge.creatorVersion === "3.8.8" ? "ready" : "incompatible",
+      ...(current.launchSource ? { launchSource: current.launchSource } : {}),
+      ...(current.dashboardVersion ? { dashboardVersion: current.dashboardVersion } : {}),
+      ...(current.dashboardProgress ? { dashboardProgress: current.dashboardProgress } : {}),
+      ...(current.instanceId ? { instanceId: current.instanceId } : {}),
+      ...(bridge.creatorPid ? { pid: bridge.creatorPid } : {}),
+      creatorVersion: bridge.creatorVersion,
+      sessionId: bridge.sessionId,
+      ...(projectInfo.capabilityProfile ? { capabilityProfile: projectInfo.capabilityProfile } : {}),
+    };
+  } catch (error) {
+    const lastKnown = router.connection(project.id);
+    router.remove(project.id);
+    const busy = error instanceof RemoteBridgeFault && error.code === "REVISION_CONFLICT";
+    return lifecycle.markDisconnected(project.id,
+      busy ? "Creator Bridge 文档写入中；等待原操作结束并查询日志，不要重放"
+        : "Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志",
+      {
+        ...(lastKnown?.creatorPid ? { pid: lastKnown.creatorPid } : {}),
+        ...(lastKnown?.creatorVersion ? { creatorVersion: lastKnown.creatorVersion } : {}),
+        ...(lastKnown?.sessionId ? { sessionId: lastKnown.sessionId } : {}),
+      });
+  }
+}
+
+/** 交互式 Creator 只能经 Dashboard 启动；Build Runner 的 --build 流程独立。 */
+async function startCreator(project: ProjectRecord, lifecycle: CreatorLifecycle): Promise<ProjectRuntimeStatus> {
+  return lifecycle.start(project);
+}
+
+/** 分发 Companion 管理方法到工程状态、Creator 控制、日志、Preview、试玩或构建。 */
+async function managementCall(
+  actions: CompanionHttpActions,
+  logs: DebugLogStore,
+  registry: ProjectRegistry,
+  lifecycle: CreatorLifecycle,
+  toolPresets: ToolPresetRepository,
+  coordination: CoordinationStore,
+  creatorRoot: string | undefined,
+  creatorAiPath: string,
+  acceptance: AcceptanceStore,
+  sessionIdFor: (projectId: string) => Promise<string | undefined>,
+  projectId: string,
+  method: string,
+  params?: JsonValue,
+): Promise<JsonValue> {
+  if (method === "coordination.lease") return coordinateLease(coordination, projectId, params) as unknown as JsonValue;
+  if (method === "coordination.operation.start") return coordinateOperationStart(coordination, projectId, params) as unknown as JsonValue;
+  if (method === "coordination.operation.get") return coordinateOperationGet(coordination, projectId, params) as unknown as JsonValue;
+  if (method === "coordination.operation.complete") return coordinateOperationComplete(coordination, projectId, params) as unknown as JsonValue;
+  if (method === "coordination.operation.reconcile") return coordinateOperationReconcile(coordination, projectId, params) as unknown as JsonValue;
+  if (!MANAGEMENT_READS.has(method)) authorizeProjectWrite(coordination, projectId, params, method);
+  const inputParams = stripCoordination(params);
+  if (method === "tools.getPreset") return await toolPresets.selectedForProject(projectId) as unknown as JsonValue;
+  if (method === "tools.usePreset") {
+    if (!isRecord(inputParams) || typeof inputParams.presetId !== "string") throw new Error("presetId is required");
+    await requireProject(registry, projectId);
+    return await toolPresets.selectForProject(projectId, inputParams.presetId) as unknown as JsonValue;
+  }
+  if (method === "project.getStatus") return await actions.projectStatus(projectId) as unknown as JsonValue;
+  if (method === "creator.start") return await actions.start(projectId) as unknown as JsonValue;
+  if (method === "creator.focus") { await actions.focus(projectId); return { ok: true }; }
+  if (method === "creator.stop") return await actions.stop(projectId) as unknown as JsonValue;
+  if (method === "creator.restart") return await actions.restart(projectId) as unknown as JsonValue;
+  if (method === "debug.getLogs") {
+    const filter = isRecord(inputParams) ? inputParams : {};
+    const source = typeof filter.source === "string" ? filter.source as DebugEvent["source"] : undefined;
+    const level = typeof filter.level === "string" ? filter.level as DebugEvent["level"] : undefined;
+    const since = typeof filter.since === "string" ? filter.since : undefined;
+    const search = typeof filter.query === "string" ? filter.query : undefined;
+    const limit = typeof filter.limit === "number" ? filter.limit : undefined;
+    const wants = (name: DebugEvent["source"]) => !source || source === name;
+    const localSource = source === "scene-console" || source === "preview-console" ? undefined : source;
+    const merged: DebugEvent[] = wants("scene-console") || wants("preview-console")
+      ? logs.query({
+        projectId,
+        ...(localSource ? { source: localSource } : {}),
+        ...(level ? { level } : {}),
+        ...(since ? { since } : {}),
+        ...(search ? { search } : {}),
+      }).filter((event) => wants(event.source))
+      : logs.query({
+        projectId,
+        ...(source ? { source } : {}),
+        ...(level ? { level } : {}),
+        ...(since ? { since } : {}),
+        ...(search ? { search } : {}),
+        ...(limit ? { limit } : {}),
+      });
+    if (wants("scene-console") || wants("preview-console")) {
+      if (wants("scene-console")) {
+        try {
+          const sceneLogs = await actions.bridgeCall(projectId, "debug.sceneLogs", {
+            ...(level ? { level } : {}),
+            ...(since ? { since } : {}),
+            ...(search ? { query: search } : {}),
+            limit: limit ?? 200,
+          }) as Array<{ time: string; level: DebugEvent["level"]; message: string }>;
+          for (const entry of sceneLogs) {
+            merged.push({
+              id: `scene-console:${entry.time}:${entry.message}`,
+              projectId,
+              source: "scene-console",
+              level: entry.level,
+              time: entry.time,
+              message: entry.message,
+            });
+          }
+        } catch {
+          // Creator bridge is down; daemon logs still return.
+        }
+      }
+      if (wants("preview-console")) {
+        try {
+          const project = await requireProject(registry, projectId);
+          const status = await actions.bridgeCall(projectId, "preview.status") as { url?: string; running?: boolean };
+          if (source === "preview-console" && status.running && status.url) {
+            const { attachPreviewConsole, ensurePreviewConsoleWatcher, stopPreviewConsoleWatcher } = await import("./companion/preview-console.js");
+            const { acquirePreviewPage } = await import("./companion/edge-session.js");
+            await ensurePreviewConsoleWatcher({
+              projectId,
+              projectPath: project.path,
+              url: status.url,
+              open: async (url) => {
+                // Hold the tab lock only while choosing and loading the page; the watcher then just listens.
+                const lease = await acquirePreviewPage(url);
+                try {
+                  attachPreviewConsole(lease.page, { projectPath: project.path, url });
+                  await lease.ensureLoaded();
+                } finally {
+                  await lease.release();
+                }
+                const onClose = () => { void stopPreviewConsoleWatcher(projectId); };
+                lease.page.once("close", onClose);
+                return { page: lease.page, close: async () => { lease.page.off("close", onClose); } };
+              },
+            }).catch(() => undefined);
+          }
+          const { queryPreviewConsole } = await import("./companion/preview-console.js");
+          for (const entry of queryPreviewConsole({
+            projectPath: project.path,
+            ...(status.url ? { url: status.url } : {}),
+            ...(level ? { level } : {}),
+            ...(since ? { since } : {}),
+            ...(search ? { query: search } : {}),
+            ...(limit ? { limit } : {}),
+          })) {
+            merged.push({
+              id: `preview-console:${entry.time}:${entry.message}`,
+              projectId,
+              source: "preview-console",
+              level: entry.level,
+              time: entry.time,
+              message: entry.message,
+            });
+          }
+        } catch {
+          // Preview console is optional when Preview or Edge is unavailable.
+        }
+      }
+      merged.sort((left, right) => left.time.localeCompare(right.time) || left.id.localeCompare(right.id));
+      return merged.slice(-(limit ?? merged.length)) as unknown as JsonValue;
+    }
+    return merged as unknown as JsonValue;
+  }
+  if (method === "debug.clearLogs") {
+    return { cleared: logs.clear({ projectId }) };
+  }
+  if (method === "debug.exportDiagnostic") {
+    return {
+      generatedAt: new Date().toISOString(),
+      projectId,
+      status: await actions.projectStatus(projectId) as unknown as JsonValue,
+      logs: logs.query({ projectId }) as unknown as JsonValue,
+    };
+  }
+  if (method.startsWith("preview.")) {
+    const result = await actions.bridgeCall(projectId, method, params);
+    if (method === "preview.stop") {
+      const { stopPreviewConsoleWatcher } = await import("./companion/preview-console.js");
+      await stopPreviewConsoleWatcher(projectId);
+    }
+    return result;
+  }
+
+  const project = await requireProject(registry, projectId);
+
+  if (method.startsWith("lsp.")) {
+    const lsp = getTypeScriptLspService(project.path);
+    const input = isRecord(inputParams) ? inputParams : {};
+    if (method === "lsp.diagnostics") {
+      return lsp.diagnostics(typeof input.path === "string" ? input.path : undefined) as unknown as JsonValue;
+    }
+    if (typeof input.path !== "string" || typeof input.line !== "number" || typeof input.column !== "number") {
+      throw new Error("path, line and column are required");
+    }
+    if (method === "lsp.hover") return lsp.hover(input.path, input.line, input.column) as unknown as JsonValue;
+    if (method === "lsp.definition") return lsp.definition(input.path, input.line, input.column) as unknown as JsonValue;
+    if (method === "lsp.references") return lsp.references(input.path, input.line, input.column) as unknown as JsonValue;
+  }
+
+  if (method === "capture.preview") {
+    const { capturePreviewUrl } = await import("./companion/screenshot.js");
+    const status = await actions.bridgeCall(projectId, "preview.status") as { url?: string; running?: boolean };
+    if (!status.url) throw new Error("Preview URL is unavailable; start Preview first");
+    return await capturePreviewUrl({ url: status.url, projectPath: project.path }) as unknown as JsonValue;
+  }
+
+  if (method.startsWith("playtest.")) {
+    const playtest = await import("./companion/playtest-runner.js");
+    if (method === "playtest.run") {
+      const acceptanceInput = readAcceptanceParams(inputParams);
+      const playParams = stripAcceptanceFields(inputParams);
+      const steps = isRecord(playParams) && Array.isArray(playParams.steps) ? playParams.steps : [];
+      const viewport = isRecord(playParams) && isRecord(playParams.viewport)
+        ? playParams.viewport as { width: number; height: number }
+        : undefined;
+      const profilerCapture = isRecord(playParams) && playParams.profilerCapture !== undefined
+        ? playParams.profilerCapture as boolean | Record<string, unknown>
+        : undefined;
+      const pageState = isRecord(playParams) && (playParams.pageState === "fresh" || playParams.pageState === "keep") ? playParams.pageState : undefined;
+      const acceptanceRequested = Boolean(acceptanceInput.verificationId || acceptanceInput.taskId);
+      const record = acceptanceRequested ? acceptance.gatePlaytest({
+        projectId,
+        sessionId: await sessionIdFor(projectId),
+        context: acceptanceInput,
+      }) : undefined;
+      if (record) await acceptance.assertFreshContent(record);
+      const status = await actions.bridgeCall(projectId, "preview.status") as { url?: string };
+      if (!status.url) throw new Error("Preview URL is unavailable; start Preview first");
+      if (acceptanceRequested) {
+        acceptance.gatePlaytest({
+          projectId,
+          sessionId: await sessionIdFor(projectId),
+          context: acceptanceInput,
+        });
+      }
+      rejectForeignPreviewOrigin(status.url, acceptanceInput.verificationId);
+      let result: JsonValue;
+      try {
+        result = await playtest.executePlaytest({
+          url: status.url,
+          projectPath: project.path,
+          steps: steps as never,
+          ...(viewport ? { viewport } : {}),
+          ...(pageState ? { pageState } : {}),
+          ...(acceptanceInput.verificationId ? { verificationId: acceptanceInput.verificationId } : {}),
+          ...(profilerCapture !== undefined ? { profilerCapture: profilerCapture as never } : {}),
+        }) as unknown as JsonValue;
+      } catch (error) {
+        if (error instanceof PreviewOriginConflict) {
+          throw acceptanceFault("ACCEPTANCE_TASK_MISMATCH", "不能沿用另一个验证任务正在使用的预览页", {
+            boundVerificationId: error.verificationId,
+            origin: error.origin,
+          });
+        }
+        throw error;
+      }
+      assertPlaytestSucceeded(result);
+      if (!record) return result;
+      await acceptance.assertFreshContent(record, result);
+      return acceptance.finishPlaytest(record, result, pageState);
+    }
+    const status = await actions.bridgeCall(projectId, "preview.status") as { url?: string };
+    if (!status.url) throw new Error("Preview URL is unavailable; start Preview first");
+    if (method === "playtest.probe") {
+      return await playtest.probeGameTest(status.url) as unknown as JsonValue;
+    }
+    if (method === "playtest.capture") {
+      const label = isRecord(params) && typeof params.label === "string" ? params.label : undefined;
+      return await playtest.captureViewports(status.url, project.path, label) as unknown as JsonValue;
+    }
+  }
+
+  if (method.startsWith("build.")) {
+    const build = await import("./companion/build-runner.js");
+    if (method === "build.getStatus") return await build.getStatus(project.path) as unknown as JsonValue;
+    if (method === "build.getLog") {
+      const maxBytes = isRecord(params) && typeof params.maxBytes === "number" ? params.maxBytes : undefined;
+      return await build.getLog(project.path, maxBytes) as unknown as JsonValue;
+    }
+    if (method === "build.ensureWebMobileConfig") {
+      const configPath = isRecord(params) && typeof params.configPath === "string" ? params.configPath : undefined;
+      return await build.ensureWebMobileConfig(project.path, configPath) as unknown as JsonValue;
+    }
+    if (method === "build.start") {
+      const operationId = isRecord(params) && typeof params.operationId === "string" ? params.operationId : undefined;
+      if (!operationId) throw new Error("operationId is required");
+      const configPath = isRecord(params) && typeof params.configPath === "string" ? params.configPath : undefined;
+      if (!configPath) throw new Error("configPath is required");
+      const logDest = isRecord(params) && typeof params.logDest === "string" ? params.logDest : undefined;
+      const installations = await discoverCreatorInstallations(creatorRoot);
+      const required = project.requiredCreatorVersion ?? "3.8.8";
+      const executable = project.creatorExecutable ?? installations.find((item) => item.version === required)?.executable;
+      if (!executable) throw new Error(`Cocos Creator ${required} was not found`);
+      void lifecycle;
+      return await build.startBuild({
+        projectPath: project.path,
+        creatorExecutable: executable,
+        configPath,
+        operationId,
+        ...(logDest ? { logDest } : {}),
+      }) as unknown as JsonValue;
+    }
+    if (method === "build.smoke") {
+      const operationId = isRecord(params) && typeof params.operationId === "string" ? params.operationId : undefined;
+      if (!operationId) throw new Error("operationId is required");
+      const status = await build.getStatus(project.path);
+      if (status.state !== "passed" && status.state !== "passed_with_warning") {
+        throw new Error(`Build smoke requires a completed build; current state is ${status.state}`);
+      }
+      if (!status.outputDir || !status.artifactIdentity) throw new Error("Completed build has no artifact identity");
+      const outputDir = status.outputDir;
+      const expectedPackageHash = status.artifactIdentity.packageHash;
+      const smoke = await import("./companion/build-smoke-runner.js");
+      const { runIdempotent } = await import("./companion/operation-receipt.js");
+      const steps = isRecord(params) && Array.isArray(params.steps) ? params.steps : [];
+      const viewport = isRecord(params) && isRecord(params.viewport)
+        ? params.viewport as { width: number; height: number }
+        : undefined;
+      return await runIdempotent(project.path, "build.smoke", operationId, () => smoke.runBuildSmoke({
+        outputDir,
+        projectPath: project.path,
+        steps: steps as never,
+        expectedPackageHash,
+        ...(viewport ? { viewport } : {}),
+      })) as unknown as JsonValue;
+    }
+  }
+
+  if (method === "profiler.capture") {
+    const operationId = isRecord(params) && typeof params.operationId === "string" ? params.operationId : undefined;
+    if (!operationId) throw new Error("operationId is required");
+    const status = await actions.bridgeCall(projectId, "preview.status") as { url?: string };
+    if (!status.url) throw new Error("Preview URL is unavailable; start Preview first");
+    const previewUrl = status.url;
+    const profiler = await import("./companion/profiler-runner.js");
+    const { runIdempotent } = await import("./companion/operation-receipt.js");
+    const input = isRecord(params) ? params : {};
+    return await runIdempotent(project.path, "profiler.capture", operationId, () => profiler.runProfilerCapture({
+      url: previewUrl,
+      projectPath: project.path,
+      ...(typeof input.warmupMs === "number" ? { warmupMs: input.warmupMs } : {}),
+      ...(typeof input.durationMs === "number" ? { durationMs: input.durationMs } : {}),
+      ...(typeof input.rendering2D === "boolean" ? { rendering2D: input.rendering2D } : {}),
+      ...(isRecord(input.viewport) ? { viewport: input.viewport as { width: number; height: number } } : {}),
+    })) as unknown as JsonValue;
+  }
+
+  if (method === "ui.captureDesignResolutions") {
+    const playtest = await import("./companion/playtest-runner.js");
+    const status = await actions.bridgeCall(projectId, "preview.status") as { url?: string };
+    if (!status.url) throw new Error("Preview URL is unavailable; start Preview first");
+    const label = isRecord(params) && typeof params.label === "string" ? params.label : "ui-design";
+    return await playtest.captureViewports(status.url, project.path, label) as unknown as JsonValue;
+  }
+
+  if (method === "scene.snapshotCreate") {
+    const { createSceneSnapshotRecord } = await import("./companion/scene-snapshot.js");
+    const tree = await actions.bridgeCall(projectId, "scene.getTree") as unknown as import("./protocol.js").SceneSnapshot;
+    const viewports = isRecord(params) && Array.isArray(params.viewports)
+      ? params.viewports.filter(
+          (vp): vp is { width: number; height: number } =>
+            isRecord(vp) && typeof vp.width === "number" && typeof vp.height === "number",
+        )
+      : undefined;
+    let screenshotPaths: string[] | undefined;
+    if (viewports?.length) {
+      const playtest = await import("./companion/playtest-runner.js");
+      const status = await actions.bridgeCall(projectId, "preview.status") as { url?: string };
+      if (!status.url) throw new Error("Preview URL is unavailable; start Preview first for viewport capture");
+      const label = isRecord(params) && typeof params.label === "string" ? params.label : "snapshot";
+      const captured = await playtest.captureViewports(status.url, project.path, label, viewports);
+      screenshotPaths = captured.paths;
+    }
+    return createSceneSnapshotRecord(projectId, tree, screenshotPaths) as unknown as JsonValue;
+  }
+
+  if (method === "scene.snapshotDiff") {
+    const { diffSceneSnapshots } = await import("./companion/scene-snapshot.js");
+    if (!isRecord(params) || typeof params.beforeId !== "string" || typeof params.afterId !== "string") {
+      throw new Error("beforeId and afterId are required");
+    }
+    return diffSceneSnapshots(projectId, params.beforeId, params.afterId) as unknown as JsonValue;
+  }
+
+  if (method === "input.simulatePreviewInput") {
+    const playtest = await import("./companion/playtest-runner.js");
+    const status = await actions.bridgeCall(projectId, "preview.status") as { url?: string };
+    if (!status.url) throw new Error("Preview URL is unavailable; start Preview first");
+    if (!isRecord(params) || typeof params.kind !== "string") throw new Error("kind is required");
+    return await playtest.simulatePreviewInput(status.url, project.path, params as never) as unknown as JsonValue;
+  }
+
+  if (method === "client.configureTrae" || method === "client.configureKiro" || method === "client.configureVscode") {
+    if (method === "client.configureTrae") {
+      const { configureTraeMcp } = await import("./companion/trae-configurator.js");
+      return await configureTraeMcp({ projectId, projectName: project.name, projectPath: project.path, creatorAiPath }) as unknown as JsonValue;
+    }
+    if (method === "client.configureKiro") {
+      const { configureKiroMcp } = await import("./companion/kiro-configurator.js");
+      return await configureKiroMcp({ projectId, projectName: project.name, projectPath: project.path, creatorAiPath }) as unknown as JsonValue;
+    }
+    const { configureVscodeMcp } = await import("./companion/vscode-configurator.js");
+    return await configureVscodeMcp({ projectId, projectName: project.name, projectPath: project.path, creatorAiPath }) as unknown as JsonValue;
+  }
+
+  throw new Error(`Unsupported management method: ${method}`);
+}
+
+function appendStatus(logs: DebugLogStore, status: ProjectRuntimeStatus, seen: Map<string, string>): void {
+  const level = status.state === "error" || status.state === "crashed" ? "error" : "info";
+  const message = status.lastError ?? `Creator state: ${status.state}`;
+  if (!noteStatusError(seen, status.projectId, level, message)) return;
+  logs.append({
+    projectId: status.projectId,
+    ...(status.instanceId ? { instanceId: status.instanceId } : {}),
+    ...(status.sessionId ? { sessionId: status.sessionId } : {}),
+    source: "launcher",
+    level,
+    message,
+  });
+}
+
+async function requireProject(registry: ProjectRegistry, projectId: string): Promise<ProjectRecord> {
+  const project = await registry.get(projectId);
+  if (!project) throw new Error(`Unknown project: ${projectId}`);
+  return project;
+}
+
+/** 原子写入守护进程定位文件（owner-only 权限）。 */
+export async function writeDaemonLocator(path: string, locator: DaemonLocator): Promise<void> {
+  await mkdir(dirname(path), { recursive: true, mode: 0o700 });
+  const temporary = `${path}.${process.pid}.tmp`;
+  try {
+    await writeFile(temporary, `${JSON.stringify(locator, null, 2)}\n`, { mode: 0o600 });
+    await rename(temporary, path);
+  } finally {
+    await rm(temporary, { force: true });
+  }
+}
+
+async function removeOwnedLocator(path: string, pid: number): Promise<void> {
+  try {
+    const locator = JSON.parse(await readFile(path, "utf8")) as Partial<DaemonLocator>;
+    if (locator.pid === pid) await rm(path, { force: true });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  }
+}
+
+function isRecord(value: JsonValue | undefined): value is { [key: string]: JsonValue } {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+function authorizeProjectWrite(store: CoordinationStore, projectId: string, params: JsonValue | undefined, method: string): void {
+  const identity = coordinationIdentity(projectId, params);
+  if (identity) {
+    if (!isRecord(params) || typeof params._operationId !== "string") {
+      throw new Error("Coordinated mutation requires _operationId");
+    }
+    const expectedTool = COMPANION_TOOL_SPECS.find((tool) => tool.method === method)?.name;
+    store.assertOperationStarted(identity, params._operationId, expectedTool);
+  }
+  else if (!PREVIEW_CONTROL_METHODS.has(method)) store.assertUncoordinatedWriteAllowed(projectId);
+}
+
+function stripCoordination(params?: JsonValue): JsonValue | undefined {
+  if (!isRecord(params) || !("_coordination" in params)) return params;
+  const { _coordination: ignored, _operationId: ignoredOperation, ...rest } = params;
+  void ignored;
+  void ignoredOperation;
+  return rest;
+}
+
+function coordinationIdentity(projectId: string, params?: JsonValue): LeaseIdentity | undefined {
+  if (!isRecord(params) || !isRecord(params._coordination)) return undefined;
+  const value = params._coordination;
+  if (typeof value.runId !== "string" || typeof value.leaseId !== "string"
+    || typeof value.fencingToken !== "number" || !Number.isInteger(value.fencingToken)) {
+    throw new Error("_coordination requires runId, leaseId and integer fencingToken");
+  }
+  if (typeof value.projectId === "string" && value.projectId !== projectId) {
+    throw new Error("_coordination projectId does not match the bound project");
+  }
+  return {
+    projectId,
+    runId: value.runId,
+    leaseId: value.leaseId,
+    fencingToken: value.fencingToken,
+  };
+}
+
+function coordinateLease(store: CoordinationStore, projectId: string, params?: JsonValue) {
+  if (!isRecord(params) || typeof params.action !== "string") throw new Error("action is required");
+  if (params.action === "status") return store.status(projectId) ?? null;
+  if (params.action === "acquire") {
+    if (typeof params.runId !== "string" || typeof params.ownerClientId !== "string") {
+      throw new Error("runId and ownerClientId are required for acquire");
+    }
+    return store.acquire({
+      projectId,
+      runId: params.runId,
+      ownerClientId: params.ownerClientId,
+      ...(typeof params.ttlMs === "number" ? { ttlMs: params.ttlMs } : {}),
+      ...(typeof params.leaseId === "string" ? { leaseId: params.leaseId } : {}),
+    });
+  }
+  const identity = directIdentity(projectId, params);
+  if (params.action === "heartbeat") {
+    return store.heartbeat(identity, typeof params.ttlMs === "number" ? params.ttlMs : undefined);
+  }
+  if (params.action === "assert") return store.assertCurrent(identity);
+  if (params.action === "release") return store.release(identity);
+  throw new Error(`Unsupported lease action: ${params.action}`);
+}
+
+function coordinateOperationStart(store: CoordinationStore, projectId: string, params?: JsonValue) {
+  if (!isRecord(params) || typeof params.operationId !== "string"
+    || typeof params.tool !== "string" || typeof params.inputDigest !== "string") {
+    throw new Error("operationId, tool and inputDigest are required");
+  }
+  return store.startOperation({
+    identity: directIdentity(projectId, params),
+    operationId: params.operationId,
+    tool: params.tool,
+    inputDigest: params.inputDigest,
+  });
+}
+
+function coordinateOperationGet(store: CoordinationStore, projectId: string, params?: JsonValue) {
+  if (!isRecord(params) || typeof params.operationId !== "string") throw new Error("operationId is required");
+  return store.getOperation(projectId, params.operationId) ?? null;
+}
+
+function coordinateOperationComplete(store: CoordinationStore, projectId: string, params?: JsonValue) {
+  if (!isRecord(params) || typeof params.operationId !== "string"
+    || (params.status !== "SUCCEEDED" && params.status !== "FAILED")) {
+    throw new Error("operationId and terminal status are required");
+  }
+  return store.completeOperation({
+    identity: directIdentity(projectId, params),
+    operationId: params.operationId,
+    status: params.status,
+    ...(params.result === undefined ? {} : { result: params.result }),
+    ...(params.error === undefined ? {} : { error: params.error }),
+  });
+}
+
+function coordinateOperationReconcile(store: CoordinationStore, projectId: string, params?: JsonValue) {
+  if (!isRecord(params) || typeof params.operationId !== "string") throw new Error("operationId is required");
+  const observedStatus = params.observedStatus === "SUCCEEDED" || params.observedStatus === "FAILED"
+    ? params.observedStatus
+    : undefined;
+  return store.reconcileOperation({
+    identity: directIdentity(projectId, params),
+    operationId: params.operationId,
+    ...(observedStatus ? { observedStatus } : {}),
+    ...(typeof params.ownerClientId === "string" ? {ownerClientId:params.ownerClientId} : {}),
+    ...(typeof params.receiptId === "string" ? {receiptId:params.receiptId} : {}),
+    ...(params.result === undefined ? {} : { result: params.result }),
+    ...(params.error === undefined ? {} : { error: params.error }),
+  });
+}
+
+function directIdentity(projectId: string, params: { [key: string]: JsonValue }): LeaseIdentity {
+  if (typeof params.runId !== "string" || typeof params.leaseId !== "string"
+    || typeof params.fencingToken !== "number" || !Number.isInteger(params.fencingToken)) {
+    throw new Error("runId, leaseId and integer fencingToken are required");
+  }
+  return { projectId, runId: params.runId, leaseId: params.leaseId, fencingToken: params.fencingToken };
+}
+
+function rejectForeignPreviewOrigin(url: string | undefined, verificationId: string | undefined): void {
+  if (!url) return;
+  let origin: string;
+  try { origin = new URL(url).origin; } catch { return; }
+  const owner = previewOriginOwner(origin);
+  if (owner && owner !== verificationId) {
+    throw acceptanceFault("ACCEPTANCE_TASK_MISMATCH", "不能沿用另一个验证任务正在使用的预览页", {
+      boundVerificationId: owner,
+      origin,
+    });
+  }
+}
+
+async function assertPreviewOriginAvailable(
+  router: BridgeRouter,
+  projectId: string,
+  verificationId: string | undefined,
+): Promise<void> {
+  const connection = router.connection(projectId);
+  if (!connection) return;
+  try {
+    const status = await new BridgeClient(connection).call("preview.status") as { url?: string };
+    rejectForeignPreviewOrigin(status.url, verificationId);
+  } catch (error) {
+    if (error instanceof AcceptanceFault) throw error;
+  }
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error ?? "unknown error");
+}
+
+/** Signal failures keep a fixed diagnostic; private close errors are never echoed. */
+export function reportBlockedDaemonShutdown(): void {
+  console.error(JSON.stringify({ code: "DAEMON_SHUTDOWN_BLOCKED", stage: "signal-close", pid: process.pid }));
+}
+
+/** 作为独立进程入口启动守护进程，并挂接 SIGINT/SIGTERM 优雅退出。 */
+export async function main(): Promise<void> {
+  const daemon = await startCompanionDaemon();
+  installGuardedShutdownSignals(() => daemon.guardedClose(), { report: reportBlockedDaemonShutdown });
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
+  void main().catch((error) => {
+    console.error(errorMessage(error));
+    process.exitCode = 1;
+  });
+}
+

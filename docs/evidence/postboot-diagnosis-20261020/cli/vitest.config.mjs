@@ -1,0 +1,1 @@
+export default {root:'C:/Users/33272/AppData/Local/Temp/boot-writer-independent-20261020',resolve:{alias:{vitest:'D:/code/shidai3/P8000/companion-next/node_modules/vitest/dist/index.js'}},test:{environment:'node',include:['independent.test.ts'],fileParallelism:false,maxWorkers:1}};

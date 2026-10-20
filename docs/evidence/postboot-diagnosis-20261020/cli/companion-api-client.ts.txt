@@ -1,0 +1,207 @@
+import type { JsonValue } from "./protocol.js";
+import { readFile, stat } from "node:fs/promises";
+import { daemonLocatorPath } from "./companion/paths.js";
+import type { McpRegisterTarget } from "./companion/http-server.js";
+import { summarizeCallValue } from "./companion/call-history.js";
+import { daemonInFlightSchema, daemonStopReceiptSchema, sameDaemonIdentity,
+  type DaemonInFlightSnapshot, type DaemonStopReceipt } from "./companion/lifecycle-drain.js";
+
+/** Companion HTTP API 客户端构造选项。 */
+export interface CompanionApiClientOptions {
+  baseUrl?: string;
+  apiToken?: string;
+  fetch?: typeof globalThis.fetch;
+}
+
+/** Companion 守护进程 API 返回的 HTTP 错误。 */
+export class CompanionApiError extends Error {
+  readonly code: string;
+  readonly retryable: boolean;
+  readonly details: JsonValue | undefined;
+
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly body?: JsonValue,
+  ) {
+    super(message);
+    this.name = "CompanionApiError";
+    const record = body && typeof body === "object" && !Array.isArray(body) ? body : undefined;
+    this.code = typeof record?.code === "string" ? record.code : `HTTP_${status}`;
+    this.retryable = typeof record?.retryable === "boolean" ? record.retryable : status === 408 || status === 429 || status >= 500;
+    this.details = record?.details;
+  }
+}
+
+/** 调用本地 Companion 守护进程 `/v1` API 的客户端。 */
+export class CompanionApiClient {
+  readonly baseUrl: string;
+  private readonly apiToken: string | undefined;
+  private readonly fetchImpl: typeof globalThis.fetch;
+
+  /** 使用显式选项或环境变量构造 API 客户端。 */
+  constructor(options: CompanionApiClientOptions = {}) {
+    this.baseUrl = (options.baseUrl ?? process.env.CREATOR_AI_DAEMON_URL ?? "http://127.0.0.1:32180").replace(/\/$/, "");
+    this.apiToken = options.apiToken ?? process.env.CREATOR_AI_DAEMON_TOKEN;
+    const fetchImpl = options.fetch ?? globalThis.fetch;
+    if (!fetchImpl) throw new Error("This Node.js runtime does not provide fetch");
+    this.fetchImpl = fetchImpl;
+  }
+
+  /** 从环境变量或安全读取的 daemon.json 发现并构造客户端。 */
+  static async discover(): Promise<CompanionApiClient> {
+    if (process.env.CREATOR_AI_DAEMON_URL || process.env.CREATOR_AI_DAEMON_TOKEN) {
+      if (!process.env.CREATOR_AI_DAEMON_URL || !process.env.CREATOR_AI_DAEMON_TOKEN) {
+        throw new Error("CREATOR_AI_DAEMON_URL and CREATOR_AI_DAEMON_TOKEN must be set together");
+      }
+      return new CompanionApiClient();
+    }
+    const statePath = daemonLocatorPath();
+    let text: string;
+    try {
+      const details = await stat(statePath);
+      if (!details.isFile()) throw new Error("Daemon state must be a regular file");
+      if (process.platform !== "win32") {
+        if ((details.mode & 0o077) !== 0 || (process.getuid && details.uid !== process.getuid())) {
+          throw new Error("Daemon state must be an owner-only regular file");
+        }
+      }
+      text = await readFile(statePath, "utf8");
+    } catch (error) {
+      throw new Error(`Cannot securely read Creator AI Companion daemon state (${statePath})`, { cause: error });
+    }
+    let value: unknown;
+    try { value = JSON.parse(text); } catch { throw new Error("Invalid Companion daemon state"); }
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invalid Companion daemon state");
+    const { baseUrl, apiToken } = value as Record<string, unknown>;
+    if (typeof baseUrl !== "string" || !/^http:\/\/127\.0\.0\.1:\d+$/.test(baseUrl) || typeof apiToken !== "string" || !apiToken) {
+      throw new Error("Invalid Companion daemon state");
+    }
+    return new CompanionApiClient({ baseUrl, apiToken });
+  }
+
+  /** 发送带 Bearer 鉴权的 JSON 请求并解析响应。 */
+  async request(method: string, path: string, body?: JsonValue, signal?: AbortSignal): Promise<JsonValue> {
+    const response = await this.fetchImpl(`${this.baseUrl}${path}`, {
+      method,
+      ...(signal ? { signal } : {}),
+      headers: {
+        accept: "application/json",
+        ...(body === undefined ? {} : { "content-type": "application/json" }),
+        ...(this.apiToken ? { authorization: `Bearer ${this.apiToken}` } : {}),
+      },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+    const text = await response.text();
+    let value: JsonValue = null;
+    if (text) {
+      try {
+        value = JSON.parse(text) as JsonValue;
+      } catch {
+        throw new CompanionApiError(`Daemon returned invalid JSON for ${method} ${path}`, response.status);
+      }
+    }
+    if (!response.ok) {
+      const message = value && typeof value === "object" && !Array.isArray(value) && typeof value.error === "string"
+        ? value.error
+        : `Daemon request failed with HTTP ${response.status}`;
+      throw new CompanionApiError(message, response.status, value);
+    }
+    return value;
+  }
+
+  /** 查询守护进程与各工程运行状态。 */
+  status(): Promise<JsonValue> { return this.request("GET", "/v1/status"); }
+
+  async startCall(projectId: string, operation: string, source: "mcp" | "cli", input: unknown): Promise<string | undefined> {
+    try {
+      const response = await this.request("POST", `/v1/projects/${encodeURIComponent(projectId)}/calls/start`,
+        { operation, source, input: summarizeCallValue(input) }, AbortSignal.timeout(1500));
+      return response && typeof response === "object" && !Array.isArray(response) && typeof response.id === "string" ? response.id : undefined;
+    } catch { return undefined; } // History must not change tool execution behavior.
+  }
+
+  async finishCall(projectId: string, id: string, result: unknown, error?: unknown): Promise<void> {
+    const envelope = result && typeof result === "object" ? result as Record<string, unknown> : undefined;
+    const data = envelope?.data && typeof envelope.data === "object" ? envelope.data as Record<string, unknown> : undefined;
+    const failedStep = Array.isArray(data?.results) ? data.results.find((step: unknown) =>
+      step && typeof step === "object" && "ok" in step && step.ok === false) as Record<string, unknown> | undefined : undefined;
+    try {
+      await this.request("POST", `/v1/projects/${encodeURIComponent(projectId)}/calls/${encodeURIComponent(id)}/finish`, {
+        result: {
+          status: failedStep || envelope?.isError === true ? "FAILED" : typeof envelope?.status === "string" ? envelope.status : "PASSED",
+          summary: summarizeCallValue(result),
+          ...(envelope?.error === undefined && !failedStep ? {} : { error: summarizeCallValue(envelope?.error ?? failedStep?.error ?? failedStep) }),
+        },
+        ...(error === undefined ? {} : { error: summarizeCallValue(error) }),
+      }, AbortSignal.timeout(1500));
+    } catch { /* Best-effort telemetry, including older Companion services. */ }
+  }
+  /** Only the running instance can issue a current in-flight snapshot; older services fail closed. */
+  async daemonInFlight(): Promise<DaemonInFlightSnapshot> {
+    const result = daemonInFlightSchema.safeParse(await this.request("GET", "/v1/daemon/inflight"));
+    if (!result.success) throw new CompanionApiError("Daemon does not expose a verified in-flight contract", 409, { code: "DAEMON_INFLIGHT_UNVERIFIED", retryable: false });
+    return result.data;
+  }
+  /** Requests a bound atomic stop, never a process kill or an unguarded legacy stop. */
+  async stopDaemon(): Promise<DaemonStopReceipt> {
+    const snapshot = await this.daemonInFlight();
+    const result = daemonStopReceiptSchema.safeParse(await this.request("POST", "/v1/daemon/stop", {
+      identity: snapshot.identity, generation: snapshot.generation, maxWaitMs: 30_000,
+    }));
+    if (!result.success || !sameDaemonIdentity(result.data.identity, snapshot.identity)
+      || result.data.generation <= snapshot.generation) {
+      throw new CompanionApiError("Daemon stop receipt does not match the observed instance", 409, { code: "DAEMON_STOP_UNVERIFIED", retryable: false });
+    }
+    return result.data;
+  }
+  /** 列出已注册工程。 */
+  listProjects(): Promise<JsonValue> { return this.request("GET", "/v1/projects"); }
+  /** 注册新工程路径。 */
+  addProject(path: string): Promise<JsonValue> { return this.request("POST", "/v1/projects", { path }); }
+  /** 创建新的 Creator 工程，或初始化一个现有空目录。 */
+  scaffoldProject(mode: "create" | "initialize", path: string, creatorVersion = "3.8.8"): Promise<JsonValue> {
+    return this.request("POST", "/v1/projects/scaffold", { mode, path, creatorVersion });
+  }
+  /** 移除已注册工程。 */
+  removeProject(projectId: string): Promise<JsonValue> {
+    return this.request("DELETE", `/v1/projects/${encodeURIComponent(projectId)}`);
+  }
+  /** 查询单个工程运行时状态。 */
+  projectStatus(projectId: string): Promise<JsonValue> {
+    return this.request("GET", `/v1/projects/${encodeURIComponent(projectId)}/status`);
+  }
+  /** 对工程执行 Creator 启停/聚焦/重启动作。 */
+  creatorAction(projectId: string, action: "start" | "focus" | "stop" | "restart"): Promise<JsonValue> {
+    return this.request("POST", `/v1/projects/${encodeURIComponent(projectId)}/creator/${action}`, {});
+  }
+  /** 经 Bridge 转发 Creator 侧 RPC 调用。 */
+  bridgeCall(projectId: string, method: string, params?: JsonValue): Promise<JsonValue> {
+    return this.request("POST", `/v1/projects/${encodeURIComponent(projectId)}/bridge/call`, {
+      method,
+      ...(params === undefined ? {} : { params }),
+    });
+  }
+  /** 调用 Companion 侧管理方法（预览控制、诊断等）。 */
+  managementCall(projectId: string, method: string, params?: JsonValue): Promise<JsonValue> {
+    return this.request("POST", `/v1/projects/${encodeURIComponent(projectId)}/management/call`, {
+      method,
+      ...(params === undefined ? {} : { params }),
+    });
+  }
+  /** 启动工程一键配置流程。 */
+  setupProject(path: string, options: { startCreator?: boolean; configureCodex?: boolean; repair?: boolean; codexPath?: string } = {}): Promise<JsonValue> {
+    return this.request("POST", "/v1/setup", { projectPath: path, ...options });
+  }
+  /** 查询一键配置操作进度。 */
+  setupStatus(operationId: string): Promise<JsonValue> {
+    return this.request("GET", `/v1/setup/${encodeURIComponent(operationId)}`);
+  }
+  /** 运行环境自检。 */
+  doctor(): Promise<JsonValue> { return this.request("GET", "/v1/doctor"); }
+  /** 将工程 MCP 注册到 Codex、Cursor、Trae、Kiro 或 VS Code。 */
+  registerMcp(projectId: string, target: McpRegisterTarget): Promise<JsonValue> {
+    return this.request("POST", `/v1/projects/${encodeURIComponent(projectId)}/mcp/register`, { target });
+  }
+}
+

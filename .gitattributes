@@ -2,3 +2,4 @@
 src/domain/legacy-v148-cli-use-copy.ts -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Freeze exact approved boot repair evidence bytes, including original CRLF sources.
 docs/evidence/boot-writer-20261020/** -text -whitespace
+docs/evidence/postboot-diagnosis-20261020/** -text -whitespace

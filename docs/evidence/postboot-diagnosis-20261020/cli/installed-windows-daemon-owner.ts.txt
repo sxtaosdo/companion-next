@@ -1,0 +1,94 @@
+import childProcess from "node:child_process";
+import { win32 } from "node:path";
+
+export interface WindowsDaemonOwner {
+  readonly pid: number;
+  readonly creationTime: string;
+  readonly executablePath: string;
+  readonly commandLineSha256: string;
+}
+
+export class WindowsDaemonOwnerFault extends Error {
+  readonly code = "WINDOWS_DAEMON_OWNER_UNVERIFIED";
+  constructor() { super("WINDOWS_DAEMON_OWNER_UNVERIFIED"); }
+}
+
+const POWERSHELL = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
+// Fixed local read-only query. The numeric request arrives through stdin, never
+// shell interpolation. Raw CommandLine stays inside this child and is never output.
+const SCRIPT = String.raw`$ErrorActionPreference='Stop'
+[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new($false)
+$request=[Console]::In.ReadToEnd()|ConvertFrom-Json
+if(@($request.PSObject.Properties.Name).Count -ne 1 -or $request.PSObject.Properties.Name -ne 'pid') {throw 'invalid-request'}
+$target=[uint32]$request.pid
+if($target -eq 0 -or $target -ne $request.pid) {throw 'invalid-pid'}
+$filter='ProcessId = '+$target.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+$rows=@(Get-CimInstance -ClassName Win32_Process -Filter $filter -Property ProcessId,CreationDate,ExecutablePath,CommandLine -ErrorAction Stop)
+if($rows.Count -eq 0) {
+  [pscustomobject]@{status='absent';pid=$target}|ConvertTo-Json -Compress
+} else {
+  if($rows.Count -ne 1) {throw 'invalid-row-count'}
+  $row=$rows[0]
+  if($row.ProcessId -ne $target -or $row.CreationDate -isnot [DateTime] -or $row.ExecutablePath -isnot [string] -or [string]::IsNullOrWhiteSpace($row.ExecutablePath) -or $row.CommandLine -isnot [string] -or [string]::IsNullOrWhiteSpace($row.CommandLine)) {throw 'incomplete-owner'}
+  $hash=[System.Security.Cryptography.SHA256]::Create()
+  $bytes=$null
+  try {
+    $bytes=[System.Text.Encoding]::UTF8.GetBytes($row.CommandLine)
+    $commandLineSha256=[BitConverter]::ToString($hash.ComputeHash($bytes)).Replace('-','').ToLowerInvariant()
+  } finally {
+    if($null -ne $bytes) {[Array]::Clear($bytes,0,$bytes.Length)}
+    $hash.Dispose()
+  }
+  $result=[pscustomobject]@{status='present';pid=$target;creationTime=$row.CreationDate.ToUniversalTime().ToString('o');executablePath=$row.ExecutablePath;commandLineSha256=$commandLineSha256}
+  $row=$null
+  $rows=$null
+  $result|ConvertTo-Json -Compress
+}`;
+
+function validPid(pid: unknown): pid is number {
+  return typeof pid === "number" && Number.isSafeInteger(pid) && pid > 0 && pid <= 0xffffffff;
+}
+function timestamp(value: unknown): string {
+  const parts = typeof value === "string" && /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\.(\d{7})Z$/.exec(value);
+  if (!parts || !Number.isFinite(Date.parse(`${parts[1]}Z`))
+    || new Date(`${parts[1]}Z`).toISOString().slice(0, 19) !== parts[1]) throw new WindowsDaemonOwnerFault();
+  return value as string;
+}
+function parse(stdout: string, requestedPid: number): WindowsDaemonOwner | null {
+  const raw: unknown = JSON.parse(stdout.replace(/^\uFEFF/, ""));
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new WindowsDaemonOwnerFault();
+  const value = raw as Record<string, unknown>;
+  if (!validPid(value.pid) || value.pid !== requestedPid) throw new WindowsDaemonOwnerFault();
+  const keys = Object.keys(value).sort().join("|");
+  if (value.status === "absent" && keys === "pid|status") return null;
+  if (value.status !== "present" || keys !== "commandLineSha256|creationTime|executablePath|pid|status"
+    || typeof value.executablePath !== "string" || !win32.isAbsolute(value.executablePath)
+    || !/^(?:[A-Za-z]:[\\/]|\\\\)/.test(value.executablePath) || /[\0\r\n]/.test(value.executablePath)
+    || typeof value.commandLineSha256 !== "string" || !/^[a-f0-9]{64}$/.test(value.commandLineSha256)) throw new WindowsDaemonOwnerFault();
+  return Object.freeze({ pid: value.pid, creationTime: timestamp(value.creationTime),
+    executablePath: value.executablePath, commandLineSha256: value.commandLineSha256 });
+}
+
+/** Exact PID identity observation only. Absence/reuse never proves Native exit,
+ * cancellation, quiescence, or permission to control a process. */
+export async function sampleWindowsDaemonOwner(pid: number): Promise<WindowsDaemonOwner | null> {
+  if (process.platform !== "win32" || !validPid(pid)) throw new WindowsDaemonOwnerFault();
+  try {
+    const stdout = await new Promise<string>((resolve, reject) => {
+      let inputFailed = false;
+      const child = childProcess.execFile(POWERSHELL,
+        ["-NoProfile", "-NonInteractive", "-WindowStyle", "Hidden", "-Command", SCRIPT],
+        { windowsHide: true, shell: false, timeout: 10_000, maxBuffer: 32_768, encoding: "utf8",
+          env: { SystemRoot: "C:\\Windows", WINDIR: "C:\\Windows" } },
+        (error, output) => error || inputFailed ? reject(new WindowsDaemonOwnerFault()) : resolve(output));
+      child.stdin?.once("error", () => { inputFailed = true; });
+      if (!child.stdin) inputFailed = true;
+      else {
+        try { child.stdin.end(JSON.stringify({ pid })); }
+        catch { inputFailed = true; }
+      }
+    });
+    return parse(stdout, pid);
+  } catch { throw new WindowsDaemonOwnerFault(); }
+}
+

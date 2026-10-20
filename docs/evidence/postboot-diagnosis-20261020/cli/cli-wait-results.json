@@ -1,0 +1,68 @@
+{
+  "sourcePath": "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js",
+  "sha256": "bc1e15920a33e388a6d5cdc8347a9bec93fbe7cc719e7208cc8b112feeebca53",
+  "functionSha256": "81a5f76118988a343483a6e5db6b2e669b6fc68bf2c47c28a72053f7329f36c0",
+  "note": "Actual installed function evaluated with fake process/clock/discovery. No daemon/process/network started. 30s row is only a proposed-budget experiment, not a product change.",
+  "rows": [
+    {
+      "readyAt": 13769.405,
+      "proposedBudget": false,
+      "probeDuration": 0,
+      "now": 8000,
+      "outcome": "Creator AI Companion daemon did not become ready within 8 seconds (Error: fetch failed)",
+      "spawns": 1,
+      "kills": 0,
+      "polls": 80
+    },
+    {
+      "readyAt": "never",
+      "proposedBudget": false,
+      "probeDuration": 0,
+      "now": 8000,
+      "outcome": "Creator AI Companion daemon did not become ready within 8 seconds (Error: fetch failed)",
+      "spawns": 1,
+      "kills": 0,
+      "polls": 80
+    },
+    {
+      "readyAt": 0,
+      "proposedBudget": false,
+      "probeDuration": 0,
+      "now": 100,
+      "outcome": "ready",
+      "spawns": 1,
+      "kills": 0,
+      "polls": 1
+    },
+    {
+      "readyAt": 0,
+      "proposedBudget": false,
+      "probeDuration": 0,
+      "now": 100,
+      "outcome": "fixture child exited",
+      "spawns": 1,
+      "kills": 0,
+      "polls": 0
+    },
+    {
+      "readyAt": 13769.405,
+      "proposedBudget": true,
+      "probeDuration": 0,
+      "now": 13800,
+      "outcome": "ready",
+      "spawns": 1,
+      "kills": 0,
+      "polls": 138
+    },
+    {
+      "readyAt": 0,
+      "proposedBudget": false,
+      "probeDuration": 10000,
+      "now": 10100,
+      "outcome": "ready",
+      "spawns": 1,
+      "kills": 0,
+      "polls": 1
+    }
+  ]
+}

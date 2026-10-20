@@ -1,0 +1,18 @@
+[
+  {
+    "file": "native-maintenance.ts",
+    "installedMapMatchesFixtureSource": true
+  },
+  {
+    "file": "native-boot-authority.ts",
+    "installedMapMatchesFixtureSource": true
+  },
+  {
+    "file": "native-writer-recovery.ts",
+    "installedMapMatchesFixtureSource": true
+  },
+  {
+    "file": "windows-writer-lock-retention.ts",
+    "installedMapMatchesFixtureSource": true
+  }
+]
