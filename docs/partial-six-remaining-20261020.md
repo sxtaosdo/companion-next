@@ -25,6 +25,8 @@ Windows无shell直接启动该JS文件被OS拒绝：Win32错误193、子进程�
 
 初始当前session counts为空。两条记录均由真实MCP只读工具通过正常start/finish审计路径产生，没有直接写CallHistoryStore或SQLite。ant-cook现为total2/retained2、source=mcp、success。limit1第一项sequence2，nextBefore2；第二项sequence1且无后续游标，和limit50的真实顺序相同。失败过滤HTTP200且0条。只归档ID/状态/摘要哈希，未归档日志或业务摘要正文。
 
+安装组合的附加边界：00/10/01/11的两位分别为startCreator/configureCodex。01是不启动Creator、配置Codex；仍需先批准其真实配置写入与目标范围。11同时包含启动Creator，当前“不启动Creator”的限制下不能执行；即使批准本文两个文件的三条启动命令修复，也不构成11向导或Creator启动授权，不能据此关闭#5。此条件应留到明确允许Creator的验收窗口，不与本轮最小配置修复捆绑。
+
 ## 一次性最小配置确认建议（尚未写入）
 
 只替换下列3条现有登记的command和args，其他字段、服务器、工程绑定和工具预设保持：
