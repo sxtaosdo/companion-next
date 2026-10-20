@@ -1,0 +1,159 @@
+import { createInterface } from "node:readline";
+import { open, lstat } from "node:fs/promises";
+import { join } from "node:path";
+import { KnowledgeAdapter, KnowledgeFault, jsonProcessInFlightCount, runJsonProcess, type KnowledgeBackend } from "./knowledge-adapter.js";
+import { knowledgeWorkerEnv, READER_KB, READER_METHODS, type ReaderMethod } from "./knowledge-isolation.js";
+
+export function validReaderIdentity(payload: unknown, now = Date.now()): boolean {
+  const value = payload as { success?: unknown; data?: Record<string, unknown> } | null;
+  const d = value?.data;
+  return value?.success === true && !!d && d.key_id === 3 && d.tenant_id === 1 && d.scope_type === "tenant" &&
+    d.full_access === false && JSON.stringify(d.knowledge_base_ids) === JSON.stringify([READER_KB]) &&
+    JSON.stringify(d.capabilities) === '["retrieve"]' && typeof d.expires_at === "string" &&
+    Date.parse(d.expires_at) > now && Date.parse(d.expires_at) === Date.parse("2026-11-08T01:25:46.685460Z");
+}
+
+/** Classification is scoped to fetch/response I/O, never to an arbitrary TypeError.
+ * Only bounded, known transport codes are inspected; raw messages/causes stay private. */
+function readerTransportFault(error: unknown, signal: AbortSignal, requestSignal: AbortSignal): KnowledgeFault {
+  if (signal.aborted) return new KnowledgeFault("CANCELLED", 499);
+  if (requestSignal.aborted) return new KnowledgeFault("TIMEOUT", 504);
+  const unavailable = new Set(["ECONNREFUSED", "ECONNRESET", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "ENETUNREACH", "EHOSTUNREACH", "UND_ERR_SOCKET"]);
+  const timedOut = new Set(["ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT", "UND_ERR_BODY_TIMEOUT"]);
+  const seen = new Set<object>();
+  let value = error;
+  for (let depth = 0; depth < 5 && value && typeof value === "object" && !seen.has(value); depth++) {
+    seen.add(value);
+    const fault = value as { code?: unknown; cause?: unknown };
+    if (typeof fault.code === "string" && timedOut.has(fault.code)) return new KnowledgeFault("TIMEOUT", 504);
+    if (typeof fault.code === "string" && unavailable.has(fault.code)) return new KnowledgeFault("UPSTREAM_UNAVAILABLE", 503);
+    value = fault.cause;
+  }
+  return new KnowledgeFault("SCHEMA_INVALID", 502);
+}
+
+export async function verifyReader(key: string, signal: AbortSignal, endpoint = "http://127.0.0.1:8081"): Promise<void> {
+  if (signal.aborted) throw new KnowledgeFault("CANCELLED", 499);
+  const requestSignal = AbortSignal.any([signal, AbortSignal.timeout(10_000)]);
+  let response: Response;
+  try {
+    response = await fetch(endpoint + "/api/v1/auth/reader-identity", {
+      headers: { "X-API-Key": key, Accept: "application/json" }, redirect: "error", signal: requestSignal,
+    });
+  } catch (error) { throw readerTransportFault(error, signal, requestSignal); }
+  if (requestSignal.aborted) throw readerTransportFault(undefined, signal, requestSignal);
+  if (response.status === 401 || response.status === 403) throw new KnowledgeFault("AUTH_DENIED", 403);
+  if (!response.ok) throw new KnowledgeFault("UPSTREAM_UNAVAILABLE", 503);
+  if (!response.body) throw new KnowledgeFault("SCHEMA_INVALID", 502);
+  const chunks: Uint8Array[] = []; let bytes = 0;
+  try {
+    for await (const chunk of response.body) {
+      bytes += chunk.length;
+      if (bytes > 16_384) throw new KnowledgeFault("OUTPUT_LIMIT", 502);
+      chunks.push(chunk);
+    }
+  } catch (error) {
+    if (error instanceof KnowledgeFault) throw error;
+    throw readerTransportFault(error, signal, requestSignal);
+  }
+  if (requestSignal.aborted) throw readerTransportFault(undefined, signal, requestSignal);
+  let payload: unknown;
+  try { payload = JSON.parse(Buffer.concat(chunks).toString("utf8")); }
+  catch { throw new KnowledgeFault("SCHEMA_INVALID", 502); }
+  if (!validReaderIdentity(payload)) throw new KnowledgeFault("AUTH_DENIED", 403);
+}
+
+/** Reads only the opt-in encrypted blob; plaintext exists only in worker/owned decryptor memory and their pipe. */
+export async function loadDpapiCredential(path: string, signal: AbortSignal): Promise<string> {
+  if (process.platform !== "win32") throw new KnowledgeFault("AUTH_MISSING", 401);
+  const before = await lstat(path);
+  if (!before.isFile() || before.isSymbolicLink() || before.size < 1 || before.size > 32_768) throw new KnowledgeFault("AUTH_MISSING", 401);
+  const file = await open(path, "r");
+  let encrypted: string;
+  try {
+    const current = await file.stat();
+    if (!current.isFile() || current.size !== before.size || current.ino !== before.ino || current.dev !== before.dev) throw new KnowledgeFault("AUTH_MISSING", 401);
+    const buffer = Buffer.alloc(32_769);
+    const { bytesRead } = await file.read(buffer, 0, buffer.length, 0);
+    if (bytesRead !== current.size || bytesRead > 32_768) throw new KnowledgeFault("AUTH_MISSING", 401);
+    encrypted = buffer.subarray(0, bytesRead).toString("utf8").replace(/^\uFEFF/, "").trim();
+    if (!/^[0-9a-f]+$/i.test(encrypted)) throw new KnowledgeFault("AUTH_MISSING", 401);
+  } finally { await file.close(); }
+  const script = "$ErrorActionPreference='Stop'; $s=[Console]::In.ReadToEnd()|ConvertTo-SecureString; $p=[IntPtr]::Zero; try {$p=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($s); @{key=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($p)}|ConvertTo-Json -Compress} finally {if($p -ne [IntPtr]::Zero){[Runtime.InteropServices.Marshal]::ZeroFreeBSTR($p)}; $s.Dispose()}";
+  const value = await runJsonProcess({
+    executable: join(process.env.SystemRoot ?? "C:/Windows", "System32/WindowsPowerShell/v1.0/powershell.exe"),
+    args: ["-NoProfile", "-NonInteractive", "-Command", script], env: knowledgeWorkerEnv(process.env),
+    input: encrypted, maxBytes: 16_384, timeoutMs: 10_000, waitForClose: true,
+  }, signal) as { key?: unknown };
+  if (typeof value.key !== "string" || !value.key || value.key.length > 8192 || /[\r\n\0]/.test(value.key)) throw new KnowledgeFault("AUTH_MISSING", 401);
+  return value.key;
+}
+
+export function redactReaderOutput(value: unknown, key: string): unknown {
+  if (typeof value === "string") {
+    return [key, JSON.stringify(key).slice(1, -1), Buffer.from(key).toString("base64"), encodeURIComponent(key)].reduce((text, secret) => text.split(secret).join("[redacted]"), value);
+  }
+  if (value && typeof value === "object" && "isBase64" in value && value.isBase64 === true && "content" in value && typeof value.content === "string") {
+    const bytes = Buffer.from(value.content, "base64");
+    if (bytes.includes(Buffer.from(key))) throw new KnowledgeFault("SCHEMA_INVALID");
+  }
+  if (Array.isArray(value)) return value.map((item) => redactReaderOutput(item, key));
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([name, item]) => [String(redactReaderOutput(name, key)), redactReaderOutput(item, key)]));
+  return value;
+}
+
+export interface ReaderWorkerDependencies {
+  load: (path: string, signal: AbortSignal) => Promise<string>;
+  verify: (key: string, signal: AbortSignal) => Promise<void>;
+  backend: (key: string) => KnowledgeBackend;
+}
+
+/** One request, no listener or environment-carried secret; cancellation waits for owned CLI close. */
+export async function serveReaderWorker(deps: ReaderWorkerDependencies): Promise<void> {
+  const abort = new AbortController();
+  const lines = createInterface({ input: process.stdin, crlfDelay: Infinity });
+  let started = false; let size = 0;
+  let work: Promise<void> | undefined;
+  process.stdin.on("data", (chunk: Buffer) => { size += chunk.length; if (size > 16_384) abort.abort(); });
+  lines.on("close", () => abort.abort());
+  lines.on("line", (line) => {
+    if (started) { abort.abort(); return; }
+    started = true;
+    work = (async () => {
+      let reply: unknown;
+      try {
+        const request = JSON.parse(line) as { method?: unknown; input?: unknown; credentialFile?: unknown };
+        if (size > 16_384 || !READER_METHODS.includes(request.method as ReaderMethod) || typeof request.credentialFile !== "string") throw new KnowledgeFault("SCHEMA_INVALID", 400);
+        if (request.input && typeof request.input === "object" && "kbId" in request.input && request.input.kbId !== READER_KB) throw new KnowledgeFault("AUTH_DENIED", 403);
+        let key: string;
+        try {
+          key = await deps.load(request.credentialFile, abort.signal);
+          if (typeof key !== "string" || !key || key.length > 8192 || /[\r\n\0]/.test(key)) throw new KnowledgeFault("AUTH_MISSING", 401);
+        } catch {
+          // AUTH_MISSING means local reader loading is unavailable, not proof that
+          // the file is absent. Keep filesystem/ACL/crypto/child details private.
+          throw new KnowledgeFault(abort.signal.aborted ? "CANCELLED" : "AUTH_MISSING", abort.signal.aborted ? 499 : 401);
+        }
+        await deps.verify(key, abort.signal);
+        const backend = deps.backend(key);
+        const value = await backend[request.method as ReaderMethod](request.input, abort.signal);
+        reply = { settled: true, ok: true, value: redactReaderOutput(value, key) };
+      } catch (error) {
+        const fault = abort.signal.aborted ? new KnowledgeFault("CANCELLED", 499) : error instanceof KnowledgeFault ? error : new KnowledgeFault("SCHEMA_INVALID", 502);
+        reply = { settled: true, ok: false, code: fault.code, status: fault.httpStatus };
+      }
+      // Close-aware runner makes zero a real child-close observation, not kill-request evidence.
+      if (jsonProcessInFlightCount() !== 0) { process.exitCode = 1; return; }
+      process.stdout.write(JSON.stringify(reply));
+      lines.close(); process.stdin.destroy();
+    })();
+  });
+  await new Promise<void>((resolve) => { process.stdin.once("close", resolve); });
+  await work;
+}
+
+export const productionReaderWorker: ReaderWorkerDependencies = {
+  load: loadDpapiCredential, verify: verifyReader,
+  backend: (key) => new KnowledgeAdapter({ apiKey: key, keywordOnly: true,
+    runJson: (input, signal) => runJsonProcess({ ...input, waitForClose: true }, signal) }),
+};

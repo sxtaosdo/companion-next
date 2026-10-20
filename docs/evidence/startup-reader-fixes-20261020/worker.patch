@@ -1,0 +1,102 @@
+diff --git a/mcp/src/companion/knowledge-worker-core.ts b/mcp/src/companion/knowledge-worker-core.ts
+index fadda0e..88241be 100644
+--- a/mcp/src/companion/knowledge-worker-core.ts
++++ b/mcp/src/companion/knowledge-worker-core.ts
+@@ -13,19 +13,54 @@ export function validReaderIdentity(payload: unknown, now = Date.now()): boolean
+     Date.parse(d.expires_at) > now && Date.parse(d.expires_at) === Date.parse("2026-11-08T01:25:46.685460Z");
+ }
+ 
++/** Classification is scoped to fetch/response I/O, never to an arbitrary TypeError.
++ * Only bounded, known transport codes are inspected; raw messages/causes stay private. */
++function readerTransportFault(error: unknown, signal: AbortSignal, requestSignal: AbortSignal): KnowledgeFault {
++  if (signal.aborted) return new KnowledgeFault("CANCELLED", 499);
++  if (requestSignal.aborted) return new KnowledgeFault("TIMEOUT", 504);
++  const unavailable = new Set(["ECONNREFUSED", "ECONNRESET", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "ENETUNREACH", "EHOSTUNREACH", "UND_ERR_SOCKET"]);
++  const timedOut = new Set(["ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT", "UND_ERR_BODY_TIMEOUT"]);
++  const seen = new Set<object>();
++  let value = error;
++  for (let depth = 0; depth < 5 && value && typeof value === "object" && !seen.has(value); depth++) {
++    seen.add(value);
++    const fault = value as { code?: unknown; cause?: unknown };
++    if (typeof fault.code === "string" && timedOut.has(fault.code)) return new KnowledgeFault("TIMEOUT", 504);
++    if (typeof fault.code === "string" && unavailable.has(fault.code)) return new KnowledgeFault("UPSTREAM_UNAVAILABLE", 503);
++    value = fault.cause;
++  }
++  return new KnowledgeFault("SCHEMA_INVALID", 502);
++}
++
+ export async function verifyReader(key: string, signal: AbortSignal, endpoint = "http://127.0.0.1:8081"): Promise<void> {
+-  const response = await fetch(endpoint + "/api/v1/auth/reader-identity", {
+-    headers: { "X-API-Key": key, Accept: "application/json" }, redirect: "error",
+-    signal: AbortSignal.any([signal, AbortSignal.timeout(10_000)]),
+-  });
+-  if (!response.ok || !response.body) throw new KnowledgeFault("AUTH_DENIED", 403);
++  if (signal.aborted) throw new KnowledgeFault("CANCELLED", 499);
++  const requestSignal = AbortSignal.any([signal, AbortSignal.timeout(10_000)]);
++  let response: Response;
++  try {
++    response = await fetch(endpoint + "/api/v1/auth/reader-identity", {
++      headers: { "X-API-Key": key, Accept: "application/json" }, redirect: "error", signal: requestSignal,
++    });
++  } catch (error) { throw readerTransportFault(error, signal, requestSignal); }
++  if (requestSignal.aborted) throw readerTransportFault(undefined, signal, requestSignal);
++  if (response.status === 401 || response.status === 403) throw new KnowledgeFault("AUTH_DENIED", 403);
++  if (!response.ok) throw new KnowledgeFault("UPSTREAM_UNAVAILABLE", 503);
++  if (!response.body) throw new KnowledgeFault("SCHEMA_INVALID", 502);
+   const chunks: Uint8Array[] = []; let bytes = 0;
+-  for await (const chunk of response.body) {
+-    bytes += chunk.length;
+-    if (bytes > 16_384) throw new KnowledgeFault("AUTH_DENIED", 403);
+-    chunks.push(chunk);
++  try {
++    for await (const chunk of response.body) {
++      bytes += chunk.length;
++      if (bytes > 16_384) throw new KnowledgeFault("OUTPUT_LIMIT", 502);
++      chunks.push(chunk);
++    }
++  } catch (error) {
++    if (error instanceof KnowledgeFault) throw error;
++    throw readerTransportFault(error, signal, requestSignal);
+   }
+-  if (!validReaderIdentity(JSON.parse(Buffer.concat(chunks).toString("utf8")))) throw new KnowledgeFault("AUTH_DENIED", 403);
++  if (requestSignal.aborted) throw readerTransportFault(undefined, signal, requestSignal);
++  let payload: unknown;
++  try { payload = JSON.parse(Buffer.concat(chunks).toString("utf8")); }
++  catch { throw new KnowledgeFault("SCHEMA_INVALID", 502); }
++  if (!validReaderIdentity(payload)) throw new KnowledgeFault("AUTH_DENIED", 403);
+ }
+ 
+ /** Reads only the opt-in encrypted blob; plaintext exists only in worker/owned decryptor memory and their pipe. */
+@@ -50,7 +85,7 @@ export async function loadDpapiCredential(path: string, signal: AbortSignal): Pr
+     args: ["-NoProfile", "-NonInteractive", "-Command", script], env: knowledgeWorkerEnv(process.env),
+     input: encrypted, maxBytes: 16_384, timeoutMs: 10_000, waitForClose: true,
+   }, signal) as { key?: unknown };
+-  if (typeof value.key !== "string" || !value.key || value.key.length > 8192 || /[\r\n\0]/.test(value.key)) throw new KnowledgeFault("AUTH_DENIED", 403);
++  if (typeof value.key !== "string" || !value.key || value.key.length > 8192 || /[\r\n\0]/.test(value.key)) throw new KnowledgeFault("AUTH_MISSING", 401);
+   return value.key;
+ }
+ 
+@@ -90,13 +125,21 @@ export async function serveReaderWorker(deps: ReaderWorkerDependencies): Promise
+         const request = JSON.parse(line) as { method?: unknown; input?: unknown; credentialFile?: unknown };
+         if (size > 16_384 || !READER_METHODS.includes(request.method as ReaderMethod) || typeof request.credentialFile !== "string") throw new KnowledgeFault("SCHEMA_INVALID", 400);
+         if (request.input && typeof request.input === "object" && "kbId" in request.input && request.input.kbId !== READER_KB) throw new KnowledgeFault("AUTH_DENIED", 403);
+-        const key = await deps.load(request.credentialFile, abort.signal);
++        let key: string;
++        try {
++          key = await deps.load(request.credentialFile, abort.signal);
++          if (typeof key !== "string" || !key || key.length > 8192 || /[\r\n\0]/.test(key)) throw new KnowledgeFault("AUTH_MISSING", 401);
++        } catch {
++          // AUTH_MISSING means local reader loading is unavailable, not proof that
++          // the file is absent. Keep filesystem/ACL/crypto/child details private.
++          throw new KnowledgeFault(abort.signal.aborted ? "CANCELLED" : "AUTH_MISSING", abort.signal.aborted ? 499 : 401);
++        }
+         await deps.verify(key, abort.signal);
+         const backend = deps.backend(key);
+         const value = await backend[request.method as ReaderMethod](request.input, abort.signal);
+         reply = { settled: true, ok: true, value: redactReaderOutput(value, key) };
+       } catch (error) {
+-        const fault = abort.signal.aborted ? new KnowledgeFault("CANCELLED", 499) : error instanceof KnowledgeFault ? error : new KnowledgeFault("AUTH_DENIED", 403);
++        const fault = abort.signal.aborted ? new KnowledgeFault("CANCELLED", 499) : error instanceof KnowledgeFault ? error : new KnowledgeFault("SCHEMA_INVALID", 502);
+         reply = { settled: true, ok: false, code: fault.code, status: fault.httpStatus };
+       }
+       // Close-aware runner makes zero a real child-close observation, not kill-request evidence.

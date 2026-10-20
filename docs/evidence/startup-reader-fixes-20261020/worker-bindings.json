@@ -1,0 +1,104 @@
+{
+  "baselineCommit": "0d9d6dc21b221556d89af615fd49b34185769dd1",
+  "supersededNormalizedBaselineCommit": "4dd829fa7ebe5fc0f6df9ec685930bc8a9a8850b",
+  "installedWorkerSha256": "07c4861de1716058f79866df3b15e64286b1281da8478e5f8feef192964013d4",
+  "installedMapSha256": "8431aff6da611a4d836fa4b34f04e1629e0f1cb00baaa56cdb65e43e84cecb2c",
+  "sources": [
+    {
+      "file": "mcp/src/companion/knowledge-worker-core.ts",
+      "mapSource": "../verified-source/mcp/src/companion/knowledge-worker-core.ts",
+      "sha256": "6de8125b5a45a0fe73767d6fea59589d7402c239d9e76829bf96e7f0d59a698f",
+      "baselineGitBlobSha256": "6de8125b5a45a0fe73767d6fea59589d7402c239d9e76829bf96e7f0d59a698f",
+      "baselineGitExact": true,
+      "candidateSha256": "9d5a8ee64b4ada7cfc73c0505f3e26db4aed4d659d7cf1c58daf98b6e38a0fad",
+      "changed": true
+    },
+    {
+      "file": "mcp/src/companion/knowledge-adapter.ts",
+      "mapSource": "../verified-source/mcp/src/companion/knowledge-adapter.ts",
+      "sha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663",
+      "baselineGitBlobSha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663",
+      "baselineGitExact": true,
+      "candidateSha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663",
+      "changed": false
+    },
+    {
+      "file": "mcp/src/companion/knowledge-isolation.ts",
+      "mapSource": "../verified-source/mcp/src/companion/knowledge-isolation.ts",
+      "sha256": "7de79d71b4b708ee8a63df244660da728abdad07d9d7875c5b9274afb7ccc75f",
+      "baselineGitBlobSha256": "7de79d71b4b708ee8a63df244660da728abdad07d9d7875c5b9274afb7ccc75f",
+      "baselineGitExact": true,
+      "candidateSha256": "7de79d71b4b708ee8a63df244660da728abdad07d9d7875c5b9274afb7ccc75f",
+      "changed": false
+    },
+    {
+      "file": "mcp/src/knowledge-worker.ts",
+      "mapSource": "../verified-source/mcp/src/knowledge-worker.ts",
+      "sha256": "88f3e8ccb90ac50ca1ae2fb0eaba2a11f8f8df636203ba7645eb4453f74177ff",
+      "baselineGitBlobSha256": "88f3e8ccb90ac50ca1ae2fb0eaba2a11f8f8df636203ba7645eb4453f74177ff",
+      "baselineGitExact": true,
+      "candidateSha256": "88f3e8ccb90ac50ca1ae2fb0eaba2a11f8f8df636203ba7645eb4453f74177ff",
+      "changed": false
+    }
+  ],
+  "files": [
+    {
+      "file": "mcp/tests/reader-error-classification.test.ts",
+      "sha256": "5bff9654361ccc5dd44464a82692fcd51042a72dbefbf989e9518777202ea6c0"
+    },
+    {
+      "file": "mcp/tsconfig.json",
+      "sha256": "9384bc1ea1ff32ae6222dc4ee2ec9fe4b5a848faf7c997ed3f6a4f7e7e7f08fc"
+    },
+    {
+      "file": "vitest.config.mjs",
+      "sha256": "733aebbd78a730c288b5d787cbddfc9083b5a7835fa2e22c488073970835ae1b"
+    },
+    {
+      "file": "package.json",
+      "sha256": "c4db0d9c22c4de03a9eb7e903b5995259f38a1e744353acf058934d4f851f6da"
+    },
+    {
+      "file": "README.md",
+      "sha256": "4c326e8e32538c0114a7bfa5bc909ca41f11404e04afca3a7f9d52b0849f03a9"
+    },
+    {
+      "file": "evidence/tests.json",
+      "sha256": "8267a9a03c87dd25a028867cf3e12a79de6276793c528878b038ae4915a3ffa9"
+    },
+    {
+      "file": "evidence/test-stdout.txt",
+      "sha256": "7927613df2ae1e677a222bed0b860e080a1e8bc77cbf404c49b2201d1470a8d8"
+    },
+    {
+      "file": "evidence/typecheck-stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "evidence/worker-core.patch",
+      "sha256": "70196995c45e12dcc88f99f659b5633ed02b82a10007126389cf94c33871e720"
+    }
+  ],
+  "tests": {
+    "passed": 64,
+    "failed": 0,
+    "testFiles": 2
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "strict": true,
+    "allFourExtractedSourcesAndTest": true
+  },
+  "node": "v25.2.1",
+  "vitest": "4.1.10",
+  "typescript": "Version 5.9.3",
+  "boundaries": {
+    "liveCredentialRead": false,
+    "realDecryptorOrCli": false,
+    "networkRequest": false,
+    "listener": false,
+    "productionWrite": false,
+    "deployed": false,
+    "historical403FirstFailureKnown": false
+  }
+}

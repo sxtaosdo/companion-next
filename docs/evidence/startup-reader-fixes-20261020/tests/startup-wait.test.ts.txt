@@ -1,0 +1,107 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { readFile } from 'node:fs/promises';
+import vm from 'node:vm';
+import ts from 'D:/code/shidai3/P8000/companion-next/node_modules/typescript/lib/typescript.js';
+
+const source = await readFile(new URL('./src/companion-cli.ts', import.meta.url), 'utf8');
+const begin = source.indexOf('function describeImmediateDaemonExit(');
+const end = source.indexOf('\ninterface CompanionClientResolutionDependencies', begin);
+const code = ts.transpileModule(source.slice(begin, end).replace('import.meta.url', JSON.stringify('file:///C:/fixture-only/creator-ai.js')),
+  { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } }).outputText;
+const sensitive = 'Bearer secret-token C:/private/project stderr raw-command --password=secret';
+type Options = { readyAt?: number; exitAt?: number; hang?: 'discover' | 'locator' | 'request'; discoverDelay?: number; preflightHang?: 'listeners' | 'locator'; preflightDelay?: number; failRequest?: boolean; staleUntil?: number; occupied?: boolean };
+function harness(options: Options = {}) {
+  let locatorReads = 0;
+  const signals: AbortSignal[] = [];
+  const kill = vi.fn(), spawn = vi.fn(() => ({ pid: 88, unref: vi.fn(), kill }));
+  const never = () => new Promise<never>(() => {});
+  const request = vi.fn(async (method: string, path: string, body: unknown, signal: AbortSignal) => {
+    signals.push(signal); expect([method, path, body]).toEqual(['GET', '/v1/status', undefined]);
+    if (options.hang === 'request') return never(); // Deliberately ignores abort: outer race still must settle.
+    if (options.failRequest) throw new Error(sensitive);
+    return { phase: 'OPEN' };
+  });
+  const client = { request };
+  const discover = vi.fn(async () => {
+    if (options.discoverDelay) await new Promise(resolve => setTimeout(resolve, options.discoverDelay));
+    if (options.hang === 'discover') return never();
+    if (Date.now() < (options.readyAt ?? 0)) throw new Error(sensitive);
+    return client;
+  });
+  const context = vm.createContext({ Date, performance, AbortController, setTimeout, clearTimeout,
+    DEFAULT_COMPANION_DAEMON_PORT: 32180,
+    listTcpListeners: vi.fn(async () => { if (options.preflightDelay) await new Promise(resolve => setTimeout(resolve, options.preflightDelay)); return options.preflightHang === 'listeners' ? never() : options.occupied ? [{ commandLine: sensitive }] : []; }),
+    resolve: () => 'fixture-only-daemon.js', dirname: (x: unknown) => x, fileURLToPath: (x: unknown) => x,
+    readLocatorPid: async () => { locatorReads++; if (locatorReads === 1) return options.preflightHang === 'locator' ? never() : 77; if (options.hang === 'locator') return never(); return Date.now() < (options.staleUntil ?? 0) ? 77 : 88; },
+    spawn, process: { execPath: 'fixture-node' }, sleep: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
+    processAlive: (pid: number) => pid === 77 || Date.now() < (options.exitAt ?? Infinity),
+    CompanionApiClient: { discover },
+  });
+  const fn = vm.runInContext(code + '\nstartDaemonAndDiscover', context);
+  const result = fn().then((value: unknown) => ({ ok: true, value }), (error: Error) => ({ ok: false, message: error.message }));
+  return { result, spawn, kill, request, discover, signals, locatorReads: () => locatorReads };
+}
+afterEach(() => vi.useRealTimers());
+describe('installed-source CLI startup wait narrow repair, fake process and clock only', () => {
+  it.each(['listeners', 'locator'] as const)('refuses a hanging initial %s preflight after 10 seconds with zero spawn', async preflightHang => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ preflightHang });
+    await vi.advanceTimersByTimeAsync(9999); let settled = false; h.result.then(() => { settled = true; }); await Promise.resolve(); expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1); expect(await h.result).toMatchObject({ ok: false, message: expect.stringContaining('no process was started') }); expect(h.spawn).not.toHaveBeenCalled(); expect(h.request).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+  });
+  it.each([-86400000, 86400000])('keeps the 30-second budget across a wall-clock jump of %i ms', async jump => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ readyAt: Infinity }); await vi.advanceTimersByTimeAsync(10000); vi.setSystemTime(Date.now() + jump);
+    await vi.advanceTimersByTimeAsync(19999); let settled = false; h.result.then(() => { settled = true; }); await Promise.resolve(); expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1); expect(await h.result).toMatchObject({ ok: false, message: expect.stringContaining('within 30 seconds') }); expect(h.spawn).toHaveBeenCalledTimes(1); expect(vi.getTimerCount()).toBe(0);
+  });
+  it('never spawns when a preflight completes after its deadline', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ preflightDelay: 10001 }); await vi.advanceTimersByTimeAsync(10000);
+    expect(await h.result).toMatchObject({ ok: false, message: expect.stringContaining('no process was started') }); await vi.advanceTimersByTimeAsync(100);
+    expect(h.spawn).not.toHaveBeenCalled(); expect(h.discover).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+  });
+  it('does not read a locator or request status when discovery completes after the startup deadline', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ discoverDelay: 31000 }); await vi.advanceTimersByTimeAsync(30000);
+    expect(await h.result).toMatchObject({ ok: false }); expect(h.locatorReads()).toBe(1);
+    await vi.advanceTimersByTimeAsync(1200); expect(h.locatorReads()).toBe(1); expect(h.request).not.toHaveBeenCalled(); expect(h.spawn).toHaveBeenCalledTimes(1); expect(vi.getTimerCount()).toBe(0);
+  });
+  it('gives startup its own 30 seconds after a successful slow preflight', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ preflightDelay: 9000, readyAt: Infinity }); await vi.advanceTimersByTimeAsync(38999);
+    let settled = false; h.result.then(() => { settled = true; }); await Promise.resolve(); expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1); expect(await h.result).toMatchObject({ ok: false, message: expect.stringContaining('within 30 seconds') }); expect(h.spawn).toHaveBeenCalledTimes(1); expect(vi.getTimerCount()).toBe(0);
+  });
+  it('accepts observed 13.769-second slow startup with one spawn and no process control', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ readyAt: 13769.405 });
+    await vi.advanceTimersByTimeAsync(13800);
+    expect(await h.result).toMatchObject({ ok: true, value: { pid: 88 } }); expect(h.spawn).toHaveBeenCalledTimes(1); expect(h.kill).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+  });
+  it('accepts immediate readiness and cleans up its deadline timer', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness(); await vi.advanceTimersByTimeAsync(100);
+    expect(await h.result).toMatchObject({ ok: true }); expect(h.request).toHaveBeenCalledTimes(1); expect(h.signals[0].aborted).toBe(false); expect(vi.getTimerCount()).toBe(0);
+  });
+  it('detects an early child exit before the next discovery and exposes no process command', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ readyAt: Infinity, exitAt: 200 }); await vi.advanceTimersByTimeAsync(200);
+    const r = await h.result; expect(r).toMatchObject({ ok: false, message: expect.stringContaining('exited immediately') }); expect(h.discover).toHaveBeenCalledTimes(1); expect(JSON.stringify(r)).not.toContain(sensitive); expect(h.spawn).toHaveBeenCalledTimes(1); expect(h.kill).not.toHaveBeenCalled();
+  });
+  it.each([{ readyAt: Infinity }, { failRequest: true }])('bounds continuously failing readiness without raw errors: %j', async options => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness(options); await vi.advanceTimersByTimeAsync(30000);
+    const r = await h.result; expect(r).toMatchObject({ ok: false, message: expect.stringContaining('within 30 seconds') }); expect(r.message).toContain('background startup may still be running (PID 88)'); expect(r.message).toContain('Check daemon status'); expect(JSON.stringify(r)).not.toContain(sensitive); expect(h.spawn).toHaveBeenCalledTimes(1); expect(h.kill).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+  });
+  it.each(['discover', 'locator', 'request'] as const)('bounds a hanging %s without depending on probe cancellation', async hang => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ hang }); await vi.advanceTimersByTimeAsync(29999);
+    let settled = false; h.result.then(() => { settled = true; }); await Promise.resolve(); expect(settled).toBe(false);
+    await vi.advanceTimersByTimeAsync(1); expect(await h.result).toMatchObject({ ok: false, message: expect.stringContaining('within 30 seconds') });
+    if (hang === 'request') { expect(h.signals).toHaveLength(1); expect(h.signals[0].aborted).toBe(true); }
+    expect(h.spawn).toHaveBeenCalledTimes(1); expect(h.kill).not.toHaveBeenCalled(); expect(vi.getTimerCount()).toBe(0);
+  });
+  it('does not accept a still-live previous locator and does not spawn again', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ staleUntil: 500 }); await vi.advanceTimersByTimeAsync(500);
+    expect(await h.result).toMatchObject({ ok: true }); expect(h.request).toHaveBeenCalledTimes(1); expect(h.spawn).toHaveBeenCalledTimes(1);
+  });
+  it('accepts readiness before the budget and refuses readiness first available at the deadline', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const first = harness({ readyAt: 29900 }); await vi.advanceTimersByTimeAsync(29900); expect(await first.result).toMatchObject({ ok: true });
+    vi.setSystemTime(0); const last = harness({ readyAt: 30000 }); await vi.advanceTimersByTimeAsync(30000); expect(await last.result).toMatchObject({ ok: false }); expect(last.spawn).toHaveBeenCalledTimes(1);
+  });
+  it('preserves occupied-port rejection before spawning without raw listener diagnostics', async () => {
+    vi.useFakeTimers(); vi.setSystemTime(0); const h = harness({ occupied: true }); const r = await h.result;
+    expect(r).toMatchObject({ ok: false, message: expect.stringContaining('DAEMON_PORT_OCCUPIED') }); expect(JSON.stringify(r)).not.toContain(sensitive); expect(h.spawn).not.toHaveBeenCalled();
+  });
+});

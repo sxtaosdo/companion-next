@@ -1,0 +1,468 @@
+{
+  "success": true,
+  "numTotalTests": 115,
+  "numPassedTests": 115,
+  "numFailedTests": 0,
+  "tests": [
+    {
+      "name": "v148 knowledge-only fixed operation surface is inert until called and uses exactly three GETs and eight logical-read POSTs",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface keeps source registration, retrieval verification and service reachability independent",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface reports partial failed service reads as unknown, never as stopped or verified",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface strictly projects all response rows and discards nested opaque diagnostics/configuration",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed or contradictory status 0",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed or contradictory status 1",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed or contradictory status 2",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed or contradictory status 3",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed or contradictory status 4",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed or contradictory status 5",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed or contradictory status 6",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed or contradictory status 7",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects unsafe search results 0",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects unsafe search results 1",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects unsafe search results 2",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects unsafe search results 3",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects unsafe search results 4",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects unsafe search results 5",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed /api/knowledge/kb/list projection",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed /api/knowledge/kb/view projection",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed /api/knowledge/doc/list projection",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed /api/knowledge/doc/view projection",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed /api/knowledge/chunk/list projection",
+      "status": "passed"
+    },
+    {
+      "name": "v148 knowledge-only fixed operation surface rejects malformed /api/knowledge/agent/list projection",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 0",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 1",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 2",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 3",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 4",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 5",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 6",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 7",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 8",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 9",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 10",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 11",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 12",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects invalid or additional input before dispatch 13",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview validates every request separately and permits backend safe identifier punctuation",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview returns the complete bounded original preview without creating a download URL or saving data",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 0",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 1",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 2",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 3",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 4",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 5",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 6",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 7",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview rejects mismatched or malformed original previews 8",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge inputs and original-content preview enforces caller-selected list/search bounds and preserves true empty results",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation returns static safe HTTP 401 failures without raw diagnostics",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation returns static safe HTTP 403 failures without raw diagnostics",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation returns static safe HTTP 429 failures without raw diagnostics",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation returns static safe HTTP 500 failures without raw diagnostics",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation returns static safe HTTP 503 failures without raw diagnostics",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation does not reflect unknown error codes or transport exceptions",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation rejects non-JSON/invalid/UTF-8 responses 0",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation rejects non-JSON/invalid/UTF-8 responses 1",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation rejects non-JSON/invalid/UTF-8 responses 2",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation rejects non-JSON/invalid/UTF-8 responses 3",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation rejects redirects even when an injected transport follows them",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation caps both announced and streamed bytes at 2 MiB and cancels rejected bodies",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation accepts a maximum bounded 1 MiB binary preview within the 2 MiB envelope budget",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation caps zero-byte streaming chunks so endless empty chunks cannot bypass the budget",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation rejects a pre-cancelled request without touching the transport",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation single-flights status/POST operations while allowing the two independent service reads",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation settles cancellation even if fetch ignores its signal and discards the late response",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation cancels a stalled body and keeps the aborted result out of the caller",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation uses 30-second reads and 45-second original-preview deadlines without auto-retries",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge transport budgets, errors and cancellation times out bodies as well as headers and validates timeout configuration",
+      "status": "passed"
+    },
+    {
+      "name": "original sync source writer gate projection retains explicit writer flags true without processing credentials",
+      "status": "passed"
+    },
+    {
+      "name": "original sync source writer gate projection retains explicit writer flags false without processing credentials",
+      "status": "passed"
+    },
+    {
+      "name": "original sync source writer gate projection rejects non-boolean source gate approved",
+      "status": "passed"
+    },
+    {
+      "name": "original sync source writer gate projection rejects non-boolean source gate enabled",
+      "status": "passed"
+    },
+    {
+      "name": "original sync source writer gate projection rejects non-boolean source gate writerReady",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation displays closed diagnostic categories for real host failures without raw transport messages",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation starts without network and has no stored contents or fabricated counts",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation explicit connect reads only statuses, never posts or starts an iframe",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation retains successful service status when CLI read fails without inventing an empty result",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation keeps service failures unknown when CLI succeeds",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation runs search only when explicitly requested",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation runs bases only when explicitly requested",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation runs base only when explicitly requested",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation runs documents only when explicitly requested",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation runs document only when explicitly requested",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation runs original only when explicitly requested",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation runs chunks only when explicitly requested",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation runs agents only when explicitly requested",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation rejects unsafe request IDs without using transport",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation clears errors and results immediately when request inputs change",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation ignores late responses after query A to B to A changes",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation does not let cancelled old work clear new work loading state",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation blocks double clicks and actions while status is in flight",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation disconnect clears private query and contents, late response cannot revive them",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation status refresh aborts old state and ignores previous-provider response",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation failed query never reuses the previous success",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge read state isolation cancelReads keeps newer action results safe from old status completions",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge document source generations discards late documents content after the selected KB or document changes",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge document source generations discards late document content after the selected KB or document changes",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge document source generations discards late chunks content after the selected KB or document changes",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge document source generations discards late original content after the selected KB or document changes",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries passive build keeps /knowledge disconnected and explains no CLI probe",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries passive build keeps /knowledge?tab=models disconnected and explains no CLI probe",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries shows missing host without requests, fixtures or guessed zero results",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries does not query on mount, connect only reads status and no frameable iframe is created",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries selects a returned base without submitting a query and clears previous result",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries searches explicitly, and input edits invalidate the old display",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries escapes original content and never renders downloaded html or a save link",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries shows binary preview metadata without embedding or exposing base64",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries keeps failed sync registration unknown instead of a successful empty list",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries keeps model tab free of knowledge CLI/status queries",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries clears result and cancels pending work on tab change and unmount",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge page read boundaries disconnects immediately if provider identity changed off page or while mounted",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge bounded read presentation keeps unverified keyword status distinct from an explicit enabled search entry",
+      "status": "passed"
+    },
+    {
+      "name": "knowledge bounded read presentation shows document and chunk truncation without inventing pagination or loading more",
+      "status": "passed"
+    }
+  ]
+}

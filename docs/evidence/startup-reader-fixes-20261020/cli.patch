@@ -1,0 +1,130 @@
+diff --git a/src/companion-cli.ts b/src/companion-cli.ts
+index 3718f32..d794449 100644
+--- a/src/companion-cli.ts
++++ b/src/companion-cli.ts
+@@ -1,4 +1,5 @@
+ import { spawn } from "node:child_process";
++import { performance } from "node:perf_hooks";
+ import { readFile } from "node:fs/promises";
+ import { fileURLToPath, pathToFileURL } from "node:url";
+ import { basename, dirname, resolve } from "node:path";
+@@ -6,7 +7,6 @@ import { CompanionApiClient } from "./companion-api-client.js";
+ import type { JsonValue } from "./protocol.js";
+ import {
+   DEFAULT_COMPANION_DAEMON_PORT,
+-  formatPortListeners,
+   listTcpListeners,
+ } from "./companion/daemon-port.js";
+ import { daemonLocatorPath } from "./companion/paths.js";
+@@ -219,47 +219,85 @@ async function waitUntilDead(pid: number, timeoutMs = 5_000): Promise<boolean> {
+   return !processAlive(pid);
+ }
+ 
+-async function describeImmediateDaemonExit(port = DEFAULT_COMPANION_DAEMON_PORT): Promise<string> {
++function describeImmediateDaemonExit(port = DEFAULT_COMPANION_DAEMON_PORT): string {
++  return `Creator AI Companion daemon exited immediately; startup did not complete (port ${port})`;
++}
++
++/** 后台拉起守护进程并轮询直到 API 可发现且 status 成功。 */
++async function daemonStartPreflight(): Promise<number | undefined> {
++  const controller = new AbortController();
++  const timer = setTimeout(() => controller.abort(), 10_000);
++  let onAbort: (() => void) | undefined;
++  let occupied = false;
+   try {
+-    const listeners = await listTcpListeners(port);
+-    if (listeners.length > 0) {
+-      return `Creator AI Companion daemon exited immediately.\n${formatPortListeners(port, listeners)}\n请在终端中重新运行并选择关闭占用进程，或使用 daemon start --kill-port。`;
+-    }
++    const timedOut = new Promise<never>((_, reject) => {
++      onAbort = () => reject(new Error("DAEMON_PREFLIGHT_DEADLINE"));
++      controller.signal.addEventListener("abort", onAbort, { once: true });
++    });
++    const checks = (async () => {
++      const listeners = await listTcpListeners(DEFAULT_COMPANION_DAEMON_PORT);
++      controller.signal.throwIfAborted();
++      occupied = listeners.length > 0;
++      if (occupied) throw new Error("DAEMON_PORT_OCCUPIED");
++      const previousPid = await readLocatorPid();
++      controller.signal.throwIfAborted();
++      return previousPid;
++    })();
++    return await Promise.race([checks, timedOut]);
+   } catch {
+-    // Fall through to generic guidance.
++    throw new Error(occupied
++      ? `DAEMON_PORT_OCCUPIED: port ${DEFAULT_COMPANION_DAEMON_PORT}; use the authenticated stop guard before starting`
++      : "Creator AI Companion daemon is temporarily unavailable: startup preflight could not be verified within its 10-second budget; no process was started.");
++  } finally {
++    clearTimeout(timer);
++    if (onAbort) controller.signal.removeEventListener("abort", onAbort);
+   }
+-  return `Creator AI Companion daemon exited immediately; check whether port ${port} is already in use`;
+ }
+ 
+-/** 后台拉起守护进程并轮询直到 API 可发现且 status 成功。 */
+ async function startDaemonAndDiscover(): Promise<{ client: CompanionApiClient; pid?: number }> {
+-  const listeners = await listTcpListeners(DEFAULT_COMPANION_DAEMON_PORT);
+-  if (listeners.length) throw new Error(`DAEMON_PORT_OCCUPIED: port ${DEFAULT_COMPANION_DAEMON_PORT}; use the authenticated stop guard before starting`);
++  const previousPid = await daemonStartPreflight();
+   const daemonPath = resolve(dirname(fileURLToPath(import.meta.url)), "companion-daemon.js");
+-  const previousPid = await readLocatorPid();
+   const child = spawn(process.execPath, [daemonPath], { detached: true, stdio: "ignore" });
+   child.unref();
+   const childPid = child.pid;
+-  const deadline = Date.now() + 8_000;
+-  let lastError: unknown;
+-  while (Date.now() < deadline) {
+-    await sleep(100);
++  const startupWaitMs = 30_000;
++  const deadline = performance.now() + startupWaitMs;
++  while (performance.now() < deadline) {
++    await sleep(Math.min(100, Math.max(0, deadline - performance.now())));
++    if (performance.now() >= deadline) break;
+     if (childPid && !processAlive(childPid)) {
+-      throw new Error(await describeImmediateDaemonExit());
++      throw new Error(describeImmediateDaemonExit());
+     }
++    const controller = new AbortController();
++    const timer = setTimeout(() => controller.abort(), Math.max(1, deadline - performance.now()));
++    let onAbort: (() => void) | undefined;
+     try {
+-      const client = await CompanionApiClient.discover();
+-      const locatorPid = await readLocatorPid();
+-      // Ignore a stale locator that still points at the previous daemon.
+-      if (previousPid && locatorPid === previousPid && processAlive(previousPid)) continue;
+-      await client.status();
+-      return { client, ...(childPid ? { pid: childPid } : {}) };
+-    } catch (error) {
+-      lastError = error;
++      // Bound discovery as well as fetch; a stalled probe must not outlive the wait.
++      const timedOut = new Promise<never>((_, reject) => {
++        onAbort = () => reject(new Error("DAEMON_READINESS_DEADLINE"));
++        controller.signal.addEventListener("abort", onAbort, { once: true });
++      });
++      const probe = (async () => {
++        const client = await CompanionApiClient.discover();
++        controller.signal.throwIfAborted();
++        const locatorPid = await readLocatorPid();
++        controller.signal.throwIfAborted();
++        // Ignore a stale locator that still points at the previous daemon.
++        if (previousPid && locatorPid === previousPid && processAlive(previousPid)) return undefined;
++        await client.request("GET", "/v1/status", undefined, controller.signal);
++        return client;
++      })();
++      const client = await Promise.race([probe, timedOut]);
++      if (client && performance.now() < deadline) return { client, ...(childPid ? { pid: childPid } : {}) };
++    } catch {
++      // Discovery/network diagnostics may contain local paths or credentials.
++      // The bounded startup result below deliberately includes no raw probe error.
++    } finally {
++      clearTimeout(timer);
++      if (onAbort) controller.signal.removeEventListener("abort", onAbort);
+     }
+   }
+-  const detail = lastError instanceof Error ? lastError.message : String(lastError ?? "unknown error");
+-  throw new Error(`Creator AI Companion daemon did not become ready within 8 seconds (${detail})`);
++  throw new Error(`Creator AI Companion daemon did not become ready within ${startupWaitMs / 1000} seconds; background startup may still be running${childPid ? ` (PID ${childPid})` : ""}. Check daemon status before starting again.`);
+ }
+ 
+ interface CompanionClientResolutionDependencies {

@@ -1,0 +1,42 @@
+{
+  "root": "C:/Users/33272/AppData/Local/Temp/cli-start-wait-repair-20261020",
+  "baselineCommit": "2bb48bf",
+  "generatedAtUtc": "2026-10-20T02:32:12.4561649Z",
+  "files": [
+    {
+      "file": "src/companion-cli.ts",
+      "bytes": 25007,
+      "sha256": "96c5784539c317900b496d9ef63410efe243e876de425b64feb147ebedb9f07b"
+    },
+    {
+      "file": "source.patch",
+      "bytes": 6798,
+      "sha256": "442ef041107e969fb1306787fa312bc06a0163728f1ce4c0ee188a52f0860e99"
+    },
+    {
+      "file": "startup-wait.test.ts",
+      "bytes": 10578,
+      "sha256": "27e5326960e4b449027d951c7c46ae2d37cae622644ba2780c0e7550889d7ab2"
+    },
+    {
+      "file": "vitest.config.mjs",
+      "bytes": 282,
+      "sha256": "4b1ee52621695d8a120c5ebe40fb1e94770f7d9f778231ff0870ea2c451ee27f"
+    },
+    {
+      "file": "tests.json",
+      "bytes": 8556,
+      "sha256": "e3a6637320d14432c710c980f76144d70a71116b4a5aee47c5ff091db0bb5b5b"
+    },
+    {
+      "file": "BASELINE.json",
+      "bytes": 344,
+      "sha256": "72faea6bd27170f621571b55194eb3796e7c2a0dd0fe2f099c8b7b5d17b14a33"
+    },
+    {
+      "file": "README.md",
+      "bytes": 3216,
+      "sha256": "c5071f473ad1b3a9ef6e2000322250b97628c7b43dbb6c9555e4d23768c35b19"
+    }
+  ]
+}

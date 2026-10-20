@@ -1,0 +1,16 @@
+{
+  "target": "cli",
+  "baselineByteIdentical": true,
+  "originalSha256": "bc1e15920a33e388a6d5cdc8347a9bec93fbe7cc719e7208cc8b112feeebca53",
+  "originalMapSha256": "ca9a00e3783398749f4949d3630adced8e3d6533e69abd0deeb3c2175d4b44f7",
+  "ownedSources": 46,
+  "changedSources": [
+    "src/companion-cli.ts"
+  ],
+  "dependenciesUnchanged": true,
+  "resolutionStubsAbsentFromOutput": true,
+  "candidate": {
+    "jsSha256": "3b9fb28a547dc9b3319a086f7e19b63d3a8bf4852680d8c6bba599291200367b",
+    "mapSha256": "345a2d0ce4f71c7c8491b49b436b7dbe71c15b2bfeb908da6be5391093b7e58a"
+  }
+}

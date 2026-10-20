@@ -1,0 +1,21 @@
+{
+  "build.mjs": "291953c4687ec1b943080aab1b84c3dbd929e80f750a2c6384f4cea3ec2782fa",
+  "checkpoint.json": "ed9f68cff654c6e741d00f32c335d6da24b5b2bc7df28ba88bcd1d0199642b19",
+  "checkpoint.py": "9952985f39b08abe48f3630bdcdb6e8e2193731c3996aee74466c5e19b77404f",
+  "cli-bindings.json": "e00ce2e661412d7c89e9c182dc83abf0101cfbfa134499e09a2fc15db6e3c19b",
+  "cli-build.json": "7ac3971144c139a6786af2f86748578ea5ee4951a578da26db60368530b0a315",
+  "cli-tests.json": "09dbfd985a4a1ce6a5b122848d8626ec39a0933584e1c53555594f6b0e40adbb",
+  "cli.patch": "442ef041107e969fb1306787fa312bc06a0163728f1ce4c0ee188a52f0860e99",
+  "deploy.py": "23e1082e5163528e793b239b75ba6619bfd91a91b532ed55b7d0e4af72c07f09",
+  "independent-review.json": "eb8499fa4ce291f3b23251b87417848981114103ecbde0ed568d27195512f8f6",
+  "next-contract-tests.json": "77cc0b88ee03d5cd6453ac99f37af14e07b97b84e2af8d9b87448f81a73faa3d",
+  "worker-bindings.json": "7a4414b97443a7979a0ba0e9321458ee231e29208ac4bc07d43bd2764f4bb354",
+  "worker-build.json": "0a917b4b72c3de3e1543f60324acbf8fcf61552a06b607c550bb5cfa729641d1",
+  "worker-classification.md": "4c326e8e32538c0114a7bfa5bc909ca41f11404e04afca3a7f9d52b0849f03a9",
+  "worker-tests.json": "04a52b4a9c61e702e553543d0e8d9fea576115c2beef63b6d9322d96a1dc019f",
+  "worker.patch": "70196995c45e12dcc88f99f659b5633ed02b82a10007126389cf94c33871e720",
+  "source/companion-cli.ts.txt": "96c5784539c317900b496d9ef63410efe243e876de425b64feb147ebedb9f07b",
+  "source/knowledge-worker-core.ts.txt": "9d5a8ee64b4ada7cfc73c0505f3e26db4aed4d659d7cf1c58daf98b6e38a0fad",
+  "tests/reader-error-classification.test.ts.txt": "5bff9654361ccc5dd44464a82692fcd51042a72dbefbf989e9518777202ea6c0",
+  "tests/startup-wait.test.ts.txt": "27e5326960e4b449027d951c7c46ae2d37cae622644ba2780c0e7550889d7ab2"
+}

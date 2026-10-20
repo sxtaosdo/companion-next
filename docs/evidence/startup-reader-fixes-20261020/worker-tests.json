@@ -1,0 +1,264 @@
+{
+  "success": true,
+  "numTotalTests": 64,
+  "numPassedTests": 64,
+  "numFailedTests": 0,
+  "tests": [
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) accepts the unchanged public identity including RFC3339Nano expiry and returns metadata",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) classifies local ENOENT as unavailable local loading, without claiming denial",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) classifies local EACCES as unavailable local loading, without claiming denial",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) classifies local EIO as unavailable local loading, without claiming denial",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) keeps decryptor/crypto/child diagnostics local 0",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) keeps decryptor/crypto/child diagnostics local 1",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) keeps decryptor/crypto/child diagnostics local 2",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects invalid local envelope 0 before decrypt/fetch",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects invalid local envelope 1 before decrypt/fetch",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects invalid local envelope 2 before decrypt/fetch",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed loaded key 0 locally",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed loaded key 1 locally",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed loaded key 2 locally",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed loaded key 3 locally",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed loaded key 4 locally",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed loaded key 5 locally",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves cancellation during local loading",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) maps explicit fetch cause ECONNREFUSED to service unavailable",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) maps explicit fetch cause ECONNRESET to service unavailable",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) maps explicit fetch cause ENOTFOUND to service unavailable",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) maps explicit fetch cause EAI_AGAIN to service unavailable",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) maps explicit fetch cause UND_ERR_SOCKET to service unavailable",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) maps explicit transport timeout ETIMEDOUT distinctly",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) maps explicit transport timeout UND_ERR_CONNECT_TIMEOUT distinctly",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) maps explicit transport timeout UND_ERR_HEADERS_TIMEOUT distinctly",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) enforces the 10s request deadline independently of caller cancellation",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves caller cancellation while fetch is pending",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves deadline when fetch resolves after abort",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves caller when fetch resolves after abort",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves deadline when response completes after abort",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves caller when response completes after abort",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) does not guess network/permission from arbitrary fetch error 0",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) does not guess network/permission from arbitrary fetch error 1",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) does not guess network/permission from arbitrary fetch error 2",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves actual upstream HTTP401 as AUTH_DENIED",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves actual upstream HTTP403 as AUTH_DENIED",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) keeps non-auth HTTP404 distinct from permission denial",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) keeps non-auth HTTP429 distinct from permission denial",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) keeps non-auth HTTP500 distinct from permission denial",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) keeps non-auth HTTP503 distinct from permission denial",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed response JSON 0 without claiming network/auth",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed response JSON 1 without claiming network/auth",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects malformed response JSON 2 without claiming network/auth",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) rejects a missing identity response body",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) keeps bounded response output failures distinct",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) classifies known response-stream transport failure",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) does not label unknown response-stream TypeError as network",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 0",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 1",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 2",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 3",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 4",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 5",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 6",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 7",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) preserves strict identity/scope/expiry refusal 8",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) refuses invalid identity shape 0",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) refuses invalid identity shape 1",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) refuses invalid identity shape 2",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) refuses invalid identity shape 3",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) refuses invalid identity shape 4",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) refuses a foreign KB before loading any reader key",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) does not turn an unrelated backend TypeError into permission denial",
+      "status": "passed"
+    },
+    {
+      "name": "reader worker phase-specific safe error classification (all I/O fake) does not apply fetch transport classification to an unrelated backend failure",
+      "status": "passed"
+    }
+  ]
+}

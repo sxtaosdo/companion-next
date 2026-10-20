@@ -1,0 +1,16 @@
+{
+  "target": "worker",
+  "baselineByteIdentical": true,
+  "originalSha256": "07c4861de1716058f79866df3b15e64286b1281da8478e5f8feef192964013d4",
+  "originalMapSha256": "8431aff6da611a4d836fa4b34f04e1629e0f1cb00baaa56cdb65e43e84cecb2c",
+  "ownedSources": 4,
+  "changedSources": [
+    "src/companion/knowledge-worker-core.ts"
+  ],
+  "dependenciesUnchanged": true,
+  "resolutionStubsAbsentFromOutput": true,
+  "candidate": {
+    "jsSha256": "9a02abcd0d885053e45a4d5a91a07f197582a7451d619e094090967d68e4eb9c",
+    "mapSha256": "3a3dc98d688089947cb1da955d476c31402b86055246f649bd72aba6dacae9b6"
+  }
+}

@@ -1,0 +1,184 @@
+import { readFileSync } from "node:fs";
+import { EventEmitter } from "node:events";
+import vm from "node:vm";
+import ts from "typescript";
+import { describe, expect, it } from "vitest";
+import { KnowledgeFault, KnowledgeAdapter } from "../src/companion/knowledge-adapter.js";
+import type * as Core from "../src/companion/knowledge-worker-core.js";
+
+const KB = "da1051a5-3fff-4198-ba55-017ea79df9c3";
+const KEY = "SYNTHETIC_FAKE_READER_KEY";
+const PRIVATE = "SYNTHETIC_PRIVATE_DIAGNOSTIC";
+const source = readFileSync(new URL("../src/companion/knowledge-worker-core.ts", import.meta.url), "utf8");
+const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+const identity = () => ({ success: true, data: { key_id: 3, tenant_id: 1, scope_type: "tenant", full_access: false,
+  knowledge_base_ids: [KB], capabilities: ["retrieve"], expires_at: "2026-11-08T01:25:46.685460+00:00" } });
+const fault = (code: string) => Object.assign(new Error(PRIVATE), { code });
+interface Options {
+  status?: number; payload?: unknown; raw?: string; noBody?: boolean; bodyError?: unknown;
+  fetchError?: unknown; loadError?: unknown; decryptError?: unknown; backendError?: unknown;
+  ciphertext?: string; key?: unknown; deadline?: boolean; cancel?: "fetch" | "load"; input?: Record<string, unknown>;
+  abortAfterFetch?: "deadline" | "caller"; abortAfterBody?: "deadline" | "caller";
+}
+
+/** Real source/class, fake filesystem, decryptor, fetch, stdio and backend.
+ * Only readFileSync above reads a file: this task's own source, never a credential.
+ * No child process, loopback listener or real authentication request can be used. */
+async function worker(options: Options = {}) {
+  const calls = { lstat: 0, open: 0, decrypt: 0, fetch: 0, backend: 0, deadlineMs: 0 };
+  const stdin = Object.assign(new EventEmitter(), { destroy(this: EventEmitter) { this.emit("close"); } });
+  const lines = Object.assign(new EventEmitter(), { close(this: EventEmitter) { this.emit("close"); } });
+  const deadline = new AbortController();
+  let output = "";
+  const exports: Record<string, unknown> = {};
+  const encrypted = options.ciphertext ?? "a1b2";
+  const stat = { isFile: () => true, isSymbolicLink: () => false, size: Buffer.byteLength(encrypted), ino: 1, dev: 1 };
+  const fakeFs = {
+    lstat: async () => { calls.lstat++; if (options.loadError) throw options.loadError; return stat; },
+    open: async () => { calls.open++; return {
+      stat: async () => stat, close: async () => undefined,
+      read: async (buffer: Buffer) => { buffer.write(encrypted); return { bytesRead: Buffer.byteLength(encrypted) }; },
+    }; },
+  };
+  const fakeRun = async () => { calls.decrypt++; if (options.decryptError) throw options.decryptError;
+    return { key: Object.hasOwn(options, "key") ? options.key : KEY }; };
+  const sandbox = {
+    exports, Buffer, Date, AbortController,
+    AbortSignal: { any: AbortSignal.any.bind(AbortSignal), timeout: (ms: number) => { calls.deadlineMs = ms; return deadline.signal; } },
+    process: { stdin, stdout: { write: (text: string) => { output += text; } }, env: { SystemRoot: "C:/Windows" }, platform: "win32" },
+    fetch: async (url: string, init: RequestInit) => {
+      calls.fetch++;
+      expect(url).toBe("http://127.0.0.1:8081/api/v1/auth/reader-identity");
+      expect(init.redirect).toBe("error");
+      expect((init.headers as Record<string, string>)["X-API-Key"]).toBe(KEY);
+      if (options.fetchError) throw options.fetchError;
+      if (options.deadline || options.cancel === "fetch") {
+        return await new Promise((_, reject) => {
+          init.signal!.addEventListener("abort", () => reject(init.signal!.reason), { once: true });
+          queueMicrotask(() => options.deadline ? deadline.abort(new DOMException(PRIVATE, "TimeoutError")) : lines.close());
+        });
+      }
+      const abortAtBoundary = (which: "deadline" | "caller" | undefined) => {
+        if (which === "deadline") deadline.abort(new DOMException(PRIVATE, "TimeoutError"));
+        if (which === "caller") lines.close();
+      };
+      abortAtBoundary(options.abortAfterFetch);
+      const status = options.status ?? 200;
+      return { status, ok: status >= 200 && status < 300,
+        body: options.noBody ? null : { async *[Symbol.asyncIterator]() {
+          if (options.bodyError) throw options.bodyError;
+          yield Buffer.from(options.raw ?? JSON.stringify(Object.hasOwn(options, "payload") ? options.payload : identity()));
+          abortAtBoundary(options.abortAfterBody);
+        } },
+      };
+    },
+    require: (name: string) => {
+      if (name === "node:readline") return { createInterface: () => lines };
+      if (name === "node:fs/promises") return fakeFs;
+      if (name === "node:path") return { join: (...parts: string[]) => parts.join("/") };
+      if (name === "./knowledge-adapter.js") return { KnowledgeFault, KnowledgeAdapter, runJsonProcess: fakeRun, jsonProcessInFlightCount: () => 0 };
+      if (name === "./knowledge-isolation.js") return { READER_KB: KB,
+        READER_METHODS: ["search", "listKnowledgeBases", "viewKnowledgeBase", "listDocuments", "viewDocument", "listChunks", "downloadDocument"],
+        knowledgeWorkerEnv: () => ({}) };
+      throw new Error("Unexpected import; no real I/O allowed");
+    },
+  };
+  vm.runInNewContext(code, sandbox, { filename: "isolated-actual-worker-core.cjs" });
+  const api = exports as unknown as typeof Core;
+  const pending = api.serveReaderWorker({
+    load: async (path, signal) => {
+      expect(path).toBe("SYNTHETIC_NEVER_OPENED.dpapi");
+      if (options.cancel === "load") { lines.close(); throw new Error(PRIVATE); }
+      return api.loadDpapiCredential(path, signal);
+    },
+    verify: api.verifyReader,
+    backend: () => ({ viewKnowledgeBase: async () => { calls.backend++; if (options.backendError) throw options.backendError;
+      return { item: { id: KB } }; } }) as never,
+  });
+  const line = JSON.stringify({ method: "viewKnowledgeBase", input: options.input ?? { kbId: KB }, credentialFile: "SYNTHETIC_NEVER_OPENED.dpapi" });
+  stdin.emit("data", Buffer.from(line + "\n")); lines.emit("line", line);
+  await pending;
+  expect(output).not.toContain(KEY); expect(output).not.toContain(PRIVATE); expect(output).not.toContain("powershell");
+  return { reply: JSON.parse(output) as { ok: boolean; code?: string; status?: number; value?: unknown }, calls, api };
+}
+async function rejectsAs(options: Options, code: string, status: number) {
+  const result = await worker(options);
+  expect(result.reply).toEqual({ settled: true, ok: false, code, status });
+  expect(result.calls.backend).toBe(0);
+  return result;
+}
+
+describe("reader worker phase-specific safe error classification (all I/O fake)", () => {
+  it("accepts the unchanged public identity including RFC3339Nano expiry and returns metadata", async () => {
+    const result = await worker();
+    expect(result.reply).toEqual({ settled: true, ok: true, value: { item: { id: KB } } });
+    expect(result.calls).toEqual({ lstat: 1, open: 1, decrypt: 1, fetch: 1, backend: 1, deadlineMs: 10_000 });
+  });
+  it.each(["ENOENT", "EACCES", "EIO"])("classifies local %s as unavailable local loading, without claiming denial", async code => {
+    const result = await rejectsAs({ loadError: fault(code) }, "AUTH_MISSING", 401);
+    expect(result.calls.fetch).toBe(0);
+  });
+  it.each([new Error(PRIVATE), new KnowledgeFault("TIMEOUT", 504), new TypeError(PRIVATE)])
+    ("keeps decryptor/crypto/child diagnostics local %#", async decryptError => {
+      const result = await rejectsAs({ decryptError }, "AUTH_MISSING", 401);
+      expect(result.calls.fetch).toBe(0);
+    });
+  it.each(["", "not-encrypted-hex", "a".repeat(32_769)])("rejects invalid local envelope %# before decrypt/fetch", async ciphertext => {
+    const result = await rejectsAs({ ciphertext }, "AUTH_MISSING", 401);
+    expect(result.calls.decrypt).toBe(0); expect(result.calls.fetch).toBe(0);
+  });
+  it.each([undefined, "", "bad\nkey", "bad\rkey", "bad\0key", "a".repeat(8193)])("rejects malformed loaded key %# locally", async key => {
+    const result = await rejectsAs({ key }, "AUTH_MISSING", 401); expect(result.calls.fetch).toBe(0);
+  });
+  it("preserves cancellation during local loading", async () => { await rejectsAs({ cancel: "load" }, "CANCELLED", 499); });
+  it.each(["ECONNREFUSED", "ECONNRESET", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_SOCKET"])
+    ("maps explicit fetch cause %s to service unavailable", async code => {
+      await rejectsAs({ fetchError: new TypeError(PRIVATE, { cause: fault(code) }) }, "UPSTREAM_UNAVAILABLE", 503);
+    });
+  it.each(["ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_HEADERS_TIMEOUT"])
+    ("maps explicit transport timeout %s distinctly", async code => { await rejectsAs({ fetchError: fault(code) }, "TIMEOUT", 504); });
+  it("enforces the 10s request deadline independently of caller cancellation", async () => {
+    const result = await rejectsAs({ deadline: true }, "TIMEOUT", 504); expect(result.calls.deadlineMs).toBe(10_000);
+  });
+  it("preserves caller cancellation while fetch is pending", async () => { await rejectsAs({ cancel: "fetch" }, "CANCELLED", 499); });
+  it.each(["deadline", "caller"] as const)("preserves %s when fetch resolves after abort", async which => {
+    await rejectsAs({ abortAfterFetch: which, status: 403 }, which === "deadline" ? "TIMEOUT" : "CANCELLED", which === "deadline" ? 504 : 499);
+  });
+  it.each(["deadline", "caller"] as const)("preserves %s when response completes after abort", async which => {
+    await rejectsAs({ abortAfterBody: which }, which === "deadline" ? "TIMEOUT" : "CANCELLED", which === "deadline" ? 504 : 499);
+  });
+  it.each([new TypeError(PRIVATE), new Error(PRIVATE), Object.assign(new Error(PRIVATE), { code: "NOT_A_NETWORK_CODE" })])
+    ("does not guess network/permission from arbitrary fetch error %#", async fetchError => { await rejectsAs({ fetchError }, "SCHEMA_INVALID", 502); });
+  it.each([401, 403])("preserves actual upstream HTTP%s as AUTH_DENIED", async status => { await rejectsAs({ status }, "AUTH_DENIED", 403); });
+  it.each([404, 429, 500, 503])("keeps non-auth HTTP%s distinct from permission denial", async status => { await rejectsAs({ status }, "UPSTREAM_UNAVAILABLE", 503); });
+  it.each(["", "{malformed", "PRIVATE not JSON"])("rejects malformed response JSON %# without claiming network/auth", async raw => {
+    await rejectsAs({ raw }, "SCHEMA_INVALID", 502);
+  });
+  it("rejects a missing identity response body", async () => { await rejectsAs({ noBody: true }, "SCHEMA_INVALID", 502); });
+  it("keeps bounded response output failures distinct", async () => { await rejectsAs({ raw: "a".repeat(16_385) }, "OUTPUT_LIMIT", 502); });
+  it("classifies known response-stream transport failure", async () => { await rejectsAs({ bodyError: new TypeError(PRIVATE, { cause: fault("ECONNRESET") }) }, "UPSTREAM_UNAVAILABLE", 503); });
+  it("does not label unknown response-stream TypeError as network", async () => { await rejectsAs({ bodyError: new TypeError(PRIVATE) }, "SCHEMA_INVALID", 502); });
+  it.each([
+    { key_id: 4 }, { tenant_id: 2 }, { scope_type: "platform" }, { full_access: true },
+    { knowledge_base_ids: [KB, "foreign"] }, { capabilities: ["retrieve", "write"] },
+    { expires_at: "2026-11-08T01:25:46Z" }, { expires_at: "2026-11-08T01:25:46.686Z" },
+    { expires_at: "2020-01-01T00:00:00Z" },
+  ])("preserves strict identity/scope/expiry refusal %#", async patch => {
+    const payload = identity(); Object.assign(payload.data, patch); await rejectsAs({ payload }, "AUTH_DENIED", 403);
+  });
+  it.each([null, [], {}, { success: false }, { success: true, data: null }])("refuses invalid identity shape %#", async payload => {
+    await rejectsAs({ payload }, "AUTH_DENIED", 403);
+  });
+  it("refuses a foreign KB before loading any reader key", async () => {
+    const result = await rejectsAs({ input: { kbId: "foreign" } }, "AUTH_DENIED", 403);
+    expect(result.calls.lstat).toBe(0); expect(result.calls.fetch).toBe(0);
+  });
+  it("does not turn an unrelated backend TypeError into permission denial", async () => {
+    const result = await worker({ backendError: new TypeError(PRIVATE) });
+    expect(result.reply).toEqual({ settled: true, ok: false, code: "SCHEMA_INVALID", status: 502 });
+  });
+  it("does not apply fetch transport classification to an unrelated backend failure", async () => {
+    const result = await worker({ backendError: new TypeError(PRIVATE, { cause: fault("ECONNREFUSED") }) });
+    expect(result.reply).toEqual({ settled: true, ok: false, code: "SCHEMA_INVALID", status: 502 });
+  });
+});
