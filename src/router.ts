@@ -36,9 +36,10 @@ export const router = createRouter({
   history: createWebHashHistory(), routes,
   scrollBehavior(to, from, saved) {
     if (saved) return saved
+    if (to.hash === '#service-status') return { el: '#service-status', top: 16 }
     if (knowledgePageFor(to)) return knowledgeScrollFor(to) ?? { left: 0, top: 0 }
     if (knowledgePageFor(from)) return { left: 0, top: 0 }
-    return to.hash === '#service-status' ? { el: '#service-status', top: 16 } : undefined
+    return undefined
   },
 })
 router.beforeEach((_to, from) => {

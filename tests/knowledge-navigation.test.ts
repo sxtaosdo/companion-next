@@ -4,7 +4,7 @@ import { createPinia } from 'pinia'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import ElementPlus from 'element-plus'
 import App from '../src/App.vue'
-import { routes } from '../src/router'
+import { routes, router as appRouter } from '../src/router'
 import { knowledgePageFor, rememberKnowledgeScroll, knowledgeScrollFor, clearKnowledgeScrollPositions } from '../src/domain/knowledge-navigation'
 import { useKnowledgeReadStore } from '../src/stores/knowledge-read'
 import { knowledgeReadProvider, registerKnowledgeReadProvider } from '../src/knowledge-read-integration'
@@ -76,6 +76,15 @@ describe('knowledge secondary navigation and visit lifetime',()=>{
   })
 })
 describe('knowledge scroll memory',()=>{
+  it('keeps the legacy service-status anchor when leaving a knowledge page',async()=>{
+    const {router}=await setup('/knowledge')
+    const from=router.currentRoute.value
+    await router.push('/overview#service-status');await flushPromises()
+    const to=router.currentRoute.value
+    const scroll=appRouter.options.scrollBehavior
+    expect(scroll).toBeDefined()
+    expect(await scroll?.(to,from,null)).toEqual({el:'#service-status',top:16})
+  })
   it('isolates page and QA mode positions without treating model/unknown routes as knowledge',()=>{
     rememberKnowledgeScroll({path:'/knowledge'},{left:0,top:120})
     rememberKnowledgeScroll({path:'/knowledge/qa'},{left:0,top:200})
