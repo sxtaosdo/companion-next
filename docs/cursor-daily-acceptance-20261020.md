@@ -1,3 +1,5 @@
+2026-10-20 Cursor actual-call update: one authorized project_get_status-only Agent request was sent once. Cursor returned Weekly usage limit reached / Buy credits or Upgrade Plan before any tool receipt. STOPPED, no retry or paid action; actual Cursor business invocation remains unverified. Matrix remains 13/6/2. [Evidence and remaining blocker](cursor-agent-status-20261020.md).
+
 # 日常 Cursor 两条既有连接验收（2026-10-20）
 
 本轮使用用户日常Cursor原配置和可见窗口，**cocos、cook各一次单独Reload后均Connected，117项工具，project_get_status可见。** 不再把隔离实例未创建client当作日常连接失败；先前隔离失败证据仍原样保留。本轮没有打开新隔离实例。

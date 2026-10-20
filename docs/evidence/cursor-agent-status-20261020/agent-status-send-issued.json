@@ -1,0 +1,10 @@
+{
+  "tool": "project_get_status",
+  "requestedCalls": 1,
+  "pid": 23912,
+  "state": "issued-or-uncertain",
+  "atUtc": "2026-10-20T04:30:24.5718025Z",
+  "target": "cocos-creator-cocos-214a2184",
+  "sendAttempts": 1,
+  "arguments": {}
+}

@@ -1,0 +1,403 @@
+{
+  "sendMarkerExists": true,
+  "atUtc": "2026-10-20T04:30:32.8026243Z",
+  "controls": [
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Tab",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.TabItem",
+      "name": "MCP connection acceptance, Chat Editors: Editor Group 1",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "MCP connection acceptance",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.ToolBar",
+      "name": "Tab actions",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Button",
+      "name": "Close (Ctrl+F4)",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.TabItem",
+      "name": "New Agent, Chat Editors: Editor Group 1",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "New Agent",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.ToolBar",
+      "name": "Tab actions",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Button",
+      "name": "Close (Ctrl+F4)",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.ToolBar",
+      "name": "Editor actions",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Button",
+      "name": "New Agent (Ctrl+N) [Alt] Replace Agent",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Button",
+      "name": "Show Chat History",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Hyperlink",
+      "name": "More Actions...",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.ToolBar",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Button",
+      "name": " ",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "bubble-cc5e637c-887a-4eab-8220-88a579e3f0e5-c335b754-b8cc-4797-b6a2-961d6fee09d7",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "One-shot MCP connection acceptance. Make exactly ONE tool call: project_get_status with empty arguments {} on the existing MCP server cocos-creator-cocos-214a2184 (project 214a2184be887306). Then report the actual tool result and stop. Do not call any other tool or any other server. Do not read or attach source files. Do not write code, modify files/configuration, run shell/terminal commands, start or stop Creator, models, or any service. Do not create a plan, background task, automatic continuation, or retries. If this exact tool is unavailable or any extra permission, login, extension, subscription or payment is required, stop and report it without taking further action.",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "Weekly usage limit reached. It resets in 1 day.",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "Buy credits to keep going now, or upgrade your plan for more weekly usage.",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "Buy Credits",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "^⏎",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "Upgrade Plan",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "⏎",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Edit",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "\n",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "Plan, Build, / for skills, @ for context",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "fcc5e637c887a4eab822088a579e3f0e5abc77e6cdc2b47baaf54b053931d7f99unifieddropdown",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "Agent",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Button",
+      "name": "Auto",
+      "id": "_r_d_",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "Auto",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Text",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Button",
+      "name": "Start voice chat",
+      "id": "base-ui-_r_m_",
+      "enabled": true
+    },
+    {
+      "type": "ControlType.Group",
+      "name": "",
+      "id": "",
+      "enabled": true
+    }
+  ],
+  "pid": 23912
+}
