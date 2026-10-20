@@ -1,3 +1,5 @@
+后续状态：既有知识库服务已按授权恢复，原reader限定只读链全部200，auth/keyword verified；CLI/worker代码仍未改，历史首错分支仍未知。见[02:07恢复结果](knowledge-service-resume-20261020.md)。下文保留先前时点的调查/阻塞记录。
+
 后续证据校正：13.769405ms为进程创建→locator对象createdAt，非精确首次就绪时长。KB403现确认存在8081不可达和旧worker错误归类，生产首次错误分支未观测；不得直接视为权限拒绝。见[完整只读调查](postboot-two-blockers-diagnosis-20261020.md)。
 
 # 2026-10-20 writer-only 启动修复及真实结果

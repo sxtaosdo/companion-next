@@ -1,0 +1,189 @@
+{
+  "reviewedAtUtc": "2026-10-20T02:01:39.002692+00:00",
+  "safeToStartKnowledgeOnly": true,
+  "scope": "one existing guarded WeKnora startup by central parent only; this review did not start anything",
+  "normalCommand": "& 'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe' -NoProfile -NonInteractive -ExecutionPolicy Bypass -File 'D:/services/weknora/Start-PilotAccess.ps1'",
+  "commandBoundary": "fresh child PowerShell as used by installed KnowledgeServiceClient; process-scoped flag only, no persistent execution-policy change",
+  "installedServiceEntry": {
+    "launcher": "D:/services/weknora/Start-PilotAccess.ps1",
+    "workingDirectory": "D:/services/weknora/pilot-access",
+    "executable": "D:/services/weknora/normal-reader-recovery-v0.8.2/weknora.exe",
+    "listen": "127.0.0.1:8081",
+    "pidFile": "pilot-access/server.pid"
+  },
+  "sourceProvenance": {
+    "upstreamCommit": "3e8b0bfc80b845b2d4b2ed683994748741450a97",
+    "upstreamClean": true,
+    "buildEntry": "Build-Recovery.ps1:31 builds ./cmd/server, not ./cmd/desktop",
+    "overlayDoesNotReplaceStartupFiles": true,
+    "sourceHashes": {
+      "cmd/server/main.go": "001a4f34b9a1bed27644f43c72e98fb58489f77314810135f1f3ff612e8903fa",
+      "cmd/server/bootstrap.go": "00886d77065485b5dc3705620102122f7116411dee950b39d13082df726416b4",
+      "internal/container/container.go": "389d74129caacd1ec101cf83ad86cb7210765bba47183c574fc1b523f91345e1",
+      "internal/container/recover_pending_wiki_tasks.go": "ba8c9e23309247485aa3b1f620659944ee953e768a6e897f438656f2515a8602",
+      "internal/container/reset_pending_tasks.go": "a23c5c2fa6f8fa86e0ce712e93b965ec5bad12afca851699ea41b63485c87c22",
+      "internal/config/config.go": "cd0bbf0af74c9e33826a4c6079d905ef1eeea62e41601b78f07a14c057b7e43b",
+      "internal/router/sync_task.go": "44045ec13fa2f3af399736ba14a947109013ec3ee28699b484307aa02901f930",
+      "internal/datasource/scheduler.go": "9d55aebee0c7378c8d11491dd6485b1ee14804ea15cb54278cd46c13588d4743",
+      "internal/application/service/knowledge_housekeeping.go": "7221e7eb0bfd96871ee9cc3ad17ceadbf7e2de5a3c0934b736d5c52d0ced9cd6",
+      "internal/models/utils/ollama/ollama.go": "0932c973ec802168bb68f90adc08edd2b0331d84315e05c21294e7aca9258dc3",
+      "internal/application/service/model.go": "ff0f47fe7e78547c570652698c0f29c5816bf02b9655c0016c98b069bc55f1f6",
+      "internal/application/service/knowledge.go": "c103de214235aae1425e2379972a3b42a0b75445af505298e0860460a7b868a1",
+      "internal/application/service/knowledgebase.go": "7c822da7fc566dd9abc4d76a8d16cbe0dc75f71c7a74c9f69923f38fedf21c2c",
+      "internal/application/service/tenant_api_key.go": "c38b6bb13805f8bb74ffc49fe5f4c0ffbd5166a764620030de6cfd1ce8d2adfd",
+      "Start-PilotAccess.ps1": "d5d799ea341e0bd4bc77fbb39f7d673e9e9200cfb1a021c93cc7b8a9737ed233",
+      "pilot-access/state-check.py": "6b7f9d9ffa53d3d35f2f06f7a21ec1d92c9b9a788a8a27c8778c9c1ac9014d04",
+      "pilot-access/Load-JwtSecret.ps1": "9233b49abe69ea40a2cf4f842692759f0f4d9faeebc262a3615257fb5a0b5af8",
+      "build/reader-recovery-v0.8.2/Build-Recovery.ps1": "ec76eb5480f20a4d9faef1d7defbdf40ba5e3bab994e022e1d02c232de0f3667",
+      "build/reader-recovery-v0.8.2/deployment-evidence.json": "7af5733287daa00b6417b95e8eff349746dbe8aac820882641edc3584b769667"
+    }
+  },
+  "artifactPins": {
+    "weknora.exe": {
+      "sha256": "b05899bc8ccaf299f8d5b5bb7c131cedf81491e51b02906b4321d72c10d6ce64",
+      "matchesManifest": true
+    },
+    "duckdb.dll": {
+      "sha256": "8bdbf7cfe619482e64f30e99c628eaee28936c5b10fe8459baea9df8b78095b6",
+      "matchesManifest": true
+    },
+    "libgcc_s_seh-1.dll": {
+      "sha256": "68ca4574b331402879dec403ba4f14491c9b8fc4aa3f4a41432008714b9bc5df",
+      "matchesManifest": true
+    },
+    "libstdc++-6.dll": {
+      "sha256": "b30dbd914d903992acb28b38455947153886656beafbd91c465c31aa258f9c45",
+      "matchesManifest": true
+    },
+    "libwinpthread-1.dll": {
+      "sha256": "76cc52adfcdb8c800813b2ae8da42a908934eb1ee54ce8e9744fc8d703c76ee1",
+      "matchesManifest": true
+    }
+  },
+  "readOnlyPreflight": {
+    "executedInspectFunctionOnly": true,
+    "databaseMode": "mode=ro; PRAGMA query_only=ON; BEGIN",
+    "databaseWrites": false,
+    "metadataBeforeUnchanged": true,
+    "knowledgeStateGuardPasses": true,
+    "integrity": "ok",
+    "migration": [
+      [
+        30,
+        0
+      ]
+    ],
+    "temporaryKbs": 0,
+    "disabledLegacyMcpOnly": true,
+    "emptyTriggerCounts": {
+      "task_pending_ops": 0,
+      "data_sources": 0,
+      "im_channels": 0,
+      "mcp_services": 0,
+      "sync_logs": 0,
+      "tenant_sandbox_configs": 0,
+      "temporary_documents": 0,
+      "fork_snapshot_leases": 0,
+      "tenant_skills": 0,
+      "sessions_with_fork_bootstrap": 0
+    },
+    "credentialHashBackfillWouldRun": false,
+    "secretOrHashValuesOutput": false
+  },
+  "environmentClosure": {
+    "launcherClearsUnlistedProcessVariables": true,
+    "redisAddressAbsentAfterClosure": true,
+    "bootstrapAdminEmailAbsentAfterClosure": true,
+    "autoMigrate": false,
+    "autoRecoverDirty": false,
+    "housekeeping": false,
+    "sandboxMode": "disabled",
+    "auditRetentionDays": 0,
+    "conversationRewrite": false,
+    "conversationQueryExpansion": false,
+    "conversationRerank": false,
+    "duckdbSkipExtensionLoad": true,
+    "ollamaOptional": true,
+    "ollamaOptionalIsNotAModelDisableFlag": true
+  },
+  "dotenvAndConfig": {
+    "workingDirectoryDotEnvExists": false,
+    "workingDirectoryDotEnvLocalExists": false,
+    "workingDirectoryDotEnvProductionExists": false,
+    "workingDirectoryConfigYamlExists": false,
+    "configConfigYamlExists": true,
+    "dotenvContentsRead": false,
+    "startupServerDoesNotImportOrInvokeDotEnvLoader": true,
+    "onlyDotEnvSourceHit": "cmd/desktop/main.go:178, outside compiled server entry",
+    "configLoader": "internal/config/config.go:501-538: Viper YAML load/AutomaticEnv/read substitution; it does not write process environment",
+    "redisBranchReadsProcessEnvironment": "container.go:438,750-754; YAML cannot reintroduce REDIS_ADDR into os.Getenv"
+  },
+  "existingSigningSecret": {
+    "loader": "pilot-access/Load-JwtSecret.ps1",
+    "existingFileOnly": true,
+    "missingOrUnsafeFileThrows": true,
+    "checks": "regular file length, reparse ancestors, owner/protected single-user ACL, base64 format",
+    "createWriteOrPermissionOperationsInLoader": false,
+    "secretValueReadByReview": false,
+    "secretEnvironment": "JWT_SECRET in launcher child Process only, then local temporary variable cleared"
+  },
+  "startupTaskAndModelEvidence": [
+    {
+      "source": "internal/container/container.go:438-468,604-608; internal/router/sync_task.go:25-28,141-165",
+      "conclusion": "no REDIS_ADDR -> Lite executor; construction/register handlers does not enqueue or replay external Redis jobs"
+    },
+    {
+      "source": "internal/container/container.go:613; internal/container/recover_pending_wiki_tasks.go:69-81",
+      "conclusion": "durable wiki recovery has no task_pending_ops rows to enqueue under the checked empty-table guard"
+    },
+    {
+      "source": "internal/datasource/scheduler.go:56-73",
+      "conclusion": "cron runner does start, but data_sources=0 means zero ingest/sync entries; do not claim all cron threads disabled"
+    },
+    {
+      "source": "internal/application/service/knowledge_housekeeping.go:92-100,728-739",
+      "conclusion": "explicit housekeeping=false returns before scheduling sweep/recovery"
+    },
+    {
+      "source": "internal/container/container.go:887-922,947-970",
+      "conclusion": "AUTO_MIGRATE=false skips migration, builtin-model loading and resolveStorageProviderPending/resetPendingTasks path; historical processing/finalizing rows alone do not trigger reparsing"
+    },
+    {
+      "source": "internal/models/utils/ollama/ollama.go:29-70; internal/application/service/model.go:37-51; knowledge.go:94-151; knowledgebase.go:58-102",
+      "conclusion": "reviewed constructors only create clients/assemble dependencies; no model process launch, Pull, Chat, Embed or Generate call in these startup constructors"
+    },
+    {
+      "source": "internal/container/container.go:1817-1836 and existing preflight",
+      "conclusion": "IM channels, sandbox configs, temporary docs, fork leases, tenant skills and bootstrap sessions are empty; background maintenance has no approved ingest/model work to perform"
+    },
+    {
+      "source": "cmd/server/bootstrap.go:39-58; recovery repository HasKeysWithPlaceholderHash; safe EXISTS projection=false",
+      "conclusion": "no pending credential-hash backfill and no bootstrap-admin env selection, so startup does not create credentials or promote roles under reviewed state"
+    }
+  ],
+  "expectedStartupWrites": [
+    "pilot-access/metadata-prestart.json metadata report",
+    "pilot-access/server.pid numeric PID",
+    "pilot-access/server.stdout.log and server.stderr.log"
+  ],
+  "parentPreservationRequired": [
+    "preserve exited stdout/stderr and stale numeric pid evidence using unique no-overwrite names before launcher opens redirects",
+    "do not read historical log contents or secrets; do not alter metadata-before baseline",
+    "run existing launcher once; if its checks fail, stop instead of editing guards or retrying alternative runtimes"
+  ],
+  "notPerformed": [
+    "service startup",
+    "model or inference action",
+    "credential read/decryption",
+    "credential or permission creation/change",
+    "installation",
+    "system service/autostart change",
+    "Companion restart",
+    "CLI/worker code change"
+  ],
+  "limits": [
+    "This approves only the reviewed existing startup under current guards; future write/model API calls are outside scope.",
+    "Lightweight cleanup/cron threads may exist; zero startup ingest/model jobs is not equivalent to globally disabling all schedulers.",
+    "The launcher itself rechecks artifacts and database before starting; review does not authorize bypassing a failed guard."
+  ]
+}

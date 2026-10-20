@@ -1,0 +1,26 @@
+[
+  {
+    "source": "D:\\services\\weknora\\pilot-access\\server.stdout.log",
+    "retained": "D:\\services\\weknora\\pilot-access\\server.stdout.log.retained-before-companion-20261020-a4126c98-f54a-4049-82a0-485f5f02b96d",
+    "bytes": 2634,
+    "inode": 281474977401190,
+    "sameFileObject": true,
+    "contentRead": false
+  },
+  {
+    "source": "D:\\services\\weknora\\pilot-access\\server.stderr.log",
+    "retained": "D:\\services\\weknora\\pilot-access\\server.stderr.log.retained-before-companion-20261020-a4126c98-f54a-4049-82a0-485f5f02b96d",
+    "bytes": 0,
+    "inode": 281474977401191,
+    "sameFileObject": true,
+    "contentRead": false
+  },
+  {
+    "source": "D:\\services\\weknora\\pilot-access\\server.pid",
+    "retained": "D:\\services\\weknora\\pilot-access\\server.pid.retained-before-companion-20261020-a4126c98-f54a-4049-82a0-485f5f02b96d",
+    "bytes": 6,
+    "inode": 281474977401192,
+    "sameFileObject": true,
+    "contentRead": false
+  }
+]

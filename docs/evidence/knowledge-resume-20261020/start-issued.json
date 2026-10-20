@@ -1,0 +1,11 @@
+{
+  "atUtc": "2026-10-20T02:03:07.253871+00:00",
+  "entry": "D:\\services\\weknora\\Start-PilotAccess.ps1",
+  "scope": "EXISTING_KNOWLEDGE_ONLY",
+  "reviewSha256": "a4f6f264c0d5bff1074c1dd56273d411638ff1dd0d9336cafe881cf7167eb9be",
+  "companionPidPreserved": 7156,
+  "metadataBeforeSha256": "a5a4ff61d8cd96bf97b57e2962a0b2637dd62be572ee9a6ab2d8e0eb7317ee00",
+  "modelStartsAuthorized": false,
+  "credentialOrPermissionChangesAuthorized": false,
+  "issuedOnce": true
+}

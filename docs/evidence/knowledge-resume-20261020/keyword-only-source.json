@@ -1,0 +1,7 @@
+{
+  "workerCoreSha256": "6de8125b5a45a0fe73767d6fea59589d7402c239d9e76829bf96e7f0d59a698f",
+  "keywordOnlyTrue": true,
+  "sourceLine": 114,
+  "adapterSearchAddsNoVectorWhenKeywordOnly": true,
+  "sameInstalledWorker": true
+}

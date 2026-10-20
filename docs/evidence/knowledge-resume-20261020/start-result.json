@@ -1,0 +1,14 @@
+{
+  "atUtc": "2026-10-20T02:03:13.605708+00:00",
+  "state": "HEALTHY",
+  "pid": 600,
+  "entryExit": 0,
+  "entryInvocations": 1,
+  "healthHttp": 200,
+  "metadataBeforeUnchanged": true,
+  "historicalLogsAndPidRetained": 3,
+  "companionRestarted": false,
+  "modelOrInferenceServicesStarted": false,
+  "credentialsCreatedOrPermissionChanges": false,
+  "persistentExecutionPolicyChanged": false
+}

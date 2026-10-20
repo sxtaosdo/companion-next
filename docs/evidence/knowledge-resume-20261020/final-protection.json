@@ -1,0 +1,64 @@
+{
+  "atUtc": "2026-10-20T02:07:04.343484+00:00",
+  "process": {
+    "creatorProcesses": 0,
+    "knowledgeCreationTime": "2026-10-20T02:03:09.5395770Z",
+    "knowledgePid": 600,
+    "knowledgeExe": "D:\\services\\weknora\\normal-reader-recovery-v0.8.2\\weknora.exe",
+    "port32180Owner": 7156,
+    "port8081Owner": 600,
+    "companionPid": 7156,
+    "knowledgeDirectChildProcesses": 1,
+    "children": [
+      {
+        "ProcessId": 21212,
+        "Name": "conhost.exe",
+        "ExecutablePath": "C:\\WINDOWS\\system32\\conhost.exe"
+      }
+    ],
+    "onlySystemConsoleHostChildren": true
+  },
+  "companionPhase": "OPEN",
+  "companionIdentityUnchanged": true,
+  "companionAll312RuntimeFilesUnchangedFromThisPhaseStart": true,
+  "shared22And21ProtectedSourcesPreserved": true,
+  "companionBusiness9TablesUnchanged": true,
+  "unknown2AndNativeHistoryUnchanged": true,
+  "knowledgeStateGuardAndCountsUnchanged": true,
+  "knowledgeEmptyTriggerCounts": {
+    "task_pending_ops": 0,
+    "data_sources": 0,
+    "im_channels": 0,
+    "mcp_services": 0,
+    "sync_logs": 0,
+    "tenant_sandbox_configs": 0,
+    "temporary_documents": 0,
+    "fork_snapshot_leases": 0,
+    "tenant_skills": 0,
+    "sessions_with_fork_bootstrap": 0
+  },
+  "knowledgeMigration": [
+    [
+      30,
+      0
+    ]
+  ],
+  "knowledgeCounts": {
+    "knowledges": 1650,
+    "chunks": 59433,
+    "lite_embeddings": 2272,
+    "auth_tokens": 38,
+    "users": 2,
+    "tenants": 2
+  },
+  "existingPublicReaderPermissionMetadataUnchanged": true,
+  "secretOrHashColumnsSelected": false,
+  "metadataBeforeUnchanged": true,
+  "oldLogsAndPidSameFileObjectsPreserved": 3,
+  "entryInvocations": 1,
+  "cliAndWorkerNotModified": true,
+  "modelOrCreatorOrInferenceRequests": 0,
+  "credentialsCreatedOrPermissionsChanged": false,
+  "readerSecretInspected": false,
+  "originalSourceContentArchived": false
+}
