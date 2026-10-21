@@ -26,6 +26,8 @@ export interface ProjectSetupProvider {
  start(projectId:string,signal?:AbortSignal):Promise<{operationId:string}>
  /** Dedicated v1 route; an old server must reject before any setup side effect. */
  startStrict?(projectId:string,options:EffectiveSetupOptions,signal?:AbortSignal):Promise<StrictSetupStarted>
+ /** Atomic legacy add path: host registers inside this setup operation. */
+ startPathStrict?(projectPath:string,options:EffectiveSetupOptions,signal?:AbortSignal):Promise<StrictSetupStarted>
  status(operationId:string,signal?:AbortSignal):Promise<SetupSnapshot>
  waitForIdle():Promise<void>
 }

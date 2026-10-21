@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import ProjectAddWizard from './ProjectAddWizard.vue'
 import AgentRegistrationPanel from './AgentRegistrationPanel.vue'
 import SetupToolScopePanel from './SetupToolScopePanel.vue'
 import { projectConnectionsProvider } from '../project-connections-integration'
 import { computed,onBeforeUnmount,ref,watch } from 'vue'
-import { Plus,Refresh } from '@element-plus/icons-vue'
+import { Refresh } from '@element-plus/icons-vue'
 import SetupCompletionUsage from './SetupCompletionUsage.vue'
 import InfoTip from './InfoTip.vue'
 import '../styles/project-setup-theme.css'
@@ -173,7 +174,7 @@ defineExpose({openForProject:show,close})
 </script>
 <template>
  <div class="project-setup-toolbar" data-testid="project-setup-panel">
-  <el-button size="small" :icon="Plus" :disabled="!projects.connected||lane.locked" @click="show()">添加已有工程</el-button>
+  <ProjectAddWizard @dialog-visibility="emit('dialog-visibility',$event)"/>
   <span v-if="compactStatus" class="setup-status" data-testid="project-setup-status" role="status">{{ compactStatus }}</span>
   <InfoTip v-if="compactStatus||(lane.locked&&hasReceipt)" label="登记与接入状态详情" :text="statusDetails"/>
   <el-button v-if="resumableTask" size="small" :disabled="!store.canResume" @click="store.resume()">继续读取此任务</el-button>

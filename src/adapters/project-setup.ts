@@ -276,6 +276,14 @@ export function createProjectSetupProvider(options: { fetch: ProjectSetupFetch; 
       await idle
       return request('/api/setup/options-v1','POST',202,raw=>decodeStrictStarted(raw,expected),JSON.stringify({projectId:target,...expected}),signal)
     },
+    async startPathStrict(path,selected,signal) {
+      let target:string,expected:EffectiveSetupOptions
+      try { target=safePath(path);if(!sameSetupOptions(selected,selected))throw Error();expected=Object.freeze({...selected}) } catch { throw fail('invalid-input','not-dispatched') }
+      try { await request('/api/setup/options-v1','GET',200,raw=>{const capability=object(raw);if(capability.optionsContractVersion!==1||capability.strictOptions!==true||capability.reusePolicy!=='same-effective-options')throw fail('options-unsupported','not-dispatched')},undefined,signal) }
+      catch(cause){throw fail(cause instanceof ProjectSetupError?cause.code:'options-unsupported','not-dispatched')}
+      await idle
+      return request('/api/setup/options-v1','POST',202,raw=>decodeStrictStarted(raw,expected),JSON.stringify({projectPath:target,...expected}),signal)
+    },
     async start(id, signal) {
       let target: string
       try { target = validateSetupProjectId(id) } catch { throw fail('invalid-input', 'not-dispatched') }
