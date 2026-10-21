@@ -1,5 +1,45 @@
 # 资源流：真实类离线验证与恢复条件
 
+## 2026-10-21 11:33 UTC：隔离 Next UI 真实出图与导出，Creator 导入尚阻塞
+
+**本轮已通过真实 UI：登记 → 规范保存和重读 → 输入 → 排队/执行 → 状态 → PNG 预览 → 选用 → 96×96 导出。Creator 导入、UUID/meta 重读尚未完成；参考图未入模。** 下方前次记录保留为历史，不代表本轮仍未出图。
+
+授权：用户批准 loopback 32181 独立完整宿主、独立凭据/数据、一个隔离工程、额外一次 UI 生成；32180、正式工程素材不动，无下载、无付费。用户随后明确“重试”；本轮仅执行原有一个新任务，没有追加请求。
+
+### 实际身份与回执
+
+- 正式宿主始终 PID1840、OPEN、epoch 47159a25-f1b7-44d2-8466-bf661d281fd4。11:11 认证 API 与独立浏览器均读到7工程；直接未认证访问403。按原认证打开独立窗口后用户回复“好了”。没有重启正式宿主。
+- 测试宿主 PID20456 / epoch49139b5f-f713-4309-a069-d2e2969c5fc5，后经官方 daemon stop（PASSED）、确认PID/端口退出后，普通启动为 PID23336 / epochc7aa24c3-e9fe-4830-9839-c52dc0e3ded5。重载仅修复测试 allowlist 漏 ProgramFiles 的发现环境；原任务、凭据和图片保留，没有重跑模型。
+- 同一完整 daemon SHA：9717bc798caaf6c709048e1f2dc6f84b9ffe290e5893583f0e1602bc77de8bf7；测试 Studio 仅 local_icons.py 使用 f4cedcf 已验证错误终态候选。测试 CLI guard 10/10 拒绝缺失/错误端点/身份，无32180回退；凭据仅测试 locator 与私有浏览器状态，不进入仓库。
+- 通过 UI 201 登记真实 Creator3.8.8 scaffold：工程16ad921aa0fb06d6，目录 D:/CompanionData/art-generation-acceptance-20261021/e2e-project，HEAD138045f326033dabc63a9a6957fbf65fb3f1de99。
+- UI 保存规范 HTTP200，version1，SHA6929cec0df96b243287efed1251b8f4645e5c28397e69ff9232d1f5eb876bcb5；画布1080×1920，icon96×96，透明PNG，目标assets/generated/acceptance，导出art/final/companion；UI另行读回相同字段。
+- UI 新任务 STUDIO-RUN-icon-mvi0tih2-c9ac2e90，requestSHA be9f0856527035182384b7afd83db35ccb52b87f000251ab57d1fe20fc844a37，封存上述规范。UI run-next HTTP200 dispatchAccepted只算派发；终态另行读取。
+- 唯一 Comfy prompt ebece44e-81e5-4ee5-95ec-52e80092170f，11:23:14 UTC提交，52.35秒执行，11:24:08回执 VERIFIED。固定 z-image-turbo-digital-asset-v1、1024×1024、8steps、1candidate、1attempt；启动日志明确加载 amd_batchnorm_fix.py 且出现 MIOpen bypass enabled。
+- PNG SHA19b87e93e23cb116131fefa718fea11443f8ba98365a5adea483d73d33cfca90；RGBA/1024×1024，透明比例0.901524543762207、可见比例0.09762096405029297；costUsd0。真实 UI img complete=true，naturalWidth/Height1024、data-sha一致。已查看图像；测试选用不代表正式美术质量批准。
+- UI select HTTP200，selectedIds唯一 CANDIDATE-acceptance-blue-crystal-1；UI export-variant HTTP200：art/final/companion/acceptance-blue-crystal-96x96-19b87e93e23c.png，96×96，SHA bc7898630727c26da62ee196da99652a6f9b0d2f9b64ba7cfcd5ed6891ff33ce，receiptSHA37eaae3c6f23211a368d3e24b22d15730cab445e88025ef1582b3db0805ad0bc。尚未写入Creator资产目录。
+- 本次 Comfy 队列 running/pending均0后正常Ctrl+C，8188监听消失，无强杀。测试服务可重复启动，不注册常驻/开机服务。
+
+### Creator 导入阻塞与隔离副作用
+
+UI Bridge-only 安装202后查询完成；未勾Creator和Codex。其后UI启动Creator：首次409 DASHBOARD_NOT_FOUND，原因是测试环境漏保留ProgramFiles；修复后经官方流程启动隔离 user-data-dir 的 Dashboard（主PID23468），最终 DASHBOARD_LAUNCH_TIMEOUT，Creator进程未启动。没有绕过Dashboard直接启动Creator。
+
+**发现未完全隔离的真实副作用**：Dashboard仍把测试工程登记到 C:/Users/33272/.Cocos/profiles/project.json（11:29:38 UTC、共10项，其中包含测试工程），而测试profile对应 .Cocos 索引不存在。该记录说明--user-data-dir不隔离Dashboard全局工程索引；不能宣称测试所有数据都已隔离。未证明其他条目发生变化，未回滚整个文件、未删该记录、未动正式素材。发现后暂停导入与Dashboard写操作；只读检查安装源码显示其工程目录使用global://project.json与Electron home相关profile。
+
+继续前需确认官方支持的全局profile隔离方式；若无，应明确批准仅在Dashboard全局索引中登记/启动本隔离工程（不改其他条目、不复制登录凭据），并先验证实际Creator与Bridge/32181身份。不能把无响应当成功，不能为完成测试修改全局安全/账号设置。当前没有import-variant提交或UUID/meta证据。
+
+### 可重复步骤与证据
+
+1. 核对32180身份与测试端口/GPU空闲；以start-e2e-host.mjs启动32181；读取独立locator创建官方UI会话，认证信息不打印。
+2. 通过项目页正常登记；step1保存并重读规范；step2准备、批准并enqueue，记录jobId。只允许一个新的UI执行确认，提交前wx哨兵避免不确定时重发。
+3. 用官方AMD必要参数与模块启动已有Comfy；queue/object_info预检；UI选择原任务→状态→执行确认；只追踪同prompt，超时保留状态，不再enqueue或run-next。
+4. step4原任务状态/保护记录核对→真实PNG预览→选择→独立确认保存。step5导出默认96→核对receipt/SHA/实际PNG。重新打开自己的浏览器可读回同任务，不生成。
+5. **暂停门**：解决上面的Dashboard全局profile边界后，才继续Creator/Bridge→UI导入当前工程→PNG/meta/UUID/SpriteFrame读回。尚未通过，不能作为最终完成。
+
+本轮证据根目录 D:/CompanionData/art-generation-acceptance-20261021/records/：e2e-ui-03-register.json、06-spec-save、08-enqueue、09-run-confirm、10-generate、12-preview、13-select、14-export、16-bridge-install、17/18-creator-launch；comfy-e2e-002.log、e2e-preflight-002.json、e2e-preparation-manifest.json。任务journal与原PNG在e2e-store/16ad921aa0fb06d6/STUDIO-RUN-icon-mvi0tih2-c9ac2e90/。临时driver在本机Temp，仅本机验收用，含私有浏览器状态的host-data不提交。
+
+## 前次 11:03 UTC 检查点（历史）
+
+
 ## 2026-10-21 正式完整流程验收进展
 
 结论：生产宿主已恢复，资源只读接口可用；完整新后台 UI 生成、选用、导出和导入链尚未通过。本轮真实任务失败，不能登记为出图或透明 PNG 成功。以下是当前状态；后文原始离线记录作为历史快照保留。
