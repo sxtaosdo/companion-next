@@ -14,7 +14,11 @@ describe('trusted runtime product metadata',()=>{
   expect(value).toEqual(metadata);expect(JSON.stringify(value)).not.toContain('must-not-survive')
  })
  it.each([401,403,404,503])('keeps HTTP %s separate from a reported product version',async status=>{
-  await expect(createProductVersionReadProvider(vi.fn(async()=>new Response('{}',{status}))).read()).rejects.toMatchObject({code:[401,403].includes(status)?'unauthorized':'unavailable'})
+  await expect(createProductVersionReadProvider(vi.fn(async()=>new Response('{}',{status}))).read()).rejects.toMatchObject({code:[401,403].includes(status)?'unauthorized':status===404?'unsupported':'unavailable'})
+ })
+ it('distinguishes unsupported old hosts from new hosts with missing metadata',async()=>{
+  setActivePinia(createPinia());const store=useProductVersionStore();productVersionReadProvider.value=createProductVersionReadProvider(vi.fn(async()=>new Response('{}',{status:404})));await store.read();expect(store.label).toBe('旧宿主未提供产品版本');expect(store.metadata).toBeNull();
+  productVersionReadProvider.value=createProductVersionReadProvider(vi.fn(async()=>new Response('{}',{status:503})));await store.read();expect(store.label).toBe('宿主版本元数据未就绪')
  })
  it('rejects protocol, checkpoint, arbitrary backend text and incomplete source proof',()=>{
   expect(()=>decodeProductVersion({...metadata,product:{...metadata.product,version:'1.3.173.209'}})).toThrow(ProductVersionReadError)
@@ -25,7 +29,7 @@ describe('trusted runtime product metadata',()=>{
  it('shows actual host package version and clears it after a failed refresh',async()=>{
   setActivePinia(createPinia());const store=useProductVersionStore();const read=vi.fn(async()=>metadata);productVersionReadProvider.value={label:'test host',read};await store.read()
   expect(store.label).toBe('宿主包 v0.3.142');read.mockRejectedValueOnce(new ProductVersionReadError('unavailable'));await store.read()
-  expect(store.metadata).toBeNull();expect(store.label).toBe('当前接口未提供')
+  expect(store.metadata).toBeNull();expect(store.label).toBe('宿主版本元数据未就绪')
  })
  it('rejects a late response after source replacement without displaying the previous host',async()=>{
   setActivePinia(createPinia());const store=useProductVersionStore();let resolve!:(value:ProductVersionMetadata)=>void

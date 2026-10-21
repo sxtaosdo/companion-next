@@ -12,7 +12,7 @@ export const useProductVersionStore=defineStore('product-version',()=>{
  catch(error){if(generation===epoch&&source===productVersionReadProvider.value&&!current.signal.aborted)failure.value=error instanceof ProductVersionReadError?error.code:'network'}
  finally{if(generation===epoch){loading.value=false;controller=undefined}}
  }
- const label=computed(()=>loading.value?'读取中':metadata.value?`宿主包 v${metadata.value.product.version}`:failure.value==='unauthorized'?'认证失效':failure.value==='invalid'?'版本信息无效':failure.value==='network'?'读取失败':'当前接口未提供')
+ const label=computed(()=>loading.value?'读取中':metadata.value?`宿主包 v${metadata.value.product.version}`:failure.value==='unsupported'?'旧宿主未提供产品版本':failure.value==='unavailable'?'宿主版本元数据未就绪':failure.value==='unauthorized'?'认证失效':failure.value==='invalid'?'版本信息无效':failure.value==='network'?'读取失败':'宿主版本未读取')
  const detail=computed(()=>metadata.value?`宿主包版本来自当前运行构建；构建 ${metadata.value.build.id}；源提交 ${metadata.value.build.sourceRevision}；运行文件 SHA-256 ${metadata.value.identity.entrySha256}`:'未取得当前宿主的可信产品版本；构建基线、Bridge协议与内部Git检查点都不代替宿主包版本。')
  return {metadata,loading,failure,label,detail,read,clear}
 })

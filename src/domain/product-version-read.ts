@@ -4,7 +4,7 @@ export interface ProductVersionMetadata {
  build:{id:string;sourceRevision:string}
  identity:{entrySha256:string}
 }
-export type ProductVersionFailure='unavailable'|'unauthorized'|'invalid'|'network'
+export type ProductVersionFailure='unsupported'|'unavailable'|'unauthorized'|'invalid'|'network'
 export class ProductVersionReadError extends Error {constructor(readonly code:ProductVersionFailure){super(code)}}
 export interface ProductVersionReadProvider {label:string;read(signal?:AbortSignal):Promise<ProductVersionMetadata>}
 function record(value:unknown):Record<string,unknown>{if(!value||typeof value!=='object'||Array.isArray(value))throw new ProductVersionReadError('invalid');return value as Record<string,unknown>}

@@ -39,10 +39,10 @@ afterEach(() => { wrapper?.unmount(); wrapper = undefined; activeHistory?.destro
 describe('help, about and visible frontend identity', () => {
   it('uses one frontend version in package, lock, header, sidebar and about without implying a daemon version', async () => {
     await setup('/about')
-    expect(frontendIdentity.version).toBe(packageInfo.version); expect(frontendIdentity.version).toBe('1.3.173'); expect(frontendIdentity.hostBase).toBe('0.3.150'); expect(frontendIdentity.nextRevision).toBe(23); const [,minor,patch]=packageInfo.companionVersion.hostBase.split('.').map(Number); expect(frontendIdentity.version).toBe(`1.${minor}.${patch + packageInfo.companionVersion.nextRevision}`); expect(lock.version).toBe(packageInfo.version); expect(lock.packages[''].version).toBe(packageInfo.version)
+    expect(frontendIdentity.version).toBe(packageInfo.version); expect(frontendIdentity.version).toBe('1.3.175'); expect(frontendIdentity.hostBase).toBe('0.3.150'); expect(frontendIdentity.nextRevision).toBe(23); expect(packageInfo.companionVersion.rule).toContain('historical migration provenance'); expect(lock.version).toBe(packageInfo.version); expect(lock.packages[''].version).toBe(packageInfo.version)
     expect(wrapper!.find('.frontend-version').text()).toBe(`Next v${packageInfo.version}`)
     expect(wrapper!.find('.sidebar-footer').text()).toContain(`前端 v${packageInfo.version}`)
-    expect(wrapper!.text()).toContain('当前接口未提供')
+    expect(wrapper!.text()).toContain('宿主版本未读取')
     expect(wrapper!.find('.frontend-version').attributes('href')).toBe('/changelog')
   })
   it('combines product identity while removing the data and compatibility display block',async()=>{
@@ -446,10 +446,10 @@ describe('restored Companion navigation categories', () => {
 it('labels frontend and unavailable backend consistently without inventing a backend version or issuing a probe',async()=>{
  const fetch=vi.fn();vi.stubGlobal('fetch',fetch);const write=vi.fn(async(_value:string)=>{});Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:write}})
  await setup('/about')
- expect(wrapper!.get('.sidebar-footer').text()).toContain('\u524d\u7aef v1.3.173');expect(wrapper!.get('.sidebar-footer .backend-version').text()).toBe('\u540e\u7aef\uff1a\u5f53\u524d\u63a5\u53e3\u672a\u63d0\u4f9b')
- expect(wrapper!.get('.about-product-heading .backend-version').text()).toBe('\u540e\u7aef\uff1a\u5f53\u524d\u63a5\u53e3\u672a\u63d0\u4f9b')
+ expect(wrapper!.get('.sidebar-footer').text()).toContain('\u524d\u7aef v1.3.175');expect(wrapper!.get('.sidebar-footer .backend-version').text()).toBe('\u540e\u7aef\uff1a\u5bbf\u4e3b\u7248\u672c\u672a\u8bfb\u53d6')
+ expect(wrapper!.get('.about-product-heading .backend-version').text()).toBe('\u540e\u7aef\uff1a\u5bbf\u4e3b\u7248\u672c\u672a\u8bfb\u53d6')
  await wrapper!.get('button[aria-label="\u590d\u5236\u7248\u672c\u4fe1\u606f"]').trigger('click');await flushPromises()
- const copied=write.mock.calls[0]?.[0];expect(copied).toContain('\u524d\u7aef\u4ea7\u54c1\u7248\u672c\uff1a1.3.173');expect(copied).toContain('\u540e\u7aef\u4ea7\u54c1\u7248\u672c\uff1a\u5f53\u524d\u63a5\u53e3\u672a\u63d0\u4f9b');expect(copied).not.toMatch(/1\.3\.173\.(196|197)/);expect(fetch).not.toHaveBeenCalled()
+ const copied=write.mock.calls[0]?.[0];expect(copied).toContain('\u524d\u7aef\u4ea7\u54c1\u7248\u672c\uff1a1.3.175');expect(copied).toContain('\u5bbf\u4e3b\u5305\u7248\u672c\uff1a\u5bbf\u4e3b\u7248\u672c\u672a\u8bfb\u53d6');expect(copied).not.toMatch(/1\.3\.173\.(196|197)/);expect(fetch).not.toHaveBeenCalled()
 })
 
 it('copies version information from Enter and Space while preventing tooltip key interception',async()=>{
