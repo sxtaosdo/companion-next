@@ -32,7 +32,7 @@ async function copyFeedback() {
 </script>
 <template>
   <section class="panel information-card about-identity-next">
-    <header class="about-product-heading"><img :src="legacyIcon" alt="Creator AI Companion 原图标" width="48" height="48"/><div><span class="section-kicker">ABOUT</span><h2>Creator AI Companion</h2><p>{{ frontendIdentity.name }} · <strong>前端 v{{ frontendIdentity.version }}</strong><el-tooltip content="复制版本信息" placement="top"><el-button class="version-copy" text size="small" :icon="CopyDocument" aria-label="复制版本信息" title="复制版本信息" @click="copyVersion"/></el-tooltip></p><p class="backend-version" :title="backendVersionInformation.detail">后端：{{ backendVersionInformation.label }}</p></div></header>
+    <header class="about-product-heading"><img :src="legacyIcon" alt="Creator AI Companion 原图标" width="48" height="48"/><div><span class="section-kicker">ABOUT</span><h2>Creator AI Companion</h2><p>{{ frontendIdentity.name }} · <strong>前端 v{{ frontendIdentity.version }}</strong><el-tooltip content="复制版本信息" placement="top"><el-button class="version-copy" text size="small" :icon="CopyDocument" aria-label="复制版本信息" title="复制版本信息" @click="copyVersion" @keydown.enter.prevent.stop="copyVersion" @keydown.space.prevent.stop="copyVersion"/></el-tooltip></p><p class="backend-version" :title="backendVersionInformation.detail">后端：{{ backendVersionInformation.label }}</p></div></header>
     <p>Cocos 工程、知识库、模型服务与游戏资源的工作区。</p>
 
     <div class="information-actions"><RouterLink to="/changelog" class="information-link">查看更新记录</RouterLink><RouterLink to="/migration" class="information-link">查看功能支持范围</RouterLink><RouterLink to="/history" class="information-link">查看版本与连接记录</RouterLink><RouterLink to="/help" class="information-link">阅读使用帮助 →</RouterLink></div>
