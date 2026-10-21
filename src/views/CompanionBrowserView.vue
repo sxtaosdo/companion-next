@@ -8,6 +8,7 @@ import { useProjectOperationLaneStore } from '../stores/project-operation-lane'
 import LogTools from '../components/LogTools.vue'
 import InfoTip from '../components/InfoTip.vue'
 import ProjectStatusTag from '../components/ProjectStatusTag.vue'
+import { useOverviewRecentProjects } from '../composables/use-overview-recent-projects'
 import { useCompanionProjectEntry } from '../composables/use-companion-project-entry'
 import { ElMessage } from 'element-plus'
 import { Refresh,SwitchButton,VideoPlay,Position,FolderOpened,Delete,Connection,ArrowRight,ArrowDown } from '@element-plus/icons-vue'
@@ -26,6 +27,8 @@ import { projectDisplayPathKey, projectStateTone, creatorPermissionLabel } from 
 import { orderedProjects } from '../domain/recent-projects'
 import { LOG_SOURCES, LOG_LEVELS, runtimeStateLabel } from '../domain/companion-browser'
 const store=useCompanionBrowserStore(),route=useRoute(),router=useRouter(),operations=useCreatorOperationsStore(),projectLane=useProjectOperationLaneStore()
+const recent=useOverviewRecentProjects()
+const projectHistory=computed(()=>recent.observed.value?recent.data.value:store.dashboard)
 const creatorDialog=ref<InstanceType<typeof CreatorOperationDialog>|null>(null)
 const setupDialog=ref<InstanceType<typeof ProjectSetupWizard>|null>(null),setupDialogOpen=ref(false)
 const clientDialogs=ref(new Set<string>())
@@ -78,17 +81,17 @@ const passiveRead=computed(()=>(store.provider ?? companionBrowserProvider.value
 watch(()=>JSON.stringify(store.logFilter),()=>{
  if(tab.value!=='calls'&&store.connected&&!passiveRead.value&&creatorOperationsProvider.value&&store.provider===companionBrowserProvider.value&&document.visibilityState==='visible'&&(!store.liveEnabled||store.logsPaused))void store.refreshLogs()
 },{flush:'post'})
-const dashboardRead=computed(()=>!passiveRead.value&&(store.dashboardRead||(store.provider ?? companionBrowserProvider.value)?.dashboardDiscoveryEnabled!==false))
+const dashboardRead=computed(()=>!passiveRead.value&&(recent.data.value.length>0||store.dashboardRead||(store.provider ?? companionBrowserProvider.value)?.dashboardDiscoveryEnabled!==false))
 const state=(id:string)=>store.statuses.find(status=>status.projectId===id)
 const matching=computed(()=>orderedProjects(store.projects.filter(project=>{
  const status=state(project.id)?.state??'unknown',starting=['launching','bridge-wait'].includes(status)
  if(filter.value==='running'&&status!=='ready'&&!starting)return false
  if(filter.value==='stopped'&&status!=='stopped')return false
  return [project.id,project.name,project.path,status,runtimeStateLabel(status)].join('\n').toLowerCase().includes(query.value.trim().toLowerCase())
-}),store.dashboard).map(item=>item.project))
+}),projectHistory.value).map(item=>item.project))
 function isExpanded(id:string){if(id in expanded.value)return expanded.value[id];try{const value=sessionStorage.getItem(`project-card-expanded:${id}`);if(value==='1'||value==='0')return value==='1'}catch{/* denied preference storage does not prevent reads */}return ['ready','launching','bridge-wait','stopping'].includes(state(id)?.state??'unknown')}
 function toggle(id:string){const value=!isExpanded(id);expanded.value={...expanded.value,[id]:value};try{sessionStorage.setItem(`project-card-expanded:${id}`,value?'1':'0')}catch{/* noncritical preference only */}}
-function dashboardFor(path:string){return store.dashboard.find(item=>projectDisplayPathKey(item.path)===projectDisplayPathKey(path))}
+function dashboardFor(path:string){return projectHistory.value.find(item=>projectDisplayPathKey(item.path)===projectDisplayPathKey(path))}
 const callNow=ref(Date.now()),callVisible=ref(document.visibilityState==='visible')
 let callTimer:ReturnType<typeof setInterval>|undefined
 const callDelay=computed(()=>{

@@ -12,7 +12,9 @@ const retained = new WeakMap<object, { source: CompanionBrowserProvider; project
 export function useOverviewRecentProjects() {
   const directory = useCompanionBrowserStore(), operations = useCreatorOperationsStore(), setup = useProjectSetupStore(), lane = useProjectOperationLaneStore()
   const owner = toRaw(directory), cached = retained.get(owner), source = companionBrowserProvider.value
-  const initial = cached && cached.source === source && directory.provider === source && directory.connected && cached.projects === directory.projects ? cached.data : []
+  const restored = !!(cached && cached.source === source && directory.provider === source && directory.connected && cached.projects === directory.projects)
+  const initial = restored ? cached!.data : []
+  const observed = ref(restored)
   const active = ref(true), data = shallowRef<DashboardProject[]>(initial), loading = ref(false), error = ref('')
   let attempted: CompanionBrowserProvider | null = null, controller: AbortController | undefined, generation = 0
   const canRead = computed(() => {
@@ -31,7 +33,7 @@ export function useOverviewRecentProjects() {
   function cancel() { if (loading.value) attempted = null; generation++; controller?.abort(); controller = undefined; loading.value = false }
   watch([companionBrowserProvider, () => directory.provider, () => directory.connected], () => {
     if (directory.connected && directory.provider === companionBrowserProvider.value && retained.get(owner)?.source === directory.provider) return
-    cancel(); attempted = null; data.value = []; error.value = ''; retained.delete(owner)
+    cancel(); attempted = null; data.value = []; observed.value = false; error.value = ''; retained.delete(owner)
   }, { flush: 'sync' })
   watch([allowed, companionBrowserProvider], ([ready]) => {
     if (!ready) { cancel(); return }
@@ -41,7 +43,7 @@ export function useOverviewRecentProjects() {
     controller = request; loading.value = true
     void source.loadDashboardProjects!(request.signal).then(result => {
       if (identity === generation && !request.signal.aborted && allowed.value && source === directory.provider && source === companionBrowserProvider.value) {
-        data.value = result
+        data.value = result; observed.value = true
         retained.set(owner, { source, projects: directory.projects, data: result })
       }
     }).catch(() => { if (identity === generation && !request.signal.aborted) error.value = data.value.length ? '最近打开时间未更新，保留上次已读取顺序' : '最近打开时间未读取，按稳定顺序显示' })
@@ -50,5 +52,5 @@ export function useOverviewRecentProjects() {
   onActivated(() => { active.value = true })
   onDeactivated(() => { active.value = false; cancel(); attempted = null })
   onBeforeUnmount(cancel)
-  return { data, loading, error, canRealtime, toggleRealtime }
+  return { data, observed, loading, error, canRealtime, toggleRealtime }
 }
