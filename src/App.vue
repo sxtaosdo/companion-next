@@ -135,7 +135,7 @@ const dateLabel = computed(() => {
     <aside class="sidebar" :class="{ 'is-open': menuOpen }">
       <RouterLink to="/about" class="brand" aria-label="关于 Companion" @click="menuOpen = false"><span class="brand-mark">C</span><span>Companion</span></RouterLink>
       <nav class="nav-list" aria-label="主导航">
-        <template v-for="(item, index) in nav" :key="item.path">
+        <template v-for="item in nav" :key="item.path">
           <div v-if="item.path === '/knowledge'" class="knowledge-nav-group">
             <button class="nav-item knowledge-nav-toggle" type="button" :aria-expanded="knowledgeExpanded" aria-controls="knowledge-navigation" @click="knowledgeExpanded = !knowledgeExpanded"><span>知识库</span><el-icon aria-hidden="true" :class="{ 'is-expanded': knowledgeExpanded }"><ArrowDown/></el-icon></button>
             <div v-show="knowledgeExpanded" id="knowledge-navigation" class="knowledge-nav-children">
@@ -143,7 +143,7 @@ const dateLabel = computed(() => {
             </div>
           </div>
           <RouterLink v-else :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><span>{{ item.label }}</span></RouterLink>
-          <div v-if="index === 0" class="art-nav-group">
+          <div v-if="item.path === '/projects'" class="art-nav-group">
             <button class="nav-item art-nav-toggle" type="button" :aria-expanded="artExpanded" aria-controls="art-navigation" @click="artExpanded = !artExpanded"><span>美术资源</span><el-icon aria-hidden="true" :class="{ 'is-expanded': artExpanded }"><ArrowDown/></el-icon></button>
             <div v-show="artExpanded" id="art-navigation" class="art-nav-children">
               <RouterLink v-for="child in artNav" :key="child.path" :to="projectLink(child.path)" class="nav-item art-nav-child" :class="{ 'is-active': isNavActive(child.path) }" active-class="" :aria-current="isNavActive(child.path) ? 'page' : undefined" @click="menuOpen = false">{{ child.label }}</RouterLink>

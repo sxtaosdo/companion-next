@@ -410,7 +410,7 @@ describe('global dashboard cards', () => {
     directory.dashboard = [{ path: projects[1]!.path, name: projects[1]!.name, exists: true, source: 'dashboard', lastOpenedAt: 999 }]
     await flushPromises()
     expect(wrapper!.findAll('.registered-project-card').map(card => card.attributes('data-project-id'))).toEqual([id,other])
-    expect(wrapper!.get('.registered-overview').text()).toContain('未返回最近使用时间')
+    expect(wrapper!.get('.registered-overview').text()).not.toContain('未返回最近使用时间')
   })
   it('never presents a registered requirement as an observed Creator version', async () => {
     const { directory } = await setup('/overview')

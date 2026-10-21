@@ -57,7 +57,7 @@ describe('Companion read UI and host identity',()=>{
  it('reads only after explicit connect and leaves missing runtime and counts unknown',async()=>{
   const p=fixture();registerCompanionBrowserProvider(p);await setup();await button('连接 Companion').trigger('click');await flushPromises()
   expect(wrapper!.findAll('.companion-project-card')).toHaveLength(2);const missing=wrapper!.findAll('.companion-project-card')[1]!
-  expect(missing.text()).toContain('未知');expect(missing.text()).toContain('调用：未记录');const detail=missing.findAllComponents({name:'InfoTip'}).find((t:VueWrapper)=> (t.props() as Record<string,unknown>).label==='工程详情')!;expect(detail.props('text')).toContain('当前 Creator：未读取；工程要求版本：3.8.8');expect(p.loadLogs).not.toHaveBeenCalled();expect(p.loadCalls).not.toHaveBeenCalled()
+  await missing.get('.project-expand').trigger('click');expect(missing.text()).toContain('未知');expect(missing.text()).toContain('调用：未记录');const detail=missing.findAllComponents({name:'InfoTip'}).find((t:VueWrapper)=> (t.props() as Record<string,unknown>).label==='工程详情')!;expect(detail.props('text')).toContain('当前 Creator：未读取；工程要求版本：3.8.8');expect(p.loadLogs).not.toHaveBeenCalled();expect(p.loadCalls).not.toHaveBeenCalled()
   expect(await tip('调用统计说明')).toContain('没有记录不推断为零')
  })
  it('opens tools help for the exact project without extra project or call reads',async()=>{const p=fixture();registerCompanionBrowserProvider(p);const {store,router}=await setup();await store.connect(p);await flushPromises();const reads=vi.mocked(p.loadProjects).mock.calls.length;await button('工具范围').trigger('click');await flushPromises();expect(router.currentRoute.value.path).toBe('/help');expect(router.currentRoute.value.query).toEqual({topic:'tools',project:'p1'});expect(p.loadProjects).toHaveBeenCalledTimes(reads);expect(p.loadCalls).not.toHaveBeenCalled()})
@@ -69,6 +69,7 @@ describe('Companion read UI and host identity',()=>{
  it('opens the exact project history from its recent-call summary without replaying',async()=>{
   const p=fixture();vi.mocked(p.loadCounts).mockResolvedValue({sessionId:'s1',counts:{p1:0,p2:1},latest:{p2:{id:'r2',operationNameZh:'读取场景',startedAt:'2026-10-17T00:00:00Z',status:'success'}}})
   registerCompanionBrowserProvider(p);const {store,router}=await setup();await store.connect(p);await flushPromises()
+  await wrapper!.findAll('.companion-project-card')[1]!.get('.project-expand').trigger('click');await flushPromises()
   const summary=wrapper!.findAll('button.project-call-summary').find(b=>b.text().includes('读取场景'))!;expect(summary.attributes('type')).toBe('button');expect(summary.attributes('aria-label')).toBe('查看 未读状态 的调用记录');expect(summary.text()).toContain('读取场景')
   expect(p.loadCalls).not.toHaveBeenCalled();expect(wrapper!.findAll('button.project-call-summary').filter(b=>b.text().includes('读取场景'))).toHaveLength(1)
   await summary.trigger('click');await flushPromises();expect(router.currentRoute.value.query.tab).toBe('calls');expect(store.callProjectId).toBe('p2');expect(p.loadCalls).toHaveBeenCalledExactlyOnceWith('p2',{failed:false},expect.any(AbortSignal))

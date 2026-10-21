@@ -22,7 +22,8 @@ import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
 import { companionBrowserProvider, companionEventProvider } from '../companion-browser-integration'
-import { projectDisplayPathKey, projectDisplayRank, projectStateTone, creatorPermissionLabel } from '../domain/companion-project-display'
+import { projectDisplayPathKey, projectStateTone, creatorPermissionLabel } from '../domain/companion-project-display'
+import { orderedProjects } from '../domain/recent-projects'
 import { LOG_SOURCES, LOG_LEVELS, runtimeStateLabel } from '../domain/companion-browser'
 const store=useCompanionBrowserStore(),route=useRoute(),router=useRouter(),operations=useCreatorOperationsStore(),projectLane=useProjectOperationLaneStore()
 const creatorDialog=ref<InstanceType<typeof CreatorOperationDialog>|null>(null)
@@ -51,6 +52,7 @@ watch(()=>[store.provider,store.connected],()=>{noticeKeys.clear()},{flush:'sync
 watch(()=>store.warnings,warnings=>{if(!store.connected)return;for(const text of warnings){if(informational(text)&&!noticeKeys.has(text)){noticeKeys.add(text);ElMessage.info(text.startsWith('Dashboard')?'未启用 Dashboard 发现；状态来自 Bridge 查询。':'只读模式：未探测运行状态。')}}},{deep:true})
 watch(()=>operations.receipts,records=>{for(const record of records){const key=`${record.id}:${record.phase}`;if(record.phase==='sending'||toastRecords.has(key))continue;toastRecords.add(key);if(!mounted||record.detached||!operations.isReceiptCurrent(record.id)||(record.phase==='acknowledged'&&['start','focus'].includes(record.action)))continue;const message=record.phase==='acknowledged'?'已收到操作回执。':record.phase==='unknown'?'操作结果未知，请刷新状态后核对。':record.phase==='reported-failure'?'后台报告操作失败，请核对状态与日志。':'操作未完成，请核对状态与日志。';ElMessage({message,type:record.phase==='acknowledged'?'success':'warning',duration:5000})}},{deep:true})
 function activeRecord(id:string){return [...operations.receipts].reverse().find(record=>record.project.id===id&&operations.isReceiptCurrent(record.id))}
+function statusOperation(id:string){const record=activeRecord(id);return record&&(record.phase==='sending'||record.snapshotRevision===store.projectSnapshotRevision)?record:undefined}
 function directLoading(id:string){const record=activeRecord(id);return !!record&&['start','focus'].includes(record.action)&&(record.phase==='sending'||(operations.transportPending&&record.id===operations.receipt?.id))}
 function needsAttention(id:string){const record=activeRecord(id);return !!record&&['unknown','reported-failure','rejected'].includes(record.phase)}
 function directAction(id:string){return state(id)?.state==='ready'?'focus' as const:'start' as const}
@@ -78,13 +80,13 @@ watch(()=>JSON.stringify(store.logFilter),()=>{
 },{flush:'post'})
 const dashboardRead=computed(()=>!passiveRead.value&&(store.dashboardRead||(store.provider ?? companionBrowserProvider.value)?.dashboardDiscoveryEnabled!==false))
 const state=(id:string)=>store.statuses.find(status=>status.projectId===id)
-const matching=computed(()=>store.projects.filter(project=>{
+const matching=computed(()=>orderedProjects(store.projects.filter(project=>{
  const status=state(project.id)?.state??'unknown',starting=['launching','bridge-wait'].includes(status)
  if(filter.value==='running'&&status!=='ready'&&!starting)return false
  if(filter.value==='stopped'&&status!=='stopped')return false
  return [project.id,project.name,project.path,status,runtimeStateLabel(status)].join('\n').toLowerCase().includes(query.value.trim().toLowerCase())
-}).sort((left,right)=>{const a=projectDisplayRank(state(left.id)?.state,dashboardFor(left.path)?.lastOpenedAt),b=projectDisplayRank(state(right.id)?.state,dashboardFor(right.path)?.lastOpenedAt);return b[0]-a[0]||b[1]-a[1]}))
-function isExpanded(id:string){if(id in expanded.value)return expanded.value[id];try{const value=sessionStorage.getItem(`project-card-expanded:${id}`);if(value==='1'||value==='0')return value==='1'}catch{/* denied preference storage does not prevent reads */}return state(id)?.state!=='stopped'}
+}),store.dashboard).map(item=>item.project))
+function isExpanded(id:string){if(id in expanded.value)return expanded.value[id];try{const value=sessionStorage.getItem(`project-card-expanded:${id}`);if(value==='1'||value==='0')return value==='1'}catch{/* denied preference storage does not prevent reads */}return ['ready','launching','bridge-wait','stopping'].includes(state(id)?.state??'unknown')}
 function toggle(id:string){const value=!isExpanded(id);expanded.value={...expanded.value,[id]:value};try{sessionStorage.setItem(`project-card-expanded:${id}`,value?'1':'0')}catch{/* noncritical preference only */}}
 function dashboardFor(path:string){return store.dashboard.find(item=>projectDisplayPathKey(item.path)===projectDisplayPathKey(path))}
 const callNow=ref(Date.now()),callVisible=ref(document.visibilityState==='visible')
@@ -133,7 +135,7 @@ onBeforeUnmount(()=>{mounted=false;if(callTimer!==undefined)clearInterval(callTi
    <el-alert v-if="store.countsError" :title="store.countsError" type="warning" :closable="false"/>
    <article v-for="project in matching" :key="project.id" class="companion-project-card" :class="`project-tone-${projectStateTone(state(project.id),passiveRead,operations.isExpectedStopDisconnect(project.id))}`"><div class="companion-project-header">
     <el-button class="project-expand" text :icon="isExpanded(project.id)?ArrowDown:ArrowRight" :title="isExpanded(project.id)?'收起':'展开'" :aria-label="isExpanded(project.id)?'收起':'展开'" :aria-expanded="isExpanded(project.id)" :aria-controls="`project-detail-${project.id}`" @click="toggle(project.id)"/>
-    <span class="project-state-dot" aria-hidden="true"/><h3 :title="project.name">{{ project.name }}</h3><ProjectStatusTag :status="state(project.id)" :passive="passiveRead" :stop-acknowledged="operations.isExpectedStopDisconnect(project.id)"/>
+    <span class="project-state-dot" aria-hidden="true"/><h3 :title="project.name">{{ project.name }}</h3><ProjectStatusTag :operation="statusOperation(project.id)" :status="state(project.id)" :passive="passiveRead" :stop-acknowledged="operations.isExpectedStopDisconnect(project.id)"/>
     <el-button class="project-permission-chip" text size="small" aria-label="工具范围" @click="showTools(project.id)">{{ passiveRead?'权限未探测':creatorPermissionLabel(state(project.id)) }}</el-button>
     <InfoTip label="工程详情" :text="`当前 Creator：${state(project.id)?.creatorVersion||'未读取'}；工程要求版本：${project.requiredCreatorVersion||'未记录'}；Creator 权限：${passiveRead?'未探测':creatorPermissionLabel(state(project.id))}；最近打开：${!dashboardRead?'未读取':displayDate(dashboardFor(project.path)?.lastOpenedAt)}；调用总数：${store.counts?.counts[project.id]??'未记录'}；状态：${runtimeStateLabel(state(project.id)?.state??'unknown')}。`"/>
     <div class="project-header-trail"><button type="button" class="project-header-id" aria-label="复制工程 ID" :title="`复制工程 ID：${project.id}`" @click="copy(project.id)"><code>{{ project.id }}</code></button><span class="project-last-opened" :title="`最近打开：${!dashboardRead?'未读取':displayDate(dashboardFor(project.path)?.lastOpenedAt)}`">{{ !dashboardRead?'未读取':displayDate(dashboardFor(project.path)?.lastOpenedAt) }}</span>

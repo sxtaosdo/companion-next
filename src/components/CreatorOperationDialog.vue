@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed,onBeforeUnmount,watch } from 'vue'
 import InfoTip from './InfoTip.vue'
+import OperationFeedback from './OperationFeedback.vue'
 import { useCreatorOperationsStore } from '../stores/creator-operations'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
 import { runtimeStateLabel } from '../domain/companion-browser'
@@ -29,9 +30,10 @@ onBeforeUnmount(()=>{mounted=false;store.leave()})
    <InfoTip label="等待与回执说明" text="确认时暂停工程自动轮询，手动刷新会撤销确认。停止等待或关窗不会取消后台动作；超时或断线先核对状态与日志，不自动重发。此操作不安装 Bridge、不配置 Codex。"/>
   </template>
   <el-alert v-if="store.error" :title="store.error" type="warning" :closable="false"/>
+  <OperationFeedback v-if="store.receipt" :phase="store.receipt.phase" :action="store.receipt.action" :message="store.display.message"/>
   <p v-if="store.receipt" class="operation-receipt" data-testid="operation-dialog-receipt">{{ store.display.message }}</p>
   <p v-if="store.receipt?.action==='remove-registration'&&store.receipt.id===store.lastReceipt?.id" data-testid="registration-dialog-readback">{{ registrationReadbackText }}。回读不改变原回执，也不证明工具绑定已清理。</p>
-  <template #footer><el-button v-if="store.receipt?.action==='remove-registration'&&!store.pending" :disabled="!store.canRefreshRegistration" :loading="projects.projectLoading" @click="store.refreshRegistration()">核对登记与状态</el-button><el-button v-if="store.pending" @click="store.cancelWaiting">停止等待</el-button><el-button @click="store.closeDialog">{{ store.pending?'关闭并停止等待':'关闭' }}</el-button><el-button v-if="store.prepared" :type="store.prepared.action==='remove-registration'?'danger':'primary'" :disabled="store.pending||store.transportPending" @click="confirm">{{ creatorActionConfirmation(store.prepared.action) }}</el-button></template>
+  <template #footer><el-button v-if="store.receipt?.action==='remove-registration'&&!store.pending" :disabled="!store.canRefreshRegistration" :loading="projects.projectLoading" @click="store.refreshRegistration()">核对登记与状态</el-button><el-button v-if="store.pending" @click="store.cancelWaiting">停止等待</el-button><el-button @click="store.closeDialog">{{ store.pending?'关闭并停止等待':'关闭' }}</el-button><el-button v-if="store.prepared" :type="store.prepared.action==='remove-registration'?'danger':'primary'" :loading="store.pending" :disabled="store.pending||store.transportPending" @click="confirm">{{ creatorActionConfirmation(store.prepared.action) }}</el-button></template>
  </el-dialog>
 
 </template>

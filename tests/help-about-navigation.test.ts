@@ -238,16 +238,21 @@ describe('help, about and visible frontend identity', () => {
     await router.push('/about'); await router.push('/image-assets'); await flushPromises()
     expect(review.uncertain).toBe(true); expect(button('导入并下载').attributes('disabled')).toBeDefined()
   })
-  it('copies only explicit diagnostic identity with a manual fallback and no transmission', async () => {
+  it('copies explicit diagnostic identity through one accessible icon with short feedback and no transmission', async () => {
     const writeText = vi.fn(async (_text: string) => {}); Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
     const fetch = vi.fn(); vi.stubGlobal('fetch', fetch); await setup('/about')
-    await button('复制版本信息').trigger('click'); await flushPromises()
+    await wrapper!.get('button[aria-label="复制版本信息"]').trigger('click'); await flushPromises()
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining(`Companion Next ${packageInfo.version}`))
     expect(writeText.mock.calls[0]?.[0]).not.toMatch(/127\.0\.0\.1|X-Review-Token|Bearer|\/workspace\//)
     expect(fetch).not.toHaveBeenCalled()
-    writeText.mockRejectedValueOnce(new Error('denied')); await button('复制版本信息').trigger('click'); await flushPromises()
-    expect(wrapper!.text()).toContain('手动选择下方版本文本')
-    expect(wrapper!.find('textarea[aria-label="版本信息文本"]').attributes('readonly')).toBeDefined()
+    writeText.mockRejectedValueOnce(new Error('denied')); await wrapper!.get('button[aria-label="复制版本信息"]').trigger('click'); await flushPromises()
+    expect(document.body.textContent).toContain('复制未完成，请重试')
+    expect(wrapper!.find('textarea').exists()).toBe(false)
+    const icon = wrapper!.get('button[aria-label="复制版本信息"]')
+    expect(icon.attributes('title')).toBe('复制版本信息');expect(icon.text()).toBe('');expect(icon.find('svg').exists()).toBe(true)
+    ;(icon.element as HTMLButtonElement).focus();expect(document.activeElement).toBe(icon.element)
+    expect(wrapper!.findAll('button[aria-label="复制版本信息"]')).toHaveLength(1)
+    expect(icon.element.closest('.about-product-heading')?.textContent).toContain(frontendIdentity.version)
   })
 
   it('uses real host evidence for history/about and copies only recognized numeric Creator versions', async () => {
@@ -257,7 +262,7 @@ describe('help, about and visible frontend identity', () => {
     companionBrowserProvider.value=source;directory.provider=source;directory.connected=true;directory.observedAt='2026-10-15T12:00:00.000Z'
     directory.projects=[{id:'a',name:'Private project',path:'C:/private/project'}]
     directory.statuses=[{projectId:'a',state:'ready',capabilityProfile:'full-control',creatorVersion:'3.8.8 token=fixture-secret'},{projectId:'b',state:'ready',capabilityProfile:'full-control',creatorVersion:'C:/private/version'},{projectId:'c',state:'ready',capabilityProfile:'full-control',creatorVersion:'3.8.8'}]
-    await flushPromises();await button('复制版本信息').trigger('click');await flushPromises()
+    await flushPromises();await wrapper!.get('button[aria-label="复制版本信息"]').trigger('click');await flushPromises()
     const copied=writeText.mock.calls[0]![0];expect(copied).toContain('已取得真实读取结果');expect(copied).toContain('Creator 已返回版本：3.8.8');expect(copied).not.toMatch(/fixture-secret|C:\/|Private project/)
     await router.push('/history');await flushPromises();expect(wrapper!.text()).toContain('1 个登记工程');expect(wrapper!.text()).not.toContain('独立试点');expect(wrapper!.text()).not.toContain('仅本地草稿')
     companionBrowserProvider.value={...source,label:'replacement'};await flushPromises();expect(wrapper!.text()).toContain('未取得有效响应');expect(wrapper!.text()).not.toContain('1 个登记工程')
@@ -274,7 +279,7 @@ describe('help, about and visible frontend identity', () => {
   it('uses the approved overview-first order and preserves other navigation groups, destinations and brand-about access', async () => {
     await setup('/overview')
     const navigation = wrapper!.find('nav[aria-label="主导航"]')
-    expect(navigation.findAll('a').map((a) => a.attributes('href'))).toEqual(['/overview', '/ai-icons', '/resources', '/image-assets', '/projects', '/knowledge', '/knowledge/qa', '/knowledge/manage', '/knowledge?tab=models'])
+    expect(navigation.findAll('a').map((a) => a.attributes('href'))).toEqual(['/overview', '/projects', '/ai-icons', '/resources', '/image-assets', '/knowledge', '/knowledge/qa', '/knowledge/manage', '/knowledge?tab=models'])
     expect(wrapper!.find('nav[aria-label="补充入口"]').exists()).toBe(false)
     expect(wrapper!.find('.sidebar a[href="/services"]').exists()).toBe(false)
     expect(wrapper!.find('nav[aria-label="旧版功能入口"]').exists()).toBe(false)
@@ -423,7 +428,7 @@ describe('restored Companion navigation categories', () => {
   it('keeps the approved art hierarchy, one engineering link and every supplementary route reachable', async () => {
     const fetch = vi.fn(); vi.stubGlobal('fetch', fetch)
     const { router } = await setup('/knowledge?tab=models')
-    expect(wrapper!.findAll('.nav-list .nav-item').map(item => item.text())).toEqual(['看板', '美术资源', 'AI 图标', '游戏资源', '图片素材', '工程', '知识库', '检索与文档', '问答', '连接与同步', '模型服务'])
+    expect(wrapper!.findAll('.nav-list .nav-item').map(item => item.text())).toEqual(['看板', '工程', '美术资源', 'AI 图标', '游戏资源', '图片素材', '知识库', '检索与文档', '问答', '连接与同步', '模型服务'])
     const sidebar = wrapper!.get('.sidebar')
     expect(sidebar.findAll('a[href="/projects"]')).toHaveLength(1)
     expect(sidebar.findAll('a[href="/ai-icons"]')).toHaveLength(1)

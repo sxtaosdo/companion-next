@@ -8,6 +8,7 @@ import LocalServiceControls from '../src/components/LocalServiceControls.vue'
 import { localServiceOperationsProvider, registerLocalServiceOperationsProvider, isCompanionLocalServiceHost } from '../src/local-service-operations-integration'
 import { knowledgeReadProvider, registerKnowledgeReadProvider } from '../src/knowledge-read-integration'
 import { useLocalServiceOperationsStore } from '../src/stores/local-service-operations'
+import { useKnowledgeReadStore } from '../src/stores/knowledge-read'
 import { useWorkspaceStore } from '../src/stores/workspace'
 import { LocalServiceOperationError, type LocalServiceOperationsProvider, type LocalServiceOperationReply } from '../src/domain/local-service-operations'
 import { knowledgeFixture, deferred } from './knowledge-read-fixture'
@@ -120,12 +121,12 @@ describe('explicit service-control UI and source protection', () => {
     const { r } = await setup({ p: null }); expect(button('读取当前服务状态').attributes('disabled')).toBeDefined(); expect(wrapper!.text()).toContain('当前构建未接入服务启停能力'); expect(r.loadServiceStates).not.toHaveBeenCalled()
   })
   it('reads just the two service-status capability endpoints on explicit request', async () => {
-    const { p, r } = await setup(); await click('读取当前服务状态'); expect(r.loadServiceStates).toHaveBeenCalledOnce(); expect(r.status).not.toHaveBeenCalled(); expect(p.run).not.toHaveBeenCalled(); expect(wrapper!.text()).toContain('本次读取：服务可达')
+    const { p, r } = await setup(); await click('读取当前服务状态'); expect(r.loadServiceStates).toHaveBeenCalledOnce(); expect(r.status).not.toHaveBeenCalled(); expect(p.run).not.toHaveBeenCalled(); expect(wrapper!.text()).toContain('服务可达')
   })
   it.each(['知识库服务', '模型启动器'])('needs separate confirmation for every %s close', async service => {
     const { p } = await setup(); await prepare(service); expect(p.run).not.toHaveBeenCalled(); expect(button('确认并关闭这一次').attributes('disabled')).toBeDefined()
     expect(wrapper!.text()).toContain('所有客户端'); await check(); await click('确认并关闭这一次'); expect(p.run).toHaveBeenCalledOnce()
-    expect(wrapper!.text()).toContain('已收到关闭回执'); expect(wrapper!.text()).toContain('不证明所有相关进程均已结束')
+    expect(wrapper!.text()).toContain('已收到停止回执'); expect(wrapper!.text()).toContain('不证明所有相关进程均已结束')
     await prepare(service); expect(button('确认并关闭这一次').attributes('disabled')).toBeDefined(); await check(); await click('确认并关闭这一次'); expect(p.run).toHaveBeenCalledTimes(2)
   })
   it('keeps model guidance in the existing accessible tip', async () => {
@@ -170,7 +171,7 @@ describe('explicit service-control UI and source protection', () => {
   })
   it('keeps backend reported failure distinct from unknown', async () => {
     const p = provider(); vi.mocked(p.run).mockRejectedValue(new LocalServiceOperationError('backend-failure', 'reported-failure')); await setup({ p }); await stop('知识库服务')
-    expect(wrapper!.text()).toContain('后台报告未关闭'); expect(wrapper!.text()).toContain('可能已有进程或文件受到影响')
+    expect(wrapper!.text()).toContain('停止失败'); expect(wrapper!.text()).toContain('可能已有进程或文件受到影响')
   })
   it('leaving cannot turn a late reply into current success', async () => {
     const p = provider(), result = deferred<LocalServiceOperationReply>(); vi.mocked(p.run).mockReturnValue(result.promise); const { store } = await setup({ p }); await stop(); wrapper!.unmount(); wrapper = undefined
@@ -205,7 +206,7 @@ describe('original model page iframe lifecycle',()=>{
    const p=provider(),result=deferred<LocalServiceOperationReply>(),{r}=await setup({modelsOnly:true,p})
    vi.mocked(r.loadServiceStates).mockRejectedValueOnce(Error('offline'));await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(false)
    await click('读取当前服务状态');expect(wrapper!.find('iframe').exists()).toBe(true)
-   vi.mocked(p.run).mockReturnValueOnce(result.promise);await button('关闭服务').trigger('click');await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false)
+   vi.mocked(p.run).mockReturnValueOnce(result.promise);await button('关闭服务').trigger('click');await flushPromises();expect(wrapper!.find('iframe').exists()).toBe(false);expect(wrapper!.text()).toContain('停止中');expect(wrapper!.find('.operation-feedback-spin').exists()).toBe(true);expect(button('关闭服务').attributes('disabled')).toBeDefined()
    await button('关闭服务').trigger('click');expect(p.run).toHaveBeenCalledOnce();expect(wrapper!.find('.service-confirm').exists()).toBe(false)
    vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});result.resolve({service:'model',action:'stop',state:{running:false}});await flushPromises()
    expect(button('启动服务').exists()).toBe(true);expect(wrapper!.find('iframe').exists()).toBe(false)
@@ -221,4 +222,23 @@ describe('original model page iframe lifecycle',()=>{
 describe('serial model entry probe during source/tab changes',()=>{
  it.each(['source','tab'] as const)('waits for the previous read and probes only the latest %s context once',async change=>{const first=knowledgeFixture(),pending=deferred<Awaited<ReturnType<typeof first.loadServiceStates>>>();vi.mocked(first.loadServiceStates).mockReturnValueOnce(pending.promise).mockResolvedValue({model:{running:false},warnings:[]});const {p,store}=await setup({modelsOnly:true,r:first});expect(store.reading).toBe(true);let current=first;if(change==='source'){current=knowledgeFixture();vi.mocked(current.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});registerKnowledgeReadProvider(current)}else{await wrapper!.setProps({modelsOnly:false});await wrapper!.setProps({modelsOnly:true})}await flushPromises();expect(current.loadServiceStates).toHaveBeenCalledTimes(change==='source'?0:1);pending.resolve({model:{running:true},warnings:[]});await flushPromises();expect(current.loadServiceStates).toHaveBeenCalledTimes(change==='source'?1:2);expect(store.states?.model?.running).toBe(false);expect(wrapper!.find('iframe').exists()).toBe(false);expect(p.run).not.toHaveBeenCalled();await flushPromises();expect(current.loadServiceStates).toHaveBeenCalledTimes(change==='source'?1:2)})
  it('drops a queued entry probe on unmount instead of starting a detached request',async()=>{const first=knowledgeFixture(),pending=deferred<Awaited<ReturnType<typeof first.loadServiceStates>>>();vi.mocked(first.loadServiceStates).mockReturnValue(pending.promise);await setup({modelsOnly:true,r:first});await wrapper!.setProps({modelsOnly:false});await wrapper!.setProps({modelsOnly:true});wrapper!.unmount();wrapper=undefined;pending.resolve({model:{running:true},warnings:[]});await flushPromises();expect(first.loadServiceStates).toHaveBeenCalledOnce()})
+})
+
+describe('shared knowledge observation and independent operation admission',()=>{
+ it('shows the same connected observation without enabling unprepared service writes',async()=>{
+  const {pinia,r,p,store}=await setup({knowledgeOnly:true})
+  const shared=useKnowledgeReadStore(pinia);await shared.connect(r);await flushPromises()
+  expect(wrapper!.text()).toContain('服务可达');expect(wrapper!.text()).not.toContain('当前状态未读取 / 未知')
+  expect(store.states).toBeNull();expect(store.canPrepare('knowledge','stop')).toBe(false);expect(p.run).not.toHaveBeenCalled()
+  shared.disconnect();await flushPromises();expect(wrapper!.text()).toContain('未检查')
+ })
+})
+
+describe('knowledge control result reads back shared state',()=>{
+ it('refreshes observations after a confirmed stop receipt without treating that receipt as process exit',async()=>{
+  const {r,p}=await setup({knowledgeOnly:true});await click('读取当前服务状态');await click('核对关闭知识库服务');await check()
+  vi.mocked(r.loadServiceStates).mockResolvedValue({knowledge:{running:false,frameable:false},warnings:[]})
+  await click('确认并关闭这一次')
+  expect(p.run).toHaveBeenCalledOnce();expect(wrapper!.text()).toContain('服务不可达');expect(wrapper!.text()).toContain('已收到停止回执');expect(wrapper!.text()).not.toContain('服务可达')
+ })
 })

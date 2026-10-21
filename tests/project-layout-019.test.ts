@@ -174,6 +174,7 @@ describe('019 compact project card structure and safe controls', () => {
       const unknown = card(id), header = unknown.get('.companion-project-header')
       expect(header.text()).toContain('未知')
       expect(header.text()).not.toContain('已停止'); expect(header.text()).not.toContain('已就绪')
+      await unknown.get('.project-expand').trigger('click')
       expect(unknown.text()).toContain('调用：未记录')
       expect(button('启动 Creator', unknown).attributes('disabled')).toBeDefined()
       await button('启动 Creator', unknown).trigger('click')

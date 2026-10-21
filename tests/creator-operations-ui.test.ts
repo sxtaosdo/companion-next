@@ -262,10 +262,20 @@ it('uses the existing status tag for expected stop disconnect without rewriting 
   setRuntime({ projectId:id, state:'error', capabilityProfile:'unknown', lastError:'Creator Bridge 不可达；当前文档和进程状态未确认，请先查询日志' })
   await click('确认停止此工程'); await click('关闭')
   expect(wrapper!.get('.project-status-trigger .el-tag').text()).toBe('已请求停止')
+  // An inactive card now folds by default; inspect its details explicitly.
+  await wrapper!.get('.project-expand').trigger('click'); await flushPromises()
   expect(wrapper!.text()).toContain('进程退出仍需核对')
   expect(wrapper!.text()).toContain('Creator Bridge 不可达')
   expect(projects.statuses[0]?.state).toBe('error')
   setRuntime({ projectId:id,state:'error',capabilityProfile:'unknown',lastError:'different failure' })
   await projects.refreshProjects(); await flushPromises()
   expect(wrapper!.get('.project-status-trigger .el-tag').text()).toBe('错误')
+})
+
+it('a newer observed runtime replaces an old unknown operation tag without replaying the operation',async()=>{
+ const {api,projects,reader,setRuntime}=await setup('stopped');api.run=vi.fn(async()=>{throw new CreatorOperationError('timeout','unknown')})
+ await projects.connect(reader);await flushPromises();await click('\u542f\u52a8 Creator')
+ expect(wrapper!.get('.project-status-trigger .el-tag').text()).toContain('\u672a\u77e5')
+ setRuntime({projectId:id,state:'ready',capabilityProfile:'read-only'});await projects.refreshProjects();await flushPromises()
+ expect(wrapper!.get('.project-status-trigger .el-tag').text()).toBe('\u5df2\u5c31\u7eea');expect(api.run).toHaveBeenCalledTimes(1)
 })

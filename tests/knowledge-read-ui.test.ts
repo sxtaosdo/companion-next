@@ -104,3 +104,49 @@ describe('knowledge content-first presentation',()=>{
   expect(p.search).not.toHaveBeenCalled()
  })
 })
+
+
+describe('knowledge list feedback stays beside its trigger',()=>{
+ it('uses the same unreachable wording as service maintenance',async()=>{
+  const p=knowledgeFixture();vi.mocked(p.loadServiceStates).mockResolvedValue({knowledge:{running:false,frameable:false},warnings:[]})
+  registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p);await flushPromises()
+  expect(wrapper!.get('.knowledge-connect').text()).toContain('服务不可达')
+  expect(wrapper!.get('.knowledge-connect').text()).not.toContain('探测未达')
+ })
+
+ it('keeps pending, populated, empty and failed list outcomes in one region without duplicate panels',async()=>{
+  const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p)
+  let complete!:(value:Awaited<ReturnType<typeof p.listKnowledgeBases>>)=>void
+  vi.mocked(p.listKnowledgeBases).mockImplementationOnce(()=>new Promise(resolve=>{complete=resolve}))
+  await button('读取知识库列表').trigger('click');await flushPromises()
+  const region=wrapper!.get('.knowledge-base-browser')
+  expect(region.text()).toContain('正在读取知识库列表')
+  expect(region.get('button').classes()).toContain('is-loading')
+  expect(wrapper!.find('.knowledge-results').exists()).toBe(false)
+  complete({items:[{id:'kb1',name:'Returned library'}]});await flushPromises()
+  expect(region.text()).toContain('Returned library');expect(region.text()).toContain('已读取 1 个知识库')
+  vi.mocked(p.listKnowledgeBases).mockResolvedValueOnce({items:[]})
+  await button('读取知识库列表').trigger('click');await flushPromises()
+  expect(region.text()).toContain('暂无知识库');expect(region.text()).not.toContain('Returned library')
+  vi.mocked(p.listKnowledgeBases).mockRejectedValueOnce(new Error('isolated failure'))
+  await button('读取知识库列表').trigger('click');await flushPromises()
+  expect(region.find('.el-alert--error').exists()).toBe(true);expect(region.text()).not.toContain('暂无知识库')
+  expect(p.listKnowledgeBases).toHaveBeenCalledTimes(3);expect(p.search).not.toHaveBeenCalled()
+ })
+ it('shows the status request loading and failure as such instead of a never-checked retrieval',async()=>{
+  const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup()
+  let reject!:(reason:unknown)=>void
+  vi.mocked(p.status).mockImplementationOnce(()=>new Promise((_resolve,fail)=>{reject=fail}))
+  const pending=store.connect(p);await flushPromises()
+  expect(wrapper!.get('.knowledge-connect').findAll('.el-tag').every(tag=>tag.text()==='检查中')).toBe(true)
+  reject(new Error('isolated status failure'));await pending;await flushPromises()
+  expect(wrapper!.get('.knowledge-connect').text()).toContain('读取失败')
+  expect(wrapper!.get('.knowledge-connect').text()).not.toContain('检索未检查')
+ })
+ it('management keeps service state in the shared bar without a duplicate connection summary',async()=>{
+  const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup('/knowledge/manage');await store.connect(p);await flushPromises()
+  expect(wrapper!.find('.knowledge-access-summary').exists()).toBe(false)
+  expect(wrapper!.get('.knowledge-connect').text()).toContain('服务可达')
+  expect(wrapper!.get('.knowledge-technical').attributes('open')).toBeUndefined()
+ })
+})

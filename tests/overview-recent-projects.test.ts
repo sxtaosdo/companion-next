@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h } from 'vue'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
-import { recentProjects } from '../src/domain/recent-projects'
+import { orderedProjects, recentProjects } from '../src/domain/recent-projects'
 import { useOverviewRecentProjects } from '../src/composables/use-overview-recent-projects'
 import { useCompanionBrowserStore } from '../src/stores/companion-browser'
 import { useProjectOperationLaneStore } from '../src/stores/project-operation-lane'
@@ -44,7 +44,7 @@ describe('bounded overview recent read',()=>{
  })
  it('reports unavailable recent data without manufacturing timestamps',async()=>{
    const source=api();source.loadDashboardProjects=vi.fn(async()=>{throw Error('failed')});await enter(source)
-   expect(state.data.value).toEqual([]);expect(state.error.value).toContain('按登记顺序')
+   expect(state.data.value).toEqual([]);expect(state.error.value).toContain('按稳定顺序')
  })
  it('replenishes a cancelled pending read once when visible and rejects its late reply',async()=>{
    let finish!:(value:DashboardProject[])=>void
@@ -74,4 +74,63 @@ describe('bounded overview recent read',()=>{
    wrapper!.unmount();wrapper=undefined;expect(signal.aborted).toBe(true)
    finish([observed(1,99)]);await flushPromises();expect(state.data.value).toEqual([])
  })
+})
+
+
+describe('stable order across route visits', () => {
+ it('orders all projects by real timestamps, with deterministic ties independent of API array order', () => {
+   const profile = [observed(2,30), observed(1,30), observed(0,10)]
+   const ids = (values: typeof projects) => orderedProjects(values, profile).map(item => item.project.id)
+   expect(ids(projects)).toEqual(['p1','p2','p0','p3','p4','p5'])
+   expect(ids([...projects].reverse())).toEqual(ids(projects))
+ })
+ it('restores same-source order immediately before the page-entry read resolves, then accepts real last-opened changes', async () => {
+   const { source } = await enter()
+   const first = recentProjects(projects, state.data.value).map(item => item.project.id)
+   wrapper!.unmount(); wrapper = undefined
+   let finish!: (items: DashboardProject[]) => void
+   source.loadDashboardProjects = vi.fn(() => new Promise<DashboardProject[]>(resolve => finish = resolve))
+   wrapper = mount(Harness)
+   expect(recentProjects(projects, state.data.value).map(item => item.project.id)).toEqual(first)
+   await flushPromises()
+   finish([observed(4,40), observed(1,20)])
+   await flushPromises()
+   expect(recentProjects(projects, state.data.value).map(item => item.project.id)).toEqual(['p4','p1','p0','p2'])
+ })
+ it('retains prior ordering after a failed return read without inventing a new timestamp', async () => {
+   const { source } = await enter()
+   const previous = state.data.value
+   wrapper!.unmount(); wrapper = undefined
+   source.loadDashboardProjects = vi.fn(async () => { throw Error('failed') })
+   wrapper = mount(Harness); await flushPromises()
+   expect(state.data.value).toEqual(previous)
+   expect(state.error.value).not.toBe('')
+ })
+ it.each(['source','session'] as const)('does not retain observations across a %s replacement while absent', async kind => {
+   const { source, directory } = await enter()
+   wrapper!.unmount(); wrapper = undefined
+   const next = kind === 'source' ? api() : source
+   if (kind === 'session') directory.disconnect()
+   registerCompanionBrowserProvider(next, undefined, { projectEntry: 'read' })
+   directory.provider = next; directory.connected = true
+   next.loadDashboardProjects = vi.fn(() => new Promise<DashboardProject[]>(() => {}))
+   wrapper = mount(Harness)
+   expect(state.data.value).toEqual([])
+ })
+})
+
+
+it('keeps retained recent order after actual equivalent project polling with changed runtime status', async () => {
+ const directory = useCompanionBrowserStore(), source = api()
+ directory.projects = projects.map(project => ({ ...project }))
+ await enter(source)
+ const previous = recentProjects(directory.projects, state.data.value).map(item => item.project.id)
+ const identity = directory.projects
+ source.loadProjects = vi.fn(async () => ({ projects: projects.map(project => ({ ...project })), statuses: [{ projectId: 'p0', state: 'ready' as const, capabilityProfile: 'unknown' as const }], dashboard: [], warnings: [] }))
+ await directory.refreshProjects(true)
+ expect(directory.projects).toBe(identity)
+ wrapper!.unmount(); wrapper = undefined
+ source.loadDashboardProjects = vi.fn(() => new Promise<DashboardProject[]>(() => {}))
+ wrapper = mount(Harness)
+ expect(recentProjects(directory.projects, state.data.value).map(item => item.project.id)).toEqual(previous)
 })

@@ -1,0 +1,17 @@
+# 2026-10-21 Companion Next UI refinement
+
+Status: implemented candidate; deployment acceptance is recorded separately after verification.
+
+Owner explicitly approved engineering recent-open ordering, second-position project navigation, inactive cards initially folded, prominent lifecycle feedback, compact dashboard cards and stable return order. Additional approval covers shared knowledge status, inline list results, one-click explicit QA submission, collapsed diagnostics, and an About version copy icon. No host interface or legacy UI changes.
+
+Root causes: engineering sort preferred runtime before timestamps; recent dashboard data was discarded on unmount; art navigation was inserted immediately after overview; missing/error runtime cards expanded by default; status receipts could mask later runtime observations. Ordering now uses only actual Dashboard lastOpenedAt and stable normalized-path/ID ties. Same-source recent observations survive route return; equivalent polling preserves cache identity. Real registration changes or a new session invalidate it. Dashboard remains capped at four and retains independent global service cards.
+
+Project operation feedback distinguishes sending, receipt, runtime readiness, rejection, failure and unknown. A receipt never proves ready or process exit. Sending prevents repeats through the existing lane; subsequent valid observations replace old operation tags without deleting historical UNKNOWN receipts. Explicit expansion remains a session preference.
+
+Knowledge status uses shared read observations and consistent tones. Maintenance execution still requires its original separate fresh read and confirmation. The list action, loading, results, empty state and errors share one region. Ordinary QA prepares and consumes the same bound request synchronously from one explicit Send click; provider, KB, session, query, concurrent Agent/Sync and UNKNOWN guards are unchanged. Technical details remain available collapsed. About copies the original complete safe payload from one accessible icon.
+
+Read-only token configuration inspection: WeKnora default KnowledgeQA is remote deepseek-flash at api.deepseek.com/v1 (OpenAI-compatible protocol); embedding is remote BAAI/bge-m3 at api.siliconflow.cn/v1. These are external API account quotas, not Codex/ChatGPT subscription usage. Per-KB/session overrides and actual charges were not exercised. No credentials were returned and no inference request was sent.
+
+Checkpoint: checkpoints/project-status-six-20261021 at 40649a459202b54e2b6ed02610fb67fa7538017b. Parallel work used explicit file ownership. An independent read-only reviewer found two P2 issues (knowledge tone mismatch and stale operation tags); both were corrected before candidate acceptance. OCR delegation rules were loaded locally; no provider/API configuration was added.
+
+Validation boundaries: isolated lifecycle and QA transitions only, mock clipboard only, no real project/model start, QA, Agent, sync or index operations. The user's browser and running daemon remain untouched. Tests use process-local NODE_OPTIONS=--no-experimental-webstorage for Node25 workers. Candidate/deployed browser and file hashes are recorded in the final delivery evidence. Library remains 403 with no retry or alternate upload.
