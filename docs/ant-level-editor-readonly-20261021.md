@@ -1,6 +1,6 @@
 # 蚂蚁关卡编辑器：指定工程目录与刷新生效核查
 
-状态：只读结论；未修改编辑器、工程关卡、Creator、预览或存档。2026-10-21。
+状态：历史只读核查记录（后续用户已授权JSON改造）。本段核查时未修改编辑器、工程关卡、Creator、预览或存档。2026-10-21。
 
 ## 结论
 
@@ -37,3 +37,7 @@
 - [生产路径](../../../P4000/ant-cook/scripts/board-editor/levelPipeline.ts:13)、[只允许隔离导入](../../../P4000/ant-cook/scripts/board-editor/levelPipeline.ts:282)。
 - [静态导入运行数据](../../../P4000/ant-cook/assets/Colony/scripts/application/operationalLevels.ts:3)、[catalog构建](../../../P4000/ant-cook/assets/Colony/scripts/application/operationalLevels.ts:21)、[启动构建session](../../../P4000/ant-cook/assets/Colony/scripts/presentation/pageStates/loadingState.ts:134)。
 - [现有使用合同](../../../P4000/ant-cook/BOARD_EDITOR.md:52)。历史端口/验收记录不代表本轮服务状态，本轮未访问7470/7471或任何编辑器服务。
+
+## 后续已授权JSON改造
+
+用户随后明确选择简单JSON保存/刷新方向，原“先CSV/TS导入”的建议已由该选择替代，不再作为推荐实施路径。蚂蚁源码`9a6fbf6 / 0.3.0.112`新增固定`assets/Colony/config/runtime-levels.json`及“保存到工程”，Loading直接加载和校验该JSON，失败不回退旧TS。具体用法、保护及未测边界见[蚂蚁JSON说明](../../../P4000/ant-cook/LEVEL_JSON.md)。修复前全组81/81，修复列数默认残留后23/23及独立浏览器10/10通过；浏览器只写临时工程，真实Creator导入/Preview仍待实测，用户现有编辑器服务未替换。原CSV/生成TS和真实关卡值/存档保持，33份既有并行文件哈希保持。
