@@ -2,9 +2,12 @@ import { version, companionVersion } from '../../package.json'
 
 /** Frontend identity, never a claim about a connected daemon / Creator version. */
 export const frontendIdentity = { name: 'Companion Next', version, releaseDate: '2026-10-16', scope: 'Cocos 工程工作区', hostBase: companionVersion.hostBase, nextRevision: companionVersion.nextRevision } as const
+/** Current Companion read contracts do not expose a backend product version. */
+export const backendVersionInformation = { label: '当前接口未提供', detail: '宿主接口未返回后端产品版本；构建基线、Bridge 协议和内部 Git 记录都不代替后端版本。' } as const
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；Vue迁移与宿主业务集成分别验收', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  { version, date: '2026-10-21', title: '明确前后端版本来源', changes: ['前端产品版本保持 1.3.173；显式列出后端版本当前接口未提供，复制信息与页面一致，不用内部 Git 记录或构建基线代替产品版本。'] },
   {"version": version, "date": "2026-10-21", "title": "工程排序与状态、知识库交互精简", "changes": ["工程按真实最后打开时间稳定排序；未启动项默认折叠，保留显式展开选择；工程导航位于看板之后。", "看板返回保留顺序，最多四个工程，状态沿用工程标签，查看工程使用箭头图标。", "启动、停止、失败与未知结果采用统一图标和短文案；真实状态回读可替换旧操作反馈。", "知识库三个子页统一顶部状态；知识库列表就地显示，问答一次明确发送，保留原范围校验与未知结果保护。", "关于页在版本旁提供复制图标，保留完整版本内容。"]},
   { version, date: '2026-10-21', title: '增加正式后台启动入口', changes: ['在原项目根目录和旧 web 目录增加 start:next，旧 start 保持不变；新版项目根目录提供 npm start。', '复用原服务启动与认证会话，直接打开新版后台；运行中复用服务，不启动本地模型，也不覆盖静态资源。'] },
   { version, date: '2026-10-20', title: '知识库按任务分成三个子页', changes: ['左侧知识库增加检索与文档、问答、连接与同步三个独立入口；原模型服务链接保持独立。', '知识库内切页保留当前选库、检索条件、完成结果、问答草稿和返回位置；换源或条件改变时清除旧结果，切页撤销未发送确认，UNKNOWN 不自动重试。', '问答页在普通知识库问答与已有 Agent 之间切换；连接和同步操作集中到管理页，只有明确点击才请求。'] },

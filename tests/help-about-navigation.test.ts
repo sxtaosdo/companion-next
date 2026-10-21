@@ -442,3 +442,12 @@ describe('restored Companion navigation categories', () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 })
+
+it('labels frontend and unavailable backend consistently without inventing a backend version or issuing a probe',async()=>{
+ const fetch=vi.fn();vi.stubGlobal('fetch',fetch);const write=vi.fn(async(_value:string)=>{});Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:write}})
+ await setup('/about')
+ expect(wrapper!.get('.sidebar-footer').text()).toContain('\u524d\u7aef v1.3.173');expect(wrapper!.get('.sidebar-footer .backend-version').text()).toBe('\u540e\u7aef\uff1a\u5f53\u524d\u63a5\u53e3\u672a\u63d0\u4f9b')
+ expect(wrapper!.get('.about-product-heading .backend-version').text()).toBe('\u540e\u7aef\uff1a\u5f53\u524d\u63a5\u53e3\u672a\u63d0\u4f9b')
+ await wrapper!.get('button[aria-label="\u590d\u5236\u7248\u672c\u4fe1\u606f"]').trigger('click');await flushPromises()
+ const copied=write.mock.calls[0]?.[0];expect(copied).toContain('\u524d\u7aef\u4ea7\u54c1\u7248\u672c\uff1a1.3.173');expect(copied).toContain('\u540e\u7aef\u4ea7\u54c1\u7248\u672c\uff1a\u5f53\u524d\u63a5\u53e3\u672a\u63d0\u4f9b');expect(copied).not.toMatch(/1\.3\.173\.(196|197)/);expect(fetch).not.toHaveBeenCalled()
+})

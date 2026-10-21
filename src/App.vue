@@ -8,7 +8,7 @@ import { liveProvider } from './integration'
 import { companionBrowserProvider } from './companion-browser-integration'
 import { useRegisteredProjectStore } from './stores/registered-project'
 import { allowsLegacyWorkspace } from './domain/project-workspace'
-import { frontendIdentity } from './domain/product-information'
+import { frontendIdentity, backendVersionInformation } from './domain/product-information'
 import InfoTip from './components/InfoTip.vue'
 import { knowledgeNavigation, knowledgePageFor } from './domain/knowledge-navigation'
 const store = useWorkspaceStore()
@@ -152,7 +152,7 @@ const dateLabel = computed(() => {
         </template>
       </nav>
 
-      <div class="sidebar-footer">前端 v{{ frontendIdentity.version }}</div>
+      <div class="sidebar-footer"><div>前端 v{{ frontendIdentity.version }}</div><div class="backend-version" :title="backendVersionInformation.detail">后端：{{ backendVersionInformation.label }}</div></div>
     </aside>
     <div class="main-shell">
       <header class="topbar">
