@@ -1,10 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { startCompanion, openNext, startupEnvironment, discoverBounded, waitForOwnedBrowser, StartupError, BASE, NEXT } from '../scripts/start-companion.mjs';
+import { mkdtempSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { startCompanion, openNext, startupEnvironment, discoverBounded, waitForOwnedBrowser, StartupError, BASE, NEXT, APPROVED_STARTUP_CONFIG, validateStartupConfiguration, loadStartupConfiguration } from '../scripts/start-companion.mjs';
 test('rejects nonlocal or partial overrides before any startup and does not mutate environment', () => {
   assert.throws(() => startupEnvironment({ CREATOR_AI_DAEMON_URL: 'http://localhost:7470', CREATOR_AI_DAEMON_TOKEN: 'test' }), /UNEXPECTED_DAEMON_URL/);
   assert.throws(() => startupEnvironment({ CREATOR_AI_DAEMON_TOKEN: 'test' }), /INCOMPLETE/);
-  const original={ DEBUG:'test', PWDEBUG:'1' };const scoped=startupEnvironment(original);
+  const original={ DEBUG:'test', PWDEBUG:'1' };const scoped=startupEnvironment(original, APPROVED_STARTUP_CONFIG);
   assert.equal(scoped.DEBUG,undefined);assert.equal(scoped.PWDEBUG,undefined);assert.equal(original.DEBUG,'test');
 });
 test('cold and already running paths each use only official start, then bounded status; no-browser never creates a ticket',async()=>{
@@ -39,5 +42,39 @@ test('discovery is bounded and a closed owned browser does not keep the command 
   await waitForOwnedBrowser({isConnected:()=>false,close:async()=>{},once:()=>assert.fail('already disconnected')});
 });
 test('shared knowledge keys are removed only from child environment',()=>{
-  const env={WEKNORA_API_KEY:'test',KNOWLEDGE_SYNC_API_KEY:'test'};const scoped=startupEnvironment(env);assert.equal(scoped.WEKNORA_API_KEY,undefined);assert.equal(scoped.KNOWLEDGE_SYNC_API_KEY,undefined);assert.equal(env.WEKNORA_API_KEY,'test');
+  const env={WEKNORA_API_KEY:'test',KNOWLEDGE_SYNC_API_KEY:'test'};const scoped=startupEnvironment(env, APPROVED_STARTUP_CONFIG);assert.equal(scoped.WEKNORA_API_KEY,undefined);assert.equal(scoped.KNOWLEDGE_SYNC_API_KEY,undefined);assert.equal(env.WEKNORA_API_KEY,'test');
+});
+
+
+test('approved machine config has exactly six explicit bindings and rejects mode/path/key drift',()=>{
+ const binding={...APPROVED_STARTUP_CONFIG};assert.deepEqual(validateStartupConfiguration(binding),binding);
+ for(const value of [null,[],{}, {...binding,CREATOR_AI_ICONS_ENDPOINT:'http://127.0.0.1:8188'}, {...binding,CREATOR_AI_ICONS_MODE:'generation'}, {...binding,CREATOR_AI_ICONS_STORE:'D:/Elsewhere'}, {...binding,CREATOR_AI_ICONS_NODE:'node.exe'}, {...binding,CREATOR_AI_ICONS_NODE:123}]) assert.throws(()=>validateStartupConfiguration(value),StartupError);
+ const getter={...binding};Object.defineProperty(getter,'CREATOR_AI_ICONS_STORE',{get:()=>assert.fail('getter must not run'),enumerable:true});assert.throws(()=>validateStartupConfiguration(getter),/LOCAL_CONFIG_VALUE_INVALID/);
+ const hidden={...binding};Object.defineProperty(hidden,'extra',{value:'unexpected',enumerable:false});assert.throws(()=>validateStartupConfiguration(hidden),/LOCAL_CONFIG_KEYS_INVALID/);
+});
+
+test('machine-local loader fails closed for missing/malformed/oversized/repeated-key configuration',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'companion-start-config-')),file=join(dir,'config.json');
+ try{
+  assert.throws(()=>loadStartupConfiguration(file),/LOCAL_CONFIG_MISSING/);
+  writeFileSync(file,'{broken');assert.throws(()=>loadStartupConfiguration(file),/LOCAL_CONFIG_JSON_INVALID/);
+  writeFileSync(file,' '.repeat(17000));assert.throws(()=>loadStartupConfiguration(file),/LOCAL_CONFIG_FILE_INVALID/);
+  const valid=JSON.stringify(APPROVED_STARTUP_CONFIG);writeFileSync(file,valid);assert.deepEqual(loadStartupConfiguration(file),APPROVED_STARTUP_CONFIG);
+  writeFileSync(file,valid.replace('{','{"CREATOR_AI_ICONS_MODE":"generation",'));assert.throws(()=>loadStartupConfiguration(file),/LOCAL_CONFIG_KEYS_INVALID/);
+  writeFileSync(file,JSON.stringify({...APPROVED_STARTUP_CONFIG,secret:'not-accepted'}));assert.throws(()=>loadStartupConfiguration(file),/LOCAL_CONFIG_KEYS_INVALID/);
+ }finally{rmSync(dir,{recursive:true});}
+});
+
+test('offline binding strips all inherited icon capabilities including case variants without mutating its parent',()=>{
+ const parent={PATH:'inherited',CREATOR_AI_ICONS_MODE:'generation',CREATOR_AI_ICONS_ENDPOINT:'http://127.0.0.1:8188',CREATOR_AI_ICONS_LEASE:'D:/unrelated',CREATOR_AI_ICONS_ADOPTION_MANIFEST:'D:/unrelated.json',CREATOR_AI_ICONS_ACCEPTANCE_MANIFEST:'D:/other.json',creator_ai_icons_future_feature:'enabled',Creator_Ai_Icons_Store:'D:/wrong',CREATOR_AI_OWNER_CACHE:'D:/unchanged'};
+ const original={...parent};const child=startupEnvironment(parent,APPROVED_STARTUP_CONFIG);
+ assert.deepEqual(Object.fromEntries(Object.entries(child).filter(([key])=>key.toUpperCase().startsWith('CREATOR_AI_ICONS_'))),APPROVED_STARTUP_CONFIG);
+ assert.equal(child.PATH,parent.PATH);assert.equal(child.CREATOR_AI_OWNER_CACHE,parent.CREATOR_AI_OWNER_CACHE);assert.deepEqual(parent,original);
+ assert.throws(()=>startupEnvironment(parent,{...APPROVED_STARTUP_CONFIG,CREATOR_AI_ICONS_MODE:'generation'}),/LOCAL_CONFIG_MODE_INVALID/);
+});
+
+test('tracked example matches the bounded allowlist and does not become an automatic fallback',()=>{
+ const example=JSON.parse(readFileSync(new URL('../companion-start.example.json',import.meta.url),'utf8'));
+ assert.deepEqual(validateStartupConfiguration(example),APPROVED_STARTUP_CONFIG);
+ assert.throws(()=>loadStartupConfiguration(join(tmpdir(),'nonexistent-companion-machine-config-'+process.pid+'.json')),/LOCAL_CONFIG_MISSING/);
 });
