@@ -1,6 +1,6 @@
 # Version source correction, 2026-10-21
 
-Status: implemented candidate; deployment result recorded after verification.
+Status: deployed as part of source0973966 / internal checkpoint.200; frontend product1.3.173 is unchanged.
 
 User sees 1.3.173 correctly. package.json.version drives frontendIdentity and the served Next header/sidebar/About/copy payload. VERSION 1.3.173.196 and documentation checkpoint .197 are four-part internal Git records, not user-facing product versions. The prior delivery wording mixed these meanings; this is not evidence of stale browser assets.
 
@@ -13,3 +13,5 @@ Minimal UI correction: sidebar/About explicitly distinguish frontend1.3.173 and 
 Checkpoint checkpoints/version-semantics-20261021 is 0c7d0ae / .197. Three source files and focused help/About copy assertions are changed. Independent reviewer /root/review_ui_refinement re-read final diff and found no P1/P2; this is a prompt-defined read-only role, not a claimed hard sandbox. No user tab, service restart, inference or real business operation. Screenshot upload has been canceled; no Library investigation or upload will continue.
 
 Candidate browser acceptance also found that the existing tooltip intercepted Enter on the copy icon. Explicit Enter/Space handlers now prevent the tooltip/default action from swallowing copy; real-browser tests use an in-context mock clipboard, never the user clipboard. The initial source198 candidate was not deployed.
+
+Final verification is in model-art-ui-20261021.md: deployed UI labels and mocked Enter/Space copy passed, source198/199 candidates were never independently deployed. The installed original /app.js still serves frontend APP_VERSION0.3.142; that value remains separate from the unavailable daemon product version.

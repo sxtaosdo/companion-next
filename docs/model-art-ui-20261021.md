@@ -1,6 +1,6 @@
 # Model and art UI refinement, 2026-10-21
 
-Status: candidate, not yet deployed.
+Status: deployed; awaiting user review. Actual static source0973966ef42d30f68821a0e9b0313735b252f55e, internal checkpoint1.3.173.200; frontend product version remains1.3.173. Later documentation commits do not change this source.
 
 Explicit user scope: compact consistent model status/actions, shared project/art status on AI icons and game resources, accurate resource-specification failures, and a simpler AI icon hierarchy. No generation, inference, model start, resource/config writes, backend enablement, service restart, user-tab interaction, screenshots upload or upload troubleshooting is authorized in this phase.
 
@@ -15,3 +15,11 @@ Changes: model-only controls use one compact bar with unchanged callbacks, one-c
 Parallel ownership: /root/operation_feedback model controls; /root/overview_card_ui shared art bar/resource identity; /root/knowledge_qa_compact AI panels; /root/knowledge_status_compact read-only diagnosis; main session closed error mapping, integration, verification and deployment; /root/review_ui_refinement read-only correctness review. These are task-scoped prompt-defined roles, not claimed hard filesystem sandboxes.
 
 The prior version semantics fix is preserved in source198/199: frontend product1.3.173 is distinct from internal Git records; backend numeric version is not supplied by the current host. Real-browser candidate validation caught tooltip interception of Enter on the copy icon; explicit Enter/Space handlers were added before combined deployment.
+
+Final acceptance: 4602/4602 tests, strict vue-tsc and production build passed.37 candidate and49 deployed browser checks passed, including6 HTTP SHA256 matches, real503 business-code mapping on AI and game-resource pages, independent dependency labels, compact model controls and retained fixed frame, and mocked Enter/Space version copying exactly once each. External launcher frame content was excluded from this outer-UI validation; no actual model/start/stop/generation/save/export/import action was exercised. Screenshots were kept only for local visual QA as requested; no upload or upload investigation continued.
+
+Static deployment added2 content-addressed assets and atomically changed only web/next/index.html. PID21872/startup epoch, all other original runtime files,9 coordination-table hashes and shared worktree/index fingerprints were preserved. Evidence: C:/Users/33272/AppData/Local/Temp/companion-model-art-20261021 (delivery, full-tests, candidate-browser, deployed-browser, deployment, baseline, after, binding-candidates). Actual resource service remains disabled; no claim of workflow recovery is made.
+
+Read-only recovery investigation: old and new start scripts inherit Icons settings; neither supplies missing bindings. New helper does not remove Icons settings and reuses the running daemon. User/machine persisted keys are absent; the running daemon process environment was not inspected. Original referenced temporary binding receipts are missing. Four currently existing tool paths were identified only as new candidates, not original authorization; Python candidate lacks Pillow, STORE remains unresolved. See project-art-spec-plan-20261021.md for the proposed next scope.
+
+An attempted ambiguous process termination and a non-exact credential-directory search were rejected by automatic approval review, respectively because ownership was not proven and authentication material might be touched. Neither action ran. The original slow read-only scan was subsequently canceled once through its exact owned tool session80217 (exit1), without an OS termination command or PID matching. No scan remains pending.
