@@ -1,3 +1,9 @@
+2026-10-21 启动入口及开机验收收尾：Next入口代码已提交f0bac11 / 1.3.173.193；熟悉的cocos-mcp根目录和web目录均使用 `npm run start:next`，本仓用 `npm start`。用户已亲自从新入口打开，随后仅只读核实，Companion仍PID21872/OPEN，无重复启动、重启或终止服务，没有操作用户当前标签。旧仓两个package仅新增本任务别名，保留未提交，不混入并行发布；旧start与22条原并行修改保持。
+
+原知识服务8081开机后未运行，按已批准的原 `D:/services/weknora/Start-PilotAccess.ps1` 恢复一次，PID29848/health200。启动原guard验证schema30/dirty0、quick_check ok、10触发表空及历史知识状态hash一致；未执行Owner登录、凭据创建、迁移/索引/模型启动。之后独立Edge只读状态验收24项通过：看板独立卡、知识三页导航/无工程污染/共享已读短状态一致、6静态HTTP SHA仍匹配5ae52d0/.191，0pageerror/0写请求。没有执行问答、Agent、同步或关键词/文档业务；不据此提升其业务验收结论。
+
+入口8隔离测试、更新记录/导航38回归、独立只读审查和本地OCR规则已核；唯一首次冷启动CLI未及时确认的历史仍保留，不伪称首次CLI返回成功。截图9份hash复核通过；Library403无恢复证据，未重试上传，仍无Library ID。详细回执：`C:/Users/33272/AppData/Local/Temp/companion-start-entry-20261021/delivery.json`、`live-verification.json`、`morning-status-verification.json`。本轮没有重新构建/部署UI，实际UI源始终为5ae52d0 / 1.3.173.191。
+
 2026-10-21 正式后台启动入口：在熟悉的 `D:/code/shidai3/P8000/cocos-mcp`（或其 `web` 目录）执行 `npm run start:next`，一次完成原官方 daemon start、原认证会话与新版 `/next/index.html#/overview` 打开；旧 `npm start` 保留不变。也可在本仓根目录执行 `npm start`。`npm run dev` 仍只是 Vite 开发服务器，不是正式后台。
 
 仅启动/复用服务而不打开窗口：`npm run start:next -- --no-browser`（本仓对应 `npm start -- --no-browser`）。默认新开一个独立 Edge 窗口，不操作当前标签；关闭该新窗口后命令结束，后台服务继续运行。无安装、构建覆盖、restart、端口强杀、模型启动、凭据创建或用户配置修改。原官方 ui 没有目标参数且认证后固定跳旧 `/`；新 helper 复用同一 `/v1/ui/session` 和 `/auth`，在独立 context 消费原 cookie，再仅导航 Next，不渲染旧页、不持久保存认证状态。
