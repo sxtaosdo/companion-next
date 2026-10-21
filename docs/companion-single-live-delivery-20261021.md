@@ -53,3 +53,35 @@
 - 验证及备份：`C:/Users/33272/AppData/Local/Temp/companion-live-static-backup-20261021-add/authenticated-verification.json`。
 - 旧添加流程恢复：目录→工具范围→一次启动接入→Agent选择/跳过→完成。原宿主Codex大写Error缺陷尚未载入修复；没有重跑用户失败任务。
 - 旧首批1.3.174资源和原始资源均保留，无删除/开窗/Creator操作。
+
+## 后端维护源完整构建收口
+
+正式维护源码HEAD `b29c526f0a2fa67cc0271da2c52bbce13c63254d`（含4376a5e迁回及仅CRLF/LF等价处理的版本构建清单修复）。类型检查、144项回归及5项metadata纯测试通过；正规esbuild完整双入口及公开配套资产构建成功，没有运行原build/postbuild强杀hook。
+
+- 新daemon产物SHA256：acce4593a02e50e90eac0045d6b7dd26e03da47cf4b9d8744d8bd728c734a915。
+- map：dbdc1b7ec8b42329f9f4bb22b4fbeb8c4169ecd3201c78eb2e0bd18f6fd23d59。
+- CLI：c572497c91bc8e97189b62ebc0639d28862eb09569abb7044408e4b9fdeb404a。
+- 新包metadata实际reader静态接受0.3.142且拒绝错entrySHA。这个数字属于新构建，不能当旧运行宿主版本。
+- 临时完整构建回执：`C:/Users/33272/AppData/Local/Temp/companion-maintained-source-merge-20261021-141858/maintained-source-build-receipt.json`。
+- 原运行daemon仍SHA9717bc...，并未切换。没有启动第二后台。
+
+
+版本同步后的完整维护源码回归：4769/4769，0失败（Temp/companion-maintained-release-full-20261021.json）。这不包含未执行的真实Creator导入，也不把后端构建当现场切换。
+
+## 14:41 UTC 最终实际部署状态（本节覆盖上文阶段状态）
+
+正式32180静态产品版本 **1.3.176**，build `v1.3.176-collector-73e77d078556e6c8`。已生效批次包含：老添加流程、真实前端产品版本/构建身份、旧宿主版本缺失的准确降级、三资源页统一顶部、独立素材采集器iframe入口。原素材审阅、生成/导入流程保留；没有带入尚无新宿主支持的美术规范三分区保存界面。
+
+正式登录HTTP六项全部200且SHA一致；8工程ID集合不变、PID1840/epoch47159a25-f1b7-44d2-8466-bf661d281fd4保持OPEN。最终入口SHA256 `ab5726dbbdf84b7c55e7a9b09a275a71662bb8e4deb0dff9b5f728653e49f1dc`，JS `c962d4481b0acc04b8690274408810a0e515fb360a8061e333b6b1a83d993d78`，CSS `02c5f6e16b20cde189c702842e27de4ee374be99fdb3f0fb86dadfdd00fb0d46`。
+
+证据与可回退备份：`C:/Users/33272/AppData/Local/Temp/companion-live-static-backup-20261021-collector/authenticated-verification.json`，对应next目录为上一正式1.3.175全备份，原内容地址资源均保留。发布前类型、227项相关测试、构建与静态引用校验通过。无用户浏览器实际刷新/视觉验收；既有标签下次刷新才加载新包。工具32182未启动，不把iframe入口上线说成采集工具已运行或浏览器嵌入验收完成。
+
+| 最终状态 | 范围 |
+|---|---|
+| 已上线 | 老添加流程；前端版本及构建标识；旧后端404准确显示；统一顶部；采集器iframe入口 |
+| 已迁回维护源码并完整构建，未载入运行宿主 | Codex Error大小写；后端版本元数据；美术规范三分区/持久化/P0001适用继承/生成输入封存绑定；Creator状态关联 |
+| 正式源码迁回被自动审批拒绝、未执行 | P9000/ai-game-studio配套导入契约；需明确此目录授权，不绕过 |
+| 尚未实现/验证 | 参考图真正入模；同32180完整生成到Creator导入/UUID重读；正式浏览器三页视觉确认及未启动工具的真实握手 |
+| 仅评估不实施 | 右上标签可识别性建议；未知开源右下悬浮按钮，需项目名或图标辨认 |
+
+没有可立即提供给用户的受支持取消维护或安全热切换按钮；请勿让用户反复点击重启。真实阻塞是运行进程的两个历史生命周期证明缺失。后端应用需真实证据满足或原进程正常退出后核验身份/锁再普通启动。未强杀、清记录、注入、重启电脑或开启第二后台。临时构建/备份是回退证据，不是另一个运行/维护后台。
