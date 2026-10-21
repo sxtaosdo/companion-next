@@ -163,3 +163,15 @@ results.json是16条记录、15个不同stage；保留重复读取及初次失�
 ## 本轮交付边界
 
 近期复盘已独立交付。资源流本轮交付的是实际离线类验证、原始失败、来源与产物哈希、模型元数据及精确恢复条件；完整生成流仍未交付。未启动任何服务/模型或监听器、未调用宿主业务API、未注册工程、未写正式素材/实际任务库、未上传文件，也没有蚂蚁或采集器新增实施与验收。
+
+### 2026-10-21 12:35 UTC：按用户要求收拢到同一后台
+
+- 32181测试宿主已通过官方 `e2e-creator-ai.mjs daemon stop` 返回 `daemon_stop: PASSED`；随后PID8548退出、32181无监听。当前仅正式32180/PID1840监听。
+- 正式 `/v1/projects` 实测HTTP200、7工程完整，未登记e2e-project，未覆盖正式包、静态页面或认证。
+- 32181保留的测试登记只有e2e-project（16ad921aa0fb06d6），目录 `D:/CompanionData/art-generation-acceptance-20261021/e2e-project`；数据及图片不删除，不迁移整个注册库。
+- 重复可见浏览器6140经CloseMainWindow正常关闭，复核MainWindowHandle=0；原用户浏览器18756仍可见。残余后台浏览器进程未强杀。
+- Creator仍是22628，Dashboard主进程12528。最新重启操作只打开确认层，未确认、未发送restart请求；没有重开或关闭Creator。12:26:29的UI focus进入真实后台，经身份核验后在Windows前台切换失败（20609ms），不能算打开成功。
+- 新宿主源码5852658、完整类型闭合ae80a187；测试候选daemon SHA256 c6cb6961931e084cc2486b828c80433de552bcfbfdbc0ff1773b549557a685d3。完整mcp+web types通过。业务候选未部署32180。
+- 规范/UI检查点6e75e4e已构建；随后补旧v2迁移的明确标志与真实版本基准，32项回归和类型检查通过。真实文件合同验证旧v1→新v2、旧文件字节不变、丢响应仅查原状态；浏览器实际迁移验收尚未做。不能将这些合同测试称为完整UI闭环。
+- 已生成、预览、选用、96x96导出图片保留；Creator真实导入/UUID重读仍未通过。P0001可信用途映射、真实参考图条件输入仍有缺口。后续统一使用32180，必要部署先说明范围及正常维护风险，不能恢复32181来继续验收。
+- 实例核验：`D:/CompanionData/art-generation-acceptance-20261021/records/instance-consolidation-20261021.json`。UI确认层未派发证据：`records/e2e-ui-33-restart-through-backend-blocked.json`。

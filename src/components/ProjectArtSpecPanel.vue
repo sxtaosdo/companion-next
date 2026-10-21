@@ -97,7 +97,7 @@ const friendlyErrors = computed(() => store.errors.map(error => {
     </fieldset>
     <ul v-if="friendlyErrors.length" role="alert"><li v-for="error in friendlyErrors" :key="error">{{ error }}</li></ul>
     <p v-if="store.dirty" class="art-secondary" aria-label="美术规范待保存差异">待保存：{{ changedSections.join('、') }}</p>
-    <footer><label class="art-check"><input v-model="store.confirmed" aria-label="确认美术规范保存" type="checkbox" :disabled="!writer || store.pending || store.blocked || !!store.errors.length">我已核对当前工程、继承来源和项目差异，批准本次保存。</label><button type="button" :disabled="!store.canSave" @click="store.save">保存美术规范到工程</button><small v-if="store.hash === undefined">尚未读取工程原文件，不能保存。</small></footer>
+    <footer><p v-if="store.legacyVersion !== null" class="art-secondary">本次确认将保留原图标文件，并创建统一美术规范（版本 {{ store.legacyVersion + 1 }}）。</p><label class="art-check"><input v-model="store.confirmed" aria-label="确认美术规范保存" type="checkbox" :disabled="!writer || store.pending || store.blocked || !!store.errors.length">我已核对当前工程、继承来源和项目差异，批准本次保存。</label><button type="button" :disabled="!store.canSave" @click="store.save">保存美术规范到工程</button><small v-if="store.hash === undefined">尚未读取工程原文件，不能保存。</small></footer>
   </template>
 </section>
 </template>

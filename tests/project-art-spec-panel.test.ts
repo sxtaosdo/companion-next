@@ -1,3 +1,4 @@
+import { resourceView } from './fixtures/ai-resource-read'
 // @ts-ignore Node test runtime provides webcrypto; no browser dependency or Node types required.
 import { webcrypto } from 'node:crypto'
 import { artBindingHash } from '../src/domain/project-art-pending'
@@ -15,6 +16,12 @@ beforeEach(() => { vi.stubGlobal('crypto',webcrypto); const data=new Map<string,
 afterEach(() => { wrapper?.unmount(); wrapper = null })
 function setup(provider: ProjectArtSpecProvider | null = null) { wrapper = mount(ProjectArtSpecPanel, { props: { project, source, provider }, global: { plugins: [createPinia()] } }); return wrapper }
 describe('project art specification three-section candidate', () => {
+  it('explains explicit legacy migration in the existing confirmation area without an automatic write', async () => {
+    const host:ProjectArtSpecProvider={label:'host',endpoint:'http://127.0.0.1:32181',status:vi.fn(),read:vi.fn(async()=>({projectId:project.id,projectPath:project.path,config:resourceView(project.id).config,hash:'a'.repeat(64),authorities:[]})),save:vi.fn()}
+    setup(host);await button('读取 / 刷新美术规范').trigger('click');await flushPromises();await button('编写项目美术草稿').trigger('click')
+    expect(wrapper!.find('footer').text()).toContain('保留原图标文件');expect(wrapper!.find('footer').text()).toContain('版本 2');expect(host.save).not.toHaveBeenCalled()
+  })
+
   it('shows unavailable engineering save and does not claim browser draft is saved', async () => {
     setup(); await button('编写项目美术草稿').trigger('click')
     expect(wrapper!.text()).toContain('工程保存接口未接入'); expect(wrapper!.text()).toContain('未保存草稿'); expect(button('保存美术规范到工程').attributes('disabled')).toBeDefined()

@@ -1,7 +1,7 @@
 import { shallowRef } from 'vue'
 import type { ArtAuthority, ProjectArtSpec } from './domain/project-art-spec'
 export interface ProjectArtSpecContext { projectId: string; projectPath: string; source: object }
-export interface ProjectArtSaveInput { operationId: string; config: ProjectArtSpec; expectedHash: string | null; approved: true }
+export interface ProjectArtSaveInput { operationId: string; config: ProjectArtSpec; expectedHash: string | null; approved: true; migrateLegacy?: true }
 export interface ProjectArtOperation { schemaVersion: 'project-art-write-v1'; projectId: string; projectPath: string; operationId: string; bindingHash: string; state: 'pending' | 'completed' | 'rejected'; receipt?: ProjectArtSpecReceipt }
 export interface ProjectArtSpecReceipt { projectId: string; projectPath: string; config: unknown | null; hash: string | null; authorities: readonly ArtAuthority[]; operation?: { operationId: string; bindingHash: string; state: 'completed' } }
 export interface ProjectArtSpecProvider {

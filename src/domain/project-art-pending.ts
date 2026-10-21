@@ -12,7 +12,7 @@ export function pendingArtWrite(context: ProjectArtSpecContext, provider: Projec
   const text = storage().getItem(key(context, provider)); if (!text) return null
   if (text.length > 512 * 1024) throw Error('invalid pending record')
   const record = JSON.parse(text) as PendingArtWrite
-  if (record.schemaVersion !== 'art-browser-pending-v1' || record.endpoint !== artEndpoint(provider) || record.projectId !== context.projectId || artPath(record.projectPath) !== artPath(context.projectPath) || !/^art-save-[a-f0-9]{32}$/.test(record.input.operationId) || !/^[a-f0-9]{64}$/.test(record.bindingHash) || !Number.isSafeInteger(record.baseVersion) || record.baseVersion < 0 || record.input.approved !== true || record.input.expectedHash !== null && !/^[a-f0-9]{64}$/.test(record.input.expectedHash)) throw Error('invalid pending record')
+  if (record.schemaVersion !== 'art-browser-pending-v1' || record.endpoint !== artEndpoint(provider) || record.projectId !== context.projectId || artPath(record.projectPath) !== artPath(context.projectPath) || !/^art-save-[a-f0-9]{32}$/.test(record.input.operationId) || !/^[a-f0-9]{64}$/.test(record.bindingHash) || !Number.isSafeInteger(record.baseVersion) || record.baseVersion < 0 || record.input.approved !== true || record.input.migrateLegacy !== undefined && record.input.migrateLegacy !== true || record.input.expectedHash !== null && !/^[a-f0-9]{64}$/.test(record.input.expectedHash)) throw Error('invalid pending record')
   if (parseProjectArtSpec(record.input.config, context.projectId).kind !== 'project') throw Error('invalid pending config')
   return record
 }
@@ -20,9 +20,9 @@ export async function artBindingHash(projectId: string, projectPath: string, inp
   const bytes = new TextEncoder().encode(artCanonical({ projectId, projectPath, input }))
   return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), value => value.toString(16).padStart(2, '0')).join('')
 }
-export async function freezeArtWrite(context: ProjectArtSpecContext, provider: ProjectArtSpecProvider, config: ProjectArtSaveInput['config'], expectedHash: string | null, baseVersion: number): Promise<PendingArtWrite> {
+export async function freezeArtWrite(context: ProjectArtSpecContext, provider: ProjectArtSpecProvider, config: ProjectArtSaveInput['config'], expectedHash: string | null, baseVersion: number, migrateLegacy = false): Promise<PendingArtWrite> {
   if (pendingArtWrite(context, provider)) throw Error('existing pending write')
-  const input: ProjectArtSaveInput = { operationId: 'art-save-' + crypto.randomUUID().replaceAll('-', ''), config: JSON.parse(JSON.stringify(config)), expectedHash, approved: true }
+  const input: ProjectArtSaveInput = { operationId: 'art-save-' + crypto.randomUUID().replaceAll('-', ''), config: JSON.parse(JSON.stringify(config)), expectedHash, approved: true, ...(migrateLegacy ? { migrateLegacy: true as const } : {}) }
   const bindingHash = await artBindingHash(context.projectId, context.projectPath, input)
   if (pendingArtWrite(context, provider)) throw Error('concurrent pending write')
   const record: PendingArtWrite = { schemaVersion: 'art-browser-pending-v1', endpoint: artEndpoint(provider), projectId: context.projectId, projectPath: context.projectPath, input, bindingHash, baseVersion }

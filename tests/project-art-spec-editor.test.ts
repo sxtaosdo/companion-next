@@ -1,3 +1,4 @@
+import { resourceView } from './fixtures/ai-resource-read'
 // @ts-ignore Node test runtime provides webcrypto; no browser dependency or Node types required.
 import { webcrypto } from 'node:crypto'
 import { artBindingHash, pendingArtWrite } from '../src/domain/project-art-pending'
@@ -13,6 +14,24 @@ function provider(): ProjectArtSpecProvider { return { label: 'test host', endpo
 async function setup() { const store = useProjectArtSpecStore(), host = provider(); store.bind(context, host); await store.read(); store.draft!.project.content = 'Changed content'; store.touch(); store.confirmed = true; return { store, host } }
 beforeEach(() => { vi.stubGlobal('crypto',webcrypto); const data=new Map<string,string>();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value)},removeItem:(key:string)=>{data.delete(key)},clear:()=>data.clear()}}); setActivePinia(createPinia()) })
 describe('project art editor real-provider boundary', () => {
+  it('explicitly migrates the observed legacy version/hash and recovers a lost original receipt without replay', async () => {
+    const store = useProjectArtSpecStore(), host = provider(), legacy = { ...resourceView(context.projectId).config!, version: 7 }
+    host.read = vi.fn(async () => ({ ...receipt(), config: legacy }))
+    store.bind(context, host); await store.read(); store.startDraft('Project'); store.draft = config()
+    store.confirmed = false; await store.save(); expect(host.save).not.toHaveBeenCalled()
+    let completed!: ProjectArtSpecReceipt
+    host.save = vi.fn(async (binding,input) => {
+      expect(input).toMatchObject({ migrateLegacy:true, expectedHash:'a'.repeat(64), approved:true })
+      completed={...receipt({...input.config,version:8},'b'.repeat(64)),operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed'}}
+      throw Error('lost after durable migration')
+    })
+    store.confirmed=true; await store.save();expect(store.phase).toBe('unknown')
+    const frozen=pendingArtWrite(context,host)!;expect(frozen.baseVersion).toBe(7);expect(frozen.input.migrateLegacy).toBe(true)
+    host.status=vi.fn(async()=>({schemaVersion:'project-art-write-v1' as const,projectId:context.projectId,projectPath:context.projectPath,operationId:frozen.input.operationId,bindingHash:frozen.bindingHash,state:'completed' as const,receipt:completed}))
+    setActivePinia(createPinia());const restored=useProjectArtSpecStore();restored.bind({...context,source:{}},host);await restored.read()
+    expect(restored.phase).toBe('saved');expect(restored.base?.version).toBe(8);expect(restored.legacyVersion).toBeNull();expect(host.save).toHaveBeenCalledOnce();expect(host.status).toHaveBeenCalledOnce()
+  })
+
   it('never saves a local candidate without provider or confirmed file read', async () => {
     const store = useProjectArtSpecStore(); store.bind(context, null); store.startDraft('Project'); store.draft = config(); store.confirmed = true
     expect(store.canSave).toBe(false); await store.save(); expect(store.phase).not.toBe('saved')
