@@ -1,3 +1,11 @@
+2026-10-21 正式后台启动入口：在熟悉的 `D:/code/shidai3/P8000/cocos-mcp`（或其 `web` 目录）执行 `npm run start:next`，一次完成原官方 daemon start、原认证会话与新版 `/next/index.html#/overview` 打开；旧 `npm start` 保留不变。也可在本仓根目录执行 `npm start`。`npm run dev` 仍只是 Vite 开发服务器，不是正式后台。
+
+仅启动/复用服务而不打开窗口：`npm run start:next -- --no-browser`（本仓对应 `npm start -- --no-browser`）。默认新开一个独立 Edge 窗口，不操作当前标签；关闭该新窗口后命令结束，后台服务继续运行。无安装、构建覆盖、restart、端口强杀、模型启动、凭据创建或用户配置修改。原官方 ui 没有目标参数且认证后固定跳旧 `/`；新 helper 复用同一 `/v1/ui/session` 和 `/auth`，在独立 context 消费原 cookie，再仅导航 Next，不渲染旧页、不持久保存认证状态。
+
+本轮首次官方CLI未及时确认，唯一child随后实际就绪；没有重发冷启动或停服务。helper只在原CLI结果未确认时追加有界只读就绪核对，不伪称CLI成功，也不二次启动。之后通过熟悉根目录别名的真实重复运行exit0，复用PID21872；认证inflight HTTP200/OPEN、daemon SHA70df不变。8隔离入口回归通过；独立Edge真实认证和看板/知识三页20检查、6静态HTTP SHA全部通过，页面错误/越权写请求0。现有UI静态仍是5ae52d0 / 1.3.173.191，文档基线18ffe02 / .192，本轮启动项提交不自动构建或替换UI。知识库查询/问答/Agent/同步/索引/模型未执行，Library403没有重试。
+
+证据：`C:/Users/33272/AppData/Local/Temp/companion-start-entry-20261021`。旧仓仅新增两个package别名，原22条并行修改、原start及其它scripts不变；旧包原字节备份在old-package.json、old-web-package.json。旧仓两个package改动保留为本任务未提交增量，不混入旧仓并行发布；检查点为旧仓checkpoints/next-start-entry-20261021与本仓checkpoints/start-entry-20261021。
+
 2026-10-20 知识库三页已实际部署 **5ae52d0 / 1.3.173.191**（产品版本1.3.173）：左侧“知识库”下为检索与文档、问答、连接与同步，默认检索页；问答页内切换普通/Agent，模型服务旧链接独立保留。选库、检索条件、完成结果、草稿和返回滚动在三页间保留；换源、改条件或默认库改变会清旧结果。未发送确认离页撤销，UNKNOWN及实际在途锁不因缓存而清除。
 
 全仓4556项通过；最后旧服务锚点兼容修正后，受影响47项通过，其余4510项保持。严格类型、独立只读审查和本地OCR规则已核。最终候选47项、部署后47项实际隔离浏览器检查通过，页面错误/拦截写请求均0；知识库列表、文档列表/详情/分块/原文及纯关键词检索实际读取通过，三页切换不重复请求。6静态HTTP文件SHA一致。模型启动、推理问答、Agent执行、同步/演练均未真实执行，不能据入口存在称业务验收通过。
