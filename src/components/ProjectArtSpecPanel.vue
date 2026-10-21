@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { ART_CATEGORIES, type ArtCategory, type ArtValues } from '../domain/project-art-spec'
+import { ART_CATEGORIES, ART_CANON_USAGES, type CanonArtUsage, type ArtCategory, type ArtValues } from '../domain/project-art-spec'
 import type { AiResourceConfigV2 } from '../domain/ai-resource-read'
 import { projectArtSpecProvider, type ProjectArtSpecProvider } from '../project-art-spec-integration'
 import { useProjectArtSpecStore } from '../stores/project-art-spec'
@@ -15,6 +15,7 @@ const styleFields = ['renderingLanguage', 'proportions', 'realism', 'materials',
 const categoryFields: Record<ArtCategory, (keyof ArtValues)[]> = { ip: ['subject', 'identity', 'allowedChanges', 'view'], equipment: ['subject', 'purpose', 'view'], skill: ['subject', 'purpose', 'state'], ui: ['subject', 'state', 'textSafeArea'], icon: ['subject', 'purpose'] }
 const phaseLabels = { idle: '尚未读取', reading: '正在读取', editing: '未保存草稿', saving: '正在保存', saved: '已保存到工程', unknown: '保存结果未知', error: '需核对' }
 const available = computed(() => store.authorities.filter(item => item.status === 'Accepted' && item.projectIds.includes(props.project?.id ?? '')))
+const usageLabels: Record<CanonArtUsage,string> = { 'shared-concept': '共享概念', runtime: '正式运行素材', 'placeholder-validation': '占位与验证' }
 const selected = computed(() => store.draft?.inheritance.mode === 'canon' ? store.draft.inheritance.sources : [])
 const chosenAuthorities = computed(() => available.value.filter(item => selected.value.some(pin => pin.path === item.source.path && pin.revision === item.source.revision)))
 function chosen(path: string) { return selected.value.some(item => item.path === path) }
@@ -23,7 +24,13 @@ function selectSource(index: number, checked: boolean) {
   const pin = available.value[index]?.source; if (!pin) return
   const sources = selected.value.filter(item => item.path !== pin.path)
   if (checked) sources.push({ ...pin })
-  store.draft.inheritance = sources.length ? { mode: 'canon', sources } : { mode: 'none', reason: '' }; store.touch()
+  const usage = store.draft.inheritance.mode === 'canon' ? store.draft.inheritance.usage : undefined
+  store.draft.inheritance = sources.length ? { mode: 'canon', sources, ...(usage ? { usage } : {}) } : { mode: 'none', reason: '' }; store.touch()
+}
+function selectUsage(event: Event) {
+  if (!store.draft || store.draft.inheritance.mode !== 'canon' || store.pending || store.base?.inheritance.mode === 'canon' && store.base.inheritance.usage !== undefined) return
+  const value = (event.target as HTMLSelectElement).value
+  if ((ART_CANON_USAGES as readonly string[]).includes(value)) { store.draft.inheritance.usage = value as CanonArtUsage; store.touch() }
 }
 function independent() { if (store.draft) { store.draft.inheritance = { mode: 'none', reason: '' }; store.touch() } }
 function lock(field: keyof ArtValues, layer: 'project' | ArtCategory): string | number | boolean | undefined {
@@ -56,6 +63,8 @@ const changedSections = computed(() => {
 const friendlyErrors = computed(() => store.errors.map(error => {
   if (error.startsWith('INHERITANCE_CHANGE')) return '已保存的继承范围与固定版本不能在此移除，请先审阅迁移。'
   if (error.startsWith('LOCKED_OVERRIDE')) return '存在与继承锁定项不同的设定，请核对。'
+  if (error.startsWith('SOURCE_DEPENDENCY_REQUIRED')) return '所选来源还需同时继承其依赖来源。'
+  if (error.startsWith('SOURCE_USAGE_OUT_OF_SCOPE')) return '请明确继承用途，并确认所选来源允许该用途。'
   if (error.startsWith('SOURCE_') || error.startsWith('CANON_')) return '继承来源尚未完整核实，请选择适用的固定版本接口。'
   return '请补齐项目名称、内容、画布及继承说明，并核对尺寸和目录。'
 }).filter((item, index, all) => all.indexOf(item) === index))
@@ -74,8 +83,9 @@ const friendlyErrors = computed(() => store.errors.map(error => {
       <label class="art-check"><input type="radio" name="art-inheritance" :disabled="store.base?.inheritance.mode === 'canon'" :checked="store.draft.inheritance.mode === 'none'" @change="independent">不继承共享 Canon</label>
       <label v-if="store.draft.inheritance.mode === 'none'">适用范围说明<input v-model="store.draft.inheritance.reason" aria-label="不继承原因" maxlength="1500" @input="store.touch"></label>
       <p v-if="!available.length">尚无经过后台核实的适用来源；不能手工填写权威或锁定项。</p>
+      <label v-if="store.draft.inheritance.mode === 'canon'">继承用途<select :value="store.draft.inheritance.usage ?? ''" aria-label="继承用途" :disabled="store.base?.inheritance.mode === 'canon' && store.base.inheritance.usage !== undefined" @change="selectUsage"><option value="" disabled>请明确用途</option><option v-for="usage in ART_CANON_USAGES" :key="usage" :value="usage">{{ usageLabels[usage] }}</option></select><small>共享概念不等于正式运行授权；旧文件未标明用途时需显式补齐。</small></label>
       <article v-for="(authority,index) in available" :key="authority.source.path" class="art-source"><label class="art-check"><input type="checkbox" :checked="chosen(authority.source.path)" :disabled="store.base?.inheritance.mode === 'canon' && store.base.inheritance.sources.some(pin => pin.path === authority.source.path)" :aria-label="`继承 ${authority.source.path}`" @change="selectSource(index,($event.target as HTMLInputElement).checked)">{{ authority.source.path }}</label><small>固定版本 {{ authority.source.revision }} · {{ authority.categories.map(value => labels[value]).join('、') }}</small>
-        <p v-if="Object.keys(authority.locked).length">锁定：{{ Object.keys(authority.locked).map(key => fieldLabels[key as keyof ArtValues] ?? key).join('、') }}</p><p v-if="Object.keys(authority.defaults).length">可覆盖默认：{{ Object.keys(authority.defaults).map(key => fieldLabels[key as keyof ArtValues] ?? key).join('、') }}</p>
+        <p>允许用途：{{ (authority.allowedUsages ?? []).map(value => usageLabels[value]).join(' / ') || '未授权' }}</p><p v-if="Object.keys(authority.locked).length">锁定：{{ Object.keys(authority.locked).map(key => fieldLabels[key as keyof ArtValues] ?? key).join('、') }}</p><p v-if="Object.keys(authority.defaults).length">可覆盖默认：{{ Object.keys(authority.defaults).map(key => fieldLabels[key as keyof ArtValues] ?? key).join('、') }}</p>
       </article>
     </fieldset>
     <fieldset :disabled="store.pending || store.blocked" data-testid="art-project-section"><legend>项目设定</legend>

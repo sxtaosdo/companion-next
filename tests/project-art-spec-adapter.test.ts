@@ -1,9 +1,16 @@
+import type { ProjectArtSpec } from '../src/domain/project-art-spec'
 import { describe, expect, it, vi } from 'vitest'
 import { createProjectArtSpecProvider } from '../src/adapters/project-art-spec'
 const context={projectId:'1234567890abcdef',projectPath:'/test/project',source:{}}
 const receipt={projectId:context.projectId,projectPath:context.projectPath,config:null,hash:null,authorities:[]}
 const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json'}})
 describe('project art authenticated same-origin transport',()=>{
+ it('reads legacy missing-usage Canon without silently filling runtime or issuing writes',async()=>{
+  const config:ProjectArtSpec={schemaVersion:'project-art-spec-v1',projectId:context.projectId,version:1,project:{name:'Old',content:'Existing old config',engine:'cocos-creator',designResolution:{width:750,height:1334}},inheritance:{mode:'canon',sources:[{path:'P0001/ip/canon_interface.md',revision:'a'.repeat(40)}]},overrides:{},categories:{}}
+  const fetcher=vi.fn<typeof fetch>(async()=>json({...receipt,config,hash:'a'.repeat(64)})),provider=createProjectArtSpecProvider(fetcher,'http://127.0.0.1:32181')
+  const value=await provider.read(context,new AbortController().signal);expect(value.config).toEqual(config);expect(fetcher).toHaveBeenCalledOnce();expect(vi.mocked(fetcher).mock.calls[0]![1]?.method).toBe('GET')
+ })
+
  it('reads exact route with same-origin credentials and no automatic write',async()=>{
   const fetcher=vi.fn<typeof fetch>(async()=>json(receipt));const provider=createProjectArtSpecProvider(fetcher,'http://127.0.0.1:32181')
   expect(await provider.read(context,new AbortController().signal)).toEqual(receipt)

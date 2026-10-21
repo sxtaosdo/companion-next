@@ -14,6 +14,32 @@ function provider(): ProjectArtSpecProvider { return { label: 'test host', endpo
 async function setup() { const store = useProjectArtSpecStore(), host = provider(); store.bind(context, host); await store.read(); store.draft!.project.content = 'Changed content'; store.touch(); store.confirmed = true; return { store, host } }
 beforeEach(() => { vi.stubGlobal('crypto',webcrypto); const data=new Map<string,string>();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value)},removeItem:(key:string)=>{data.delete(key)},clear:()=>data.clear()}}); setActivePinia(createPinia()) })
 describe('project art editor real-provider boundary', () => {
+  it('never accepts a completed save or recovered receipt with a removed explicit usage',async()=>{
+    const {store,host}=await setup(),pin={path:'P0001/ip/canon_interface.md',revision:'a'.repeat(40)}
+    store.authorities=[{source:pin,status:'Accepted',kind:'canon-interface',projectIds:[context.projectId],allowedUsages:['runtime'],categories:['icon'],locked:{},defaults:{},requiresImageReference:false}]
+    store.draft!.inheritance={mode:'canon',usage:'runtime',sources:[pin]};store.confirmed=true
+    let bad!:ProjectArtSpecReceipt
+    host.save=vi.fn(async(binding,input)=>{
+      const config={...input.config,version:2};if(config.inheritance.mode==='canon')config.inheritance={mode:'canon',sources:config.inheritance.sources}
+      bad={...receipt(config,'b'.repeat(64)),authorities:store.authorities,operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed'}};return bad
+    })
+    await store.save();expect(store.phase).toBe('unknown');expect(store.blocked).toBe(true);const frozen=pendingArtWrite(context,host)!
+    host.status=vi.fn(async()=>({schemaVersion:'project-art-write-v1' as const,projectId:context.projectId,projectPath:context.projectPath,operationId:frozen.input.operationId,bindingHash:frozen.bindingHash,state:'completed' as const,receipt:bad}))
+    await store.recover();expect(store.phase).toBe('unknown');expect(store.blocked).toBe(true);expect(host.save).toHaveBeenCalledOnce()
+  })
+
+  it('protects an existing explicit Canon usage while allowing an old unresolved usage to be explicitly completed',async()=>{
+    const {store,host}=await setup();const pin={path:'P0001/ip/canteen-transport-interface.md',revision:'a'.repeat(40)}
+    store.authorities=[{source:pin,status:'Accepted',kind:'canon-interface',projectIds:[context.projectId],categories:['icon'],allowedUsages:['runtime','shared-concept'],locked:{},defaults:{},requiresImageReference:false}]
+    store.base!.inheritance={mode:'canon',usage:'shared-concept',sources:[pin]};store.draft!.inheritance={mode:'canon',usage:'runtime',sources:[pin]}
+    expect(store.errors).toEqual(['INHERITANCE_CHANGE_REQUIRES_REVIEW']);await store.save();expect(host.save).not.toHaveBeenCalled()
+    delete store.base!.inheritance.usage;delete store.draft!.inheritance.usage;expect(store.errors.join()).toContain('SOURCE_USAGE_OUT_OF_SCOPE')
+    store.draft!.inheritance.usage='shared-concept';expect(store.errors).toEqual([])
+    host.save=vi.fn(async(binding,input)=>({...receipt({...input.config,version:2},'b'.repeat(64)),authorities:store.authorities,operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed' as const}}))
+    store.confirmed=true;await store.save();expect(store.phase).toBe('saved')
+    const input=vi.mocked(host.save).mock.calls[0]![1];expect(input.config.inheritance).toMatchObject({usage:'shared-concept'})
+  })
+
   it('explicitly migrates the observed legacy version/hash and recovers a lost original receipt without replay', async () => {
     const store = useProjectArtSpecStore(), host = provider(), legacy = { ...resourceView(context.projectId).config!, version: 7 }
     host.read = vi.fn(async () => ({ ...receipt(), config: legacy }))
@@ -70,7 +96,7 @@ describe('project art editor real-provider boundary', () => {
   })
   it('cannot remove existing fixed Canon sources to escape locks', async () => {
     const { store } = await setup(); const pin = { path: 'P0001/ip/canteen-transport-interface.md', revision: 'a'.repeat(40) }
-    store.base!.inheritance = { mode: 'canon', sources: [pin] }; expect(store.errors).toEqual(['INHERITANCE_CHANGE_REQUIRES_REVIEW']); expect(store.canSave).toBe(false)
+    store.base!.inheritance = { mode: 'canon', usage: 'runtime', sources: [pin] }; expect(store.errors).toEqual(['INHERITANCE_CHANGE_REQUIRES_REVIEW']); expect(store.canSave).toBe(false)
   })
   it('preserves UNKNOWN across source recreation, new provider and a fresh Pinia; only polls the original status', async () => {
     const {store,host}=await setup();host.save=vi.fn(async()=>{throw Error('lost response')});await store.save()
@@ -94,8 +120,8 @@ describe('project art editor real-provider boundary', () => {
   })
   it('does not permit locks to be overridden through direct draft mutation', async () => {
     const { store } = await setup(); const pin = { path: 'P0001/ip/canteen-transport-interface.md', revision: 'a'.repeat(40) }
-    store.authorities = [{ source: pin, status: 'Accepted', kind: 'canon-interface', projectIds: [context.projectId], categories: ['icon'], locked: { materials: 'locked' }, defaults: {}, requiresImageReference: true }]
-    store.draft!.inheritance = { mode: 'canon', sources: [pin] }; store.draft!.overrides.materials = 'unapproved'
+    store.authorities = [{ source: pin, status: 'Accepted', kind: 'canon-interface', allowedUsages: ['runtime'], projectIds: [context.projectId], categories: ['icon'], locked: { materials: 'locked' }, defaults: {}, requiresImageReference: true }]
+    store.draft!.inheritance = { mode: 'canon', usage: 'runtime', sources: [pin] }; store.draft!.overrides.materials = 'unapproved'
     expect(store.errors.join()).toContain('LOCKED_OVERRIDE'); expect(store.canSave).toBe(false)
   })
 })

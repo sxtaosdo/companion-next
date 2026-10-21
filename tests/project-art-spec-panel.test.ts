@@ -16,6 +16,14 @@ beforeEach(() => { vi.stubGlobal('crypto',webcrypto); const data=new Map<string,
 afterEach(() => { wrapper?.unmount(); wrapper = null })
 function setup(provider: ProjectArtSpecProvider | null = null) { wrapper = mount(ProjectArtSpecPanel, { props: { project, source, provider }, global: { plugins: [createPinia()] } }); return wrapper }
 describe('project art specification three-section candidate', () => {
+  it('requires an explicit usage for an old Canon file and exposes the existing inheritance selector',async()=>{
+    const pin={path:'P0001/ip/canon_interface.md',revision:'a'.repeat(40)},old=config();old.inheritance={mode:'canon',sources:[pin]}
+    const host:ProjectArtSpecProvider={label:'host',endpoint:'http://127.0.0.1:32181',status:vi.fn(),read:vi.fn(async()=>({projectId:project.id,projectPath:project.path,config:old,hash:'a'.repeat(64),authorities:[{source:pin,status:'Accepted' as const,kind:'canon-interface' as const,projectIds:[project.id],allowedUsages:['shared-concept' as const],categories:['icon' as const],locked:{},defaults:{},requiresImageReference:false}]})),save:vi.fn()}
+    setup(host);await button('读取 / 刷新美术规范').trigger('click');await flushPromises()
+    const select=wrapper!.get('[aria-label="继承用途"]');expect((select.element as HTMLSelectElement).value).toBe('');expect(wrapper!.find('[role="alert"]').exists()).toBe(true)
+    await select.setValue('shared-concept');expect(wrapper!.find('[role="alert"]').exists()).toBe(false);expect(host.save).not.toHaveBeenCalled()
+  })
+
   it('explains explicit legacy migration in the existing confirmation area without an automatic write', async () => {
     const host:ProjectArtSpecProvider={label:'host',endpoint:'http://127.0.0.1:32181',status:vi.fn(),read:vi.fn(async()=>({projectId:project.id,projectPath:project.path,config:resourceView(project.id).config,hash:'a'.repeat(64),authorities:[]})),save:vi.fn()}
     setup(host);await button('读取 / 刷新美术规范').trigger('click');await flushPromises();await button('编写项目美术草稿').trigger('click')
@@ -34,7 +42,7 @@ describe('project art specification three-section candidate', () => {
   })
   it('only exposes backend-provided pinned sources and locks inherited fields', async () => {
     const pin = { path: 'P0001/ip/canteen-transport-interface.md', revision: 'a'.repeat(40) }
-    const host: ProjectArtSpecProvider = { label: 'host', endpoint: 'http://127.0.0.1:32181', status: vi.fn(), read: vi.fn(async () => ({ projectId: project.id, projectPath: project.path, config: config(), hash: 'a'.repeat(64), authorities: [{ source: pin, status: 'Accepted' as const, kind: 'canon-interface' as const, projectIds: [project.id], categories: ['icon' as const], locked: { materials: 'accepted material' }, defaults: {}, requiresImageReference: true }] })), save: vi.fn() }
+    const host: ProjectArtSpecProvider = { label: 'host', endpoint: 'http://127.0.0.1:32181', status: vi.fn(), read: vi.fn(async () => ({ projectId: project.id, projectPath: project.path, config: config(), hash: 'a'.repeat(64), authorities: [{ source: pin, status: 'Accepted' as const, kind: 'canon-interface' as const, allowedUsages: ['runtime' as const], projectIds: [project.id], categories: ['icon' as const], locked: { materials: 'accepted material' }, defaults: {}, requiresImageReference: true }] })), save: vi.fn() }
     setup(host); await button('读取 / 刷新美术规范').trigger('click'); await flushPromises()
     await wrapper!.get(`[aria-label="继承 ${pin.path}"]`).setValue(true)
     expect(wrapper!.text()).toContain(pin.revision); expect(wrapper!.get('[aria-label="项目材质"]').attributes('disabled')).toBeDefined(); expect(wrapper!.get('[aria-label="项目材质"]').element).toHaveProperty('value', 'accepted material')

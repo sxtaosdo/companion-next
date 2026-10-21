@@ -25,7 +25,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
     try {
       if (base.value?.inheritance.mode === 'canon') {
         const current = draft.value.inheritance
-        if (current.mode !== 'canon' || base.value.inheritance.sources.some(pin => !current.sources.some(item => item.path === pin.path && item.revision === pin.revision))) return ['INHERITANCE_CHANGE_REQUIRES_REVIEW']
+        if (current.mode !== 'canon' || base.value.inheritance.usage !== undefined && current.usage !== base.value.inheritance.usage || base.value.inheritance.sources.some(pin => !current.sources.some(item => item.path === pin.path && item.revision === pin.revision))) return ['INHERITANCE_CHANGE_REQUIRES_REVIEW']
       }
       parseProjectArtSpec(draft.value, context.value.projectId); validateProjectArtBindings(draft.value, authorities.value); return [] }
     catch (error) { return [error instanceof ArtSpecError ? `${error.code} · ${error.field}` : '美术规范字段无效'] }

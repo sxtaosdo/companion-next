@@ -9,7 +9,7 @@ export function createProjectArtSpecProvider(fetcher: typeof fetch, origin: stri
     const value = raw as ProjectArtSpecReceipt
     if (!value || value.projectId !== context.projectId || artPath(value.projectPath) !== artPath(context.projectPath) || !Array.isArray(value.authorities) || value.authorities.length > 8) throw Error('Invalid art receipt')
     if (value.config === null) { if (value.hash !== null) throw Error('Invalid missing receipt') }
-    else { if (!value.hash || !/^[a-f0-9]{64}$/.test(value.hash)) throw Error('Invalid art hash'); const parsed = parseProjectArtSpec(value.config, context.projectId); if (parsed.kind === 'project') validateProjectArtBindings(parsed.spec, value.authorities) }
+    else { if (!value.hash || !/^[a-f0-9]{64}$/.test(value.hash)) throw Error('Invalid art hash'); const parsed = parseProjectArtSpec(value.config, context.projectId); if (parsed.kind === 'project' && !(parsed.spec.inheritance.mode === 'canon' && parsed.spec.inheritance.usage === undefined)) validateProjectArtBindings(parsed.spec, value.authorities) }
     return value
   }
   async function request(route: string, signal: AbortSignal, body?: unknown): Promise<unknown> {

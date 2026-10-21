@@ -2,6 +2,8 @@ import { decodeAiResourceConfigV2, isAiReferencePath, type AiResourceConfigV2 } 
 
 /** Configuration only. Loading/accepting authority sources and persisting files belong to the host. */
 export const ART_CATEGORIES = ['ip', 'equipment', 'skill', 'ui', 'icon'] as const
+export const ART_CANON_USAGES = ['shared-concept', 'runtime', 'placeholder-validation'] as const
+export type CanonArtUsage = typeof ART_CANON_USAGES[number]
 export type ArtCategory = typeof ART_CATEGORIES[number]
 const textFields = ['renderingLanguage', 'proportions', 'realism', 'materials', 'lighting', 'palette', 'subject', 'identity', 'allowedChanges', 'purpose', 'view', 'state', 'textSafeArea', 'destination'] as const
 const numberFields = ['width', 'height', 'paddingPercent'] as const
@@ -12,6 +14,8 @@ export interface ArtAuthority {
   status: 'Accepted'
   kind: 'canon-interface' | 'art-style'
   projectIds: readonly string[]
+  requiredSources?: readonly ArtSourcePin[]
+  allowedUsages: readonly CanonArtUsage[]
   categories: readonly ArtCategory[]
   locked: ArtValues
   defaults: ArtValues
@@ -22,7 +26,7 @@ export interface ProjectArtSpec {
   projectId: string
   version: number
   project: { name: string; content: string; engine: 'cocos-creator'; designResolution: { width: number; height: number } }
-  inheritance: { mode: 'none'; reason: string } | { mode: 'canon'; sources: ArtSourcePin[] }
+  inheritance: { mode: 'none'; reason: string } | { mode: 'canon'; sources: ArtSourcePin[]; usage?: CanonArtUsage }
   overrides: ArtValues
   categories: Partial<Record<ArtCategory, ArtValues>>
 }
@@ -52,6 +56,15 @@ function source(value: unknown): ArtSourcePin {
   if (!path.startsWith('P0001/') || path.includes('\\') || /[\u0000-\u001f:<>\"|?*]/.test(path) || path.split('/').some(part => !part || part === '.' || part === '..') || !path.endsWith('.md')) fail('INVALID_SOURCE', path)
   if (typeof raw.revision !== 'string' || !/^[a-f0-9]{40}$/.test(raw.revision)) fail('UNPINNED_SOURCE', path)
   return { path, revision: raw.revision }
+}
+/** Dependencies come only from trusted mappings; never select or modify project pins implicitly. */
+function requireDependencies(authority: ArtAuthority, pins: readonly ArtSourcePin[]) {
+  if (authority.requiredSources === undefined) return
+  if (!Array.isArray(authority.requiredSources) || authority.requiredSources.length > 8) fail('INVALID_SOURCE', authority.source.path)
+  for (const dependency of authority.requiredSources) {
+    const required = source(dependency)
+    if (!pins.some(pin => pin.path === required.path && pin.revision === required.revision)) fail('SOURCE_DEPENDENCY_REQUIRED', required.path)
+  }
 }
 function values(value: unknown, field: string): ArtValues {
   const raw = object(value, field); keys(raw, [...textFields, ...numberFields, 'transparent'], field)
@@ -87,11 +100,12 @@ export function parseProjectArtSpec(value: unknown, expectedProjectId: string): 
   if (inheritance.mode === 'none') {
     keys(inheritance, ['mode', 'reason'], 'inheritance'); inherited = { mode: 'none', reason: text(inheritance.reason, 'inheritance.reason') }
   } else if (inheritance.mode === 'canon') {
-    keys(inheritance, ['mode', 'sources'], 'inheritance')
+    keys(inheritance, ['mode', 'sources', 'usage'], 'inheritance')
+    if (inheritance.usage !== undefined && !(ART_CANON_USAGES as readonly unknown[]).includes(inheritance.usage)) fail('SOURCE_USAGE_OUT_OF_SCOPE', 'inheritance.usage')
     if (!Array.isArray(inheritance.sources) || !inheritance.sources.length || inheritance.sources.length > 8) fail('INVALID_SOURCE', 'inheritance.sources')
     const sources = inheritance.sources.map(source)
     if (new Set(sources.map(item => item.path)).size !== sources.length) fail('DUPLICATE_SOURCE', 'inheritance.sources')
-    inherited = { mode: 'canon', sources }
+    inherited = { mode: 'canon', sources, ...(inheritance.usage === undefined ? {} : { usage: inheritance.usage as CanonArtUsage }) }
   } else fail('EXPLICIT_INHERITANCE_REQUIRED', 'inheritance.mode')
   const categories = object(raw.categories, 'categories'); keys(categories, ART_CATEGORIES, 'categories')
   const checked: ProjectArtSpec['categories'] = {}
@@ -118,6 +132,7 @@ export function resolveArtGenerationInput(spec: ProjectArtSpec, asset: ArtAssetI
   const defaults: ArtValues = {}, locked: ArtValues = {}, provenance: Record<string, string> = {}
   let requiresImageReference = asset.references.length > 0
   let hasInterface = checked.inheritance.mode === 'none'
+  if (checked.inheritance.mode === 'canon' && !checked.inheritance.usage) fail('SOURCE_USAGE_OUT_OF_SCOPE', 'inheritance.usage')
   if (checked.inheritance.mode === 'canon') for (const pin of checked.inheritance.sources) {
     const matches = authorities.filter(item => item.source.path === pin.path && item.source.revision === pin.revision)
     if (matches.length !== 1) fail('SOURCE_UNAVAILABLE', pin.path)
@@ -126,6 +141,8 @@ export function resolveArtGenerationInput(spec: ProjectArtSpec, asset: ArtAssetI
     if (!['canon-interface', 'art-style'].includes(authority.kind)) fail('INVALID_SOURCE', pin.path)
     if (authority.status !== 'Accepted') fail('SOURCE_NOT_ACCEPTED', pin.path)
     if (!authority.projectIds.includes(checked.projectId)) fail('SOURCE_OUT_OF_SCOPE', pin.path)
+    if (!Array.isArray(authority.allowedUsages) || !authority.allowedUsages.includes(checked.inheritance.usage!)) fail('SOURCE_USAGE_OUT_OF_SCOPE', pin.path)
+    requireDependencies(authority, checked.inheritance.sources)
     if (!authority.categories.includes(asset.category)) continue
     hasInterface ||= authority.kind === 'canon-interface'
     if (typeof authority.requiresImageReference !== 'boolean') fail('INVALID_SOURCE', pin.path)
@@ -154,7 +171,7 @@ export function resolveArtGenerationInput(spec: ProjectArtSpec, asset: ArtAssetI
   if (requiresImageReference && !asset.references.length) blockers.push('REQUIRED_REFERENCE_MISSING')
   if (requiresImageReference && !capabilities.imageReferenceInput) blockers.push('IMAGE_REFERENCE_INPUT_UNSUPPORTED')
   return { projectId: checked.projectId, assetId: asset.assetId, category: asset.category, prompt, values: resolved, sources: checked.inheritance.mode === 'canon' ? checked.inheritance.sources.map(item => ({ ...item })) : [],
-    lockedFields: Object.keys(locked), provenance, references: [...asset.references], requiresImageReference, readyForGeneration: blockers.length === 0, blockers,
+    usage: checked.inheritance.mode === 'canon' ? checked.inheritance.usage : null, lockedFields: Object.keys(locked), provenance, references: [...asset.references], requiresImageReference, readyForGeneration: blockers.length === 0, blockers,
     // Parsing does not attest source bytes, semantic prompt compliance, viewed references, or model support.
     persistence: 'not-performed' as const, visualCompliance: 'unverified' as const }
 }
@@ -163,12 +180,18 @@ export function resolveArtGenerationInput(spec: ProjectArtSpec, asset: ArtAssetI
 export function validateProjectArtBindings(spec: ProjectArtSpec, authorities: readonly ArtAuthority[]): void {
   const parsed = parseProjectArtSpec(spec, spec.projectId)
   if (parsed.kind !== 'project' || parsed.spec.inheritance.mode === 'none') return
-  const selected = parsed.spec.inheritance.sources.map(pin => {
+  const inherited = parsed.spec.inheritance
+  const usage = inherited.usage
+  if (!usage) fail('SOURCE_USAGE_OUT_OF_SCOPE', 'inheritance.usage')
+  const selected = inherited.sources.map(pin => {
     const matches = authorities.filter(item => item.source.path === pin.path && item.source.revision === pin.revision)
     if (matches.length !== 1) fail('SOURCE_UNAVAILABLE', pin.path)
     const authority = matches[0]!
     if (authority.status !== 'Accepted') fail('SOURCE_NOT_ACCEPTED', pin.path)
-    if (!authority.projectIds.includes(spec.projectId) || !authority.categories.length || authority.categories.some(category => !ART_CATEGORIES.includes(category))) fail('SOURCE_OUT_OF_SCOPE', pin.path)
+    if (!authority.projectIds.includes(spec.projectId)) fail('SOURCE_OUT_OF_SCOPE', pin.path)
+    if (!Array.isArray(authority.allowedUsages) || !authority.allowedUsages.includes(usage)) fail('SOURCE_USAGE_OUT_OF_SCOPE', pin.path)
+    requireDependencies(authority, inherited.sources)
+    if (!authority.categories.length || authority.categories.some(category => !ART_CATEGORIES.includes(category))) fail('SOURCE_OUT_OF_SCOPE', pin.path)
     if (!['canon-interface', 'art-style'].includes(authority.kind)) fail('INVALID_SOURCE', pin.path)
     values(authority.locked, 'authority.locked'); values(authority.defaults, 'authority.defaults')
     return authority

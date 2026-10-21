@@ -1,16 +1,46 @@
 import { describe, expect, it } from 'vitest'
-import { ART_CATEGORIES, ArtSpecError, parseProjectArtSpec, resolveArtGenerationInput, type ArtAuthority, type ArtAssetInput, type ProjectArtSpec } from '../src/domain/project-art-spec'
+import { ART_CATEGORIES, ART_CANON_USAGES, validateProjectArtBindings, ArtSpecError, parseProjectArtSpec, resolveArtGenerationInput, type ArtAuthority, type ArtAssetInput, type ProjectArtSpec } from '../src/domain/project-art-spec'
 const projectId = '1234567890abcdef'
 const pin = { path: 'P0001/ip/canteen-transport-interface.md', revision: 'a'.repeat(40) }
 function spec(): ProjectArtSpec { return { schemaVersion: 'project-art-spec-v1', projectId, version: 1,
   project: { name: 'Test project', content: 'Owner project content', engine: 'cocos-creator', designResolution: { width: 750, height: 1334 } },
   inheritance: { mode: 'none', reason: 'No applicable Canon interface confirmed' }, overrides: { width: 96, height: 96, transparent: true, destination: 'assets/art' }, categories: {} } }
 function asset(): ArtAssetInput { return { assetId: 'coin-pouch', category: 'icon', prompt: 'A coin pouch', overrides: { subject: 'coin pouch', purpose: 'inventory icon' }, references: [] } }
-function authority(): ArtAuthority { return { source: { ...pin }, status: 'Accepted', kind: 'canon-interface', projectIds: [projectId], categories: [...ART_CATEGORIES], locked: { renderingLanguage: 'Owner accepted language' }, defaults: { paddingPercent: 10 }, requiresImageReference: false } }
-function inherited() { const config = spec(); config.inheritance = { mode: 'canon', sources: [{ ...pin }] }; return config }
+function authority(): ArtAuthority { return { source: { ...pin }, status: 'Accepted', kind: 'canon-interface', allowedUsages: ['runtime'], projectIds: [projectId], categories: [...ART_CATEGORIES], locked: { renderingLanguage: 'Owner accepted language' }, defaults: { paddingPercent: 10 }, requiresImageReference: false } }
+function inherited() { const config = spec(); config.inheritance = { mode: 'canon', usage: 'runtime', sources: [{ ...pin }] }; return config }
 const resolve = (config = spec(), input = asset(), sources: ArtAuthority[] = []) => resolveArtGenerationInput(config, input, sources, { imageReferenceInput: false, categories: ART_CATEGORIES })
 function rejects(code: string, run: () => unknown) { try { run(); throw Error('expected rejection') } catch (error) { expect(error).toBeInstanceOf(ArtSpecError); expect((error as ArtSpecError).code).toBe(code) } }
 describe('project art specification boundary', () => {
+  it('requires exact trusted dependencies before category filtering without implicitly selecting sources',()=>{
+    const config=inherited(), a=authority(), master=authority();master.source={path:'P0001/art/master-style-reference.md',revision:'b'.repeat(40)};master.kind='art-style';master.requiresImageReference=true
+    a.requiredSources=[master.source];a.categories=['ip'];const original=JSON.stringify(config)
+    rejects('SOURCE_DEPENDENCY_REQUIRED',()=>resolve(config,asset(),[a,master]));rejects('SOURCE_DEPENDENCY_REQUIRED',()=>validateProjectArtBindings(config,[a,master]));expect(JSON.stringify(config)).toBe(original)
+    if(config.inheritance.mode==='canon')config.inheritance.sources.push({...master.source,revision:'c'.repeat(40)})
+    rejects('SOURCE_DEPENDENCY_REQUIRED',()=>resolve(config,asset(),[a,master]))
+    if(config.inheritance.mode==='canon')config.inheritance.sources[1]={...master.source}
+    // Dependency is present but an interface for another category cannot authorize icons.
+    rejects('CANON_INTERFACE_REQUIRED',()=>resolve(config,asset(),[a,master]))
+    a.categories=['icon'];const result=resolve(config,asset(),[a,master]);expect(result.blockers).toContain('REQUIRED_REFERENCE_MISSING');expect(result.blockers).toContain('IMAGE_REFERENCE_INPUT_UNSUPPORTED');expect(result.readyForGeneration).toBe(false)
+    expect(resolve().usage).toBeNull()
+  })
+
+  it.each(ART_CANON_USAGES)('preserves explicit %s usage through parse and generation freeze', usage => {
+    const config=inherited();if(config.inheritance.mode==='canon')config.inheritance.usage=usage
+    const a=authority();a.allowedUsages=[usage]
+    expect(parseProjectArtSpec(config,projectId)).toEqual({kind:'project',spec:config});expect(()=>validateProjectArtBindings(config,[a])).not.toThrow();expect(resolve(config,asset(),[a]).usage).toBe(usage)
+  })
+  it('reads old Canon with unresolved usage but never grants default runtime use',()=>{
+    const config=inherited();if(config.inheritance.mode==='canon')delete config.inheritance.usage
+    const parsed=parseProjectArtSpec(config,projectId);expect(parsed).toEqual({kind:'project',spec:config})
+    rejects('SOURCE_USAGE_OUT_OF_SCOPE',()=>validateProjectArtBindings(config,[authority()]));rejects('SOURCE_USAGE_OUT_OF_SCOPE',()=>resolve(config,asset(),[authority()]))
+  })
+  it('cannot use shared concepts as runtime, even when category and project match',()=>{
+    const a=authority();a.allowedUsages=['shared-concept'];a.categories=['ip']
+    rejects('SOURCE_USAGE_OUT_OF_SCOPE',()=>validateProjectArtBindings(inherited(),[a]));rejects('SOURCE_USAGE_OUT_OF_SCOPE',()=>resolve(inherited(),asset(),[a]))
+    a.allowedUsages=undefined as any;rejects('SOURCE_USAGE_OUT_OF_SCOPE',()=>resolve(inherited(),asset(),[a]))
+    const c=inherited();if(c.inheritance.mode==='canon')c.inheritance.usage='unapproved' as any;rejects('SOURCE_USAGE_OUT_OF_SCOPE',()=>parseProjectArtSpec(c,projectId))
+  })
+
   it('round trips project differences without copying inherited content and never mutates inputs', () => {
     const config = inherited(), sources = [authority()], original = JSON.stringify({ config, sources })
     const parsed = parseProjectArtSpec(JSON.parse(JSON.stringify(config)), projectId)
@@ -104,8 +134,8 @@ describe('project art specification boundary', () => {
     ['projectId', (c: ProjectArtSpec) => { c.projectId = 'ffffffffffffffff' }, 'PROJECT_MISMATCH'],
     ['schema', (c: ProjectArtSpec) => { Object.assign(c, { schemaVersion: 'new-version' }) }, 'UNSUPPORTED_SCHEMA'],
     ['unknown field', (c: ProjectArtSpec) => { Object.assign(c, { inheritedCanonCopy: {} }) }, 'UNKNOWN_FIELD'],
-    ['unversioned source', (c: ProjectArtSpec) => { c.inheritance = { mode: 'canon', sources: [{ ...pin, revision: 'main' }] } }, 'UNPINNED_SOURCE'],
-    ['traversal source', (c: ProjectArtSpec) => { c.inheritance = { mode: 'canon', sources: [{ ...pin, path: 'P0001/../secret.md' }] } }, 'INVALID_SOURCE'],
+    ['unversioned source', (c: ProjectArtSpec) => { c.inheritance = { mode: 'canon', usage: 'runtime', sources: [{ ...pin, revision: 'main' }] } }, 'UNPINNED_SOURCE'],
+    ['traversal source', (c: ProjectArtSpec) => { c.inheritance = { mode: 'canon', usage: 'runtime', sources: [{ ...pin, path: 'P0001/../secret.md' }] } }, 'INVALID_SOURCE'],
     ['no explicit scope', (c: ProjectArtSpec) => { Object.assign(c, { inheritance: {} }) }, 'EXPLICIT_INHERITANCE_REQUIRED'],
   ] as const)('rejects %s', (_label, change, code) => { const config = spec(); change(config); rejects(code, () => parseProjectArtSpec(config, projectId)) })
   it('rejects invalid dimensions, unsafe destination, and reference traversal', () => {
