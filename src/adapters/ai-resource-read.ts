@@ -70,7 +70,21 @@ export function createAiResourceReadProvider(options: { fetch: AiResourceFetch; 
         })
       }).then(async response => { if (controller.signal.aborted) await discardBody(response); return response }))
       const response = await abortable(pending, controller.signal, abortError)
-      if (!response.ok) { void track(discardBody(response)); throw fail(endpoint, response.status === 401 ? 'unauthorized' : response.status === 403 ? 'forbidden' : 'http-error', response.status) }
+      if (!response.ok) {
+        let code: AiResourceReadCode = response.status === 401 ? 'unauthorized' : response.status === 403 ? 'forbidden' : 'http-error'
+        // Retain only verified closed business codes, never backend diagnostics.
+        if ([404, 503].includes(response.status) && !response.redirected && response.type !== 'opaque' && response.type !== 'opaqueredirect' && /^application\/json(?:\s*;|\s*$)/i.test(response.headers.get('content-type') ?? '')) {
+          try {
+            const raw = await boundedJson(response, endpoint, controller.signal, abortError, track)
+            if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+              const businessCode = (raw as Record<string, unknown>).code
+              if (response.status === 503 && businessCode === 'ICON_ADAPTER_DISABLED') code = 'adapter-disabled'
+              if (response.status === 404 && businessCode === 'PROJECT_NOT_FOUND') code = 'project-unavailable'
+            }
+          } catch { if (controller.signal.aborted) throw abortError() }
+        } else void track(discardBody(response))
+        throw fail(endpoint, code, response.status)
+      }
       if (response.redirected || response.type === 'opaque' || response.type === 'opaqueredirect' || !/^application\/json(?:\s*;|\s*$)/i.test(response.headers.get('content-type') ?? '')) { void track(discardBody(response)); throw fail(endpoint, 'invalid-shape') }
       const raw = await boundedJson(response, endpoint, controller.signal, abortError, track)
       if (controller.signal.aborted) throw abortError()

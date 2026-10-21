@@ -8,7 +8,7 @@ import { AI_JOB_STATE_LABELS, isAiCandidateId } from '../domain/ai-jobs-read'
 import type { AiJobsReadProvider } from '../domain/ai-jobs-read'
 import { createAiJobsReadState } from '../stores/ai-jobs-read'
 import type { AiJobActionReadback, AiJobsProject } from '../stores/ai-jobs-read'
-const props = defineProps<{ project: AiJobsProject | null; source: object | null; provider?: AiJobsReadProvider | null; workflowStep?: number }>()
+const props = defineProps<{ project: AiJobsProject | null; source: object | null; provider?: AiJobsReadProvider | null; workflowStep?: number; compact?: boolean }>()
 const store = reactive(createAiJobsReadState())
 const previewImage = ref<HTMLImageElement | null>(null)
 const reader = computed(() => props.provider === undefined ? aiJobsReadProvider.value : props.provider)
@@ -27,7 +27,8 @@ async function readCreatedTask(input: { snapshot: import('../domain/ai-jobs-read
   await store.readJobs(input.jobsReader)
   if (current() && store.history?.jobs.some(job => job.jobId === input.snapshot.jobId)) store.selectJob(input.snapshot.jobId)
 }
-defineExpose({ readCreatedTask })
+const readStatusSnapshot=computed(()=>({projectId:store.project?.id??'',projectPath:store.project?.path??'',source:props.source,loading:store.busy,error:store.error||store.statusError||'',observedAt:store.statusObservedAt||store.observedAt||'',hasRead:!!store.history,state:store.status?.state??null}))
+defineExpose({ readCreatedTask, readStatusSnapshot })
 const actionsByStep: Record<number, readonly AiJobAction[]> = { 1: [], 2: [], 3: ['run-next', 'resume'], 4: ['select', 'export-variant', 'import-variant'], 5: ['import', 'export-variant', 'import-variant'], 6: [] }
 const allowedOperations = computed(() => props.workflowStep === undefined ? undefined : actionsByStep[props.workflowStep] ?? [])
 const uncertain = computed(() => store.status && ['unknown', 'import_unknown'].includes(store.status.state))
@@ -38,9 +39,9 @@ onBeforeUnmount(() => store.disconnect())
     <div class="section-heading"><div><h3>原图标任务与候选</h3><p>查看当前登记工程已有任务，再按需刷新单个任务或预览候选。不会自动查询或轮询。</p></div></div>
     <p v-if="!reader" class="form-help">当前构建未接入原任务读取；需原 Companion 同源会话与已配置的任务后端。</p>
     <p v-if="!store.project" class="form-help">请先选择已读取登记的工程。</p>
-    <dl v-else class="job-identity"><dt>工程</dt><dd>{{ store.project.name }} · {{ store.project.id }}</dd><dt>工程路径</dt><dd>{{ store.project.path }}</dd></dl>
+    <details v-else class="job-secondary" :open="!props.compact"><summary>工程信息</summary><dl class="job-identity"><dt>工程</dt><dd>{{ store.project.name }} · {{ store.project.id }}</dd><dt>工程路径</dt><dd>{{ store.project.path }}</dd></dl></details>
     <div class="job-actions"><el-button :disabled="!reader || !store.project || store.busy" :loading="store.loading" @click="reader && store.readJobs(reader)">读取 / 刷新任务历史</el-button><el-button v-if="store.busy || store.history || store.error" @click="store.clearReads()">{{ store.busy ? '取消本页读取' : '清空本页结果' }}</el-button></div>
-    <p class="form-help">这些读取会由原后台执行 Python、读取文件与 Git，并可能用 Pillow 检查候选。取消页面读取不能证明后台进程已结束。{{ aiJobActionsProvider ? '任务操作在下方逐次确认，接收回执不等于执行完成。' : '这里只读取原任务，不生成、不批准选择、不导入。' }}</p>
+    <details class="job-secondary" :open="!props.compact"><summary>读取说明</summary>    <p class="form-help">这些读取会由原后台执行 Python、读取文件与 Git，并可能用 Pillow 检查候选。取消页面读取不能证明后台进程已结束。{{ aiJobActionsProvider ? '任务操作在下方逐次确认，接收回执不等于执行完成。' : '这里只读取原任务，不生成、不批准选择、不导入。' }}</p></details>
     <el-alert v-if="store.error" type="error" :closable="false" :title="store.error"/>
     <template v-if="store.history">
       <p>已读取 {{ store.history.jobs.length }} 个任务 · 历史读取时间 {{ store.observedAt }}</p><p>本次列表工程 HEAD：{{ store.history.sourceRevision }}。任务自身的源版本单独显示，不能据状态查询断言它仍匹配当前工程 HEAD。</p>
@@ -53,11 +54,12 @@ onBeforeUnmount(() => store.disconnect())
     <article v-if="store.status" aria-live="polite" class="job-detail">
       <h4>{{ AI_JOB_STATE_LABELS[store.status.state] }} · {{ store.status.state }}</h4>
       <el-alert v-if="store.status.historyOnly" type="warning" :closable="false" title="历史任务 · 只读" :description="`任务保留原工程版本；当前 HEAD ${store.status.historyOnly.currentSourceRevision}。不重放任务，不从旧选择发起写入。`"/>
-      <dl class="job-identity"><dt>任务 ID</dt><dd>{{ store.status.jobId }}</dd><dt>任务版本</dt><dd>{{ store.status.revision }}</dd><dt>状态读取时间</dt><dd>{{ store.statusObservedAt }}</dd><dt>创建时间（原值）</dt><dd>{{ store.status.createdAt }}</dd><dt>任务源版本</dt><dd>{{ store.status.sourceRevision }}</dd><dt>请求 SHA-256</dt><dd>{{ store.status.requestHash }}</dd><dt>运行模式 / 来源</dt><dd>{{ store.status.mode ?? '原协议未返回' }} / {{ store.status.origin ?? '原协议未返回' }}</dd></dl>
+      <details class="job-secondary" :open="!props.compact"><summary>任务诊断</summary>      <dl class="job-identity"><dt>任务 ID</dt><dd>{{ store.status.jobId }}</dd><dt>任务版本</dt><dd>{{ store.status.revision }}</dd><dt>状态读取时间</dt><dd>{{ store.statusObservedAt }}</dd><dt>创建时间（原值）</dt><dd>{{ store.status.createdAt }}</dd><dt>任务源版本</dt><dd>{{ store.status.sourceRevision }}</dd><dt>请求 SHA-256</dt><dd>{{ store.status.requestHash }}</dd><dt>运行模式 / 来源</dt><dd>{{ store.status.mode ?? '原协议未返回' }} / {{ store.status.origin ?? '原协议未返回' }}</dd></dl></details>
       <el-alert v-if="uncertain" type="warning" :closable="false" :title="store.status.state === 'import_unknown' ? '导入可能已经写入；结果尚未确认。' : '生成是否完成尚未确认。'" :description="aiJobActionsProvider ? '保留原任务查询；生成 UNKNOWN 只能按原协议明确恢复，导入 UNKNOWN 不重试导入。' : '这里只能明确刷新原任务状态；不会新建、重新生成、恢复执行或重试导入。'"/>
       <p v-if="store.status.state === 'imported_pending_verification'">原任务已进入导入后待验证状态；这不等于场景绑定、Preview、Build 或生产验收完成。</p>
       <p v-if="store.status.state === 'running'">原任务仍显示执行中。HTTP 返回或派发接受不代表任务完成。</p>
       <p v-if="store.status.errorCode">原任务错误码：{{ store.status.errorCode }}</p>
+      <details class="job-secondary" :open="!props.compact"><summary>验收与导入记录</summary>
       <p>原协议 productionVerified：false；这不表示独立人工验收通过。</p><details v-if="store.status.resourceSnapshot"><summary>任务封存规范</summary><template v-if="store.status.resourceSnapshot.state === 'sealed'"><p>版本 {{ store.status.resourceSnapshot.version }} · SHA-256 {{ store.status.resourceSnapshot.hash }}</p><p>{{ store.status.resourceSnapshot.config.style.description }}</p><p>此处为原后台已绑定此任务的封存证据，不替代当前配置或运行验收。</p></template><p v-else>原后台无法确认此任务的封存规范。</p></details>
       <section v-if="store.status.productAcceptance" class="job-acceptance" data-testid="job-product-acceptance">
         <h4>{{ store.status.productAcceptance.state === 'blocked' ? '关联工程验收：阻塞' : store.status.productAcceptance.state === 'owner_manual_passed' ? 'Owner 已手工确认：导入与运行可见' : '关联工程验收：证据未确认' }}</h4>
@@ -82,6 +84,7 @@ onBeforeUnmount(() => store.disconnect())
         <div v-if="store.variantPreview" class="job-preview" data-testid="variant-png-preview"><img :src="`data:image/png;base64,${store.variantPreview.base64}`" alt="已核对文件与收据 SHA 的变体预览" @error="store.variantPreviewDisplayFailed()"/><p>{{ store.variantPreview.width }} × {{ store.variantPreview.height }} · SHA-256 {{ store.variantPreview.sha256 }}</p><el-button @click="store.clearVariantPreview()">关闭变体预览</el-button></div>
         <ul><li v-for="(tool, index) in store.status.variantImport.tools" :key="index">{{ tool.tool }} · {{ tool.operationId }} · {{ tool.status }}</li></ul>
       </section>
+      </details>
       <h4>已记录候选</h4><p v-if="!store.status.candidates.length">这个任务快照没有返回候选。</p><ul class="job-candidates"><li v-for="candidate in store.status.candidates" :key="candidate.candidateId"><div><strong>{{ candidate.candidateId }}</strong><p>资产 {{ candidate.assetId }} · {{ candidate.width }} × {{ candidate.height }} · PNG / Alpha</p><p>SHA-256 {{ candidate.fileSha256 }}</p><p>{{ store.status.selectedIds.includes(candidate.candidateId) ? '原任务已保存此选择' : '原任务未选择此候选' }}</p></div><el-button :disabled="store.busy || !!store.status.historyOnly || !isAiCandidateId(candidate.candidateId)" @click="store.readPreview(candidate.candidateId)">预览此候选</el-button><small v-if="!isAiCandidateId(candidate.candidateId)">原候选 ID 不符合已部署预览请求约束，保留记录但不发请求。</small></li></ul>
     </article>
     <section v-if="store.previewCandidateId" aria-live="polite" class="job-preview"><div class="section-heading"><h4>候选预览 · {{ store.previewCandidateId }}</h4><el-button @click="store.clearPreview()">关闭候选预览</el-button></div><p v-if="store.previewLoading">正在核对候选字节与原任务 SHA-256…</p><el-alert v-if="store.previewError" type="error" :closable="false" :title="store.previewError"/><template v-if="store.preview"><img ref="previewImage" :key="`${store.preview.candidateId}/${store.preview.sha256}`" :data-candidate="store.preview.candidateId" :data-sha="store.preview.sha256" :src="`data:image/png;base64,${store.preview.base64}`" alt="已核对任务候选的预览" @load="previewLoaded" @error="previewFailed"/><p>{{ store.preview.width }} × {{ store.preview.height }} · SHA-256 {{ store.preview.sha256 }}</p><p>像素可显示和文件一致不等于风格、用途、透明效果或生产验收通过。</p></template></section>
@@ -91,3 +94,5 @@ onBeforeUnmount(() => store.disconnect())
 <style scoped>
 .ai-jobs-read{display:grid;gap:14px}.ai-jobs-read p{line-height:1.65;overflow-wrap:anywhere;margin:5px 0}.job-identity{display:grid;grid-template-columns:145px minmax(0,1fr);gap:8px;margin:0}.job-identity dt{color:var(--text-secondary,#637187)}.job-identity dd{margin:0;overflow-wrap:anywhere}.job-actions{display:flex;flex-wrap:wrap;gap:10px}.job-picker{display:grid;gap:8px}.job-detail{display:grid;gap:12px}.job-detail h4{margin:8px 0}.job-candidates{list-style:none;padding:0;display:grid;gap:12px}.job-candidates li{border:1px solid var(--border-color,#e3e8ef);padding:12px;border-radius:8px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.job-candidates li>div{flex:1;min-width:180px;overflow-wrap:anywhere}.job-preview img{display:block;max-width:100%;max-height:480px;object-fit:contain;border:1px solid #dfe5ed;background:repeating-conic-gradient(#f1f3f6 0% 25%,#fff 0% 50%) 0/20px 20px}.job-preview h4{overflow-wrap:anywhere}@media(max-width:600px){.job-identity{grid-template-columns:1fr}.job-identity dd{margin-bottom:6px}}
 </style>
+
+<style scoped>.job-secondary{font-size:12px;color:var(--el-text-color-secondary)}.job-secondary>summary{cursor:pointer;margin-bottom:8px}.job-detail>h4{color:var(--el-text-color-primary)}.job-actions :deep(.el-button:first-child){font-weight:600}</style>

@@ -1,0 +1,17 @@
+# Model and art UI refinement, 2026-10-21
+
+Status: candidate, not yet deployed.
+
+Explicit user scope: compact consistent model status/actions, shared project/art status on AI icons and game resources, accurate resource-specification failures, and a simpler AI icon hierarchy. No generation, inference, model start, resource/config writes, backend enablement, service restart, user-tab interaction, screenshots upload or upload troubleshooting is authorized in this phase.
+
+Read-only diagnosis: authenticated project listing200, all seven registered projects resource-config POST503 with closed business code ICON_ADAPTER_DISABLED. Five ordinary project roots do not contain either expected resource-config filename; the two acceptance projects contain project-bound valid v2/version1 specifications and still fail503. Therefore the error precedes file-state detection. The user's active browser selection was not inspected; all project scopes were checked instead.
+
+The running installed daemon source map shows IconAdapter is constructed normally. The same disabled error is thrown in executeConfigured when its trusted startup configuration is undefined. Five core CREATOR_AI_ICONS_{STUDIO_ROOT,PYTHON,NODE,CLI,STORE} bindings are mandatory; generation also needs LEASE/ENDPOINT, while offline_import_only does not. Missing or invalid startup bindings trigger the existing fail-closed condition. This session did not read process environment memory and cannot identify a specific missing key. No bindings were enabled or rewritten.
+
+Old and new UI already implement resource-config creation/migration/edit with confirmed resource-config-save. Creation requires a verified missing resource view; the generic503 must not expose a fabricated missing state or an unsafe new-create shortcut. No new creation API is necessary. The Next adapter now reads bounded JSON only for verified failure categories, maps closed known codes to safe local text, and never retains raw backend diagnostics.401/403 and unknown errors remain distinct. Missing remains available only from the validated successful resource-view contract.
+
+Changes: model-only controls use one compact bar with unchanged callbacks, one-click behavior and existing fixed8090 frame. ArtStatusBar renders registration, Creator, specification and optional project/source-bound jobs separately; it performs no request. Game resources replace only the redundant identity block. AI task creation and candidate reading lead the page; existing read-spec action and its error remain visible at the top, configuration and diagnostic details fold, embedded workflows preserve their original defaults. Existing generation parameters and all write confirmations are preserved. Historical receipts cannot override newer runtime observations.
+
+Parallel ownership: /root/operation_feedback model controls; /root/overview_card_ui shared art bar/resource identity; /root/knowledge_qa_compact AI panels; /root/knowledge_status_compact read-only diagnosis; main session closed error mapping, integration, verification and deployment; /root/review_ui_refinement read-only correctness review. These are task-scoped prompt-defined roles, not claimed hard filesystem sandboxes.
+
+The prior version semantics fix is preserved in source198/199: frontend product1.3.173 is distinct from internal Git records; backend numeric version is not supplied by the current host. Real-browser candidate validation caught tooltip interception of Enter on the copy icon; explicit Enter/Space handlers were added before combined deployment.

@@ -50,8 +50,10 @@ export interface AiResourceReadProvider {
   previewReference(projectId: string, relativePath: string, signal?: AbortSignal): Promise<AiReferencePreview>
 }
 export type AiResourceReadEndpoint = 'resource-config' | 'reference-preview'
-export type AiResourceReadCode = 'unauthorized' | 'forbidden' | 'timeout' | 'aborted' | 'invalid-shape' | 'response-too-large' | 'http-error' | 'network-error' | 'invalid-query' | 'busy' | 'verification-unavailable' | 'capability-disabled'
+export type AiResourceReadCode = 'unauthorized' | 'forbidden' | 'timeout' | 'aborted' | 'invalid-shape' | 'response-too-large' | 'http-error' | 'network-error' | 'invalid-query' | 'busy' | 'verification-unavailable' | 'capability-disabled' | 'adapter-disabled' | 'project-unavailable'
 const failureText: Record<AiResourceReadCode, string> = {
+  'adapter-disabled': '宿主未启用 AI 资源服务，暂不能读取工程规范；这不表示规范不存在。',
+  'project-unavailable': '后台未找到当前登记工程，请刷新工程后重新选择；工程规范尚未读取。',
   'capability-disabled': '此只读预览未启用参考图处理；未调用后台 Python。',
   unauthorized: '需要已有的 Companion 会话（401）。',
   forbidden: 'Companion 拒绝读取 AI 资源（403），请核对已有会话与同源部署。',

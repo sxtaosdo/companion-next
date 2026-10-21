@@ -204,10 +204,10 @@ describe('canonical bounded PNG preview and hash verification', () => {
 })
 
 describe('transport content limits, diagnostics, cancellation and independent deadlines', () => {
-  it.each([[401, 'unauthorized'], [403, 'forbidden'], [404, 'http-error'], [409, 'http-error'], [500, 'http-error'], [503, 'http-error']] as const)('maps HTTP %s locally and discards raw error bodies', async (status, code) => {
+  it.each([[401, 'unauthorized'], [403, 'forbidden'], [404, 'http-error'], [409, 'http-error'], [500, 'http-error'], [503, 'http-error']] as const)('maps HTTP %s locally and never retains raw error bodies', async (status, code) => {
     const response = json({ code: 'PRIVATE_CODE', error: 'token=PRIVATE' }, { status }), cancel = vi.spyOn(response.body!, 'cancel')
     const error = await expectCode(createAiResourceReadProvider({ fetch: fixture(response) }).readConfig(id), code)
-    expect(error.status).toBe(status); expect(error).not.toHaveProperty('cause'); expect(JSON.stringify(error)).not.toContain('PRIVATE'); expect(cancel).toHaveBeenCalledOnce()
+    expect(error.status).toBe(status); expect(error).not.toHaveProperty('cause'); expect(JSON.stringify(error)).not.toContain('PRIVATE'); if([404,503].includes(status))expect(response.bodyUsed).toBe(true);else expect(cancel).toHaveBeenCalledOnce()
   })
   it('scrubs transport rejection and does not retry', async () => {
     const fetch = vi.fn<AiResourceFetch>(async () => { throw Error('https://host/?token=PRIVATE') })
@@ -318,4 +318,13 @@ describe('transport content limits, diagnostics, cancellation and independent de
     finish.get(`/api/icons/${id}/reference-preview`)!(json(preview())); expect(await reference).toEqual(png)
     finish.get(`/api/icons/${id}/resource-config`)!(json(view()))
   })
+})
+
+describe('resource read business failures remain distinct from a verified missing config',()=>{
+ it('reports the verified disabled adapter without treating a failed read as missing or exposing backend text',async()=>{
+  const fetch=fixture(json({code:'ICON_ADAPTER_DISABLED',error:'private-token-and-path'}, {status:503})),provider=createAiResourceReadProvider({fetch})
+  const error=await expectCode(provider.readConfig(id),'adapter-disabled');expect(error.status).toBe(503);expect(error.message).toContain('\u672a\u542f\u7528');expect(error.message).not.toContain('private');expect(fetch).toHaveBeenCalledTimes(1);await provider.waitForIdle!()
+ })
+ it.each([[404,'PROJECT_NOT_FOUND','project-unavailable'],[404,'UNKNOWN','http-error'],[503,'UNKNOWN','http-error'],[403,'ICON_ADAPTER_DISABLED','forbidden'],[401,'ICON_ADAPTER_DISABLED','unauthorized']] as const)('preserves HTTP and closed business categories %s/%s',async(status,code,expected)=>{await expectCode(createAiResourceReadProvider({fetch:fixture(json({code,error:'private'}, {status}))}).readConfig(id),expected)})
+ it('does not expose malformed non-success response text',async()=>{const error=await expectCode(createAiResourceReadProvider({fetch:fixture(new Response('private not JSON',{status:503,headers:{'Content-Type':'application/json'}}))}).readConfig(id),'http-error');expect(error.message).not.toContain('private')})
 })
