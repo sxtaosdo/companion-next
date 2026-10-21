@@ -7,7 +7,7 @@ import { createSameOriginImageReviewProvider } from '../src/adapters/image-revie
 import type { ReviewFetch } from '../src/adapters/image-review'
 import { imageReviewProvider, registerImageReviewProvider } from '../src/image-review-integration'
 import { useImageReviewStore } from '../src/stores/image-review'
-import ImageAssetsView from '../src/views/ImageAssetsView.vue'
+import ImageAssetsView from '../src/components/CompanionImageReviewPanel.vue'
 
 const taskId = 'a'.repeat(32)
 const imageId = 'b'.repeat(32)

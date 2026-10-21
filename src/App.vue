@@ -10,11 +10,15 @@ import { useRegisteredProjectStore } from './stores/registered-project'
 import { allowsLegacyWorkspace } from './domain/project-workspace'
 import { frontendIdentity, backendVersionInformation } from './domain/product-information'
 import InfoTip from './components/InfoTip.vue'
+import ImageAssetsView from './views/ImageAssetsView.vue'
 import { knowledgeNavigation, knowledgePageFor } from './domain/knowledge-navigation'
 const store = useWorkspaceStore()
 const route = useRoute()
 const router = useRouter()
 const menuOpen = ref(false)
+// Keep the iframe in the document: moving it through a deactivated route cache can reload its browsing context.
+const imageAssetsVisited=ref(route.path==='/image-assets')
+watch(()=>route.path,path=>{if(path==='/image-assets')imageAssetsVisited.value=true},{flush:'sync'})
 const registered = useRegisteredProjectStore()
 const legacyWorkspace = computed(() => allowsLegacyWorkspace(import.meta.env.MODE, Boolean(companionBrowserProvider.value)))
 const usesLegacySnapshot = computed(() => legacyWorkspace.value && store.mode !== 'disconnected')
@@ -167,11 +171,14 @@ const dateLabel = computed(() => {
         <el-alert v-if="showRegisteredChrome && !companionBrowserProvider" type="info" :closable="false" title="当前宿主未接入 Companion 工程读取接口" description="请通过原 Companion 同源工程服务打开。没有加载示例工程。"/>
         <el-alert v-if="showRegisteredChrome && registered.directory.projectError" type="error" :closable="false" title="工程读取失败" :description="registered.directory.projectError"/>
         <div v-if="showRegisteredChrome && registered.directory.warnings.length" class="registered-read-warnings"><InfoTip label="工程读取限制" :text="registered.directory.warnings.join('；')"/><span>部分状态或发现信息未读取</span></div>
+        <KeepAlive>
+          <ImageAssetsView v-if="imageAssetsVisited" v-show="route.path==='/image-assets'"/>
+        </KeepAlive>
         <RouterView v-slot="{ Component }">
           <KeepAlive :key="knowledgeCacheEpoch">
             <component :is="Component" v-if="knowledgeActive" :key="route.path" />
           </KeepAlive>
-          <component :is="Component" v-if="!knowledgeActive" />
+          <component :is="Component" v-if="!knowledgeActive && route.path!=='/image-assets'" />
         </RouterView>
       </main>
     </div>

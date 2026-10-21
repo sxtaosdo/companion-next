@@ -13,13 +13,6 @@ export const CHANGELOG_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
   {
-    version: "1.3.173",
-    updatedAt: "2026-10-21T03:20:00.000Z",
-    changes: [
-      "启动入口增加项目专用离线资源配置，严格使用已确认的工具和新任务库路径；清除继承的生成端点、GPU租约与采用配置，正常启动仍复用现有服务。",
-    ],
-  },
-  {
     version: "0.3.148",
     updatedAt: "2026-10-12T06:44:36.677Z",
     changes: [

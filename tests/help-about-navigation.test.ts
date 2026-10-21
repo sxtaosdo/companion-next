@@ -196,7 +196,7 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.find('.sidebar .frontend-version').exists()).toBe(false)
   })
   it('keeps unparsed Picker text through help and never reuses a download confirmation on return', async () => {
-    const { router, review } = await setup('/image-assets')
+    const { router, review } = await setup('/image-assets'); await wrapper!.get('[data-testid="review-tab"]').trigger('click'); await flushPromises()
     const text = JSON.stringify({ schema_version: 1, images: [{ image_url: 'https://example.org/a.png', source_page: 'https://example.org/' }] })
     await wrapper!.find('textarea[aria-label="Picker 候选 JSON"]').setValue(text)
     await router.push('/help?topic=picker'); await flushPromises(); await router.push('/image-assets'); await flushPromises()
@@ -212,7 +212,7 @@ describe('help, about and visible frontend identity', () => {
     expect(button('导入并下载').attributes('disabled')).toBeDefined()
   })
   it('preserves parsed A separately from unparsed B across utilities and keeps submission blocked', async () => {
-    const { router, review } = await setup('/image-assets')
+    const { router, review } = await setup('/image-assets'); await wrapper!.get('[data-testid="review-tab"]').trigger('click'); await flushPromises()
     const a = JSON.stringify({ schema_version: 1, images: [{ image_url: 'https://example.org/a.png', source_page: 'https://example.org/' }] })
     const b = a.replace('/a.png', '/b.png')
     await wrapper!.find('textarea[aria-label="Picker 候选 JSON"]').setValue(a); await button('解析候选清单').trigger('click'); await flushPromises()
@@ -227,7 +227,7 @@ describe('help, about and visible frontend identity', () => {
     let reject!: (reason: Error) => void
     const provider: ImageReviewProvider = { label: 'offline navigation test', saveSelectionGuard: 'verified', loadState: async () => ({ taskId: null, busy: false, items: [] }), importCandidates: vi.fn(() => new Promise<void>((_resolve, fail) => { reject = fail })), loadPreview: vi.fn(), saveSelected: vi.fn() }
     registerImageReviewProvider(provider)
-    const { router, review } = await setup('/image-assets'); await review.connect(provider)
+    const { router, review } = await setup('/image-assets'); await wrapper!.get('[data-testid="review-tab"]').trigger('click'); await flushPromises(); await review.connect(provider)
     review.stage(JSON.stringify({ schema_version: 1, images: [{ image_url: 'https://example.org/a.png', source_page: 'https://example.org/' }] }))
     const pending = review.submitImport(true)
     await router.push('/help'); await flushPromises(); expect(review.mutation).toBe('import')

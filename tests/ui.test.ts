@@ -138,12 +138,12 @@ describe('review regression cases', () => {
    expect(store.localDraft).toBeNull(); expect(localStorage.length).toBe(0)
  })
 
-it('opens image asset review independently without a project or fixture', async () => {
+it('opens the independent image collector without a project or fixture', async () => {
  const {router,store}=await setup('/image-assets')
  expect(wrapper!.find('[data-testid="image-assets-page"]').exists()).toBe(true)
  expect(store.mode).toBe('disconnected')
- expect(wrapper!.text()).toContain('尚未导入候选图片')
- expect(wrapper!.text()).toContain('审阅服务未连接')
+ expect(wrapper!.text()).toContain('素材采集器')
+ expect(wrapper!.find('[data-testid="companion-image-review-panel"]').exists()).toBe(false)
  expect(wrapper!.findAll('img')).toHaveLength(0)
- await router.push('/overview'); await flushPromises(); expect(wrapper!.find('[data-testid="image-assets-page"]').exists()).toBe(false)
+ await router.push('/overview'); await flushPromises(); expect(wrapper!.get('[data-testid="image-assets-page"]').isVisible()).toBe(false)
 })

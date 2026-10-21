@@ -6,7 +6,7 @@ import { useImageReviewStore } from '../src/stores/image-review'
 import { createSameOriginImageReviewProvider } from '../src/adapters/image-review'
 import { ImageReviewRejection } from '../src/domain/image-review'
 import type { ImageReviewProvider, ImageReviewSnapshot } from '../src/domain/image-review'
-import ImageAssetsView from '../src/views/ImageAssetsView.vue'
+import ImageAssetsView from '../src/components/CompanionImageReviewPanel.vue'
 import { imageReviewProvider, registerImageReviewProvider } from '../src/image-review-integration'
 const task='a'.repeat(32), other='b'.repeat(32), a='c'.repeat(32), b='d'.repeat(32)
 function state():ImageReviewSnapshot{return {taskId:task,busy:false,items:[a,b].map(id=>({id,status:'ready',selected:false,title:id,width:128,height:128,contentType:'image/png'}))}}
