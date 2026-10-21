@@ -1,3 +1,4 @@
+import { aiResourceSnapshotOutput } from './ai-resource-snapshot'
 import { decodeAiJobSnapshot, isAiCandidateId, isAiJobId } from './ai-jobs-read'
 import type { AiJobSnapshot } from './ai-jobs-read'
 import { isAiProjectId } from './ai-resource-read'
@@ -47,10 +48,10 @@ const shape = () => new AiJobActionError('invalid-shape', 'unknown')
 const sha = /^[a-f0-9]{64}$/
 /** Fixed sibling filename, from the sealed destination and the actual exported file identity. */
 export function aiVariantDestination(job: AiJobSnapshot, variant: { candidateId: string; width: number; height: number; sha256: string }): string {
-  const sealed = job.resourceSnapshot, candidate = job.candidates.find(row => row.candidateId === variant.candidateId)
-  if (sealed?.state !== 'sealed' || sealed.config.schemaVersion !== 'project-resource-config-v2' || !candidate || !sha.test(variant.sha256)) throw invalid()
+  const candidate = job.candidates.find(row => row.candidateId === variant.candidateId), output = aiResourceSnapshotOutput(job.resourceSnapshot,candidate?.assetId)
+  if (!output || !candidate || !sha.test(variant.sha256)) throw invalid()
   if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(candidate.assetId)) throw invalid()
-  const destination = `db://${sealed.config.destination.directory}/${candidate.assetId}-${variant.width}x${variant.height}-${variant.sha256.slice(0, 12)}.png`
+  const destination = `db://${output.directory}/${candidate.assetId}-${variant.width}x${variant.height}-${variant.sha256.slice(0, 12)}.png`
   if (!/^db:\/\/assets\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+\.png$/.test(destination) || destination.split('/').some(part => part === '.' || part === '..')) throw invalid()
   return destination
 }
@@ -67,6 +68,7 @@ function exact(value: unknown, keys: readonly string[]): Record<string, unknown>
 export function aiJobActionIdentityMatches(a: AiJobSnapshot, b: AiJobSnapshot): boolean {
   return a.projectId === b.projectId && a.jobId === b.jobId && a.requestHash === b.requestHash && a.sourceRevision === b.sourceRevision
     && aiJobActionCanonical(a.assets) === aiJobActionCanonical(b.assets)
+    && (!(a.resourceSnapshot?.state==='sealed' && 'kind' in a.resourceSnapshot || b.resourceSnapshot?.state==='sealed' && 'kind' in b.resourceSnapshot) || aiJobActionCanonical(a.resourceSnapshot)===aiJobActionCanonical(b.resourceSnapshot))
 }
 export function aiJobActionAllowed(operation: AiJobAction, job: AiJobSnapshot, offlineOnly = false): boolean {
   // The mother job can remain selected after a variant import. Preserve that separate binding.
@@ -77,7 +79,7 @@ export function aiJobActionAllowed(operation: AiJobAction, job: AiJobSnapshot, o
   if (operation === 'select') return ['awaiting_selection', 'selected'].includes(job.state)
   if (operation === 'import') return job.state === 'selected' && job.selectedIds.length > 0
   return ['selected', 'imported_pending_verification'].includes(job.state) && job.selectedIds.length === 1
-    && job.resourceSnapshot?.state === 'sealed' && job.resourceSnapshot.config.schemaVersion === 'project-resource-config-v2'
+    && !!aiResourceSnapshotOutput(job.resourceSnapshot,job.candidates.find(c=>c.candidateId===job.selectedIds[0])?.assetId)
 }
 export function validateAiJobActionSubmission(projectId: string, value: unknown): AiJobActionSubmission {
   try {
@@ -119,10 +121,10 @@ export function decodeAiJobActionResponse(value: unknown, projectId: string, sub
     if (raw.schemaVersion !== 'companion-icons-v1') throw shape()
     if (checked.operation === 'export-variant') {
       const input = checked.input as Extract<AiJobActionInput, { candidateId: string }>, candidate = expected.candidates.find(c => c.candidateId === input.candidateId)!
-      const sealed = expected.resourceSnapshot
-      if (sealed?.state !== 'sealed' || sealed.config.schemaVersion !== 'project-resource-config-v2') throw shape()
+      const output = aiResourceSnapshotOutput(expected.resourceSnapshot,candidate.assetId)
+      if (!output) throw shape()
       const upscaled = input.width > 1024 && input.height > 1024
-      const path = `${sealed.config.destination.exportDirectory}/${candidate.assetId}-${input.width}x${input.height}-${candidate.fileSha256.slice(0, 12)}.png`
+      const path = `${output.exportDirectory}/${candidate.assetId}-${input.width}x${input.height}-${candidate.fileSha256.slice(0, 12)}.png`
       if (raw.jobId !== expected.jobId || raw.revision !== expected.revision || raw.candidateId !== candidate.candidateId || raw.relativePath !== path
         || typeof raw.sha256 !== 'string' || !sha.test(raw.sha256) || raw.sourceSha256 !== candidate.fileSha256 || raw.width !== input.width || raw.height !== input.height
         || typeof raw.created !== 'boolean' || raw.upscaled !== upscaled || raw.qualityLimit !== (upscaled ? 'Upscaling adds no new detail.' : null) || raw.dispatchAccepted !== undefined) throw shape()

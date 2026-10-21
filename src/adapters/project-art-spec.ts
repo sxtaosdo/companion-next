@@ -5,11 +5,14 @@ import { ProjectArtSpecWriteError, type ProjectArtOperation, type ProjectArtSpec
 export function createProjectArtSpecProvider(fetcher: typeof fetch, origin: string): ProjectArtSpecProvider {
   const endpoint = new URL(origin)
   if (endpoint.protocol !== 'http:' || endpoint.hostname !== '127.0.0.1' || endpoint.username || endpoint.password || endpoint.pathname !== '/' || endpoint.search || endpoint.hash) throw Error('Invalid art host')
+  const pending = new Set<Promise<unknown>>()
+  function tracked<T>(work: Promise<T>):Promise<T> { pending.add(work); void work.finally(()=>pending.delete(work)).catch(()=>undefined); return work }
   function receipt(raw: unknown, context: ProjectArtSpecContext): ProjectArtSpecReceipt {
     const value = raw as ProjectArtSpecReceipt
     if (!value || value.projectId !== context.projectId || artPath(value.projectPath) !== artPath(context.projectPath) || !Array.isArray(value.authorities) || value.authorities.length > 8) throw Error('Invalid art receipt')
     if (value.config === null) { if (value.hash !== null) throw Error('Invalid missing receipt') }
     else { if (!value.hash || !/^[a-f0-9]{64}$/.test(value.hash)) throw Error('Invalid art hash'); const parsed = parseProjectArtSpec(value.config, context.projectId); if (parsed.kind === 'project' && !(parsed.spec.inheritance.mode === 'canon' && parsed.spec.inheritance.usage === undefined)) validateProjectArtBindings(parsed.spec, value.authorities) }
+    if(value.generationCapabilities !== undefined && (value.generationCapabilities.imageReferenceInput !== false || !Array.isArray(value.generationCapabilities.categories) || value.generationCapabilities.categories.length !== 1 || value.generationCapabilities.categories[0] !== 'icon')) throw Error('Invalid generation capabilities')
     return value
   }
   async function request(route: string, signal: AbortSignal, body?: unknown): Promise<unknown> {
@@ -26,9 +29,9 @@ export function createProjectArtSpecProvider(fetcher: typeof fetch, origin: stri
     return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes))
   }
   function route(context: ProjectArtSpecContext) { if (!/^[a-f0-9]{16}$/.test(context.projectId)) throw Error('Invalid project'); return '/api/art-spec/' + context.projectId }
-  return { label: '工程美术规范', endpoint: endpoint.origin,
-    read: async (context, signal) => receipt(await request(route(context), signal), context),
-    save: async (context, input, signal) => receipt(await request(route(context), signal, input), context),
+  return { label: '工程美术规范', endpoint: endpoint.origin, waitForIdle: async()=>{while(pending.size) await Promise.allSettled([...pending])},
+    read: (context, signal) => tracked((async()=>receipt(await request(route(context), signal), context))()),
+    save: (context, input, signal) => tracked((async()=>receipt(await request(route(context), signal, input), context))()),
     status: async (context, operationId, signal) => {
       if (!/^art-save-[a-f0-9]{32}$/.test(operationId)) throw Error('Invalid operation')
       const value = await request(route(context) + '/operations/' + operationId, signal) as ProjectArtOperation

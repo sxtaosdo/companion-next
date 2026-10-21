@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import ArtStatusBar from './ArtStatusBar.vue'
+import { allowsLegacyWorkspace } from '../domain/project-workspace'
+import { companionBrowserProvider } from '../companion-browser-integration'
+import { useWorkspaceStore } from '../stores/workspace'
 import AssetInventorySummary from './AssetInventorySummary.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRegisteredProjectStore } from '../stores/registered-project'
@@ -12,6 +15,8 @@ import { useAiResourceEditorStore } from '../stores/ai-resource-editor'
 import type { AiJobSnapshot, AiJobsReadProvider } from '../domain/ai-jobs-read'
 import type { AiJobsProject } from '../stores/ai-jobs-read'
 const selection = useRegisteredProjectStore()
+const workspace = useWorkspaceStore()
+const allowDemo = computed(() => allowsLegacyWorkspace(import.meta.env.MODE, Boolean(companionBrowserProvider.value)))
 const route = useRoute(), router = useRouter()
 const jobsPanel = ref<InstanceType<typeof AiJobsReadPanel> | null>(null), editor = useAiResourceEditorStore()
 const configDirty = computed(() => !!editor.project && editor.project.id === selection.project?.id && editor.project.path === selection.project?.path
@@ -40,7 +45,7 @@ function chooseStep(index: number) { void router.replace({ path: '/resources', q
       <section v-else-if="step === 1" class="panel real-resource-empty" data-testid="real-resource-empty"><el-empty :description="emptyTitles[step]" :image-size="90"/><p>当前构建未启用原单图任务准备；上方库存汇总独立读取，是否可用以该次接口回执为准。</p><p class="form-help">Owner 资产保持保护；没有用草稿或示例代替真实资源。</p></section>
       <AiJobsReadPanel ref="jobsPanel" v-show="step >= 2" :project="selection.project" :source="selection.currentSource" :workflow-step="step + 1"/>
     </template>
-    <template v-else><ArtStatusBar/><section class="panel real-resource-empty"><el-empty :description="selection.directory.projectLoading ? '正在读取登记工程' : selection.requestedId ? '所选工程不可用，请重新选择' : '请先选择已登记工程'" :image-size="90"/><RouterLink to="/overview">前往看板</RouterLink></section></template>
+    <template v-else><ArtStatusBar/><section class="panel real-resource-empty"><el-empty :description="selection.directory.projectLoading ? '正在读取登记工程' : selection.requestedId ? '所选工程不可用，请重新选择' : '请先选择已登记工程'" :image-size="90"/><el-button v-if="allowDemo" @click="workspace.openDemo">查看示例工作台</el-button><RouterLink to="/overview">前往看板</RouterLink></section></template>
   </section>
 </template>
 <style scoped>

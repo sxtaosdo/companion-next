@@ -9,7 +9,7 @@ describe('original job sealed resource projection', () => {
   it('retains v2 sealed identity, sizes and reference evidence without private metadata', () => {
     const value = sealed(), output = decodeAiJobResourceSnapshot({ ...value, privatePath: 'SECRET', configBytes: 'SECRET' }, id)
     expect(output).toEqual(value); expect(JSON.stringify(output)).not.toContain('SECRET')
-    expect(output).not.toBe(value); if (output.state === 'sealed') output.config.style.references.push('assets/new.png')
+    expect(output).not.toBe(value); if (output.state === 'sealed' && !('kind' in output)) output.config.style.references.push('assets/new.png')
     expect(value.config!.style.references).toEqual(['art/reference/a.png'])
   })
   it('retains unavailable honestly and does not turn absent into unavailable or a default config', () => {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { aiResourceSnapshotOutput } from '../domain/ai-resource-snapshot'
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { aiJobActionsProvider } from '../ai-job-actions-integration'
 import type { AiJobActionsProvider, AiJobAction } from '../domain/ai-job-actions'
@@ -29,9 +30,9 @@ const explanations: Record<AiJobAction, string> = {
 }
 function choose(candidateId: string, checked: boolean) { store.setSelectedIds(checked ? [candidateId] : store.selectedIds.filter(id => id !== candidateId)) }
 function openCustom() {
-  const sealed = store.job?.resourceSnapshot
-  if (!store.allowed('export-variant') || sealed?.state !== 'sealed' || sealed.config.schemaVersion !== 'project-resource-config-v2') return
-  store.cancelConfirmation(); customWidth.value = sealed.config.iconSize.width; customHeight.value = sealed.config.iconSize.height; customOpen.value = true
+  const output = aiResourceSnapshotOutput(store.job?.resourceSnapshot,store.job?.candidates.find(c=>c.candidateId===store.job?.selectedIds[0])?.assetId)
+  if (!store.allowed('export-variant') || !output) return
+  store.cancelConfirmation(); customWidth.value = output.width; customHeight.value = output.height; customOpen.value = true
 }
 function prepareCustom() { if (store.prepare('export-variant', { width: customWidth.value, height: customHeight.value })) customOpen.value = false }
 function checked(event: Event) { return (event.target as HTMLInputElement).checked }
@@ -68,7 +69,7 @@ onBeforeUnmount(() => store.leave())
         <el-button v-if="operationVisible('import') && store.job.state === 'selected'" :disabled="!store.allowed('import')" @click="store.prepare('import')">导入已选母图（1024）</el-button>
         <template v-if="operationVisible('export-variant') && ['selected','imported_pending_verification'].includes(store.job.state)"><el-button :disabled="!store.allowed('export-variant')" @click="store.prepare('export-variant')">导出默认尺寸 PNG</el-button><el-button :disabled="!store.allowed('export-variant')" @click="openCustom()">导出其他尺寸</el-button></template>
       </div>
-      <p v-if="operationVisible('export-variant') && ['selected','imported_pending_verification'].includes(store.job.state) && (store.job.resourceSnapshot?.state !== 'sealed' || store.job.resourceSnapshot.config.schemaVersion !== 'project-resource-config-v2' || store.job.selectedIds.length !== 1)">默认尺寸导出需要这个原任务的有效 v2 单尺寸封存配置和唯一已保存候选；缺少证据时保持不可用。</p>
+      <p v-if="operationVisible('export-variant') && ['selected','imported_pending_verification'].includes(store.job.state) && (!aiResourceSnapshotOutput(store.job.resourceSnapshot,store.job.candidates.find(c=>c.candidateId===store.job?.selectedIds[0])?.assetId) || store.job.selectedIds.length !== 1)">默认尺寸导出需要这个原任务的有效 v2 单尺寸封存配置和唯一已保存候选；缺少证据时保持不可用。</p>
       <p v-if="store.job.state === 'import_unknown'">导入可能已写入，写入效果与租约释放相互独立。这里只能读取原任务，不重试导入。</p>
       <p v-if="store.hasPending">此工程存在待核对操作保护记录。离开页面、切换来源或重载不会清除未知结果。</p>
       <el-button :disabled="store.refreshing || store.busy" :loading="store.refreshing" @click="store.refreshStatus()">刷新原任务并核对保护记录</el-button>

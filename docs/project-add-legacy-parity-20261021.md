@@ -29,3 +29,13 @@
 ## 候选验证结果
 
 八组 setup 定向回归 469/469：新增 store 10、默认添加真实组件 2，以及保留维护界面、原 adapter、options、store、recovery、completion。随后仅补新组件 dialog/form epoch 防迟到保护，新 store+组件 12/12 再过，vue-tsc 与 git diff --check exit0。两个原共享小组件原文件为 CRLF，任务修改统一为 LF；未改其余无关语义。未进行全站回归或真实浏览器/Creator 验收，不能把模拟通过当成正式用户任务已修复。
+
+## 默认入口完整回归收口
+
+完整回归揭示原候选的真实遗漏：空登记工程入口未转发新向导、目录能力缺失仍显示选择按钮、Dashboard 状态/中文错态/关闭取消丢失、scaffold 历史与异步来源保护不足。先仅修实现，原五组测试恢复到 123 通过、12 失败；证据 `Temp/add-parity-source-only.json`。剩余旧控件阻塞逐项核对后，才把已取消的登记/二次创建确认转换为默认 Next，并保留原安全断言。
+
+原四文件批量修改被自动审批拒绝，未执行；没有拆批绕过。父线程审查了新实证与每个文件的精确差异后，新的 directory、scaffold、discovery、layout 单文件窄动作分别获批。未创建共享虚构能力夹具、未 mock canStart、未把这些默认入口 case 转向维护入口。必要测试能力使用原 decoder 接受的标准 core/full 元数据。
+
+目录 22/22、Dashboard 17/17、scaffold 43/43、布局 19/19 均通过。scaffold 编辑撤销仍在真实组件层验证：读取范围进入启动确认后保留旧启动按钮，返回修改表单，旧按钮也不能发起任务；原 lane、cleanup、迟到、导航、来源变更和 no-write 断言保留。
+
+最终相关九文件合并 212/212，vue-tsc 与 diff 检查 exit0；结构化报告 `C:/Users/33272/AppData/Local/Temp/add-parity-final-focused.json`。原维护界面测试独立保留；新默认入口继续覆盖真实 native/scaffold/discovery 行为。父线程恢复的示例入口也已在该组合回归中通过。本代理未运行全量、未部署或操作用户服务/Creator；发布及真实验收由父线程统筹。

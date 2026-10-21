@@ -38,6 +38,7 @@ async function setup(path = '/overview', options: { source?: CompanionBrowserPro
   return { pinia, api, directory, router, workspace, lane, lease, selection: useRegisteredProjectStore(pinia), reader: useAiResourceReadStore(pinia), operations: useCreatorOperationsStore(pinia) }
 }
 function button(label: string) { const target = wrapper!.findAll('button').find(item => item.text().includes(label)); if (!target) throw Error(label); return target }
+function currentProjectIdentity() { const bar = wrapper!.getComponent({ name: 'ArtStatusBar' }); const tip = bar.findAllComponents({ name: 'InfoTip' }).find(item => item.props('label') === '当前工程详情'); if (!tip) throw Error('Missing current project details'); return String(tip.props('text')) }
 beforeEach(() => { localStorage.clear(); vi.stubGlobal('fetch', vi.fn()) })
 afterEach(() => { wrapper?.unmount(); wrapper = undefined; history?.destroy(); history = undefined; companionProjectEntryProvider.value = null; companionBrowserProvider.value = null; aiResourceReadProvider.value = null; document.body.innerHTML = ''; vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.restoreAllMocks() })
 describe('registered project overview and resource context', () => {
@@ -239,7 +240,7 @@ describe('registered project overview and resource context', () => {
     expect(workspace.mode).toBe('disconnected')
     await wrapper!.get('.art-nav-toggle').trigger('click')
     await wrapper!.get('.art-nav-child[href^="/resources"]').trigger('click'); await flushPromises()
-    expect(router.currentRoute.value.query.project).toBe(id); expect(wrapper!.get('.art-current-project strong').attributes('title')).toContain('/real/project-a')
+    expect(router.currentRoute.value.query.project).toBe(id); expect(currentProjectIdentity()).toContain('/real/project-a')
     expect(wrapper!.findAll('.resource-row')).toHaveLength(0); expect(wrapper!.findAll('img')).toHaveLength(0)
     expect(wrapper!.text()).toContain('尚未读取任务历史')
     for (let index = 0; index < 6; index++) {
@@ -255,7 +256,7 @@ describe('registered project overview and resource context', () => {
     expect(wrapper!.find('.resource-steps button.active').text()).toContain('视觉审阅')
     await router.push('/resources?project=not-registered&step=2'); await flushPromises()
     expect(selection.project).toBeNull(); expect(wrapper!.text()).toContain('所选工程不可用')
-    expect(wrapper!.get('.art-current-project strong').text()).toBe('所选工程不可用')
+    expect(wrapper!.get('.real-resource-empty').text()).toContain('所选工程不可用')
   })
   it('does not create a selection from duplicated or missing query parameters', async () => {
     const { router, selection } = await setup(`/overview?project=${id}&project=${other}`)
@@ -282,7 +283,7 @@ describe('registered project overview and resource context', () => {
     const { selection } = await setup(`/resources?project=${other}&step=1`, { source: api, automatic: true })
     expect(selection.project).toBeNull(); expect(api.loadProjects).toHaveBeenCalledTimes(2)
     finish(result()); await flushPromises(); expect(selection.project?.id).toBe(other)
-    expect(wrapper!.get('.art-current-project strong').attributes('title')).toContain('/real/project-b')
+    expect(currentProjectIdentity()).toContain('/real/project-b')
   })
   it('uses the existing entry guard and does not retry when a project-operation lane is released', async () => {
     const { api, lane, lease, router } = await setup('/overview', { connect: false, automatic: true, locked: true })

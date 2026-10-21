@@ -15,7 +15,7 @@ import { AI_JOB_STATE_LABELS, type AiJobState } from '../domain/ai-jobs-read'
 import { aiResourceReadProvider } from '../ai-resource-read-integration'
 const props=withDefaults(defineProps<{projectPicker?:boolean;showCreator?:boolean;showModel?:boolean;service?:{label:string;text:string;tone:'info'|'success'|'warning'|'danger';busy?:boolean}|null;jobs?:{projectId:string;projectPath:string;source:object|null;loading:boolean;error:string;observedAt:string;hasRead:boolean;state:AiJobState|null}|null}>(),{projectPicker:true,showCreator:false,showModel:false,service:null})
 const router=inject(routerKey,null),knowledge=useKnowledgeReadStore()
-function selectProject(id:string){selection.restoreRouteProject(id);if(router)void router.replace({path:router.currentRoute.value.path,query:{...router.currentRoute.value.query,project:id}})}
+function selectProject(id:string){selection.restoreRouteProject(id);if(router)void router.push({path:router.currentRoute.value.path,query:{...router.currentRoute.value.query,project:id}})}
 function refreshProjects(){if(directory.provider)void directory.refreshProjects();else if(companionBrowserProvider.value)void directory.connect(companionBrowserProvider.value)}
 const model=computed<State>(()=>knowledge.provider!==knowledgeReadProvider.value||!knowledge.provider?{text:'未读取',tone:'info'}:knowledge.statusLoading?{text:'读取中',tone:'info',busy:true}:knowledge.serviceError?{text:'读取失败',tone:'danger'}:knowledge.services?.model?.running===true?{text:'可达',tone:'success'}:knowledge.services?.model?.running===false?{text:'不可达',tone:'warning'}:{text:'未知',tone:'info'})
 const selection=useRegisteredProjectStore(), directory=selection.directory, resource=useAiResourceReadStore(), operations=useCreatorOperationsStore()

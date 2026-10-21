@@ -33,6 +33,7 @@ function selectRegisteredProject(value:string){
  if(!target)return
  store.clearPrepared();scaffold.clearPrepared();projectId.value=target.id;path.value=target.path
 }
+const addDialog=ref<InstanceType<typeof ProjectAddWizard>|null>(null)
 const open=ref(false),path=ref(''),projectId=ref('')
 const sourceMode=ref<'custom'|'dashboard'|'create'|'initialize'>('custom'),parentPath=ref(''),projectName=ref('')
 const pickingDirectory=ref(false),directoryError=ref('')
@@ -99,7 +100,8 @@ watch(()=>[projects.provider,projectSetupProvider.value,projects.connected,JSON.
 watch([path,projectId,sourceMode,parentPath,projectName,()=>JSON.stringify(consents.value)],()=>{formEpoch++;store.clearPrepared();scaffold.clearPrepared()},{flush:'sync'})
 watch(open,value=>emit('dialog-visibility',value),{flush:'sync',immediate:true})
 function resetConsents(){consents.value={installBridge:false,startCreator:false,configureCodex:false,acknowledgeReuse:false,acknowledgeToolScope:false}}
-function show(id=''){
+function show(id=''){if(!id){addDialog.value?.open();return}showMaintenance(id)}
+function showMaintenance(id=''){
  if(lane.locked)return
  const target=id?projects.projects.find(project=>project.id===id):undefined
  if(id&&!target)return
@@ -107,7 +109,7 @@ function show(id=''){
  if(target)path.value=target.path
  projectId.value=id;step.value=target?3:1;open.value=true
 }
-function close(){dialogEpoch++;store.clearPrepared();scaffold.clearPrepared();store.stopWaiting();projects.cancelDashboardRead();open.value=false}
+function close(){addDialog.value?.close();dialogEpoch++;store.clearPrepared();scaffold.clearPrepared();store.stopWaiting();projects.cancelDashboardRead();open.value=false}
 async function pickDirectory(target:'path'|'parent'='path'){
  const api=projectSetupProvider.value,source=projects.provider
  if(!mounted||!open.value||!projects.connected||lane.locked||!api?.pickDirectory)return
@@ -170,11 +172,11 @@ async function submitFull(){const preview=store.preparedSetup;if(preview)await s
 function visibility(){store.setVisible(document.visibilityState==='visible')}
 visibility();document.addEventListener('visibilitychange',visibility)
 onBeforeUnmount(()=>{mounted=false;store.leave();scaffold.clearPrepared();projects.cancelDashboardRead();document.removeEventListener('visibilitychange',visibility);emit('dialog-visibility',false)})
-defineExpose({openForProject:show,close})
+defineExpose({openForProject:show,openMaintenance:showMaintenance,close})
 </script>
 <template>
  <div class="project-setup-toolbar" data-testid="project-setup-panel">
-  <ProjectAddWizard @dialog-visibility="emit('dialog-visibility',$event)"/>
+  <ProjectAddWizard ref="addDialog" @dialog-visibility="emit('dialog-visibility',$event)"/>
   <span v-if="compactStatus" class="setup-status" data-testid="project-setup-status" role="status">{{ compactStatus }}</span>
   <InfoTip v-if="compactStatus||(lane.locked&&hasReceipt)" label="登记与接入状态详情" :text="statusDetails"/>
   <el-button v-if="resumableTask" size="small" :disabled="!store.canResume" @click="store.resume()">继续读取此任务</el-button>

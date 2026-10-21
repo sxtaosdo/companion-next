@@ -161,7 +161,7 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
   if (new Set(assetIds).size !== assetIds.length || new Set(candidateIds).size !== candidateIds.length || new Set(selectedIds).size !== selectedIds.length
     || candidates.some(candidate => !assetIds.includes(candidate.assetId)) || selectedIds.some(id => !candidateIds.includes(id))) throw invalid()
   let resourceSnapshot: AiJobResourceSnapshot | undefined
-  try { if (raw.resourceSnapshot !== undefined) resourceSnapshot = decodeAiJobResourceSnapshot(raw.resourceSnapshot, projectId) } catch { throw invalid() }
+  try { if (raw.resourceSnapshot !== undefined) resourceSnapshot = decodeAiJobResourceSnapshot(raw.resourceSnapshot, projectId, raw as {jobId:unknown;sourceRevision:unknown;requestHash:unknown;assets:unknown}) } catch { throw invalid() }
   const variantDispatchObservation = raw.variantDispatchObservation === undefined ? undefined : decodeVariantDispatchObservation(raw.variantDispatchObservation, raw, candidates, selectedIds, resourceSnapshot)
   const importReceipt = decodeImport(raw.import)
   const variantImport = raw.variantImport === undefined ? undefined : decodeVariantImport(raw.variantImport, candidates, selectedIds)

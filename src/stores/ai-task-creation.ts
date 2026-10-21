@@ -1,16 +1,19 @@
+import { parseProjectArtSpec, resolveArtGenerationInput } from '../domain/project-art-spec'
+import { artPath, pendingArtWrite } from '../domain/project-art-pending'
+import type { ProjectArtSpecProvider, ProjectArtSpecReceipt } from '../project-art-spec-integration'
 import { computed, reactive, ref, shallowRef } from 'vue'
 import { useProjectOperationLaneStore } from './project-operation-lane'
 import type { AiResourceReadProvider, AiResourceView } from '../domain/ai-resource-read'
 import { decodeAiResourceView, isAiProjectId } from '../domain/ai-resource-read'
 import { decodeAiJobsView } from '../domain/ai-jobs-read'
 import type { AiJobsReadProvider, AiJobsView, AiJobSnapshot } from '../domain/ai-jobs-read'
-import { AiTaskCreationError, aiTaskCanonicalJson, aiTaskGapAllowsWrite, aiTaskHistoryBlocked, aiTaskInputHash, buildAiTaskSubmission, decodeAiTaskInspection, newAiTaskRunId, savedAiTaskConfig, validateAiTaskCreatedJob } from '../domain/ai-task-creation'
+import { AiTaskCreationError, aiTaskCanonicalJson, aiTaskGapAllowsWrite, aiTaskHistoryBlocked, aiTaskInputHash, buildAiTaskSubmission, buildArtTaskSubmission, decodeAiTaskInspection, newAiTaskRunId, savedAiTaskConfig, validateAiTaskCreatedJob } from '../domain/ai-task-creation'
 import type { AiTaskBrief, AiTaskCreationProvider, AiTaskCreationSubmission, AiTaskInspection } from '../domain/ai-task-creation'
 import { AiWriteCoordinationError, aiWriteCoordinator, getAiWriteFenceStorage, hasPendingAiWrites, putAiWriteFence, readAiWriteFences, removeAiWriteFence } from '../domain/ai-write-coordination'
 import type { AiWriteCoordinator, AiWriteFence, AiWriteFenceStorage } from '../domain/ai-write-coordination'
 export interface AiTaskProject { id: string; name: string; path: string }
 export interface AiTaskCreatedEvent { snapshot: AiJobSnapshot; project: AiTaskProject; source: object; jobsReader: AiJobsReadProvider; recovered?: true }
-interface Binding { project: AiTaskProject; source: object; resourceReader: AiResourceReadProvider; jobsReader: AiJobsReadProvider; provider: AiTaskCreationProvider }
+interface Binding { project: AiTaskProject; source: object; resourceReader: AiResourceReadProvider; jobsReader: AiJobsReadProvider; provider: AiTaskCreationProvider; artReader: ProjectArtSpecProvider | null }
 export type AiTaskCreationPhase = 'idle' | 'reading' | 'ready' | 'prepared' | 'inspecting' | 'rechecking' | 'submitting' | 'readback' | 'accepted' | 'unknown' | 'blocked'
 const unknownMessage = '任务可能已封存或入队，结果尚未确认。已保留原任务 ID 与保护记录；不要新建或重发。'
 const equal = (a: unknown, b: unknown) => aiTaskCanonicalJson(a) === aiTaskCanonicalJson(b)
@@ -20,6 +23,8 @@ function validProject(value: AiTaskProject | null): value is AiTaskProject { ret
 /** Per-panel state. Durable UNKNOWN identity is shared with all original-job writes across tabs. */
 export function createAiTaskCreationState(options: { storage?: AiWriteFenceStorage; coordinator?: AiWriteCoordinator; createRunId?: () => string } = {}) {
   const project = shallowRef<AiTaskProject | null>(null), resource = shallowRef<AiResourceView | null>(null), history = shallowRef<AiJobsView | null>(null)
+  const art = shallowRef<ProjectArtSpecReceipt | null>(null)
+  const artConfig = computed(() => { if(!art.value?.config || !project.value)return null; const parsed=parseProjectArtSpec(art.value.config,project.value.id);return parsed.kind==='project'?parsed.spec:null })
   const brief = reactive<AiTaskBrief>({ name: '', assetId: '', purpose: '', prompt: '', sourceId: '' })
   const active = ref(true), contextVersion = ref(0), pendingRunIds = ref<string[]>([]), recovered = ref(false)
   const phase = ref<AiTaskCreationPhase>('idle'), error = ref(''), confirmed = ref(false), busy = ref(false), dirty = ref(false), storageBlocked = ref(false), pending = ref(false)
@@ -30,12 +35,13 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   const coordinator = options.coordinator ?? aiWriteCoordinator, lane = useProjectOperationLaneStore()
   const storage = () => options.storage ?? getAiWriteFenceStorage()
   const config = computed(() => { try { return resource.value && project.value ? savedAiTaskConfig(resource.value, project.value.id) : null } catch { return null } })
-  const targetPath = computed(() => config.value && brief.assetId.trim() ? `${config.value.destination.directory}/${brief.assetId.trim()}.png` : '')
-  const supportsDrain = (bound: Binding) => typeof bound.resourceReader.waitForIdle === 'function' && typeof bound.jobsReader.waitForIdle === 'function' && typeof bound.provider.waitForIdle === 'function'
+  const output = computed(() => { if(artConfig.value) { try {return resolveArtGenerationInput(artConfig.value,{assetId:brief.assetId.trim()||'preview',category:'icon',prompt:brief.prompt.trim()||'preview',overrides:{subject:brief.prompt.trim()||'preview',purpose:brief.purpose.trim()||'preview'},references:[]},art.value!.authorities,{categories:['icon'],imageReferenceInput:false}).values} catch{return null} } return config.value?{width:config.value.iconSize.width,height:config.value.iconSize.height,destination:config.value.destination.directory}:null })
+  const targetPath = computed(() => output.value && brief.assetId.trim() ? `${output.value.destination}/${brief.assetId.trim()}.png` : '')
+  const supportsDrain = (bound: Binding) => typeof bound.resourceReader.waitForIdle === 'function' && typeof bound.jobsReader.waitForIdle === 'function' && typeof bound.provider.waitForIdle === 'function' && (!bound.artReader || typeof bound.artReader.waitForIdle === 'function')
   const drainAvailable = computed(() => { contextVersion.value; return !!binding && supportsDrain(binding) })
-  const canPrepare = computed(() => active.value && !!project.value && !!binding && !!config.value && !!history.value && drainAvailable.value && !aiTaskHistoryBlocked(history.value) && !dirty.value && !busy.value && !pending.value && !storageBlocked.value && !lane.locked && phase.value !== 'unknown' && !retainedRunId.value)
+  const canPrepare = computed(() => active.value && !!project.value && !!binding && !!(config.value || artConfig.value) && !!history.value && drainAvailable.value && !aiTaskHistoryBlocked(history.value) && !dirty.value && !busy.value && !pending.value && !storageBlocked.value && !lane.locked && phase.value !== 'unknown' && !retainedRunId.value)
   const canSubmit = computed(() => active.value && !!prepared.value && drainAvailable.value && confirmed.value && approval === prepared.value && !busy.value && !dirty.value && !pending.value && !storageBlocked.value && !lane.locked && phase.value === 'prepared')
-  const recoveryContextMatches = () => !!recovery && !!binding && equal(recovery.binding.project, binding.project) && recovery.binding.source === binding.source && recovery.binding.resourceReader === binding.resourceReader && recovery.binding.jobsReader === binding.jobsReader && recovery.binding.provider === binding.provider
+  const recoveryContextMatches = () => !!recovery && !!binding && equal(recovery.binding.project, binding.project) && recovery.binding.source === binding.source && recovery.binding.resourceReader === binding.resourceReader && recovery.binding.jobsReader === binding.jobsReader && recovery.binding.provider === binding.provider && recovery.binding.artReader === binding.artReader
   const canRecover = computed(() => { contextVersion.value; return active.value && phase.value === 'unknown' && !!activeFence && !!recovery && drainAvailable.value && !busy.value && !lane.locked && recoveryContextMatches() })
   function clearApproval() { confirmed.value = false; approval = null }
   function refreshFenceState() {
@@ -47,14 +53,14 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
     if (dispatching || activeFence) { phase.value = 'unknown'; error.value = unknownMessage }
     else { prepared.value = null; inspection.value = null; phase.value = 'idle' }
   }
-  function setContext(next: AiTaskProject | null, source: object | null, resourceReader: AiResourceReadProvider | null, jobsReader: AiJobsReadProvider | null, provider: AiTaskCreationProvider | null, configDirty = false) {
+  function setContext(next: AiTaskProject | null, source: object | null, resourceReader: AiResourceReadProvider | null, jobsReader: AiJobsReadProvider | null, provider: AiTaskCreationProvider | null, configDirty = false, artReader: ProjectArtSpecProvider | null = null) {
     const valid = validProject(next) && !!source && typeof source === 'object' && !!resourceReader && !!jobsReader && !!provider
-    const same = valid && binding && equal(binding.project, next) && binding.source === source && binding.resourceReader === resourceReader && binding.jobsReader === jobsReader && binding.provider === provider
+    const same = valid && binding && equal(binding.project, next) && binding.source === source && binding.resourceReader === resourceReader && binding.jobsReader === jobsReader && binding.provider === provider && binding.artReader === artReader
     if (same && dirty.value === configDirty) return
     invalidate(); dirty.value = configDirty
-    if (!same) { resource.value = null; history.value = null; snapshot.value = null }
+    if (!same) { resource.value = null; art.value = null; history.value = null; snapshot.value = null }
     project.value = validProject(next) ? freeze({ ...next }) : null
-    binding = valid ? { project: project.value!, source: source!, resourceReader: resourceReader!, jobsReader: jobsReader!, provider: provider! } : null
+    binding = valid ? { project: project.value!, source: source!, resourceReader: resourceReader!, jobsReader: jobsReader!, provider: provider!, artReader } : null
     contextVersion.value++
     if (!dispatching && !activeFence) retainedRunId.value = ''
     refreshFenceState()
@@ -62,27 +68,42 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   function setActive(value: boolean) {
     if (active.value === value) return
     active.value = value; invalidate()
-    if (value && !activeFence && !dispatching) phase.value = resource.value && history.value ? 'ready' : 'idle'
+    if (value && !activeFence && !dispatching) phase.value = (resource.value || artConfig.value) && history.value ? 'ready' : 'idle'
   }
   function edit(field: keyof AiTaskBrief, value: string) {
     if (!active.value || busy.value || phase.value === 'unknown' || retainedRunId.value) return
     brief[field] = value
     if (field === 'name') brief.assetId = value.trim()
-    clearApproval(); prepared.value = null; inspection.value = null; phase.value = history.value && config.value ? 'ready' : 'idle'; error.value = ''
+    clearApproval(); prepared.value = null; inspection.value = null; phase.value = history.value && (config.value || artConfig.value) ? 'ready' : 'idle'; error.value = ''
   }
   const current = (bound: Binding, token: number, frozen?: AiTaskCreationSubmission) => active.value && binding === bound && epoch === token && !dirty.value && (!frozen || prepared.value === frozen)
   const message = (cause: unknown) => cause instanceof AiTaskCreationError ? new AiTaskCreationError(cause.code).message : cause instanceof AiWriteCoordinationError ? cause.message : '原任务读取或核对未完成；未显示内部诊断。'
+  async function readArt(bound:Binding,signal:AbortSignal):Promise<ProjectArtSpecReceipt|null> {
+    if(!bound.artReader)return null
+    const context={projectId:bound.project.id,projectPath:bound.project.path,source:bound.source}
+    if(pendingArtWrite(context,bound.artReader))throw new AiTaskCreationError('context-changed','not-sent')
+    const receipt=await bound.artReader.read(context,signal)
+    if(receipt.projectId!==bound.project.id||artPath(receipt.projectPath)!==artPath(bound.project.path))throw new AiTaskCreationError('invalid-input','not-sent')
+    if(receipt.config===null){if(receipt.hash!==null)throw new AiTaskCreationError('invalid-input','not-sent');return null}
+    const parsed=parseProjectArtSpec(receipt.config,bound.project.id)
+    if(parsed.kind==='legacy-v2')return null
+    if(!receipt.hash||!/^[a-f0-9]{64}$/.test(receipt.hash)||receipt.generationCapabilities?.imageReferenceInput!==false||receipt.generationCapabilities.categories.length!==1||receipt.generationCapabilities.categories[0]!=='icon')throw new AiTaskCreationError('invalid-input','not-sent')
+    return {...receipt,config:parsed.spec}
+  }
+  function build(runId?:string) { return artConfig.value ? buildArtTaskSubmission(copy(brief),artConfig.value,art.value!.hash!,art.value!.authorities,history.value!,runId) : buildAiTaskSubmission(copy(brief),resource.value!,history.value!,runId) }
   async function readContext() {
     const bound = binding
     if (!active.value || !bound || busy.value || dirty.value) return
-    clearApproval(); prepared.value = null; inspection.value = null; resource.value = null; history.value = null
+    clearApproval(); prepared.value = null; inspection.value = null; resource.value = null; art.value = null; history.value = null
     const token = ++epoch, abort = new AbortController(); controller = abort; busy.value = true; phase.value = 'reading'; error.value = ''
     try {
-      const saved = decodeAiResourceView(await bound.resourceReader.readConfig(bound.project.id, abort.signal), bound.project.id)
+      const artReceipt = await readArt(bound,abort.signal)
+      if (!current(bound, token)) return
+      const saved = artReceipt ? null : decodeAiResourceView(await bound.resourceReader.readConfig(bound.project.id, abort.signal), bound.project.id)
       if (!current(bound, token)) return
       const jobs = decodeAiJobsView(await bound.jobsReader.readJobs(bound.project.id, abort.signal), bound.project.id)
       if (!current(bound, token)) return
-      resource.value = freeze(saved); history.value = freeze(jobs); refreshFenceState()
+      art.value = artReceipt ? freeze(artReceipt) : null; resource.value = saved ? freeze(saved) : null; history.value = freeze(jobs); refreshFenceState()
       phase.value = activeFence || retainedRunId.value ? 'unknown' : 'ready'
       if (aiTaskHistoryBlocked(jobs)) error.value = '原工程仍有 running / unknown / import_unknown 任务，不能创建新任务。'
       else if (phase.value === 'unknown') error.value = unknownMessage
@@ -91,17 +112,17 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   }
   function prepare(): boolean {
     refreshFenceState()
-    if (!canPrepare.value || !resource.value || !history.value) return false
+    if (!canPrepare.value || !(resource.value || artConfig.value) || !history.value) return false
     if (prepared.value && phase.value === 'prepared') return true
-    try { prepared.value = freeze(buildAiTaskSubmission(copy(brief), resource.value, history.value, (options.createRunId ?? newAiTaskRunId)())); inspection.value = null; clearApproval(); phase.value = 'prepared'; error.value = ''; return true }
+    try { prepared.value = freeze(build((options.createRunId ?? newAiTaskRunId)())); inspection.value = null; clearApproval(); phase.value = 'prepared'; error.value = ''; return true }
     catch (cause) { error.value = message(cause); return false }
   }
   function confirm(value: boolean) { clearApproval(); if (active.value && value && prepared.value && phase.value === 'prepared' && !busy.value && !dirty.value) { confirmed.value = true; approval = prepared.value } }
-  function assertCurrent(bound: Binding, token: number, frozen: AiTaskCreationSubmission) { if (!current(bound, token, frozen) || !supportsDrain(bound) || !equal(buildAiTaskSubmission(copy(brief), resource.value!, history.value!, frozen.input.request.runId), frozen)) throw new AiTaskCreationError('context-changed', 'not-sent') }
+  function assertCurrent(bound: Binding, token: number, frozen: AiTaskCreationSubmission) { if (!current(bound, token, frozen) || !supportsDrain(bound) || !equal(build(frozen.input.request.runId), frozen)) throw new AiTaskCreationError('context-changed', 'not-sent') }
   async function settleIo(bound: Binding): Promise<void> {
     try {
       if (!bound.resourceReader.waitForIdle || !bound.jobsReader.waitForIdle || !bound.provider.waitForIdle) throw new Error('missing-drain')
-      await Promise.all([bound.provider.waitForIdle(), bound.resourceReader.waitForIdle(), bound.jobsReader.waitForIdle()])
+      await Promise.all([bound.provider.waitForIdle(), bound.resourceReader.waitForIdle(), bound.jobsReader.waitForIdle(), ...(bound.artReader ? [bound.artReader.waitForIdle!()] : [])])
     } catch {
       // Failed cleanup is not proof of completed I/O. Keep the global lock, project lane and any fence.
       phase.value = activeFence ? 'unknown' : 'blocked'; error.value = '无法确认请求清理已结束，已保留操作锁；不会继续写入。'
@@ -109,10 +130,10 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
     }
   }
   async function submit(): Promise<AiTaskCreatedEvent | null> {
-    if (!canSubmit.value || !binding || !supportsDrain(binding) || !prepared.value || !resource.value || !history.value) return null
+    if (!canSubmit.value || !binding || !supportsDrain(binding) || !prepared.value || !(resource.value || artConfig.value) || !history.value) return null
     const lease = lane.acquire('原图标任务检查与创建')
     if (!lease) { error.value = '当前工程管理或写操作尚未结束。'; return null }
-    const bound = binding, frozen = prepared.value, baseResource = resource.value, baseHistory = history.value, token = epoch, abort = new AbortController()
+    const bound = binding, frozen = prepared.value, baseResource = resource.value, baseArt = art.value, baseHistory = history.value, token = epoch, abort = new AbortController()
     controller = abort; busy.value = true; error.value = ''; accepted = null
     try {
       const result = await coordinator.run(async () => {
@@ -125,12 +146,13 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
           assertCurrent(bound, token, frozen)
           if (!aiTaskGapAllowsWrite(inspection.value, frozen)) throw new AiTaskCreationError('target-exists', 'not-sent')
           phase.value = 'rechecking'
-          const latestResource = decodeAiResourceView(await bound.resourceReader.readConfig(bound.project.id, abort.signal), bound.project.id)
+          const latestArt = await readArt(bound,abort.signal)
+          const latestResource = latestArt ? null : decodeAiResourceView(await bound.resourceReader.readConfig(bound.project.id, abort.signal), bound.project.id)
           assertCurrent(bound, token, frozen)
           const latestJobs = decodeAiJobsView(await bound.jobsReader.readJobs(bound.project.id, abort.signal), bound.project.id)
           assertCurrent(bound, token, frozen)
-          savedAiTaskConfig(latestResource, bound.project.id)
-          if (!equal(latestResource, baseResource) || !equal(latestJobs, baseHistory) || aiTaskHistoryBlocked(latestJobs)) throw new AiTaskCreationError('context-changed', 'not-sent')
+          if(latestResource) savedAiTaskConfig(latestResource, bound.project.id)
+          if (!equal(latestArt,baseArt) || !equal(latestResource, baseResource) || !equal(latestJobs, baseHistory) || aiTaskHistoryBlocked(latestJobs)) throw new AiTaskCreationError('context-changed', 'not-sent')
           const inputHash = await aiTaskInputHash(frozen.input.request)
           assertCurrent(bound, token, frozen)
           if (hasPendingAiWrites(storage(), bound.project.id)) throw new AiTaskCreationError('busy', 'not-sent')
@@ -200,6 +222,6 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   }
   function storageChanged() { refreshFenceState(); if (busy.value) invalidate(); else clearApproval() }
   function leave() { invalidate(); binding = null; contextVersion.value++ }
-  return { active, project, resource, history, brief, config, targetPath, phase, error, confirmed, busy, dirty, pending, pendingRunIds, recovered, storageBlocked, prepared, inspection, snapshot, retainedRunId,
+  return { active, project, resource, history, brief, config, artConfig, art, output, targetPath, phase, error, confirmed, busy, dirty, pending, pendingRunIds, recovered, storageBlocked, prepared, inspection, snapshot, retainedRunId,
     drainAvailable, canPrepare, canSubmit, canRecover, recoverOriginal, setActive, setContext, edit, readContext, prepare, confirm, submit, newBrief, storageChanged, leave }
 }

@@ -1,3 +1,6 @@
+import { useProjectSetupAddStore } from '../src/stores/project-setup-add'
+import { toolPresetReadProvider } from '../src/tool-presets-read-integration'
+import { projectConnectionsProvider } from '../src/project-connections-integration'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import {createPinia} from 'pinia'
 import {DOMWrapper,flushPromises,mount,type VueWrapper} from '@vue/test-utils'
@@ -20,7 +23,7 @@ const reply={path:created,creatorVersion:'3.8.8' as const}
 const json=(value:unknown,status=201)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}})
 function deferred<T>(){let resolve!:(value:T)=>void;const promise=new Promise<T>(done=>resolve=done);return {promise,resolve}}
 let wrapper:VueWrapper|undefined
-afterEach(()=>{wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;projectSetupProvider.value=null;companionEventProvider.value=null;companionProjectEntryProvider.value=null;creatorOperationsProvider.value=null;ElMessage.closeAll();sessionStorage.clear();document.body.innerHTML='';vi.useRealTimers()})
+afterEach(()=>{toolPresetReadProvider.value=null;projectConnectionsProvider.value=null;wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;projectSetupProvider.value=null;companionEventProvider.value=null;companionProjectEntryProvider.value=null;creatorOperationsProvider.value=null;ElMessage.closeAll();sessionStorage.clear();document.body.innerHTML='';vi.useRealTimers()})
 
 describe('original scaffold adapter with controlled transports',()=>{
  it.each([create,initialize])('sends only the fixed same-origin $mode request and requires201',async input=>{
@@ -56,11 +59,17 @@ describe('original scaffold adapter with controlled transports',()=>{
 async function setup(dispatch:NonNullable<ProjectSetupProvider['scaffold']>=async()=>reply,ui=false){
  const source:CompanionBrowserProvider={label:'controlled original source',runtimeProbesEnabled:true,dashboardDiscoveryEnabled:false,loadProjects:vi.fn(async()=>({projects:[target],statuses:[],dashboard:[],warnings:[]})),loadCounts:vi.fn(async()=>({sessionId:'test',counts:{},latest:{}})),loadLogs:vi.fn(async()=>[]),loadCalls:vi.fn(async()=>({sessionId:'test',total:0,retained:0,records:[]}))}
  const api:ProjectSetupProvider={label:'controlled scaffold',scaffold:vi.fn(dispatch),pickDirectory:vi.fn(async()=>parent),register:vi.fn(async()=>target),start:vi.fn(),status:vi.fn(),waitForIdle:vi.fn(async()=>{})}
+ if(ui){
+  api.startPathStrict=vi.fn(async()=>({operationId:'11111111-1111-4111-8111-111111111111',optionsContractVersion:1 as const,effectiveOptions:{startCreator:true,configureCodex:false},reused:false}))
+  const stamp='1970-01-01T00:00:00.000Z',presets=[{id:'full',name:'全部工具',baseProfile:'full' as const,enabled:[],disabled:[],builtIn:true,updatedAt:stamp},{id:'core',name:'核心工具',baseProfile:'core' as const,enabled:[],disabled:[],builtIn:true,updatedAt:stamp}]
+  toolPresetReadProvider.value={label:'isolated readonly scopes',loadTools:vi.fn(async()=>[]),loadPresets:vi.fn(async()=>({presets,selectedPresetId:'full'})),exportPreset:vi.fn()}
+  projectConnectionsProvider.value={label:'isolated scope writer',run:vi.fn(async()=>({key:'ok',text:'ok'})),waitForIdle:vi.fn(async()=>{})}
+ }
  registerCompanionBrowserProvider(source);registerProjectSetupProvider(api)
  const pinia=createPinia(),projects=useCompanionBrowserStore(pinia),store=useProjectScaffoldStore(pinia),lane=useProjectOperationLaneStore(pinia)
  const router=createRouter({history:createMemoryHistory(),routes:[{path:'/projects',component:CompanionBrowserView},{path:'/elsewhere',component:{template:'<p>Elsewhere</p>'}}]});await router.push('/projects');await router.isReady()
  if(ui)wrapper=mount(RouterView,{attachTo:document.body,global:{plugins:[pinia,router,ElementPlus]}})
- await projects.connect(source);await flushPromises();return {api,source,projects,store,lane,router}
+ await projects.connect(source);await flushPromises();return {api,source,projects,store,lane,router,add:useProjectSetupAddStore(pinia)}
 }
 describe('scaffold approval and same-session uncertainty',()=>{
  it('consumes only the exact approved preview once and never auto-registers',async()=>{
@@ -94,36 +103,41 @@ function button(text:string){const found=body().findAll('button').find(node=>nod
 async function click(text:string){await button(text).trigger('click');await flushPromises()}
 async function chooseSource(mode:string){await body().get(`input[value="${mode}"]`).setValue(true);await flushPromises();await click('下一步')}
 const pathInput=()=>body().get('input[aria-label="已有工程绝对路径"]')
-async function prepareCreate(){await click('添加已有工程');await chooseSource('create');await body().get('input[aria-label="新工程父目录"]').setValue(parent);await body().get('input[aria-label="新工程名称"]').setValue('新工程');await click('核对创建工程')}
+async function prepareCreate(){await click('添加已有工程');await chooseSource('create');await body().get('input[aria-label="新工程父目录"]').setValue(parent);await body().get('input[aria-label="新工程名称"]').setValue('新工程')}
 describe('four original source choices and explicit continuation',()=>{
  it('creates only after confirmation then fills the registration path with no follow-on write',async()=>{
-  const {api}=await setup(undefined,true);await prepareCreate();expect(api.scaffold).not.toHaveBeenCalled();expect(body().text()).toContain('请求目标：'+created)
-  await click('确认创建工程');expect((pathInput().element as HTMLInputElement).value).toBe(created);expect(api.scaffold).toHaveBeenCalledWith(create);expect(api.register).not.toHaveBeenCalled();expect(api.start).not.toHaveBeenCalled();expect(api.status).not.toHaveBeenCalled();expect(body().get('[data-testid="scaffold-receipt"]').text()).toContain('尚未登记')
+  const {api,add}=await setup(undefined,true);await prepareCreate();expect(api.scaffold).not.toHaveBeenCalled();expect(body().text()).toContain('请求目标：'+created)
+  await click('下一步');expect(add.target).toBe(created);expect(api.scaffold).toHaveBeenCalledWith(create);expect(api.register).not.toHaveBeenCalled();expect(api.start).not.toHaveBeenCalled();expect(api.status).not.toHaveBeenCalled();expect(body().get('[data-testid="scaffold-receipt"]').text()).toContain('尚未登记')
  })
  it('initializes the explicitly supplied empty directory through the old mode',async()=>{
   const {api}=await setup(async()=>({path:initialize.path,creatorVersion:'3.8.8'}),true);await click('添加已有工程');await chooseSource('initialize');await pathInput().setValue(initialize.path)
-  await click('核对初始化目录');expect(api.scaffold).not.toHaveBeenCalled();await click('确认初始化空目录');expect(api.scaffold).toHaveBeenCalledWith(initialize);expect(api.register).not.toHaveBeenCalled()
+  expect(api.scaffold).not.toHaveBeenCalled();await click('下一步');expect(api.scaffold).toHaveBeenCalledWith(initialize);expect(api.register).not.toHaveBeenCalled()
  })
  it('selects a parent directory without changing the registration path or creating files',async()=>{
-  const {api}=await setup(undefined,true);await click('添加已有工程');await pathInput().setValue(target.path);await chooseSource('create');await click('选择父目录…')
-  expect((body().get('input[aria-label="新工程父目录"]').element as HTMLInputElement).value).toBe(parent);expect((pathInput().element as HTMLInputElement).value).toBe(target.path);expect(api.scaffold).not.toHaveBeenCalled()
+  const {api}=await setup(undefined,true);await click('添加已有工程');await click('下一步');await pathInput().setValue(target.path);await click('上一步');await chooseSource('create');await click('选择父目录…')
+  expect((body().get('input[aria-label="新工程父目录"]').element as HTMLInputElement).value).toBe(parent);await click('上一步');await chooseSource('custom');expect((pathInput().element as HTMLInputElement).value).toBe(target.path);expect(api.scaffold).not.toHaveBeenCalled()
  })
  it('invalidates prepared approval on a form edit',async()=>{
-  const {api}=await setup(undefined,true);await prepareCreate();await body().get('input[aria-label="新工程名称"]').setValue('Other');expect(body().find('[data-testid="scaffold-confirm"]').exists()).toBe(false);expect(api.scaffold).not.toHaveBeenCalled()
+  const {api,add}=await setup(undefined,true);await prepareCreate();expect(api.scaffold).not.toHaveBeenCalled();await click('下一步')
+  const oldLaunch=body().findAll('button').find(b=>b.text()==='通过 Dashboard 启动 Creator'&&!b.classes().includes('setup-timeline-heading'))!
+  expect(oldLaunch.attributes('disabled')).toBeUndefined();expect(add.target).toBe(created);expect(toolPresetReadProvider.value!.loadPresets).toHaveBeenCalledOnce()
+  await click('上一步');await body().get('input[aria-label="新工程名称"]').setValue('Other');expect(add.target).toBe('');expect(add.canStart).toBe(false)
+  expect(body().findAll('button').some(b=>b.text()==='通过 Dashboard 启动 Creator'&&!b.classes().includes('setup-timeline-heading'))).toBe(false)
+  await oldLaunch.trigger('click');await flushPromises();expect(api.startPathStrict).not.toHaveBeenCalled();expect(api.register).not.toHaveBeenCalled();expect(api.start).not.toHaveBeenCalled();expect(api.scaffold).toHaveBeenCalledOnce();expect(toolPresetReadProvider.value!.loadPresets).toHaveBeenCalledOnce()
  })
  it('keeps a late result as history after close and never fills a reopened form',async()=>{
-  const held=deferred<typeof reply>(),{api,lane}=await setup(()=>held.promise,true);await prepareCreate();await click('确认创建工程');expect(lane.locked).toBe(true);await click('关闭向导')
+  const held=deferred<typeof reply>(),{api,lane}=await setup(()=>held.promise,true);await prepareCreate();await click('下一步');expect(lane.locked).toBe(true);await click('关闭向导')
   held.resolve(reply);await flushPromises();expect(lane.locked).toBe(false);await click('添加已有工程');await click('下一步');expect((pathInput().element as HTMLInputElement).value).not.toBe(created);expect(body().get('[data-testid="scaffold-receipt"]').text()).toContain(created);expect(api.scaffold).toHaveBeenCalledOnce();expect(api.register).not.toHaveBeenCalled()
  })
  it('keeps exclusion across navigation until the original response and never applies its old path',async()=>{
-  const held=deferred<typeof reply>(),{router,lane,api}=await setup(()=>held.promise,true);await prepareCreate();await click('确认创建工程');await router.push('/elsewhere');await flushPromises();expect(lane.locked).toBe(true)
+  const held=deferred<typeof reply>(),{router,lane,api}=await setup(()=>held.promise,true);await prepareCreate();await click('下一步');await router.push('/elsewhere');await flushPromises();expect(lane.locked).toBe(true)
   held.resolve(reply);await flushPromises();expect(lane.locked).toBe(false);await router.push('/projects');await flushPromises();await click('添加已有工程');await click('下一步');expect((pathInput().element as HTMLInputElement).value).not.toBe(created);expect(api.scaffold).toHaveBeenCalledOnce()
  })
  it('never applies a result after replacing the reader source',async()=>{
-  const held=deferred<typeof reply>(),{projects,source,api}=await setup(()=>held.promise,true);await prepareCreate();await click('确认创建工程');projects.disconnect();await projects.connect({...source,label:'different source'});held.resolve(reply);await flushPromises()
-  expect((pathInput().element as HTMLInputElement).value).not.toBe(created);expect(api.register).not.toHaveBeenCalled()
+  const held=deferred<typeof reply>(),{projects,source,api,add}=await setup(()=>held.promise,true);await prepareCreate();await click('下一步');projects.disconnect();await projects.connect({...source,label:'different source'});held.resolve(reply);await flushPromises()
+  expect(add.target).not.toBe(created);expect(api.register).not.toHaveBeenCalled()
  })
  it('does not offer confirmation without the original scaffold capability',async()=>{
-  const {api}=await setup(undefined,true);delete api.scaffold;await prepareCreate();expect(button('核对创建工程').attributes('disabled')).toBeDefined();expect(body().find('[data-testid="scaffold-confirm"]').exists()).toBe(false)
+  const {api}=await setup(undefined,true);delete api.scaffold;await prepareCreate();expect(button('下一步').attributes('disabled')).toBeDefined();expect(body().find('[data-testid="scaffold-confirm"]').exists()).toBe(false)
  })
 })

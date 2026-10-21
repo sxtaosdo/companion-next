@@ -1,3 +1,4 @@
+import { aiResourceSnapshotOutput, verifyAiResourceSnapshotIntegrity } from '../domain/ai-resource-snapshot'
 import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 import { decodeAiJobSnapshot, verifyAiJobPreview } from '../domain/ai-jobs-read'
@@ -108,9 +109,9 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
       input = { ...base, selectedIds: [...selectedIds.value], approved: true }
     }
     if (operation === 'export-variant') {
-      const sealed = target.job.resourceSnapshot
-      if (sealed?.state !== 'sealed' || sealed.config.schemaVersion !== 'project-resource-config-v2' || target.job.selectedIds.length !== 1) return false
-      const { width, height } = variantSize ?? sealed.config.iconSize
+      const output = aiResourceSnapshotOutput(target.job.resourceSnapshot,target.job.candidates.find(c=>c.candidateId===target.job.selectedIds[0])?.assetId)
+      if (!output || target.job.selectedIds.length !== 1) return false
+      const { width, height } = variantSize ?? output
       needsUpscale = width > 1024 && height > 1024
       input = { ...base, candidateId: target.job.selectedIds[0]!, width, height, allowUpscale: needsUpscale, expectedTargetSha256: null, approved: true }
     }
@@ -188,7 +189,8 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
       try {
         const result = await target.reader.readStatus(target.project.id, target.job.jobId, signal.signal)
         if (binding.value === target && epoch === token) {
-          const checked = freeze(decodeAiJobSnapshot(result, target.project.id, target.job.jobId)), previous = observed.value ?? target.job
+          const checked = freeze(decodeAiJobSnapshot(result, target.project.id, target.job.jobId)); await verifyAiResourceSnapshotIntegrity(checked.resourceSnapshot)
+          const previous = observed.value ?? target.job
           if (!aiJobActionIdentityMatches(checked, target.job) || checked.revision < previous.revision) throw new AiJobActionError('invalid-shape', 'unknown')
           snapshot = checked
         }
@@ -242,6 +244,8 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
           // even if this panel changes context or unmounts; no new write was sent, so no job fence is invented.
           await new Promise<never>(() => undefined)
         }
+        if (!current() || abort.signal.aborted || approvedScope !== scopeEpoch) return false
+        await verifyAiResourceSnapshotIntegrity(target.job.resourceSnapshot)
         if (!current() || abort.signal.aborted || approvedScope !== scopeEpoch) return false
         if (hasPendingAiWrites(getStorage(), target.project.id)) { hasPending.value = true; message.value = pendingMessage; return false }
         putAiWriteFence(getStorage(), fence); hasPending.value = true

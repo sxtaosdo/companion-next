@@ -1,3 +1,5 @@
+import { useProjectSetupAddStore } from '../src/stores/project-setup-add'
+import { toolPresetReadProvider } from '../src/tool-presets-read-integration'
 import { afterEach,beforeEach,describe,expect,it,vi } from 'vitest'
 import { createPinia,setActivePinia } from 'pinia'
 import { createMemoryHistory,createRouter,RouterView } from 'vue-router'
@@ -27,7 +29,7 @@ function reader(overrides:Partial<CompanionBrowserProvider>={}):CompanionBrowser
 }}
 let wrapper:VueWrapper|undefined
 beforeEach(()=>setActivePinia(createPinia()))
-afterEach(()=>{wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;companionEventProvider.value=null;companionProjectEntryProvider.value=null;creatorOperationsProvider.value=null;projectSetupProvider.value=null;ElMessage.closeAll();sessionStorage.clear();document.body.innerHTML='';vi.useRealTimers()})
+afterEach(()=>{toolPresetReadProvider.value=null;wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;companionEventProvider.value=null;companionProjectEntryProvider.value=null;creatorOperationsProvider.value=null;projectSetupProvider.value=null;ElMessage.closeAll();sessionStorage.clear();document.body.innerHTML='';vi.useRealTimers()})
 
 describe('explicit Dashboard transport, separate from project polling',()=>{
  it('uses only the existing authenticated GET when explicitly requested',async()=>{
@@ -101,7 +103,11 @@ const body=()=>new DOMWrapper(document.body)
 
 describe('original Dashboard select-to-registration interaction',()=>{
  it('loads explicitly, labels real state, disables missing paths and only fills the chosen path',async()=>{
-  const {setup,source,store}=await setupUi();await click('添加已有工程')
+  const {setup,source,store}=await setupUi()
+  setup.startPathStrict=vi.fn(async()=>({operationId:'11111111-1111-4111-8111-111111111111',optionsContractVersion:1 as const,effectiveOptions:{startCreator:true,configureCodex:false},reused:false}))
+  const stamp='1970-01-01T00:00:00.000Z',presets=[{id:'full',name:'全部工具',baseProfile:'full' as const,enabled:[],disabled:[],builtIn:true,updatedAt:stamp},{id:'core',name:'核心工具',baseProfile:'core' as const,enabled:[],disabled:[],builtIn:true,updatedAt:stamp}]
+  toolPresetReadProvider.value={label:'isolated readonly scopes',loadTools:vi.fn(async()=>[]),loadPresets:vi.fn(async()=>({presets,selectedPresetId:'full'})),exportPreset:vi.fn()}
+  await click('添加已有工程')
   expect(body().text()).toContain('尚未读取 Dashboard 工程');expect(source.loadDashboardProjects).not.toHaveBeenCalled()
   await click('刷新 Dashboard 工程')
   const items=body().findAll('.dashboard-item');expect(items).toHaveLength(3)
@@ -112,7 +118,7 @@ describe('original Dashboard select-to-registration interaction',()=>{
   expect((body().get('input[aria-label="已有工程绝对路径"]').element as HTMLInputElement).value).toBe(discovered[1]!.path)
   expect(setup.register).not.toHaveBeenCalled();expect(setup.start).not.toHaveBeenCalled();expect(store.projects).toEqual([target])
   expect(body().find('[data-testid="registration-confirm"]').exists()).toBe(false)
-  await click('核对仅登记');expect(body().get('[data-testid="registration-confirm"]').text()).toContain(discovered[1]!.path)
+  await click('下一步');expect(useProjectSetupAddStore().target).toBe(discovered[1]!.path);expect(body().find('[data-testid="registration-confirm"]').exists()).toBe(false);expect(setup.startPathStrict).not.toHaveBeenCalled()
   expect(setup.register).not.toHaveBeenCalled();await click('关闭向导')
   expect(wrapper!.get('.companion-project-card').text()).not.toContain('最近打开未读取')
  })

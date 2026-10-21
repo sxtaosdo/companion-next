@@ -1,3 +1,5 @@
+import { useProjectSetupAddStore } from '../src/stores/project-setup-add'
+import { toolPresetReadProvider } from '../src/tool-presets-read-integration'
 import { afterEach,describe,expect,it,vi } from 'vitest'
 import { createPinia } from 'pinia'
 import { createMemoryHistory,createRouter,RouterView } from 'vue-router'
@@ -18,7 +20,7 @@ const chosen='D:\\Fixture\\未登记工程',original='D:\\Fixture\\Original'
 const json=(value:unknown,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}})
 function deferred<T>(){let resolve!:(value:T)=>void;const promise=new Promise<T>(r=>{resolve=r});return {promise,resolve}}
 let wrapper:VueWrapper|undefined
-afterEach(()=>{wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;companionEventProvider.value=null;companionProjectEntryProvider.value=null;creatorOperationsProvider.value=null;projectSetupProvider.value=null;ElMessage.closeAll();sessionStorage.clear();document.body.innerHTML='';vi.useRealTimers()})
+afterEach(()=>{toolPresetReadProvider.value=null;wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;companionEventProvider.value=null;companionProjectEntryProvider.value=null;creatorOperationsProvider.value=null;projectSetupProvider.value=null;ElMessage.closeAll();sessionStorage.clear();document.body.innerHTML='';vi.useRealTimers()})
 
 describe('original native directory endpoint, controlled transports only',()=>{
  it('is passive until explicitly called and sends the original empty same-origin POST',async()=>{
@@ -58,7 +60,7 @@ async function setup(pick:()=>Promise<string|undefined>=async()=>chosen){
  const pinia=createPinia(),router=createRouter({history:createMemoryHistory(),routes:[{path:'/projects',component:CompanionBrowserView},{path:'/elsewhere',component:{template:'<p>Elsewhere</p>'}}]})
  await router.push('/projects');await router.isReady();wrapper=mount(RouterView,{attachTo:document.body,global:{plugins:[pinia,router,ElementPlus]}})
  const projects=useCompanionBrowserStore(pinia);await projects.connect(source);await flushPromises()
- return {api,source,projects,router,lane:useProjectOperationLaneStore(pinia),store:useProjectSetupStore(pinia)}
+ return {api,source,projects,router,lane:useProjectOperationLaneStore(pinia),store:useProjectSetupStore(pinia),add:useProjectSetupAddStore(pinia)}
 }
 const body=()=>new DOMWrapper(document.body)
 function button(text:string){const value=body().findAll('button').find(b=>b.text()===text||b.attributes('aria-label')===text);if(!value)throw Error('Missing '+text);return value}
@@ -68,11 +70,15 @@ const pathValue=()=>(input().element as HTMLInputElement).value
 
 describe('original select-directory interaction in the existing wizard',()=>{
  it('only fills the path, invalidates the old registration confirmation and leaves all writes explicit',async()=>{
-  const {api,store}=await setup();expect(api.pickDirectory).not.toHaveBeenCalled();await click('添加已有工程')
-  await input().setValue(original);await click('核对仅登记');expect(store.preparedRegistration?.path).toBe(original)
-  await click('选择目录…');expect(pathValue()).toBe(chosen);expect(store.preparedRegistration).toBeNull()
+  const {api,add}=await setup();
+  api.startPathStrict=vi.fn(async()=>({operationId:'11111111-1111-4111-8111-111111111111',optionsContractVersion:1 as const,effectiveOptions:{startCreator:true,configureCodex:false},reused:false}))
+  const stamp='1970-01-01T00:00:00.000Z',presets=[{id:'full',name:'全部工具',baseProfile:'full' as const,enabled:[],disabled:[],builtIn:true,updatedAt:stamp},{id:'core',name:'核心工具',baseProfile:'core' as const,enabled:[],disabled:[],builtIn:true,updatedAt:stamp}]
+  toolPresetReadProvider.value={label:'isolated readonly scopes',loadTools:vi.fn(async()=>[]),loadPresets:vi.fn(async()=>({presets,selectedPresetId:'full'})),exportPreset:vi.fn()}
+  expect(api.pickDirectory).not.toHaveBeenCalled();await click('添加已有工程')
+  await input().setValue(original);await click('下一步');expect(add.target).toBe(original);await click('上一步')
+  await click('选择目录…');expect(pathValue()).toBe(chosen);expect(add.target).toBe('')
   expect(api.register).not.toHaveBeenCalled();expect(api.start).not.toHaveBeenCalled();expect(api.status).not.toHaveBeenCalled()
-  await click('核对仅登记');expect(store.preparedRegistration?.path).toBe(chosen);expect(api.register).not.toHaveBeenCalled()
+  await click('下一步');expect(add.target).toBe(chosen);expect(api.register).not.toHaveBeenCalled();expect(api.startPathStrict).not.toHaveBeenCalled()
  })
  it('cancel keeps the existing input and causes no registration or refresh',async()=>{
   const {api,source}=await setup(async()=>undefined);await click('添加已有工程');await input().setValue(original);await click('选择目录…')
@@ -81,7 +87,7 @@ describe('original select-directory interaction in the existing wizard',()=>{
  it('coalesces repeated clicks and holds the lane until actual client cleanup',async()=>{
   const pending=deferred<string|undefined>(),idle=deferred<void>(),{api,lane}=await setup(()=>pending.promise)
   api.waitForIdle=vi.fn(()=>idle.promise);await click('添加已有工程');await click('选择目录…');await click('选择目录…')
-  expect(api.pickDirectory).toHaveBeenCalledTimes(1);expect(lane.locked).toBe(true);expect(button('核对仅登记').attributes('disabled')).toBeDefined()
+  expect(api.pickDirectory).toHaveBeenCalledTimes(1);expect(lane.locked).toBe(true);expect(button('下一步').attributes('disabled')).toBeDefined()
   pending.resolve(chosen);await flushPromises();expect(lane.locked).toBe(true);idle.resolve();await flushPromises();expect(lane.locked).toBe(false)
  })
  it('closing discards a late path without claiming to close the system dialog',async()=>{

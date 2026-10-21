@@ -1,3 +1,4 @@
+import { verifyAiResourceSnapshotIntegrity } from '../domain/ai-resource-snapshot'
 import { AI_JOBS_BACKEND_ERRORS, AI_JOBS_READ_LIMITS, AiJobsReadError, decodeAiJobCandidate, decodeAiJobsView, decodeAiJobStatus, decodeAiJobSnapshot, isAiJobId, isAiCandidateId, verifyAiJobPreview, verifyAiVariantPreview } from '../domain/ai-jobs-read'
 import { isAiProjectId } from '../domain/ai-resource-read'
 import type { AiJobsReadProvider, AiJobsReadEndpoint, AiJobsReadCode, AiJobsBackendCode } from '../domain/ai-jobs-read'
@@ -102,11 +103,11 @@ export function createAiJobsReadProvider(options: { fetch: AiJobsReadFetch; time
     waitForIdle: () => active.size ? new Promise<void>(resolve => idleWaiters.add(resolve)) : Promise.resolve(),
     async readJobs(projectId, signal) {
       if (!isAiProjectId(projectId)) throw fail('invalid-query', 'jobs')
-      return read(projectId, 'jobs', undefined, value => decodeAiJobsView(value, projectId), signal)
+      return read(projectId, 'jobs', undefined, async value => { const view=decodeAiJobsView(value,projectId); await Promise.all(view.jobs.map(job=>verifyAiResourceSnapshotIntegrity(job.resourceSnapshot))); return view }, signal)
     },
     async readStatus(projectId, jobId, signal) {
       if (!isAiProjectId(projectId) || !isAiJobId(jobId)) throw fail('invalid-query', 'status')
-      return read(projectId, 'status', { jobId }, value => decodeAiJobStatus(value, projectId, jobId), signal)
+      return read(projectId, 'status', { jobId }, async value => { const job=decodeAiJobStatus(value,projectId,jobId); await verifyAiResourceSnapshotIntegrity(job.resourceSnapshot); return job }, signal)
     },
     async previewCandidate(projectId, jobId, candidate, signal) {
       let expected

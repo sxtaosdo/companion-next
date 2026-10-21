@@ -45,7 +45,7 @@ export function createAiTaskCreationProvider(options: { fetch: AiTaskCreationFet
     if (busy) throw fail('busy', false)
     if (signal?.aborted) throw fail('aborted', false)
     const frozen = validateAiTaskSubmission(projectId, value), operation = inspecting ? 'inspect' : frozen.operation
-    const body = JSON.stringify(inspecting ? { request: frozen.input.request, resourceBinding: frozen.input.resourceBinding } : frozen.input)
+    const body = JSON.stringify(inspecting ? (frozen.input.artBinding ? { request: frozen.input.request, artBinding: frozen.input.artBinding, artAssets: frozen.input.artAssets } : { request: frozen.input.request, resourceBinding: frozen.input.resourceBinding }) : frozen.input)
     if (new TextEncoder().encode(body).byteLength > AI_TASK_CREATION_LIMITS.maxRequestBytes) throw fail('invalid-input', false)
     busy = true
     let resolveIdle!: () => void

@@ -36,7 +36,7 @@ const body=()=>new DOMWrapper(document.body)
 function button(text:string){const found=body().findAll('button').find(x=>x.text()===text||x.attributes('aria-label')===text);if(!found)throw Error(`Missing ${text}`);return found}
 // Retained maintenance registration coverage opens the maintenance wizard directly.
 // The user-facing default add entry is exercised separately in project-setup-add-ui.test.ts.
-async function click(text:string){if(text==='添加已有工程'){const wizard=wrapper!.findComponent({name:'ProjectSetupWizard'});(wizard.vm as unknown as {openForProject(id:string):void}).openForProject('');await flushPromises();await button('下一步').trigger('click');await flushPromises();return}await button(text).trigger('click');await flushPromises()}
+async function click(text:string){if(text==='添加已有工程'){const wizard=wrapper!.findComponent({name:'ProjectSetupWizard'});(wizard.vm as unknown as {openMaintenance(id:string):void}).openMaintenance('');await flushPromises();await button('下一步').trigger('click');await flushPromises();return}await button(text).trigger('click');await flushPromises()}
 async function finishWizard(){const skip=body().findAll('button').find(b=>b.text()==='跳过 Agent 接入');if(skip&&skip.attributes('disabled')===undefined){await skip.trigger('click');await flushPromises()}}
 async function openFull(){await click('安装 / 更新接入')}
 async function consent(){for(const input of body().findAll('.setup-consents input[type="checkbox"]'))await input.setValue(true);await flushPromises()}
@@ -236,7 +236,7 @@ describe('registration readback form ownership',()=>{
 
 describe('restored progressive five-step wizard',()=>{
  it.each(['custom','dashboard','create','initialize'])('expands only the current step for %s and returns without writes',async mode=>{
-  const {api}=await setup();const wizard=wrapper!.findComponent({name:'ProjectSetupWizard'});(wizard.vm as unknown as {openForProject(id:string):void}).openForProject('');await flushPromises()
+  const {api}=await setup();const wizard=wrapper!.findComponent({name:'ProjectSetupWizard'});(wizard.vm as unknown as {openMaintenance(id:string):void}).openMaintenance('');await flushPromises()
   expect(body().get('[data-testid="setup-source-step"]').isVisible()).toBe(true)
   expect(body().get('[data-testid="setup-project-step"]').isVisible()).toBe(false)
   expect(body().get('[data-testid="setup-launch-step"]').isVisible()).toBe(false)

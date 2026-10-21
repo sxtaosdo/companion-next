@@ -242,6 +242,7 @@ describe('019 compact project card structure and safe controls', () => {
     const leave = vi.spyOn(setupStore, 'leave')
     await button('添加已有工程').trigger('click'); await flushPromises()
     const body = new DOMWrapper(document.body)
+    await body.findAll('button').find(b => b.text() === '下一步')!.trigger('click'); await flushPromises()
     await body.get('input[aria-label="已有工程绝对路径"]').setValue('D:\\Unsaved\\Input')
     for (const tab of ['logs', 'calls', 'projects']) {
       await router.push(tab === 'projects' ? '/projects' : `/projects?tab=${tab}`); await flushPromises()
