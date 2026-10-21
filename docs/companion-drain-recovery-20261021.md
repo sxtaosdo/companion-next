@@ -16,7 +16,7 @@
 - 目录：`C:/Users/33272/AppData/Local/Temp/companion-drain-recovery-20261021`，含原源码、candidate.patch、来源 SHA、测试、应用与回滚说明。
 - 完整 daemon 隔离打包未通过：安装 map 缺少 `src/companion-mcp.ts`、`src/companion/tool-profiles.ts`、`src/companion/types.ts`。未从共享脏工作区拼接，也未用 stub 掩盖。
 
-已限定核对现有 Git 历史：安装 map 指向 companion-client-rollback-fix-20261019 临时工作树；其记录提交 dacb89b 仅 74/85 个嵌入项目源匹配，当前 main 6ff44f5 为 54/85，已知修复提交 2994d14 为 56/85。不存在已证明匹配的完整安装源码版本，因此没有从任一提交复制缺失文件混入。安装路径与旧 package 版本均不足以证明可重建版本。
+已限定核对现有 Git 历史：安装 map 指向 companion-client-rollback-fix-20261019 临时工作树；其记录提交 dacb89b 在归一换行后仅 74/85 个嵌入项目源匹配（原字节精确匹配 6/85），当前 main 6ff44f5 为 54/85，已知修复提交 2994d14 为 56/85。不存在已证明匹配的完整安装源码版本，因此没有从任一提交复制缺失文件混入。安装路径与旧 package 版本均不足以证明可重建版本；此次仅核对三个已知候选，没有穷尽全部 Git 历史。
 
 ## 现场边界
 
@@ -25,3 +25,5 @@
 当前进程没有公开恢复准入或热加载接口。官方停止证明已以 UNKNOWN_CONTEXT_COVERAGE 拒绝，不能重试同一动作或伪造证明。磁盘源码修复不会改变已加载的进程。当前批准范围排除强杀、注入、改数据库和整机重启，因此现场应用仍阻塞；需要先确定合规的进程替换路径及完整宿主构建来源。
 
 本批未修改共享旧宿主源码、安装文件、数据库或进程，也未启动模型。
+
+2026-10-21追加只读取证：安装版本OS采样与可信anchor比较为同机器、同kernel boot、不同System进程生命周期；退出验证要求后两者均不同，当前条件不满足。没有人工取消历史aggregate或公开resume入口。保留inflight/native-history与候选，由宿主维护方提供匹配完整源码和保留历史UNKNOWN的正式准入恢复及应用方案；当前没有获准的现场替换路径。未再次调用stop/proof/reconcile。
