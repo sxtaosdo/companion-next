@@ -140,6 +140,18 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
   function reconcileLocked(target: Binding, snapshot: AiJobSnapshot) {
     if (binding.value !== target) return
     for (const fence of readAiWriteFences(getStorage())) {
+      // Only this authenticated, fully scoped observation proves the old strict facade rejected before Creator dispatch.
+      // It is not a fabricated import receipt or a claim that a server lease was released.
+      const observation = snapshot.variantDispatchObservation, scope = observation?.binding
+      if (fence.operation === 'import-variant' && fence.variant && scope && snapshot.revision === fence.revision
+        && scope.projectId === fence.projectId && scope.jobId === fence.jobId && scope.revision === fence.revision
+        && scope.requestHash === fence.requestHash && scope.sourceRevision === fence.sourceRevision
+        && scope.candidateId === fence.variant.candidateId && scope.width === fence.variant.width && scope.height === fence.variant.height
+        && scope.fileSha256 === fence.variant.fileSha256 && scope.receiptSha256 === fence.variant.receiptSha256 && scope.destinationUrl === fence.variant.destinationUrl) {
+        removeAiWriteFence(getStorage(), fence.key)
+        phase.value = 'not-sent'; message.value = '已核实旧接口在派发前拒绝，未调用 Creator；请重新核对并确认导入。'
+        continue
+      }
       if (['enqueue', 'adopt', 'export-variant'].includes(fence.operation) || fence.projectId !== snapshot.projectId || fence.jobId !== snapshot.jobId
         || fence.requestHash !== snapshot.requestHash || fence.sourceRevision !== snapshot.sourceRevision || snapshot.revision <= fence.revision) continue
       // Revision advancement alone cannot prove an unresolved import finished or did not write.

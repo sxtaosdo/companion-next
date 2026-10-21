@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+
 import { useRegisteredProjectStore } from '../stores/registered-project'
 import { useRegisteredProjectPage } from '../composables/use-registered-project-page'
 import { useAiResourceEditorStore } from '../stores/ai-resource-editor'
 import { useAiResourceReadStore } from '../stores/ai-resource-read'
 import { aiResourceReadProvider } from '../ai-resource-read-integration'
 import ArtStatusBar from '../components/ArtStatusBar.vue'
+import ProjectArtSpecPanel from '../components/ProjectArtSpecPanel.vue'
 import AiResourceConfigDialog from '../components/AiResourceConfigDialog.vue'
 import AiTaskCreationPanel from '../components/AiTaskCreationPanel.vue'
 import { aiTaskCreationProvider } from '../ai-task-creation-integration'
@@ -19,16 +20,6 @@ const props = withDefaults(defineProps<{ embedded?: boolean }>(), { embedded: fa
 const selection = useRegisteredProjectStore()
 if (!props.embedded) useRegisteredProjectPage()
 const directory = selection.directory, store = useAiResourceReadStore(), editor = useAiResourceEditorStore()
-const route = useRoute(), router = useRouter()
-const projects = computed(() => selection.projects.filter(project => isAiProjectId(project.id)))
-const selectedId = computed({
-  get: () => selection.project?.id ?? '',
-  set: (value: string) => {
-    selection.restoreRouteProject(value)
-    const query = { ...route.query, project: value || undefined }
-    void router.push({ path: route.path, query })
-  },
-})
 const jobsPanel = ref<InstanceType<typeof AiJobsReadPanel> | null>(null)
 const configDirty = computed(() => !!editor.project && editor.project.id === selection.project?.id && editor.project.path === selection.project?.path
   && (editor.dirty || editor.busy || !!editor.pendingFence))
@@ -56,11 +47,11 @@ onBeforeUnmount(() => store.disconnect())
 </script>
 <template>
   <section class="ai-resource-read">
-    <ArtStatusBar v-if="!props.embedded" :jobs="jobsPanel?.readStatusSnapshot ?? null"><div class="ai-read-actions ai-status-read-actions"><el-button aria-label="读取工程规范" type="primary" :disabled="!store.project || !aiResourceReadProvider || store.loading" :loading="store.loading" @click="aiResourceReadProvider && store.readConfig(aiResourceReadProvider)">读取 / 刷新工程规范</el-button><el-button v-if="store.loading || store.previewLoading" @click="store.clearReads">取消读取</el-button><el-button v-if="store.resource" @click="store.clearReads">清空读取结果</el-button></div></ArtStatusBar>
+    <ArtStatusBar v-if="!props.embedded" :show-creator="false" :jobs="jobsPanel?.readStatusSnapshot ?? null"><div class="ai-read-actions ai-status-read-actions"><el-button aria-label="读取工程规范" type="primary" :disabled="!store.project || !aiResourceReadProvider || store.loading" :loading="store.loading" @click="aiResourceReadProvider && store.readConfig(aiResourceReadProvider)">读取 / 刷新工程规范</el-button><el-button v-if="store.loading || store.previewLoading" @click="store.clearReads">取消读取</el-button><el-button v-if="store.resource" @click="store.clearReads">清空读取结果</el-button></div></ArtStatusBar>
     <el-alert v-if="!props.embedded && store.error" class="ai-config-error" type="error" :closable="false" :title="store.error"/>
-    <div v-if="!props.embedded" class="ai-icon-project-picker"><label v-if="!props.embedded">已读取登记工程<el-select v-model="selectedId" aria-label="AI 规范目标工程" placeholder="请选择工程" clearable><el-option v-for="project in projects" :key="project.id" :value="project.id" :label="`${project.name} · ${project.id}`"/></el-select></label><RouterLink :to="resourcesLink">游戏资源与规范</RouterLink></div>
     <AiTaskCreationPanel compact v-if="!props.embedded && aiTaskCreationProvider" :project="selection.project" :source="selection.currentSource" :config-dirty="configDirty" @created="payload => jobsPanel?.readCreatedTask(payload)"/>
     <AiJobsReadPanel compact v-if="!props.embedded" ref="jobsPanel" :project="selection.project" :source="selection.currentSource"/>
+    <ProjectArtSpecPanel :project="selection.project" :source="selection.currentSource" :legacy="saved?.schemaVersion === 'project-resource-config-v2' ? saved : null"/>
     <details class="ai-icon-config section-card" :open="props.embedded"><summary>工程规范与参考图</summary>
     <section class="section-card">
       <div class="section-heading"><div><h2>{{ props.embedded ? '工程已保存规范' : '工程资源规范' }}</h2><p>核对当前登记工程的已保存配置与参考图。新建、迁移和编辑共用同一配置弹窗。</p></div><RouterLink v-if="props.embedded" :to="aiIconsLink">打开 AI 图标</RouterLink><RouterLink v-else :to="resourcesLink">返回游戏资源 · 项目规范</RouterLink></div>

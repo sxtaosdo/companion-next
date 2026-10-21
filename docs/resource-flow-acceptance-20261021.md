@@ -1,5 +1,18 @@
 # 资源流：真实类离线验证与恢复条件
 
+## 2026-10-21 11:53 UTC：Creator入口约束与当前真实边界
+
+用户原话（11:52:23 UTC）：**“你对cocos creator的所有操作都要用开发者后台”**。所有真实打开、关闭、导入、刷新、构建等动作都必须从后台现有UI发起；失败就修后台，不得用Dashboard/CLI/脚本/exe替代。后台内部正常调用不受影响；只读日志/代码诊断可用。已记入本项目AGENTS.md，并通知所有执行者。
+
+- 11:27:47、11:29:34两次是32181工程页“启动Creator”，分别409/最终超时；对应历史属于32181，正式32180未登记测试工程。
+- 用户批准仅使用全局索引的测试条目后，约11:44使用本机脚本直接调用复制运行包的DashboardLauncher.launch，列表只过滤获准的测试路径。这**不是UI入口，不计UI启动验收**，也不产生Companion调用历史。不得补造历史。
+- 虽launcher报告超时，Creator实际主PID22628于11:44:07.506 UTC创建，父Dashboard12528；测试工程temp/startup.json pid相同，进程project参数匹配测试路径。11:45:53独立后台UI显示该工程已就绪。后续只用后台UI，不再次脚本打开。证据records/e2e-creator-open-evidence.json、e2e-ui-20-creator-observed.json。
+- 11:47从32181真实UI确认import-variant一次，HTTP200仅dispatchAccepted，尚未出现目标PNG/meta/UUID。11:53宿主OPEN、当前全部在途0，不代表导入成功；原任务仍selected、UI未决保护保留。
+- 定位版本合同不匹配：测试Studio来自P9000 main fbceaea，prepare-import仅接受jobId/revision/approved，拒绝宿主传入variant；其local-icon-import.ts也无变体合同。宿主异步catch吞错，未给UI可恢复的失败回执。历史96正确Studio是完整提交7e117fed/.42，而非main fbceaea。正在独立Temp恢复该完整提交并保留f4cedcf错误终态修复，尚未替换活服务/改任务。不得清UNKNOWN或手写成功记录。
+
+下方11:33阶段记录及旧失败保留；本轮真实生成、预览、选用、导出已通过，但**UI打开工程及Creator导入/UUID重读仍未通过**。参考图入模仍未实现。
+
+
 ## 2026-10-21 11:33 UTC：隔离 Next UI 真实出图与导出，Creator 导入尚阻塞
 
 **本轮已通过真实 UI：登记 → 规范保存和重读 → 输入 → 排队/执行 → 状态 → PNG 预览 → 选用 → 96×96 导出。Creator 导入、UUID/meta 重读尚未完成；参考图未入模。** 下方前次记录保留为历史，不代表本轮仍未出图。

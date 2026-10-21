@@ -1,4 +1,6 @@
 import { version, companionVersion } from '../../package.json'
+declare const __COMPANION_BUILD_ID__:string
+export const frontendBuildIdentity=typeof __COMPANION_BUILD_ID__==='string'?__COMPANION_BUILD_ID__:'unavailable'
 
 /** Frontend identity, never a claim about a connected daemon / Creator version. */
 export const frontendIdentity = { name: 'Companion Next', version, releaseDate: '2026-10-16', scope: 'Cocos 工程工作区', hostBase: companionVersion.hostBase, nextRevision: companionVersion.nextRevision } as const
@@ -7,6 +9,7 @@ export const backendVersionInformation = { label: '当前接口未提供', detai
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；Vue迁移与宿主业务集成分别验收', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  { version, date:'2026-10-21', title:'资源统一顶部与宿主版本元数据候选', changes:['三个美术资源页面共用工程选择与规范状态；采集器保留独立就绪状态，Creator仅在导入相关步骤显示。', '前端产品版本与源码构建标识分别显示；宿主包版本只取当前认证接口返回的可信构建元数据，缺失、认证失败或无效响应不沿用旧值。', '当前为本地候选验证，未部署正式后台。'] },
   {"version": "1.3.173", "date": "2026-10-21", "title": "独立素材采集器入口", "changes": ["图片素材新增独立采集器内嵌入口，保留原后台审阅；仅连接固定本机工具地址，明确显示加载、未确认就绪和重试，支持独立窗口打开。跨页面和标签切换保留采集器页面与选择，不自动搜图、下载或保存。"]},
   {"version": "1.3.173", "date": "2026-10-21", "title": "离线资源启动绑定", "changes": ["启动入口增加项目专用离线资源配置，严格使用已确认的工具和新任务库路径；清除继承的生成端点、GPU租约与采用配置，正常启动仍复用现有服务。"]},
   {"version": version, "date": "2026-10-21", "title": "模型和资源页面状态与操作精简", "changes": ["模型服务以紧凑状态栏显示状态、刷新与原一键启停；保留原模型面板。", "AI 图标与游戏资源共用工程信息状态栏，登记、Creator、规范及任务状态分别显示。", "AI 图标核心制作和候选预览优先，规范读取在顶部，配置与说明按需展开，保留原写入确认。", "工程规范读取遇到已验证的服务禁用错误时显示明确原因，不将服务失败误报为规范未创建。"]},

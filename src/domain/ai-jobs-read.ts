@@ -17,6 +17,13 @@ export interface AiJobVariantImport extends AiJobImport {
   artifact?: { kind: 'variant'; candidateId: string; width: number; height: number; fileSha256: string; receiptSha256: string; destinationUrl: string }
 }
 export interface AiJobBudget { maxAssets: 2; candidatesPerAsset: 1; submissionAttempts: 1 }
+export interface AiVariantDispatchObservation {
+  schemaVersion: 'variant-dispatch-observation-v1'; state: 'not-started'; effectApplied: false
+  originalReceipt: null; leaseDisposition: 'not-claimed'; reason: 'KNOWN_LEGACY_PREPARE_REJECTED_BEFORE_READ_WRITE'
+  binding: { projectId: string; jobId: string; revision: number; requestHash: string; sourceRevision: string; candidateId: string;
+    motherSha256: string; configHash: string; width: number; height: number; fileSha256: string; receiptSha256: string; destinationUrl: string }
+  taskSha256: string; observedAt: string
+}
 export interface AiJobSnapshot {
   projectId: string; jobId: string; revision: number; state: AiJobState; sourceRevision: string; requestHash: string
   profile: string; budget: AiJobBudget; createdAt: string; assets: Array<{ assetId: string; relativePath: string }>
@@ -25,6 +32,7 @@ export interface AiJobSnapshot {
   resourceSnapshot?: AiJobResourceSnapshot
   productAcceptance?: AiJobProductAcceptance
   variantImport?: AiJobVariantImport
+  variantDispatchObservation?: AiVariantDispatchObservation
   historyOnly?: { reason: 'SOURCE_REVISION_CHANGED'; currentSourceRevision: string }
 }
 export interface AiJobsView {
@@ -118,6 +126,30 @@ function decodeVariantImport(value: unknown, candidates: AiJobCandidate[], selec
   }
   return { ...summary, active: raw.active, ...(artifact ? { artifact } : {}) }
 }
+function decodeVariantDispatchObservation(value: unknown, job: Record<string, unknown>, candidates: AiJobCandidate[], selectedIds: string[], resource?: AiJobResourceSnapshot): AiVariantDispatchObservation {
+  const raw = record(value), b = record(raw.binding)
+  const exact = (item: Record<string, unknown>, keys: string[]) => Object.keys(item).length === keys.length && keys.every(key => Object.hasOwn(item, key))
+  if (!exact(raw, ['schemaVersion','state','effectApplied','originalReceipt','leaseDisposition','reason','binding','taskSha256','observedAt'])
+    || !exact(b, ['projectId','jobId','revision','requestHash','sourceRevision','candidateId','motherSha256','configHash','width','height','fileSha256','receiptSha256','destinationUrl'])
+    || raw.schemaVersion !== 'variant-dispatch-observation-v1' || raw.state !== 'not-started' || raw.effectApplied !== false
+    || raw.originalReceipt !== null || raw.leaseDisposition !== 'not-claimed' || raw.reason !== 'KNOWN_LEGACY_PREPARE_REJECTED_BEFORE_READ_WRITE'
+    || job.state !== 'selected' || job.import !== null || job.variantImport !== undefined || job.historyOnly !== undefined
+    || b.projectId !== job.projectId || b.jobId !== job.jobId || b.revision !== job.revision || b.requestHash !== job.requestHash || b.sourceRevision !== job.sourceRevision
+    || selectedIds.length !== 1 || b.candidateId !== selectedIds[0] || !isAiCandidateId(b.candidateId)
+    || candidates.find(c => c.candidateId === b.candidateId)?.fileSha256 !== b.motherSha256 || resource?.state !== 'sealed' || resource.hash !== b.configHash
+    || typeof b.width !== 'number' || typeof b.height !== 'number' || !Number.isInteger(b.width) || !Number.isInteger(b.height)
+    || b.width < 1 || b.height < 1 || b.width > 4096 || b.height > 4096 || b.width * b.height > 16_000_000) throw invalid()
+  const destinationUrl = text(b.destinationUrl,512)
+  if (!/^db:\/\/assets\/(?:[a-zA-Z0-9_.-]+\/)*[a-zA-Z0-9_.-]+\.png$/.test(destinationUrl) || destinationUrl.split('/').some(p => p === '.' || p === '..')) throw invalid()
+  const observedAt = text(raw.observedAt,60)
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(observedAt) || !Number.isFinite(Date.parse(observedAt))) throw invalid()
+  return { schemaVersion: 'variant-dispatch-observation-v1', state: 'not-started', effectApplied: false, originalReceipt: null, leaseDisposition: 'not-claimed',
+    reason: 'KNOWN_LEGACY_PREPARE_REJECTED_BEFORE_READ_WRITE', taskSha256: pattern(raw.taskSha256,sha,64), observedAt,
+    binding: { projectId: job.projectId as string, jobId: job.jobId as string, revision: job.revision as number,
+      requestHash: pattern(b.requestHash,sha,64), sourceRevision: pattern(b.sourceRevision,revision,40), candidateId: b.candidateId,
+      motherSha256: pattern(b.motherSha256,sha,64), configHash: pattern(b.configHash,sha,64), width: b.width, height: b.height,
+      fileSha256: pattern(b.fileSha256,sha,64), receiptSha256: pattern(b.receiptSha256,sha,64), destinationUrl } }
+}
 /** Sealed config is validated metadata; it is never production acceptance. */
 export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: string): AiJobSnapshot {
   const raw = record(value)
@@ -130,6 +162,7 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
     || candidates.some(candidate => !assetIds.includes(candidate.assetId)) || selectedIds.some(id => !candidateIds.includes(id))) throw invalid()
   let resourceSnapshot: AiJobResourceSnapshot | undefined
   try { if (raw.resourceSnapshot !== undefined) resourceSnapshot = decodeAiJobResourceSnapshot(raw.resourceSnapshot, projectId) } catch { throw invalid() }
+  const variantDispatchObservation = raw.variantDispatchObservation === undefined ? undefined : decodeVariantDispatchObservation(raw.variantDispatchObservation, raw, candidates, selectedIds, resourceSnapshot)
   const importReceipt = decodeImport(raw.import)
   const variantImport = raw.variantImport === undefined ? undefined : decodeVariantImport(raw.variantImport, candidates, selectedIds)
   let historyOnly: AiJobSnapshot['historyOnly']
@@ -150,7 +183,7 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
     ...(raw.mode !== undefined ? { mode: member(raw.mode, ['generation', 'offline_import_only'] as const) } : {}),
     ...(raw.origin !== undefined ? { origin: member(raw.origin, ['generated', 'adopted'] as const) } : {}),
     ...(raw.errorCode !== undefined ? { errorCode: raw.errorCode === null ? null : pattern(raw.errorCode, errorCode, 80) } : {}),
-    ...(resourceSnapshot ? { resourceSnapshot } : {}), ...(productAcceptance ? { productAcceptance } : {}), ...(variantImport ? { variantImport } : {}), ...(historyOnly ? { historyOnly } : {}) }
+    ...(resourceSnapshot ? { resourceSnapshot } : {}), ...(productAcceptance ? { productAcceptance } : {}), ...(variantImport ? { variantImport } : {}), ...(variantDispatchObservation ? { variantDispatchObservation } : {}), ...(historyOnly ? { historyOnly } : {}) }
 }
 export function decodeAiJobsView(value: unknown, projectId: string): AiJobsView {
   const raw = record(value), profile = record(raw.profile)

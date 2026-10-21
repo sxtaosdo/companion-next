@@ -1,3 +1,7 @@
+import {createProjectArtSpecProvider} from './adapters/project-art-spec'
+import {registerProjectArtSpecProvider} from './project-art-spec-integration'
+import {createProductVersionReadProvider} from './adapters/product-version-read'
+import {productVersionReadProvider} from './product-version-integration'
 import { createCompanionOwnerReviewProvider } from './adapters/companion-owner-review'
 import { createKnowledgeAgentProvider } from './adapters/knowledge-agent'
 import { registerKnowledgeAgentProvider } from './knowledge-agent-integration'
@@ -55,9 +59,11 @@ const configEditorHost = isCompanionConfigEditHost(import.meta.env.MODE,window.l
 const normalWorkspaceHost = isCompanionWorkspaceHost(import.meta.env.MODE,window.location)
 const passiveReadHost = isCompanionReadHost(import.meta.env.MODE,window.location)
 if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatHost) {
+  productVersionReadProvider.value=createProductVersionReadProvider(window.fetch.bind(window))
   // Normal workspace exposes the approved existing capabilities; readonly keeps
   // its passive boundary. Loopback never replaces session or per-action consent.
   if (normalWorkspaceHost) {
+    registerProjectArtSpecProvider(createProjectArtSpecProvider(window.fetch.bind(window),window.location.origin))
     registerImageReviewProvider(createCompanionOwnerReviewProvider(window.fetch.bind(window)))
     registerKnowledgeAgentProvider(createKnowledgeAgentProvider({fetch:window.fetch.bind(window)}))
     registerKnowledgeSyncProvider(createKnowledgeSyncProvider({fetch:window.fetch.bind(window)}))

@@ -8,10 +8,14 @@ import { liveProvider } from './integration'
 import { companionBrowserProvider } from './companion-browser-integration'
 import { useRegisteredProjectStore } from './stores/registered-project'
 import { allowsLegacyWorkspace } from './domain/project-workspace'
-import { frontendIdentity, backendVersionInformation } from './domain/product-information'
+import { frontendIdentity, frontendBuildIdentity } from './domain/product-information'
 import InfoTip from './components/InfoTip.vue'
+import {useProductVersionStore} from './stores/product-version'
+import {productVersionReadProvider} from './product-version-integration'
 import ImageAssetsView from './views/ImageAssetsView.vue'
 import { knowledgeNavigation, knowledgePageFor } from './domain/knowledge-navigation'
+const backendVersionInformation=useProductVersionStore()
+watch(productVersionReadProvider,()=>{void backendVersionInformation.read()},{immediate:true})
 const store = useWorkspaceStore()
 const route = useRoute()
 const router = useRouter()
@@ -22,7 +26,7 @@ watch(()=>route.path,path=>{if(path==='/image-assets')imageAssetsVisited.value=t
 const registered = useRegisteredProjectStore()
 const legacyWorkspace = computed(() => allowsLegacyWorkspace(import.meta.env.MODE, Boolean(companionBrowserProvider.value)))
 const usesLegacySnapshot = computed(() => legacyWorkspace.value && store.mode !== 'disconnected')
-const showRegisteredContext = computed(() => !usesLegacySnapshot.value && ['/overview', '/resources'].includes(route.path))
+const showRegisteredContext = computed(() => !usesLegacySnapshot.value && ['/overview'].includes(route.path))
 const compactOverview = computed(() => route.path === '/overview' && !usesLegacySnapshot.value)
 const showRegisteredChrome = computed(() => showRegisteredContext.value && !compactOverview.value)
 const showProjectContext = computed(() => !showRegisteredContext.value && legacyWorkspace.value && route.path !== '/image-assets' && !route.meta.workspaceIndependent)
@@ -32,10 +36,10 @@ watch(legacyWorkspace, allowed => { if (!allowed && store.mode !== 'disconnected
 // registered store's source/path-bound project and never trusts this query.
 const registeredRouteIntent = ref<LocationQueryValue | LocationQueryValue[] | undefined>()
 watch(() => route.fullPath, () => {
-  if (['/overview', '/resources', '/ai-icons'].includes(route.path)) registeredRouteIntent.value = route.query.project
+  if (['/overview', '/resources', '/ai-icons', '/image-assets'].includes(route.path)) registeredRouteIntent.value = route.query.project
 }, { immediate: true, flush: 'sync' })
 function projectLink(path: string) {
-  if (!['/overview', '/resources', '/ai-icons'].includes(path)) return path
+  if (!['/overview', '/resources', '/ai-icons', '/image-assets'].includes(path)) return path
   const intent = registered.project?.id ?? (registered.requestedId || registeredRouteIntent.value)
   return intent !== undefined ? { path, query: { project: intent } } : path
 }
@@ -156,7 +160,7 @@ const dateLabel = computed(() => {
         </template>
       </nav>
 
-      <div class="sidebar-footer"><div>前端 v{{ frontendIdentity.version }}</div><div class="backend-version" :title="backendVersionInformation.detail">后端：{{ backendVersionInformation.label }}</div></div>
+      <div class="sidebar-footer"><div>前端 v{{ frontendIdentity.version }}</div><div v-if="frontendBuildIdentity!=='unavailable'" class="frontend-build" title="源码构建标识，与产品版本分别记录">构建 {{ frontendBuildIdentity }}</div><div class="backend-version" :title="backendVersionInformation.detail">后端：{{ backendVersionInformation.label }}</div></div>
     </aside>
     <div class="main-shell">
       <header class="topbar">
@@ -186,6 +190,8 @@ const dateLabel = computed(() => {
 </template>
 <style scoped>
 .sidebar { overflow-y: auto; }
+.sidebar-footer { display:grid; grid-template-columns:minmax(0,1fr); align-items:start; gap:5px; line-height:1.5; }
+.sidebar-footer > div { min-width:0; width:100%; white-space:normal; overflow-wrap:anywhere; }
 .nav-list { margin-top: 24px; }
 .nav-list { gap: 3px; }
 .nav-item { padding: 10px 14px; }

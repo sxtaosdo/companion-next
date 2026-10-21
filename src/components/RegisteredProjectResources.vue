@@ -30,7 +30,7 @@ function chooseStep(index: number) { void router.replace({ path: '/resources', q
 <template>
   <section class="registered-resources">
     <template v-if="selection.project">
-      <ArtStatusBar :jobs="jobsPanel?.readStatusSnapshot ?? null"><RouterLink :to="{ path: '/overview', query: { project: selection.project.id } }">返回看板</RouterLink></ArtStatusBar>
+      <ArtStatusBar :show-creator="step >= 4" :show-model="step >= 2 && step <= 3" :jobs="jobsPanel?.readStatusSnapshot ?? null"><RouterLink :to="{ path: '/overview', query: { project: selection.project.id } }">返回看板</RouterLink></ArtStatusBar>
       <nav class="resource-steps panel" aria-label="资源生产步骤"><button v-for="(title,index) in steps" :key="title" :class="{ active: step === index }" :aria-current="step === index ? 'step' : undefined" @click="chooseStep(index)"><span>{{ index + 1 }}</span><strong>{{ title }}</strong><i v-if="index < steps.length - 1"></i></button></nav>
       <section v-if="step === 0" class="panel saved-project-spec" data-testid="saved-project-spec">
         <AiResourceReadView embedded/>

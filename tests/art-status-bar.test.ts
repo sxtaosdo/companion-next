@@ -21,7 +21,7 @@ async function enter(){
  const reader:AiResourceReadProvider={label:'isolated resource',readConfig:vi.fn(async()=>resourceView(id)),previewReference:vi.fn()}
  registerCompanionBrowserProvider(source);aiResourceReadProvider.value=reader
  await selection.directory.connect(source);selection.restoreRouteProject(id);resource.setContext(selection.project,selection.currentSource)
- wrapper=mount(ArtStatusBar,{global:{plugins:[pinia,ElementPlus]}});await flushPromises()
+ wrapper=mount(ArtStatusBar,{props:{projectPicker:false,showCreator:true},global:{plugins:[pinia,ElementPlus]}});await flushPromises()
  return {selection,resource,source,reader,operations:useCreatorOperationsStore(pinia)}
 }
 function tag(kind:string){const node=wrapper!.get(`[data-status="${kind}"]`);return node.classes().includes('el-tag')?node:node.get('.el-tag')}
@@ -72,6 +72,22 @@ describe('shared compact art status',()=>{
   directory.projectSnapshotRevision++;directory.statuses=[{projectId:id,state:'ready',capabilityProfile:'authoring'}];await flushPromises()
   expect(wrapper!.get('.art-creator-state').text()).not.toContain('结果未知')
   expect(wrapper!.get('.art-creator-state').text()).toContain('已就绪')
+ })
+ it('provides one shared real-project selector and hides Creator outside import context',async()=>{
+  const {selection,source}=await enter();await wrapper!.setProps({projectPicker:true,showCreator:false})
+  expect(wrapper!.find('input[aria-label="当前登记工程"]').exists()).toBe(true)
+  expect(wrapper!.find('.art-creator-state').exists()).toBe(false)
+  await wrapper!.setProps({showCreator:true});expect(wrapper!.find('.art-creator-state').exists()).toBe(true)
+  selection.directory.disconnect();await flushPromises()
+  expect(wrapper!.find('input[aria-label="当前登记工程"]').exists()).toBe(false)
+  expect(tag('registration').classes()).not.toContain('el-tag--success')
+  expect(source.loadProjects).toHaveBeenCalledTimes(1)
+ })
+ it('keeps an independent collector status separate from Creator and registration',async()=>{
+  await enter();await wrapper!.setProps({showCreator:false,service:{label:'采集器',text:'未确认就绪',tone:'warning'}})
+  expect(tag('service').classes()).toContain('el-tag--warning');expect(wrapper!.find('.art-creator-state').exists()).toBe(false)
+  await wrapper!.setProps({service:{label:'采集器',text:'已就绪',tone:'success'}})
+  expect(tag('service').classes()).toContain('el-tag--success');expect(tag('specification').classes()).toContain('el-tag--info')
  })
  it.each(['missing','invalid'] as const)('shows %s as a specification condition after a successful real-shaped read',async state=>{
   const {resource,reader}=await enter();await resource.readConfig(reader);resource.resource={...resource.resource!,state};await flushPromises()

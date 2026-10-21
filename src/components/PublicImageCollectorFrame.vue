@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { CircleCheck, Loading, Refresh, TopRight, Warning } from '@element-plus/icons-vue'
 import { PUBLIC_IMAGE_COLLECTOR_URL, PUBLIC_IMAGE_COLLECTOR_READY_TIMEOUT_MS, isPublicImageCollectorReady } from '../domain/public-image-collector'
+defineProps<{compact?:boolean}>()
+const emit=defineEmits<{(event:'status-change',value:'loading'|'ready'|'unconfirmed'):void}>()
 const frame=ref<HTMLIFrameElement|null>(null),generation=ref(0),state=ref<'loading'|'ready'|'unconfirmed'>('loading')
 const label=computed(()=>state.value==='ready'?'已就绪':state.value==='loading'?'加载中':'未确认就绪')
+watch(state,value=>emit('status-change',value),{immediate:true,flush:'sync'})
 let timer:ReturnType<typeof setTimeout>|undefined,disposed=false
 function clearTimer(){if(timer!==undefined)clearTimeout(timer);timer=undefined}
 function waitForReady(){clearTimer();timer=setTimeout(()=>{timer=undefined;if(!disposed&&state.value!=='ready')state.value='unconfirmed'},PUBLIC_IMAGE_COLLECTOR_READY_TIMEOUT_MS)}
@@ -15,7 +18,7 @@ onBeforeUnmount(()=>{disposed=true;clearTimer();window.removeEventListener('mess
 </script>
 <template>
  <section class="collector-workspace" data-testid="public-image-collector">
-  <header class="collector-toolbar"><div class="collector-status" role="status" aria-live="polite"><strong>素材采集器</strong><el-tag size="small" :type="state==='ready'?'success':state==='loading'?'info':'warning'" :aria-busy="state==='loading'"><el-icon :class="{'is-loading':state==='loading'}"><component :is="state==='ready'?CircleCheck:state==='loading'?Loading:Warning"/></el-icon>{{ label }}</el-tag></div><div class="collector-actions"><el-button size="small" :icon="Refresh" :disabled="state==='loading'" @click="retry">重试加载</el-button><a class="el-button el-button--small" :href="PUBLIC_IMAGE_COLLECTOR_URL" target="_blank" rel="noopener noreferrer"><el-icon aria-hidden="true"><TopRight/></el-icon><span>独立窗口</span></a></div></header>
+  <header class="collector-toolbar"><div v-if="!compact" class="collector-status" role="status" aria-live="polite"><strong>素材采集器</strong><el-tag size="small" :type="state==='ready'?'success':state==='loading'?'info':'warning'" :aria-busy="state==='loading'"><el-icon :class="{'is-loading':state==='loading'}"><component :is="state==='ready'?CircleCheck:state==='loading'?Loading:Warning"/></el-icon>{{ label }}</el-tag></div><div class="collector-actions"><el-button size="small" :icon="Refresh" :disabled="state==='loading'" @click="retry">重试加载</el-button><a class="el-button el-button--small" :href="PUBLIC_IMAGE_COLLECTOR_URL" target="_blank" rel="noopener noreferrer"><el-icon aria-hidden="true"><TopRight/></el-icon><span>独立窗口</span></a></div></header>
   <div class="collector-stage" :aria-busy="state==='loading'">
    <iframe :key="generation" ref="frame" v-show="state==='ready'" class="collector-frame" :src="PUBLIC_IMAGE_COLLECTOR_URL" title="独立素材采集器" referrerpolicy="no-referrer" @error="frameFailed"/>
    <div v-if="state!=='ready'" class="collector-placeholder" role="status"><el-icon :class="{'is-loading':state==='loading'}" :size="28"><component :is="state==='loading'?Loading:Warning"/></el-icon><strong>{{ state==='loading'?'正在等待采集器就绪':'尚未收到采集器就绪确认' }}</strong><p v-if="state==='unconfirmed'">请在 public-image-review 目录运行 <code>npm run start:companion</code>，再重试加载；也可在独立窗口检查。</p></div>

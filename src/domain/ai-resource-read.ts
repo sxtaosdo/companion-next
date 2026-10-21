@@ -310,7 +310,7 @@ export async function verifyAiReferencePreview(value: unknown): Promise<AiRefere
   const preview = decodeAiReferencePreview(value)
   if (!globalThis.crypto?.subtle) throw new AiResourceReadError('verification-unavailable', previewEndpoint)
   let digest: ArrayBuffer
-  try { digest = await globalThis.crypto.subtle.digest('SHA-256', previewBytes(preview.base64)) }
+  try { digest = await globalThis.crypto.subtle.digest('SHA-256', new Uint8Array(previewBytes(preview.base64))) }
   catch { throw new AiResourceReadError('verification-unavailable', previewEndpoint) }
   const sha256 = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
   if (sha256 !== preview.sha256) throw invalid(previewEndpoint)

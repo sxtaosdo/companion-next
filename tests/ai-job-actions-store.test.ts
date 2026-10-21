@@ -197,3 +197,51 @@ describe('rejected post-dispatch read drainage', () => {
     expect(readAiWriteFences(saved)).toHaveLength(1);expect(lock.locked()).toBe(true);expect(store.readback).toBeNull()
   })
 })
+
+describe('strict read-only legacy variant dispatch observation', () => {
+  function fixture() {
+    const snapshot = job('selected'), variant = { candidateId, width: 96, height: 96, fileSha256: 'e'.repeat(64), receiptSha256: 'f'.repeat(64), destinationUrl: 'db://assets/icons/gem-96.png' }
+    const observation = { schemaVersion: 'variant-dispatch-observation-v1' as const, state: 'not-started' as const, effectApplied: false as const,
+      originalReceipt: null, leaseDisposition: 'not-claimed' as const, reason: 'KNOWN_LEGACY_PREPARE_REJECTED_BEFORE_READ_WRITE' as const,
+      binding: { projectId: id, jobId, revision: 1, requestHash: snapshot.requestHash, sourceRevision: snapshot.sourceRevision,
+        motherSha256: snapshot.candidates[0]!.fileSha256, configHash: 'd'.repeat(64), ...variant }, taskSha256: '1'.repeat(64), observedAt: '2026-10-21T12:00:00.000Z' }
+    snapshot.variantDispatchObservation = observation
+    const fence = { key: `${id}/${jobId}/import-variant/1/${candidateId}/96x96`, projectId: id, jobId, operation: 'import-variant' as const,
+      revision: 1, requestHash: snapshot.requestHash, sourceRevision: snapshot.sourceRevision, variant }
+    return { snapshot, observation, fence }
+  }
+  it('uses existing refresh to release only the exact proven pre-dispatch fence without sending a write or inventing a receipt', async () => {
+    const { snapshot, fence } = fixture(), saved = storage(); putAiWriteFence(saved,fence)
+    putAiWriteFence(saved,{...fence,key:fence.key+'-other',variant:{...fence.variant,width:97}})
+    const { store,write } = setup(snapshot,saved)
+    expect(await store.refreshStatus()).toBe(true)
+    expect(readAiWriteFences(saved)).toEqual([expect.objectContaining({key:fence.key+'-other'})])
+    expect(store.observed?.import).toBeNull(); expect(store.observed?.variantImport).toBeUndefined()
+    expect(store.phase).toBe('not-sent'); expect(store.message).toContain('未调用 Creator'); expect(write.execute).not.toHaveBeenCalled()
+  })
+  it.each(['candidateId','width','height','fileSha256','receiptSha256','destinationUrl','revision','requestHash','sourceRevision','projectId','jobId'] as const)('does not release a mismatched %s binding', async key => {
+    const {snapshot,observation,fence}=fixture(), saved=storage(); putAiWriteFence(saved,fence)
+    const b = observation.binding as unknown as Record<string, unknown>
+    b[key] = typeof b[key] === 'number' ? Number(b[key])+1 : key === 'candidateId' ? 'CANDIDATE-other-1' : key === 'destinationUrl' ? 'db://assets/icons/other.png' : key === 'jobId' ? 'STUDIO-RUN-other-0123abcd' : key === 'projectId' ? 'fedcba9876543210' : '0'.repeat(key === 'sourceRevision' ? 40 : 64)
+    const {store}=setup(job('selected'),saved); const read=reader(snapshot)
+    store.setContext(project,source,job('selected'),read,writer()); await store.refreshStatus(); expect(readAiWriteFences(saved)).toHaveLength(1)
+  })
+  it.each(['effect','lease','receipt','reason','mother','config','active-import','extra'])('retains original fence for malformed or nonproof %s',async kind => {
+    const {snapshot,observation,fence}=fixture(),saved=storage(); putAiWriteFence(saved,fence)
+    const raw=observation as unknown as Record<string,unknown>
+    if(kind==='effect') raw.effectApplied='UNKNOWN'
+    if(kind==='lease') raw.leaseDisposition='RELEASED'
+    if(kind==='receipt') raw.originalReceipt={state:'done'}
+    if(kind==='reason') raw.reason='NO_RECORD'
+    if(kind==='mother') observation.binding.motherSha256='0'.repeat(64)
+    if(kind==='config') observation.binding.configHash='0'.repeat(64)
+    if(kind==='active-import') snapshot.import={operationId:'icon-import-'+ 'a'.repeat(32),state:'STARTED',effectApplied:'UNKNOWN',leaseState:'UNKNOWN',errorCode:null,tools:[]}
+    if(kind==='extra') raw.untrusted=true
+    const {store}=setup(job('selected'),saved); store.setContext(project,source,job('selected'),reader(snapshot),writer()); expect(await store.refreshStatus()).toBe(false)
+    expect(readAiWriteFences(saved)).toHaveLength(1)
+  })
+  it('absence of a record or observation never releases same-revision UNKNOWN',async()=>{
+    const {snapshot,fence}=fixture(),saved=storage();delete snapshot.variantDispatchObservation;putAiWriteFence(saved,fence)
+    const {store}=setup(snapshot,saved);await store.refreshStatus();expect(readAiWriteFences(saved)).toHaveLength(1)
+  })
+})
