@@ -130,10 +130,10 @@
 | 环境键（统一前缀CREATOR_AI_ICONS_） | 用途与代码约束 | 只读核实的候选 / 缺失 |
 |---|---|---|
 | STUDIO_ROOT | 可信美术工具根目录；包含固定companion_api.py、tsx入口及local-icon-import.ts；不能由浏览器选择 | 候选 `D:/code/shidai3/P9000/ai-game-studio`。三处约定入口存在且已记录SHA；**不是原绑定证明** |
-| PYTHON | 执行固定Python工具/图像处理；公开工具文档要求Python3.12与已安装Pillow | 候选 `C:/Users/33272/miniconda3/python.exe` 存在，但当前未发现Pillow，不能视为完整可用工具环境。两处Studio常见.venv入口不存在；合格解释器仍缺 |
+| PYTHON | 执行固定Python工具/图像处理；公开工具文档要求Python3.12与已安装Pillow | 推荐候选 `C:/ai/ComfyUI/py/python.exe`：Python3.12.15、Pillow12.3.0；固定companion_api.py的--help和纯内存PNG读写/LANCZOS缩放均通过。来自已知conda环境清单，仅运行解释器检查，未启动ComfyUI或模型；不是原绑定证明。miniconda3主环境3.12.9无Pillow，两个Studio .venv不存在 |
 | NODE | 运行既有TypeScript/Creator导入桥的Node解释器 | 候选 `C:/Program Files/nodejs/node.exe`，与当前PID21872的可执行文件一致，SHA已记录；原Icons绑定仍未证实 |
 | CLI | 固定官方Creator CLI入口，供独立导入动作调用 | 候选 `D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js` 存在并已记录SHA；不因此获得导入/启动授权 |
-| STORE | 本地任务、候选及产物状态目录；接口要求显式路径，不能与目标工程重合或互为父子目录 | **原路径缺失，无已验证候选。** 不猜路径、不创建空库冒充历史，也不把现有82条旧读取证据当成当前已找到库 |
+| STORE | 本地任务、候选及产物状态目录；接口要求显式路径，不能与目标工程重合或互为父子目录 | 原路径缺失。建议新库 `D:/CompanionData/art-task-store-v1`，当前不存在、未创建，解析后不在目标工程内且不互为父子；须获批后创建并再次验证真实路径。明确是全新空库，不把82条旧读取证据当成已找回历史 |
 
 原明确引用的三处历史Temp回执目录已不存在，仓库的明确部署回执没有五绑定值。只能把这些工具路径作为重新配置候选，不能称为恢复原权限。
 
@@ -148,7 +148,7 @@
 - 配置核准后在单独维护窗口通过官方流程替换Companion进程即可加载新环境；无需重启知识服务/Creator或加载模型。维护前检查in-flight/UNKNOWN并保存现有启动信息，不能用重启掩盖不确定执行。
 - 回滚：恢复原启动绑定与静态入口（若有变更），用官方维护流程替换Companion；不清理规范、任务、租约历史或UNKNOWN。现有文件写入另受CAS/收据保护，不靠简单环境回滚撤销。
 
-当前缺合格Python和STORE，故不提供可直接执行的恢复命令。本轮没有修改绑定、权限、机器环境或启动配置。候选元数据在 `C:/Users/33272/AppData/Local/Temp/companion-model-art-20261021/binding-candidates.json`；诊断在Temp的 `resource-config-read-diagnostic-20261021.json`。
+现已找到符合公开工具版本要求的Python候选，并提出新STORE具体路径；尚未授权/创建/接入，故不提供让用户直接执行的恢复命令。本轮没有修改绑定、权限、机器环境或启动配置。候选元数据在 `C:/Users/33272/AppData/Local/Temp/companion-model-art-20261021/binding-candidates.json`；诊断在Temp的 `resource-config-read-diagnostic-20261021.json`。
 
 ## 7. 最小可交付阶段与验收
 
@@ -178,10 +178,43 @@
 
 架构建议由 `/root/project_art_architecture` 只读角色复核；流程事实由 `/root/knowledge_qa_compact`、配置根因由 `/root/knowledge_status_compact` 只读核查。主会话形成本Markdown方案；这些为任务级prompt角色，不声称硬隔离或已有用户批准。
 
-## 9. 下一步责任与精确授权前提
+## 10. 下一步责任与精确授权前提
 
-我们可继续准备（不启用、不安装、不生成）：核查本机已有Python是否包含Pillow，限定已知工具环境而非全盘扫描；列出新建专用STORE的候选位置与预计写入内容，验证路径不在工程内且不与工程互为父子；形成五项完整配置清单、依赖版本、文件哈希、offline_import_only启动参数、维护窗口和回滚步骤。旧STORE历史路径查不到不必永久阻塞：可提出“全新空任务库”的独立方案，但必须明确不会自动找回旧任务或冒称恢复历史库，先得到用户确认后才创建。
+### 已完成的只读准备
 
-真正需要用户确认的是：使用哪个目标工程作隔离/随后真实闭环验收；认可完整可信工具路径及新STORE或已确认历史STORE的读写范围；允许维护窗口仅替换Companion进程；离线验证后首批资源类别、权威配置路径与迁移差异。现阶段不用用户手填五个环境变量。若本机没有合格Python环境，我们先报告精确依赖差距及最小安装方案，未获批准不安装。
+仅查已知miniconda3/envs、明确登记的conda环境清单和两个Studio .venv路径；未全盘扫描、未查凭据目录。结果：
 
-完成上述前提才提交可执行接入方案；不会在路径或依赖仍未核实时要求用户批准模糊的“恢复全部权限”。真实生成、付费调用、模型启动、生产规范保存与Creator资源导入仍需在各自明确范围获批，不能由offline模式授权自动推导。
+| 解释器 | 版本与Pillow | 结论 |
+|---|---|---|
+| `C:/Users/33272/miniconda3/python.exe` | Python3.12.9，无Pillow | 不选 |
+| `C:/Users/33272/miniconda3/envs/qwen-convert/python.exe` | Python3.11.15，无Pillow | 不选 |
+| `C:/Users/33272/miniconda3/envs/sd-webui-amd/python.exe` | Python3.10.20，Pillow9.5.0 | 不符合公开工具Python3.12要求，不选 |
+| `C:/ai/ComfyUI/py/python.exe` | Python3.12.15，Pillow12.3.0 | 推荐候选；固定工具--help退出0，PNG纯内存读写与LANCZOS缩放退出0 |
+
+推荐解释器SHA256：`a23a2e27c7f51886fbd683181d0ddcbb1b87c95d77e46758f147f4d0b68178a7`。只调用解释器和Pillow，不运行ComfyUI入口、torch推理或网络请求。后续维护前重新核验完整工具文件哈希及版本；上述检查不是完整真实资源业务验收。
+
+### 新STORE范围与历史影响
+
+建议 `D:/CompanionData/art-task-store-v1`。只读检查时目标及父目录均不存在，D盘存在；没有创建目录或探测写权限。其解析路径与已知工程根分离，正式启用前需再次核验真实路径、别名/链接和工程边界；不修改ACL。若普通用户权限不能创建则明确报错，不提升权限强建。
+
+按现有代码，该根目录用于：
+
+- `<projectId>/<jobId>/local-comfy/`：task.json、身份/配置证据、选择状态、锁、过程日志和导入结果围栏；`content/`保存候选PNG、候选清单、合同及采用来源证据。仅在对应动作获准后产生。
+- `companion-resource-snapshots/<projectId>/<jobId>.json`：任务封存规范；`companion-reference-snapshots/<sha>.png`：引用图片封存。
+- `companion-reference-crop-receipts/<projectId>/`、`companion-variant-receipts/<projectId>/`：裁切和尺寸变体收据。裁切/导出仍会另外写工程的既有受限art路径，不能称为“只写STORE”。
+
+这是**全新空任务库**：初始任务列表为空，不复制、不删改、不迁移旧任务，也不证明原82项所在库已找回。旧工程规范文件继续留在工程内，不因新库消失；已有工程图片也不删除。但旧jobId、规范快照、候选、采用来源、裁切/变体和导入验证依赖的库内收据不会自动出现，部分旧产物只能浏览文件、不能通过新库继续执行或证明导入，必须保留“缺历史证据”状态。将来找到原库，先只读核对schema、工程归属、任务/收据哈希与UNKNOWN，另提显式迁移方案，不能直接合并覆盖。
+
+新库不是任意文件上传目录，也不是新的跨工程文件权限。宿主全局绑定会对所有已登记工程路由生效，现有五项环境键没有“仅某工程启用”的范围开关，不能承诺物理上只暴露蚂蚁工程。初次验收只操作用户指定的隔离工程，已有projectId/注册路径与规范归属检查继续生效；若用户要求仅一个工程在接口层可用，需另行提出宿主范围限制方案，当前不修改。
+
+### 可一次确认的受限接入方案
+
+请用户确认这一具体范围即可，不用填写环境变量：
+
+1. 使用第6节的Studio/Node/CLI及本节Python候选，创建上述全新STORE；不安装、不改ACL、不读取模型权重。
+2. `CREATOR_AI_ICONS_MODE=offline_import_only`；不设置生成ENDPOINT、LEASE或ADOPTION_MANIFEST，不开放真实生成或任意候选采用。若继承环境存在这些项，先报告并在该次受限启动环境显式排除，不能默许切回generation。
+3. 在单独维护窗口通过官方生命周期替换Companion一次以加载配置；不重启Creator、知识服务或模型。维护前核实动作排空/UNKNOWN，并保护当前UI和启动信息；未满足则停在明确阻塞，不能靠重启消除UNKNOWN。
+4. 先在用户指定的隔离工程验证读规范、显式新建/保存/重读及冲突保护。生产工程规范写入、裁切/导出、Creator导入均不包含在泛化接入授权中；需明确相应目标和写范围后执行。已有可信PNG如需离线采用，另审受信清单和来源，不因新库自动授权。
+5. 回滚仅恢复原启动配置并经官方流程替换Companion；保留新库及证据，不删除旧/新任务，不用环境回滚撤销已确认的工程文件写入。
+
+我们可继续准备完整启动清单、全工具SHA/依赖复核、维护前检查和隔离验收脚本；不再将“找不到原STORE”作为无限期阻塞。现在真正需要确认的是上述新库及可信执行范围、全局登记工程接口影响、维护窗口、用于显式保存验收的隔离工程。真实生成、付费API、模型启动、新schema和生产规范迁移仍独立待确认。
