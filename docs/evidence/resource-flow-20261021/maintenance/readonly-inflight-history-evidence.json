@@ -1,0 +1,35 @@
+{
+  "source": "Transcribed from prior successful read-only tool outputs in this agent turn; not a new observation",
+  "observedAtNotCaptured": true,
+  "productionMutation": false,
+  "inflight": {
+    "route": "GET /v1/daemon/inflight",
+    "phase": "DRAINING",
+    "pid": 21872,
+    "startupEpoch": "aff8b2a9-97a7-4e58-a6b8-4d9fe1a2d5fe",
+    "entrySha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "generation": 5538,
+    "allCurrentBusyObserverVerifierCounts": 0,
+    "nativeEpochUnproven": 2,
+    "unknown": [
+      "NATIVE_PRIOR_EPOCH_UNVERIFIED"
+    ]
+  },
+  "history": {
+    "route": "GET /v1/daemon/native-history",
+    "historicalUnknownCount": 2,
+    "archivedUnknownCount": 0,
+    "unprovenInFlightCount": 2,
+    "quiescenceEvidenceCount": 0,
+    "aggregates": [
+      {
+        "aggregateDigest": "e3cfcdda5ae72201f1496d03cdb635a713ddc6ea0b2a874327bc6d0bf862749f",
+        "count": 2,
+        "epoch": "62e066f5-5081-43e4-a19c-242889e46a90",
+        "contextCoverage": "UNVERIFIED",
+        "hasBootSession": false,
+        "anchored": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "mapPath": "D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/companion-daemon.js.map",
+  "mapSha256": "a37eab4792d6b9b98365a8b1823513d322701422ff5b860179cc00ba00c1b878",
+  "sources": [
+    {
+      "name": "icon-resource-config.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/icon-resource-config.ts",
+      "sha256": "1912f7a6c35fbf55c936546a5147680b334aee0b42fc0b46bd84d4c045a0c525"
+    },
+    {
+      "name": "icon-image-assets.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/icon-image-assets.ts",
+      "sha256": "1c0119242129650806801a06a5164279291a83a3075d6b369fcac8745358664d"
+    },
+    {
+      "name": "knowledge-adapter.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/knowledge-adapter.ts",
+      "sha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663"
+    },
+    {
+      "name": "icon-handoff.ts",
+      "mapSource": "../../companion-client-rollback-fix-20261019/mcp/src/companion/icon-handoff.ts",
+      "sha256": "35da7b391cf7018bf8d6069497c93a43af310fa989e4507a43d86551c38fb5df"
+    }
+  ],
+  "noSourcePatches": true,
+  "dependency": "existing esbuild and installed zod",
+  "noDaemonEntryExecuted": true,
+  "compiledModuleSha256": "8ca6d8ad2bdf9e96dc9e5383fb65d14732446ecfe72fa398028121524bd97fef",
+  "zodVersion": "4.4.3",
+  "esbuildVersion": "0.25.12",
+  "studioHead": "fbceaea84d13639b98932de1813ac9bd17dd585c",
+  "studioSources": [
+    {
+      "path": "D:/code/shidai3/P9000/ai-game-studio/project/tools/local-icons/companion_api.py",
+      "sha256": "1b1b918d13f045173dba2e484c20b3ae8f9388f094397bbb1938a6512607979b"
+    },
+    {
+      "path": "D:/code/shidai3/P9000/ai-game-studio/project/tools/local-icons/local_icons.py",
+      "sha256": "3fd53335dfa41879df69d439eb2c3c76f7d719c882f04c7e05744ab2122b2964"
+    }
+  ]
+}

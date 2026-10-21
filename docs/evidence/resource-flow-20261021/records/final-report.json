@@ -1,0 +1,70 @@
+{
+  "scope": "isolated offline actual functions and CLI; no host UI connection",
+  "root": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021",
+  "actualPassedStages": [
+    "isolated_git_head",
+    "synthetic_png",
+    "missing_draft",
+    "save_reread",
+    "stale_save_rejected",
+    "prepare_sealed",
+    "studio_inspect",
+    "enqueue_offline_rejected",
+    "run-next_offline_rejected",
+    "resume_offline_rejected",
+    "synthetic_adoption_rejected",
+    "cpu_export_actual_not_task_export",
+    "cpu_no_overwrite",
+    "cpu_receipt_readback",
+    "boundaries"
+  ],
+  "simulatedStages": [],
+  "pngReadback": {
+    "format": "PNG",
+    "width": 96,
+    "height": 96,
+    "mode": "RGBA",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "transparentPixels": 5983,
+    "visiblePixels": 3233,
+    "sha256": "a98df5e8d5f8cc7f4b584fd7d9b75193a76cb9b09cab313c5b6236e77b062a84",
+    "modelGenerated": false,
+    "scope": "actual installed CPU exporter only; not full task export"
+  },
+  "blocked": [
+    "trusted existing generated PNG + adoption manifest required for adopt/select/task-bound export success",
+    "host remains DRAINING; no host APIs used"
+  ],
+  "safety": {
+    "modelRequests": 0,
+    "listenersOpened": 0,
+    "hostRegistration": false,
+    "productionWrites": 0,
+    "sourcePatches": false
+  },
+  "runtimeQualification": {
+    "initialExecutionPython": "C:/Users/33272/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/python.exe",
+    "initialRuntimeWasApprovedBinding": false,
+    "approvedPython": {
+      "python": "C:\\ai\\ComfyUI\\py\\python.exe",
+      "version": "3.12.15 | packaged by Anaconda, Inc. | (main, Oct  1 2026, 20:14:50) [MSC v.1942 64 bit (AMD64)]",
+      "pillow": "12.3.0"
+    },
+    "approvedPythonRechecked": [
+      "Studio inspect on existing prepared request",
+      "actual installed CPU exporter on independent assetId",
+      "PNG decode/SHA/dimensions/alpha and receipt readback"
+    ],
+    "configSavedAgain": false,
+    "completeHostBindingValidated": false,
+    "fullTaskExportValidated": false
+  },
+  "approvedPythonCheck": "records/approved-python-check.json",
+  "artifactManifestPolicy": "artifact-manifest.json excludes itself; all other files hashed after final report update",
+  "initialFailureRetained": true,
+  "initialExecutionFailure": "普通执行link返回EPERM，同预期隔离目标在获准执行环境补跑成功；未独立确定根因，未改ACL/算法。原failure.json保留。",
+  "executionRecordCount": 16,
+  "distinctStageCount": 15,
+  "countingNote": "16条执行记录、15个不同stage；missing_draft重复观察不计作额外测试。"
+}

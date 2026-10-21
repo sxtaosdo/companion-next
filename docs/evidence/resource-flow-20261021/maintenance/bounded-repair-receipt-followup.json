@@ -1,0 +1,29 @@
+{
+  "documentsRead": [
+    "docs/boot-writer-recovery-closeout-20261020.md",
+    "docs/boot-admission-fix-scope-review-20261020.md",
+    "docs/evidence/boot-writer-20261020/REPAIR.md",
+    "docs/evidence/boot-writer-20261020/installed.json",
+    "docs/evidence/boot-writer-20261020/build-result.json",
+    "docs/evidence/boot-writer-20261020/independent-source-binding.json",
+    "docs/evidence/boot-writer-20261020/sha256.json"
+  ],
+  "installedReceipt": {
+    "atUtc": "2026-10-20T01:33:21.563144+00:00",
+    "daemonSha256": "70df42a8f84e6bf9d32c050919fcb91565ff4b53ff9f85a3b1e50664d267ca65",
+    "mapSha256": "a37eab4792d6b9b98365a8b1823513d322701422ff5b860179cc00ba00c1b878",
+    "changedFiles": 2,
+    "uiAndCliUnchanged": true,
+    "serviceStarted": false
+  },
+  "baselineByteIdentical": true,
+  "baselineSha256": "71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f",
+  "missingThreeInBaselineAndCandidateInputPaths": true,
+  "missingThreeHaveOwnedHashRecords": false,
+  "referencedIndependentGitCommits": [
+    "5b39b55",
+    "7965c4b"
+  ],
+  "referencesExistInKnownSharedCocosGit": false,
+  "conclusion": "Receipt binds exact current daemon/map hashes, but missing three source hashes or saved source snapshots are not present in these bounded records. No missing source copied; no wider Temp/history search or build attempted."
+}

@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-10-21T03:46:46.159Z",
+  "realClasses": true,
+  "productionMutations": false,
+  "passed": 18,
+  "total": 18,
+  "results": [
+    {
+      "name": "Original reproduces permanently DRAINING with only historical uncertainty",
+      "passed": true
+    },
+    {
+      "name": "Candidate restores OPEN without deleting history or claiming global/native cancellation proof",
+      "passed": true
+    },
+    {
+      "name": "Recovery does not grant stopping: a second unproved stop is still rejected",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen while current nativeAwaiting remains",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen while current nativeUncertain remains",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen while current projectActions remains",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen while current globalActions remains",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen while current icons remains",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen while current ownerBusy remains",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen while current recovery remains",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen with current/foreign unknown NATIVE_OUTCOME_UNCONFIRMED",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen with current/foreign unknown BACKGROUND_OBSERVATION_FAILED",
+      "passed": true
+    },
+    {
+      "name": "Does not reopen with current/foreign unknown ICON_INFLIGHT_UNVERIFIED",
+      "passed": true
+    },
+    {
+      "name": "Actual active HTTP completion retains gate until release and does not lose generation tracking",
+      "passed": true
+    },
+    {
+      "name": "Actual concurrent observer prevents admission recovery until it settles",
+      "passed": true
+    },
+    {
+      "name": "Timed-out verifier retains admission gate while real verification is still unsettled",
+      "passed": true
+    },
+    {
+      "name": "Identity and stale generation guards reject before closing admission",
+      "passed": true
+    },
+    {
+      "name": "Truly idle stop still reaches STOPPING and is never reopened",
+      "passed": true
+    }
+  ],
+  "artifacts": {
+    "original/lifecycle-drain.ts": "935242a4e5d5b7cec31b0c6a8c6efa5f2c1a99b15dac13f5d22f22be83abdb16",
+    "candidate/lifecycle-drain.ts": "8fd66fdd2755035e574541c3dcf3ccd854212a9b83e540386b0fae42f0f94cfd",
+    "original/lifecycle-drain.cjs": "1a48da84d5385402c8838aa0af971cb195f0a1921d7eef0de5f851b12e9a6741",
+    "candidate/lifecycle-drain.cjs": "1ccb355d03a687090a656bcc2a7e5b5de41586fad7a41e19d143538865abe25e",
+    "candidate.patch": "ee5af2733c4ad286376f7e7a837a044c683f0e16e0eff1d4e869ea8e0eaee032",
+    "verify.cjs": "8fdda429c5af8591e77026662143e4f928d3979fd73bd42a92570801afa0b1c8"
+  }
+}

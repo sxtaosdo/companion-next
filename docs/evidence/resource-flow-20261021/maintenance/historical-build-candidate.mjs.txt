@@ -1,0 +1,36 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {createHash} from 'node:crypto';
+import {dirname} from 'node:path';
+const root='C:/Users/33272/AppData/Local/Temp/companion-client-rollback-fix-20261019/mcp';
+const work='C:/Users/33272/AppData/Local/Temp/companion-boot-repair-20261020';
+const live='D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion';
+const sha=x=>createHash('sha256').update(x).digest('hex');
+const originalHash=sha(await readFile(live+'/companion-daemon.js'));
+if(originalHash!=='71cbf7d8bc200fdcc867da7ed3d671f00721e3cc025098624ba54a15ba8a167f')throw Error('Installed baseline changed');
+const map=JSON.parse(await readFile(live+'/companion-daemon.js.map','utf8')),original=new Map();
+for(let i=0;i<map.sources.length;i++){const m=map.sources[i].match(/\/mcp\/src\/(.+)$/);if(m&&map.sourcesContent[i]!==null)original.set('src/'+m[1],map.sourcesContent[i]);}
+if(original.size!==82)throw Error('Unexpected installed source count');
+const keys=['native-boot-authority.ts','native-maintenance.ts','native-epoch-journal.ts','native-writer-recovery.ts','windows-writer-lock-retention.ts','legacy-writer-recovery.json'].map(x=>'src/companion/'+x);
+const overlays=new Map(await Promise.all(keys.map(async k=>[k,await readFile(work+'/'+k,'utf8')])));
+const {build}=createRequire(root+'/package.json')('esbuild');
+async function compile(kind,patch){
+ const out=work+'/'+kind;await mkdir(out,{recursive:true});
+ const result=await build({absWorkingDir:root,entryPoints:['src/companion-daemon.ts'],outfile:out+'/companion-daemon.js',bundle:true,platform:'node',format:'esm',target:'node20',sourcemap:true,metafile:true,
+ external:['playwright','playwright-core','chromium-bidi','fsevents','better-sqlite3','typescript'],banner:{js:'#!/usr/bin/env node\nimport { createRequire } from "node:module"; const require = createRequire(import.meta.url);'},
+ plugins:[{name:'installed-source-overlay',setup(b){
+  b.onResolve({filter:/(?:creator-process-stop|native-writer-recovery|windows-writer-lock-retention)\.js$|legacy-writer-recovery\.json$/},args=>({path:root+'/src/companion/'+args.path.split('/').at(-1).replace(/\.js$/,'.ts')}));
+  b.onLoad({filter:/\.(?:ts|json)$/},args=>{const key=args.path.replaceAll('\\','/').slice(root.length+1);const content=patch&&overlays.has(key)?overlays.get(key):original.get(key);return content===undefined?null:{contents:content,loader:key.endsWith('.json')?'json':'ts',resolveDir:dirname(args.path)};});
+ }}]});
+ const builtMap=JSON.parse(await readFile(out+'/companion-daemon.js.map','utf8')),owned=[];
+ for(let i=0;i<builtMap.sources.length;i++){const m=builtMap.sources[i].match(/\/mcp\/src\/(.+)$/);if(!m)continue;const key='src/'+m[1],content=builtMap.sourcesContent[i],expected=patch&&overlays.has(key)?overlays.get(key):original.get(key);if(content!==expected||expected===undefined)throw Error('Unexpected source '+key);owned.push({path:key,sha256:sha(content),overlay:patch&&overlays.has(key)});}
+ return {jsSha256:sha(await readFile(out+'/companion-daemon.js')),mapSha256:sha(await readFile(out+'/companion-daemon.js.map')),owned,inputs:Object.keys(result.metafile.inputs)};
+}
+const baseline=await compile('baseline',false);
+if(baseline.jsSha256!==originalHash)throw Error('Baseline bundle is not byte identical');
+const candidate=await compile('candidate',true);
+if(JSON.stringify(candidate.owned.filter(x=>x.overlay).map(x=>x.path).sort())!==JSON.stringify(keys.sort()))throw Error('Overlay set mismatch');
+if(candidate.owned.length!==85)throw Error('Own source count mismatch');
+const proof={atUtc:new Date().toISOString(),originalHash,baselineByteIdentical:true,baseline,candidate,sharedSourceModified:false,uiOrCliBuilt:false};
+await writeFile(work+'/build-result.json',JSON.stringify(proof,null,2)+'\n');
+console.log(JSON.stringify({baselineByteIdentical:true,candidateHash:candidate.jsSha256,ownedSources:candidate.owned.length,overlays:keys}));

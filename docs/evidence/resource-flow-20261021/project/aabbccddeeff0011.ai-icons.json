@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "project-resource-config-v2",
+  "projectId": "aabbccddeeff0011",
+  "version": 1,
+  "designResolution": {
+    "width": 750,
+    "height": 1334
+  },
+  "orientation": "portrait",
+  "iconSize": {
+    "width": 96,
+    "height": 96
+  },
+  "style": {
+    "description": "Synthetic CPU test only; not model-generated.",
+    "references": [
+      "art/reference/synthetic-reference.png"
+    ]
+  },
+  "background": {
+    "format": "png",
+    "transparent": true,
+    "color": "#ffffff"
+  },
+  "composition": {
+    "centered": true,
+    "paddingPercent": 10
+  },
+  "destination": {
+    "directory": "assets/icons",
+    "exportDirectory": "art/final/companion",
+    "naming": "kebab-case"
+  }
+}

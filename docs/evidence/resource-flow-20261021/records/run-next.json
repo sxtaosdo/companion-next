@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "local-icons-api-v1",
+  "ok": false,
+  "error": {
+    "code": "GENERATION_DISABLED",
+    "message": "Offline import mode cannot submit or resume GPU work"
+  }
+}

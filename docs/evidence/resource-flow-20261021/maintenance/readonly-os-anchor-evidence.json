@@ -1,0 +1,12 @@
+{
+  "source": "Transcribed from prior successful read-only tool outputs in this agent turn; not a new observation",
+  "observedAtNotCaptured": true,
+  "productionMutation": false,
+  "method": "Installed-map sampleWindowsBootSession only; NativeBootAuthority/proof not invoked",
+  "sameMachine": true,
+  "sameKernelBoot": true,
+  "sameSystemProcessLifetime": false,
+  "currentSystemProcessCreatedAt": "2026-10-21T00:50:31.8468880Z",
+  "currentLastBootUpTime": "2026-10-21T00:50:24.5000000Z",
+  "bothRequiredDifferencesPresent": false
+}

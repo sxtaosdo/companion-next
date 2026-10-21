@@ -1,0 +1,38 @@
+{
+  "status": "ACTUAL_PASS",
+  "environment": {
+    "python": "C:\\ai\\ComfyUI\\py\\python.exe",
+    "version": "3.12.15 | packaged by Anaconda, Inc. | (main, Oct  1 2026, 20:14:50) [MSC v.1942 64 bit (AMD64)]",
+    "pillow": "12.3.0"
+  },
+  "inspectPassed": true,
+  "export": {
+    "relativePath": "art/final/companion/synthetic-comfy-python-cpu-only-96x96-d689fb47f5c5.png",
+    "sha256": "a98df5e8d5f8cc7f4b584fd7d9b75193a76cb9b09cab313c5b6236e77b062a84",
+    "sourceSha256": "d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48",
+    "width": 96,
+    "height": 96,
+    "created": true,
+    "upscaled": false,
+    "qualityLimit": null
+  },
+  "png": {
+    "format": "PNG",
+    "size": [
+      96,
+      96
+    ],
+    "mode": "RGBA",
+    "alpha": [
+      0,
+      255
+    ],
+    "sha256": "a98df5e8d5f8cc7f4b584fd7d9b75193a76cb9b09cab313c5b6236e77b062a84"
+  },
+  "receiptPath": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\store\\companion-variant-receipts\\aabbccddeeff0011\\55f9e8775075bad4613e7f2d146130ddac5e59778b19739c6dcac583efe58066.json",
+  "receiptSha256": "fbbc7e0da3d314817ea2821a2fc43ec505a98ad02d4cd5574ffd14fefa3600fd",
+  "configUnchanged": true,
+  "scope": "approved Python inspect + direct actual CPU class only; not full host binding or adopted task export",
+  "modelRequests": 0,
+  "listenersOpened": 0
+}

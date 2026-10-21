@@ -1,0 +1,188 @@
+[
+  {
+    "stage": "isolated_git_head",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "revision": "00bbbae331edf0ef4983e8822ba8c2aeeb67086a",
+      "registeredToHost": false
+    }
+  },
+  {
+    "stage": "synthetic_png",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "sourcePath": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\sources\\synthetic-not-generated.png",
+      "sha256": "d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48",
+      "size": [
+        1024,
+        1024
+      ],
+      "mode": "RGBA",
+      "modelGenerated": false
+    }
+  },
+  {
+    "stage": "missing_draft",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "state": "missing",
+      "detected": {
+        "designResolution": {
+          "width": 750,
+          "height": 1334
+        },
+        "designSource": "settings/v2/packages/project.json",
+        "resourceDirectories": [
+          "assets/icons",
+          "assets"
+        ]
+      }
+    }
+  },
+  {
+    "stage": "missing_draft",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "state": "missing",
+      "detected": {
+        "designResolution": {
+          "width": 750,
+          "height": 1334
+        },
+        "designSource": "settings/v2/packages/project.json",
+        "resourceDirectories": [
+          "assets/icons",
+          "assets"
+        ]
+      }
+    }
+  },
+  {
+    "stage": "save_reread",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "relativePath": "aabbccddeeff0011.ai-icons.json",
+      "version": 1,
+      "hash": "663b2b7f379c17eedb0a697469eaa1f457b5bbd03dd1a5b6489e9eb36ef2fc89"
+    }
+  },
+  {
+    "stage": "stale_save_rejected",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "code": "RESOURCE_CONFIG_STALE"
+    }
+  },
+  {
+    "stage": "prepare_sealed",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "hash": "663b2b7f379c17eedb0a697469eaa1f457b5bbd03dd1a5b6489e9eb36ef2fc89",
+      "referenceSnapshots": [
+        {
+          "relativePath": "art/reference/synthetic-reference.png",
+          "sha256": "d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48"
+        }
+      ],
+      "referencesAsModelInput": false
+    }
+  },
+  {
+    "stage": "studio_inspect",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "gap": {
+        "schemaVersion": "local-icon-gap-report-v1",
+        "requestSha256": "dee00f37425dcdcc13a9f36aab8a7bf190a4b60a279bff6346e5b3b137f8cbec",
+        "assets": [
+          {
+            "assetId": "synthetic-offline-icon",
+            "relativePath": "assets/icons/synthetic-offline-icon.png",
+            "required": true,
+            "status": "MISSING",
+            "detail": "No file at the explicitly requested target"
+          }
+        ],
+        "requiredMissing": [
+          "synthetic-offline-icon"
+        ],
+        "blockedExisting": []
+      }
+    }
+  },
+  {
+    "stage": "enqueue_offline_rejected",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "code": "GENERATION_DISABLED"
+    }
+  },
+  {
+    "stage": "run-next_offline_rejected",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "code": "GENERATION_DISABLED"
+    }
+  },
+  {
+    "stage": "resume_offline_rejected",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "code": "GENERATION_DISABLED"
+    }
+  },
+  {
+    "stage": "synthetic_adoption_rejected",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "code": "ADOPTION_SOURCE_INVALID",
+      "reason": "Synthetic is not existing comfyui-local provenance; no attribution falsified."
+    }
+  },
+  {
+    "stage": "cpu_export_actual_not_task_export",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "relativePath": "art/final/companion/synthetic-cpu-only-96x96-d689fb47f5c5.png",
+      "sha256": "a98df5e8d5f8cc7f4b584fd7d9b75193a76cb9b09cab313c5b6236e77b062a84",
+      "sourceSha256": "d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48",
+      "width": 96,
+      "height": 96,
+      "created": true,
+      "upscaled": false,
+      "qualityLimit": null,
+      "bindingAbsent": true,
+      "sameBytesReused": true
+    }
+  },
+  {
+    "stage": "cpu_no_overwrite",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "code": "OVERWRITE_FORBIDDEN",
+      "sentinelHash": "b2f3d5092c24cb99b49e4006e0c0f95862c5135edc57d45f80f73389d1500461"
+    }
+  },
+  {
+    "stage": "cpu_receipt_readback",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "receiptPath": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\store\\companion-variant-receipts\\aabbccddeeff0011\\be1f179c2e3137dc80f7649708f9c959db2c9127692176491de22a2d0b63240a.json",
+      "receiptSha256": "66d4b7e4c951461065e0222f058aa5c951adc6ea1832372a2ee95cb012648495",
+      "schemaVersion": "companion-icon-variant-v1",
+      "runtimeImported": false
+    }
+  },
+  {
+    "stage": "boundaries",
+    "status": "ACTUAL_PASS",
+    "detail": {
+      "listenersOpened": 0,
+      "modelRequests": 0,
+      "hostRegistration": false,
+      "productionWrites": 0,
+      "adoptSelectTaskExport": "BLOCKED_TRUSTED_EXISTING_GENERATED_PNG_AND_MANIFEST_REQUIRED",
+      "simulatedStages": []
+    }
+  }
+]

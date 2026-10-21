@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "local-icons-api-v1",
+  "ok": true,
+  "data": {
+    "jobId": "STUDIO-RUN-offline-fixture-deadbeef",
+    "gap": {
+      "schemaVersion": "local-icon-gap-report-v1",
+      "requestSha256": "dee00f37425dcdcc13a9f36aab8a7bf190a4b60a279bff6346e5b3b137f8cbec",
+      "assets": [
+        {
+          "assetId": "synthetic-offline-icon",
+          "relativePath": "assets/icons/synthetic-offline-icon.png",
+          "required": true,
+          "status": "MISSING",
+          "detail": "No file at the explicitly requested target"
+        }
+      ],
+      "requiredMissing": [
+        "synthetic-offline-icon"
+      ],
+      "blockedExisting": []
+    },
+    "profile": {
+      "schemaVersion": "local-icon-profile-v1",
+      "id": "z-image-turbo-digital-asset-v1",
+      "model": "z-image-turbo-Q8_0.gguf",
+      "clip": "Qwen_3_4b-Q8_0.gguf",
+      "lora": "DigitalAssetMedia_Redmond_ZImageTurbo.safetensors",
+      "vae": "ae.safetensors",
+      "backgroundRemoval": "birefnet.safetensors",
+      "width": 1024,
+      "height": 1024,
+      "seed": 20261010,
+      "steps": 8,
+      "cfg": 1,
+      "loraStrength": 0.8,
+      "sampler": "res_multistep",
+      "scheduler": "simple",
+      "maxAssets": 2,
+      "candidatesPerAsset": 1,
+      "submissionAttempts": 1,
+      "generationDeadlineSeconds": 360
+    },
+    "sourceRevision": "00bbbae331edf0ef4983e8822ba8c2aeeb67086a"
+  }
+}

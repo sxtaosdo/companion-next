@@ -27,3 +27,5 @@
 本批未修改共享旧宿主源码、安装文件、数据库或进程，也未启动模型。
 
 2026-10-21追加只读取证：安装版本OS采样与可信anchor比较为同机器、同kernel boot、不同System进程生命周期；退出验证要求后两者均不同，当前条件不满足。没有人工取消历史aggregate或公开resume入口。保留inflight/native-history与候选，由宿主维护方提供匹配完整源码和保留历史UNKNOWN的正式准入恢复及应用方案；当前没有获准的现场替换路径。未再次调用stop/proof/reconcile。
+
+补充来源定位：已从既有修复回执确认当前70df daemon和a37eab map的安装来源，原build-candidate.mjs仍可只读取得；它依赖的companion-client-rollback-fix-20261019/mcp工作树及三份fallback源码已不存在。既有归档仅6份overlay，没有三模块的原源码hash/快照；不能运行限定旧71cb baseline的脚本冒称当前可重建。所需维护输入是该次构建的完整工作树快照或权威同版三模块及构建输入清单，再于隔离环境逐字节复现70df后考虑已审补丁。取证摘要及历史脚本已归档至[evidence/resource-flow-20261021/maintenance](evidence/resource-flow-20261021/maintenance/)。

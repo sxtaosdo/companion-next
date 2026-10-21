@@ -1,0 +1,192 @@
+[
+  {
+    "path": "approved-python-check.cjs",
+    "bytes": 3892,
+    "sha256": "fd0ab74e8a6c7d6cf5410bb81ba1c97e8768a7a6cb8971956b4093e244511d6c"
+  },
+  {
+    "path": "installed-classes.cjs",
+    "bytes": 614591,
+    "sha256": "8ca6d8ad2bdf9e96dc9e5383fb65d14732446ecfe72fa398028121524bd97fef"
+  },
+  {
+    "path": "installed-src\\entry.ts",
+    "bytes": 137,
+    "sha256": "0fe91207e346e40c22a3e75ec0dc422abda9baa0372d11c237f0cc735faaec0e"
+  },
+  {
+    "path": "installed-src\\icon-handoff.ts",
+    "bytes": 6145,
+    "sha256": "35da7b391cf7018bf8d6069497c93a43af310fa989e4507a43d86551c38fb5df"
+  },
+  {
+    "path": "installed-src\\icon-image-assets.ts",
+    "bytes": 28240,
+    "sha256": "1c0119242129650806801a06a5164279291a83a3075d6b369fcac8745358664d"
+  },
+  {
+    "path": "installed-src\\icon-resource-config.ts",
+    "bytes": 29127,
+    "sha256": "1912f7a6c35fbf55c936546a5147680b334aee0b42fc0b46bd84d4c045a0c525"
+  },
+  {
+    "path": "installed-src\\knowledge-adapter.ts",
+    "bytes": 36156,
+    "sha256": "56800c64f2b9621d0c3cbd2d6798cfe0e4562a15fcf50ba53b66cb28f7e91663"
+  },
+  {
+    "path": "make-fixture.py",
+    "bytes": 773,
+    "sha256": "06d5dea8d57bcc0b7a1374e342ee0dc207386cc865bc74ea6e2cb65e70a8aa96"
+  },
+  {
+    "path": "project\\README.md",
+    "bytes": 54,
+    "sha256": "3814dea20bed92df4187ee17d94326c3b37e296a92d9881f78e1886c4caf97a7"
+  },
+  {
+    "path": "project\\aabbccddeeff0011.ai-icons.json",
+    "bytes": 704,
+    "sha256": "663b2b7f379c17eedb0a697469eaa1f457b5bbd03dd1a5b6489e9eb36ef2fc89"
+  },
+  {
+    "path": "project\\art\\final\\companion\\collision-test-96x96-d689fb47f5c5.png",
+    "bytes": 47,
+    "sha256": "b2f3d5092c24cb99b49e4006e0c0f95862c5135edc57d45f80f73389d1500461"
+  },
+  {
+    "path": "project\\art\\final\\companion\\synthetic-comfy-python-cpu-only-96x96-d689fb47f5c5.png",
+    "bytes": 1253,
+    "sha256": "a98df5e8d5f8cc7f4b584fd7d9b75193a76cb9b09cab313c5b6236e77b062a84"
+  },
+  {
+    "path": "project\\art\\final\\companion\\synthetic-cpu-only-96x96-d689fb47f5c5.png",
+    "bytes": 1253,
+    "sha256": "a98df5e8d5f8cc7f4b584fd7d9b75193a76cb9b09cab313c5b6236e77b062a84"
+  },
+  {
+    "path": "project\\art\\reference\\synthetic-reference.png",
+    "bytes": 6270,
+    "sha256": "d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48"
+  },
+  {
+    "path": "project\\settings\\v2\\packages\\project.json",
+    "bytes": 60,
+    "sha256": "4b6b4ab9b3e90c4dfc8068a6467f9bf052c66c9105907d61b721101a7d2f53ea"
+  },
+  {
+    "path": "records\\adopt.json",
+    "bytes": 178,
+    "sha256": "5f6dbfb8f406da8ded25b56dbd80275578c4e3986871b706a45fe2a878a61ca6"
+  },
+  {
+    "path": "records\\approved-python-check.json",
+    "bytes": 1367,
+    "sha256": "8a69210a6dbb58430fa5f041d7c119e2a2d9a708a56c033ff1946e7252238007"
+  },
+  {
+    "path": "records\\approved-python-inspect.json",
+    "bytes": 1397,
+    "sha256": "18320d5c73c955908fd77d972a745acc1cd100bb53f7fc75010a84c8bd20380a"
+  },
+  {
+    "path": "records\\enqueue.json",
+    "bytes": 181,
+    "sha256": "76297df07a3a26bb73b3caf393d68f29a1852dbe68180b90cdd5ff13002fcb1d"
+  },
+  {
+    "path": "records\\failure.json",
+    "bytes": 963,
+    "sha256": "b003d49bf30084f042c2e0906ac65b44454f97c7bc1de8e13b95c885f31585a3"
+  },
+  {
+    "path": "records\\final-report.json",
+    "bytes": 2659,
+    "sha256": "112e38abc73787954ce3bcae90c9397bab19e5fb5a409a2caed9ab8fbfbcff62"
+  },
+  {
+    "path": "records\\inspect.json",
+    "bytes": 1397,
+    "sha256": "18320d5c73c955908fd77d972a745acc1cd100bb53f7fc75010a84c8bd20380a"
+  },
+  {
+    "path": "records\\output-path.json",
+    "bytes": 234,
+    "sha256": "5addff7c3f4a4fd2565ef0225f38e1a44c6cdd1d42c3e50dd87626703a12bdb3"
+  },
+  {
+    "path": "records\\png-readback.json",
+    "bytes": 350,
+    "sha256": "ebddbd4ff6482eadcca50bf235833165eed2d75051dac3a7b2d17f4c1619ab6f"
+  },
+  {
+    "path": "records\\prepared.json",
+    "bytes": 1096,
+    "sha256": "4a3c6840cba2ddac9baae11a5a91255180dc1fad98c3bcb9fdd1eb56810aca12"
+  },
+  {
+    "path": "records\\results.json",
+    "bytes": 5075,
+    "sha256": "7c7ef36d04836ce86220586de72a4598f3ac481ffeb1b970b47e617df05a9288"
+  },
+  {
+    "path": "records\\resume.json",
+    "bytes": 181,
+    "sha256": "76297df07a3a26bb73b3caf393d68f29a1852dbe68180b90cdd5ff13002fcb1d"
+  },
+  {
+    "path": "records\\run-next.json",
+    "bytes": 181,
+    "sha256": "76297df07a3a26bb73b3caf393d68f29a1852dbe68180b90cdd5ff13002fcb1d"
+  },
+  {
+    "path": "records\\source-evidence.json",
+    "bytes": 1884,
+    "sha256": "3c1b8e82e7f1c817572ac28410f57b47d51c78fbf8b4b417eeab209b4477fb77"
+  },
+  {
+    "path": "resume-flow.cjs",
+    "bytes": 7749,
+    "sha256": "6af7cc0f7fdedbc8d28dfd339b0f6b34ca34158fb072260be075b4d247e1910e"
+  },
+  {
+    "path": "run-flow.cjs",
+    "bytes": 8623,
+    "sha256": "36344b2aef72a2fc15d8352e05f71fb98e4750baa05aa6084eaefcf190939ad9"
+  },
+  {
+    "path": "sources\\SYNTHETIC-NOT-GENERATED.txt",
+    "bytes": 104,
+    "sha256": "58e1d713443beaf90e2ea5acabf81d42b36870f5e9e8e7a53f58fa4674a5acbc"
+  },
+  {
+    "path": "sources\\synthetic-manifest-not-eligible.json",
+    "bytes": 653,
+    "sha256": "f9720c02e4d5a983ef632853a57aff31ba4018cc3262a887243b637696ea6010"
+  },
+  {
+    "path": "sources\\synthetic-not-generated.png",
+    "bytes": 6270,
+    "sha256": "d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48"
+  },
+  {
+    "path": "store\\companion-reference-snapshots\\d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48.png",
+    "bytes": 6270,
+    "sha256": "d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48"
+  },
+  {
+    "path": "store\\companion-resource-snapshots\\aabbccddeeff0011\\STUDIO-RUN-offline-fixture-deadbeef.json",
+    "bytes": 3265,
+    "sha256": "f26473e9a1433daa3684afb7aacd787f205513437ce86dd052901ddd3487d739"
+  },
+  {
+    "path": "store\\companion-variant-receipts\\aabbccddeeff0011\\55f9e8775075bad4613e7f2d146130ddac5e59778b19739c6dcac583efe58066.json",
+    "bytes": 490,
+    "sha256": "fbbc7e0da3d314817ea2821a2fc43ec505a98ad02d4cd5574ffd14fefa3600fd"
+  },
+  {
+    "path": "store\\companion-variant-receipts\\aabbccddeeff0011\\be1f179c2e3137dc80f7649708f9c959db2c9127692176491de22a2d0b63240a.json",
+    "bytes": 477,
+    "sha256": "66d4b7e4c951461065e0222f058aa5c951adc6ea1832372a2ee95cb012648495"
+  }
+]

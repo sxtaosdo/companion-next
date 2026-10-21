@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "local-icons-api-v1",
+  "ok": false,
+  "error": {
+    "code": "ADOPTION_SOURCE_INVALID",
+    "message": "Trusted adoption source could not be verified"
+  }
+}

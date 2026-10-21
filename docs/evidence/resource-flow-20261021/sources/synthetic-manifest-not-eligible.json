@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "local-icon-adoption-manifest-v1",
+  "sources": [
+    {
+      "sourceId": "synthetic-test",
+      "sourcePath": "C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\sources\\synthetic-not-generated.png",
+      "fileSha256": "d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48",
+      "provenance": {
+        "generator": "synthetic-cpu-test-not-generated",
+        "sourceProjectId": null,
+        "sourceRunId": null,
+        "sourceRevision": null,
+        "sourceCandidateId": null,
+        "sourceArtifactSha256": null,
+        "sourcePromptId": null
+      },
+      "evidence": []
+    }
+  ]
+}

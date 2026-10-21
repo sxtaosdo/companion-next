@@ -1,0 +1,35 @@
+{
+  "source": "captured successful read-only tool output in this thread; original observedAt not captured",
+  "metadataOnly": true,
+  "modelLoaded": false,
+  "scope": "C:/ai/ComfyUI/models; depth<=2, directories<=100; 35 visited",
+  "files": [
+    {
+      "path": "C:/ai/ComfyUI/models/unet/z-image-turbo-Q8_0.gguf",
+      "bytes": 7224707136
+    },
+    {
+      "path": "C:/ai/ComfyUI/models/text_encoders/Qwen_3_4b-Q8_0.gguf",
+      "bytes": 4280404704
+    },
+    {
+      "path": "C:/ai/ComfyUI/models/loras/DigitalAssetMedia_Redmond_ZImageTurbo.safetensors",
+      "bytes": 85094904
+    },
+    {
+      "path": "C:/ai/ComfyUI/models/vae/ae.safetensors",
+      "bytes": 335304388
+    },
+    {
+      "path": "C:/ai/ComfyUI/models/background_removal/birefnet.safetensors",
+      "bytes": 444473596
+    }
+  ],
+  "notVerified": [
+    "model integrity",
+    "node compatibility",
+    "loaded readiness",
+    "inference quality",
+    "GPU window"
+  ]
+}

@@ -1,0 +1,2 @@
+# Frozen evidence retains exact source/output bytes, including original CRLF.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

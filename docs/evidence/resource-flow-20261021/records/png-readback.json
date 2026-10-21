@@ -1,0 +1,13 @@
+{
+  "format": "PNG",
+  "width": 96,
+  "height": 96,
+  "mode": "RGBA",
+  "alphaMin": 0,
+  "alphaMax": 255,
+  "transparentPixels": 5983,
+  "visiblePixels": 3233,
+  "sha256": "a98df5e8d5f8cc7f4b584fd7d9b75193a76cb9b09cab313c5b6236e77b062a84",
+  "modelGenerated": false,
+  "scope": "actual installed CPU exporter only; not full task export"
+}

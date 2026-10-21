@@ -1,0 +1,5 @@
+{
+  "message": "EPERM: operation not permitted, link 'C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\project\\.resource-config-2e6aa469-9892-4031-9ab8-786c0b6262dd.tmp' -> 'C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\project\\aabbccddeeff0011.ai-icons.json'",
+  "code": "EPERM",
+  "stack": "Error: EPERM: operation not permitted, link 'C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\project\\.resource-config-2e6aa469-9892-4031-9ab8-786c0b6262dd.tmp' -> 'C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\project\\aabbccddeeff0011.ai-icons.json'\n    at async link (node:internal/fs/promises:1060:10)\n    at async IconResourceConfigs.save (C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\installed-classes.cjs:14877:9)\n    at async C:\\Users\\33272\\AppData\\Local\\Temp\\companion-resource-flow-20261021\\run-flow.cjs:25:14"
+}

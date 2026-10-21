@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "local-icon-requests-v1",
+  "projectId": "aabbccddeeff0011",
+  "runId": "STUDIO-RUN-offline-fixture-deadbeef",
+  "sourceRevision": "00bbbae331edf0ef4983e8822ba8c2aeeb67086a",
+  "visualSpec": "Synthetic CPU test only; not model-generated.\n配置 v1 SHA256 663b2b7f379c17eedb0a697469eaa1f457b5bbd03dd1a5b6489e9eb36ef2fc89; 设计 750×1334 portrait; 默认尺寸 96×96（CPU 派生）; 母图 1024×1024 透明 PNG; 居中完整，四周 10% 留白; 参考仅记录，不作为模型图像输入。\nart/reference/synthetic-reference.png:d689fb47f5c57a6dfcc671824f74194878ce193f2fc52f581987b4bc71accd48",
+  "assets": [
+    {
+      "assetId": "synthetic-offline-icon",
+      "relativePath": "assets/icons/synthetic-offline-icon.png",
+      "prompt": "Synthetic offline fixture only; never submit generation.\nSynthetic CPU test only; not model-generated.\n单个游戏图标，物体居中完整，四周 10% 留白，透明背景，PNG，无文字、无水印；文字由游戏 UI 承担。",
+      "purpose": "Offline protocol validation",
+      "required": true
+    }
+  ]
+}
