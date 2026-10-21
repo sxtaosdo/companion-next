@@ -4,13 +4,21 @@ const projectId = '1234567890abcdef'
 const pin = { path: 'P0001/ip/canteen-transport-interface.md', revision: 'a'.repeat(40) }
 function spec(): ProjectArtSpec { return { schemaVersion: 'project-art-spec-v1', projectId, version: 1,
   project: { name: 'Test project', content: 'Owner project content', engine: 'cocos-creator', designResolution: { width: 750, height: 1334 } },
-  inheritance: { mode: 'none', reason: 'No applicable Canon interface confirmed' }, overrides: { width: 96, height: 96, transparent: true, destination: 'assets/art' }, categories: {} } }
+  inheritance: { mode: 'none', reason: 'No applicable Canon interface confirmed' }, overrides: { width: 96, height: 96, transparent: true, destination: 'assets/art', exportDirectory: 'art/final/icons' }, categories: {} } }
 function asset(): ArtAssetInput { return { assetId: 'coin-pouch', category: 'icon', prompt: 'A coin pouch', overrides: { subject: 'coin pouch', purpose: 'inventory icon' }, references: [] } }
 function authority(): ArtAuthority { return { source: { ...pin }, status: 'Accepted', kind: 'canon-interface', allowedUsages: ['runtime'], projectIds: [projectId], categories: [...ART_CATEGORIES], locked: { renderingLanguage: 'Owner accepted language' }, defaults: { paddingPercent: 10 }, requiresImageReference: false } }
 function inherited() { const config = spec(); config.inheritance = { mode: 'canon', usage: 'runtime', sources: [{ ...pin }] }; return config }
 const resolve = (config = spec(), input = asset(), sources: ArtAuthority[] = []) => resolveArtGenerationInput(config, input, sources, { imageReferenceInput: false, categories: ART_CATEGORIES })
 function rejects(code: string, run: () => unknown) { try { run(); throw Error('expected rejection') } catch (error) { expect(error).toBeInstanceOf(ArtSpecError); expect((error as ArtSpecError).code).toBe(code) } }
 describe('project art specification boundary', () => {
+  it('requires explicit safe export output and opaque color without inventing defaults', () => {
+    const c=spec(); delete c.overrides.exportDirectory; rejects('REQUIRED_FIELD',()=>resolve(c));
+    for(const value of ['assets/icons','art/final/../icons','art/final/con','art/final/a.b','art/final/a/']) { c.overrides.exportDirectory=value; rejects('INVALID_CONFIG',()=>resolve(c)) }
+    c.overrides.exportDirectory='art/final/icons'; c.overrides.transparent=false; rejects('REQUIRED_FIELD',()=>resolve(c));
+    c.overrides.backgroundColor='#aBc012';expect(resolve(c).values.backgroundColor).toBe('#aBc012');
+    c.overrides.backgroundColor='white';rejects('INVALID_CONFIG',()=>resolve(c));
+    const next=spec();next.categories.icon={exportDirectory:'art/final/category',backgroundColor:'#123456',transparent:false}; expect(resolve(next).values.exportDirectory).toBe('art/final/category');expect(resolve(next).provenance.backgroundColor).toBe('category');
+  })
   it('requires exact trusted dependencies before category filtering without implicitly selecting sources',()=>{
     const config=inherited(), a=authority(), master=authority();master.source={path:'P0001/art/master-style-reference.md',revision:'b'.repeat(40)};master.kind='art-style';master.requiresImageReference=true
     a.requiredSources=[master.source];a.categories=['ip'];const original=JSON.stringify(config)

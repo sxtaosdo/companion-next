@@ -5,7 +5,7 @@ export const ART_CATEGORIES = ['ip', 'equipment', 'skill', 'ui', 'icon'] as cons
 export const ART_CANON_USAGES = ['shared-concept', 'runtime', 'placeholder-validation'] as const
 export type CanonArtUsage = typeof ART_CANON_USAGES[number]
 export type ArtCategory = typeof ART_CATEGORIES[number]
-const textFields = ['renderingLanguage', 'proportions', 'realism', 'materials', 'lighting', 'palette', 'subject', 'identity', 'allowedChanges', 'purpose', 'view', 'state', 'textSafeArea', 'destination'] as const
+const textFields = ['renderingLanguage', 'proportions', 'realism', 'materials', 'lighting', 'palette', 'subject', 'identity', 'allowedChanges', 'purpose', 'view', 'state', 'textSafeArea', 'destination', 'exportDirectory', 'backgroundColor'] as const
 const numberFields = ['width', 'height', 'paddingPercent'] as const
 export type ArtValues = Partial<Record<typeof textFields[number], string> & Record<typeof numberFields[number], number> & { transparent: boolean }>
 export interface ArtSourcePin { path: string; revision: string }
@@ -73,6 +73,8 @@ function values(value: unknown, field: string): ArtValues {
     if ((textFields as readonly string[]).includes(key)) {
       const checked = text(item, `${field}.${key}`)
       if (key === 'destination' && (!/^assets(?:\/[A-Za-z0-9_-]+)*$/.test(checked))) fail('INVALID_CONFIG', `${field}.${key}`)
+      if (key === 'exportDirectory' && (!(checked === 'art/final' || checked.startsWith('art/final/')) || checked.length > 240 || !checked.split('/').every(part => /^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/.test(part) && !/^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(part)))) fail('INVALID_CONFIG', `${field}.${key}`)
+      if (key === 'backgroundColor' && !/^#[a-fA-F0-9]{6}$/.test(checked)) fail('INVALID_CONFIG', `${field}.${key}`)
       out[key] = checked
     } else if (key === 'transparent') {
       if (typeof item !== 'boolean') fail('INVALID_CONFIG', `${field}.${key}`)
@@ -164,7 +166,8 @@ export function resolveArtGenerationInput(spec: ProjectArtSpec, asset: ArtAssetI
       if (!Object.hasOwn(locked, key)) provenance[key] = layerName
     }
   }
-  for (const key of [...required[asset.category], 'width', 'height', 'transparent', 'destination'] as const) if (resolved[key] === undefined) fail('REQUIRED_FIELD', key)
+  for (const key of [...required[asset.category], 'width', 'height', 'transparent', 'destination', 'exportDirectory'] as const) if (resolved[key] === undefined) fail('REQUIRED_FIELD', key)
+  if (resolved.transparent === false && resolved.backgroundColor === undefined) fail('REQUIRED_FIELD', 'backgroundColor')
   if (resolved.width! * resolved.height! > 16_000_000) fail('INVALID_CONFIG', 'dimensions')
   const blockers: string[] = []
   if (!capabilities.categories.includes(asset.category)) blockers.push('GENERATION_CATEGORY_UNSUPPORTED')

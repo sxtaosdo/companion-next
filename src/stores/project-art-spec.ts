@@ -1,3 +1,4 @@
+import type { AiResourceConfigV2 } from '../domain/ai-resource-read'
 import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 import { ArtSpecError, parseProjectArtSpec, validateProjectArtBindings, type ArtAuthority, type ArtCategory, type ArtValues, type ProjectArtSpec } from '../domain/project-art-spec'
@@ -9,6 +10,7 @@ function same(a: ProjectArtSpecContext | null, b: ProjectArtSpecContext | null) 
 export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () => {
   const context = shallowRef<ProjectArtSpecContext | null>(null), provider = shallowRef<ProjectArtSpecProvider | null>(null)
   const draft = ref<ProjectArtSpec | null>(null), base = ref<ProjectArtSpec | null>(null), hash = ref<string | null | undefined>(undefined)
+  let legacyConfig: AiResourceConfigV2 | null = null
   const legacyVersion = ref<number | null>(null)
   const authorities = shallowRef<readonly ArtAuthority[]>([])
   const phase = ref<'idle' | 'reading' | 'editing' | 'saving' | 'saved' | 'unknown' | 'error'>('idle'), message = ref(''), confirmed = ref(false), pending = ref(false)
@@ -37,7 +39,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
     if (dirty.value && context.value && draft.value) retained.value = { context: context.value, draft: copy(draft.value) }
     epoch++; controller?.abort(); confirmed.value = false
     context.value = next; provider.value = writer; draft.value = null; base.value = null; hash.value = undefined; authorities.value = []
-    observedPath.value = null; legacyVersion.value = null
+    observedPath.value = null; legacyVersion.value = null; legacyConfig = null
     phase.value = blocked.value ? 'unknown' : 'idle'
     message.value = phase.value === 'unknown' ? '此工程保存结果未知；请回读核对，不能重复保存。' : ''
   }
@@ -59,7 +61,8 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
       if (signal.aborted || revision !== epoch || provider.value !== reader || !same(context.value, captured)) return
       if (dirty.value && draft.value) retained.value = { context: captured, draft: copy(draft.value) }
       observedPath.value = receipt.projectPath; hash.value = receipt.hash; authorities.value = copy(receipt.authorities)
-      legacyVersion.value = parsed?.kind === 'legacy-v2' ? parsed.config.version : null
+      legacyConfig = parsed?.kind === 'legacy-v2' ? copy(parsed.config) : null
+      legacyVersion.value = legacyConfig?.version ?? null
       base.value = parsed?.kind === 'project' ? copy(parsed.spec) : null; draft.value = base.value ? copy(base.value) : null
       phase.value = blocked.value ? 'unknown' : 'editing'
       message.value = blocked.value ? '已回读文件；这不是原保存回执，未知保护仍保留。' : parsed?.kind === 'legacy-v2' ? '读取到旧 v2；旧图标流程保留，未自动迁移。' : parsed ? '已读取工程美术规范。' : '工程尚无美术规范，可新建草稿。'
@@ -71,7 +74,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
     // Explicit local candidate; undefined hash still prevents saving until a real read confirms missing.
     draft.value = { schemaVersion: 'project-art-spec-v1', projectId: context.value.projectId, version: 1,
       project: { name, content: '', engine: 'cocos-creator', designResolution: { width: 0, height: 0 } },
-      inheritance: { mode: 'none', reason: '' }, overrides: {}, categories: {} }
+      inheritance: { mode: 'none', reason: '' }, overrides: legacyConfig ? { width: legacyConfig.iconSize.width, height: legacyConfig.iconSize.height, transparent: legacyConfig.background.transparent, backgroundColor: legacyConfig.background.color, destination: legacyConfig.destination.directory, exportDirectory: legacyConfig.destination.exportDirectory, paddingPercent: legacyConfig.composition.paddingPercent } : {}, categories: {} }
     phase.value = 'editing'; message.value = '未保存草稿；请填写项目设定，保存前需读取工程原文件。'
   }
   function setValue(layer: 'project' | ArtCategory, key: keyof ArtValues, value: string | number | boolean) {

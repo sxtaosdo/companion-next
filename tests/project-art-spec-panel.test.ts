@@ -27,7 +27,7 @@ describe('project art specification three-section candidate', () => {
   it('explains explicit legacy migration in the existing confirmation area without an automatic write', async () => {
     const host:ProjectArtSpecProvider={label:'host',endpoint:'http://127.0.0.1:32181',status:vi.fn(),read:vi.fn(async()=>({projectId:project.id,projectPath:project.path,config:resourceView(project.id).config,hash:'a'.repeat(64),authorities:[]})),save:vi.fn()}
     setup(host);await button('读取 / 刷新美术规范').trigger('click');await flushPromises();await button('编写项目美术草稿').trigger('click')
-    expect(wrapper!.find('footer').text()).toContain('保留原图标文件');expect(wrapper!.find('footer').text()).toContain('版本 2');expect(host.save).not.toHaveBeenCalled()
+    expect(wrapper!.get('[aria-label="项目导出目录"]').element).toHaveProperty('value', 'art/final/icons');expect(wrapper!.get('[aria-label="项目底色"]').element).toHaveProperty('value', '#ffffff');expect(wrapper!.find('footer').text()).toContain('保留原图标文件');expect(wrapper!.find('footer').text()).toContain('版本 2');expect(host.save).not.toHaveBeenCalled()
   })
 
   it('shows unavailable engineering save and does not claim browser draft is saved', async () => {
@@ -38,7 +38,7 @@ describe('project art specification three-section candidate', () => {
   it('switches five categories and edits specific structured fields without network', async () => {
     setup(); await button('编写项目美术草稿').trigger('click'); await button('人物 IP').trigger('click'); expect(wrapper!.find('[aria-label="人物 IP身份 / 角色编号"]').exists()).toBe(true)
     await button('UI').trigger('click'); expect(wrapper!.find('[aria-label="UI文本安全区"]').exists()).toBe(true)
-    expect(wrapper!.text()).toContain('参考图入模仍未实现'); expect(wrapper!.find('[aria-label="UI成品宽"]').exists()).toBe(true); expect(wrapper!.find('[aria-label="UI透明背景"]').exists()).toBe(true); expect(wrapper!.find('[aria-label="UI资源目录"]').exists()).toBe(true)
+    expect(wrapper!.text()).toContain('参考图入模仍未实现'); expect(wrapper!.find('[aria-label="UI成品宽"]').exists()).toBe(true); expect(wrapper!.find('[aria-label="UI透明背景"]').exists()).toBe(true); expect(wrapper!.find('[aria-label="UI资源目录"]').exists()).toBe(true); expect(wrapper!.find('[aria-label="UI导出目录"]').exists()).toBe(true); expect(wrapper!.find('[aria-label="UI底色"]').exists()).toBe(true)
   })
   it('only exposes backend-provided pinned sources and locks inherited fields', async () => {
     const pin = { path: 'P0001/ip/canteen-transport-interface.md', revision: 'a'.repeat(40) }
