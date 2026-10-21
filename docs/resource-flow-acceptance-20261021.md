@@ -175,3 +175,13 @@ results.json是16条记录、15个不同stage；保留重复读取及初次失�
 - 规范/UI检查点6e75e4e已构建；随后补旧v2迁移的明确标志与真实版本基准，32项回归和类型检查通过。真实文件合同验证旧v1→新v2、旧文件字节不变、丢响应仅查原状态；浏览器实际迁移验收尚未做。不能将这些合同测试称为完整UI闭环。
 - 已生成、预览、选用、96x96导出图片保留；Creator真实导入/UUID重读仍未通过。P0001可信用途映射、真实参考图条件输入仍有缺口。后续统一使用32180，必要部署先说明范围及正常维护风险，不能恢复32181来继续验收。
 - 实例核验：`D:/CompanionData/art-generation-acceptance-20261021/records/instance-consolidation-20261021.json`。UI确认层未派发证据：`records/e2e-ui-33-restart-through-backend-blocked.json`。
+
+
+### 2026-10-21 12:59 UTC：同后台UI登记未完成，候选独立验证
+
+- 正式 `/v1/projects` HTTP200，PID1840，仍7条，目标测试目录匹配0。没有调用注册写API、没有登记成功，也没有新的Creator请求。
+- 复用原Edge PID18756。只读发现原选中页在32180根路径显示旧DAEMON_DRAINING内容；当前服务OPEN。经原有一次性UI认证和地址栏导航后，窗口标题实际变为Companion，地址栏为32180/next/index.html#/projects。
+- 系统UI自动化未得到网页内“添加已有工程”按钮，最后一次查找 Invoked=false；不能将导航请求、页面标题或地址栏输入算作已登记。未新开窗口/后台，未绕过UI用接口注册。浏览器没有可附加调试入口，不改变其安全设置。
+- 最小人工操作：在现有32180工程页点“添加已有工程”，填写 `D:/CompanionData/art-generation-acceptance-20261021/e2e-project` 后登记已有目录（不新建、不启动）。登记后应只读核验原7项完整和唯一新增目标。后续Creator UI操作仍须确认现有浏览器控件可控，不承诺登记后自动完成导入。
+- 本轮冻结bc7afdd独立复跑9个相关测试文件161项全过，完整workspace UI构建exit0。独立交付清单见candidate-bc7afdd-delivery-20261021.md。进程内真实存储合同不等于浏览器端保存/迁移验收。
+- 后端正式入口默认存储组合是已授权下一步候选源码工作；不以启动第二套服务验收，不直接替换正式包。
