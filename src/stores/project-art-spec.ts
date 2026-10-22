@@ -83,7 +83,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
     if (!context.value || pending.value || blocked.value || draft.value) return
     // Explicit local candidate; undefined hash still prevents saving until a real read confirms missing.
     draft.value = { schemaVersion: 'project-art-spec-v1', projectId: context.value.projectId, version: 1,
-      project: { name, content: '', engine: 'cocos-creator', designResolution: { width: 0, height: 0 } },
+      project: { name, content: '', engine: 'cocos-creator', designResolution: legacyConfig ? { ...legacyConfig.designResolution } : { width: 0, height: 0 } },
       inheritance: { mode: 'none', reason: '' }, overrides: legacyConfig ? { width: legacyConfig.iconSize.width, height: legacyConfig.iconSize.height, transparent: legacyConfig.background.transparent, backgroundColor: legacyConfig.background.color, destination: legacyConfig.destination.directory, exportDirectory: legacyConfig.destination.exportDirectory, paddingPercent: legacyConfig.composition.paddingPercent } : {}, categories: {} }
     phase.value = 'editing'; message.value = '未保存草稿；请填写项目设定，保存前需读取工程原文件。'
   }

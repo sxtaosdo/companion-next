@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { markRaw, nextTick, reactive } from 'vue'
-import { mount, type VueWrapper } from '@vue/test-utils'
+import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
 import ArtProductionFlow from '../src/components/ArtProductionFlow.vue'
 import { artProductionStage, canChooseArtStage, savedArtSpecDependency, sameArtSpecDependency } from '../src/domain/art-production-flow'
@@ -10,6 +10,8 @@ import { aiTaskCreationProvider } from '../src/ai-task-creation-integration'
 import { createAiTaskCreationState } from '../src/stores/ai-task-creation'
 import type { AiTaskCreationProvider } from '../src/domain/ai-task-creation'
 import type { AiResourceReadProvider } from '../src/domain/ai-resource-read'
+import { aiJobsReadProvider } from '../src/ai-jobs-read-integration'
+import type { AiJobSnapshot, AiJobsView } from '../src/domain/ai-jobs-read'
 import type { AiJobsReadProvider } from '../src/domain/ai-jobs-read'
 import { resourceView } from './fixtures/ai-resource-read'
 import { useProjectArtSpecStore } from '../src/stores/project-art-spec'
@@ -25,7 +27,10 @@ function savedSpec(){
  const spec:ProjectArtSpec={schemaVersion:'project-art-spec-v1',projectId:project.id,version:1,project:{name:'A',content:'Owner content',engine:'cocos-creator',designResolution:{width:750,height:1334}},inheritance:{mode:'none',reason:'Independent project'},overrides:{width:96,height:96,transparent:true,destination:'assets/art',exportDirectory:'art/final/icons'},categories:{}}
  art.base=structuredClone(spec);art.draft=structuredClone(spec);art.hash='a'.repeat(64);art.phase='saved';return art
 }
-function setup(category:'icon'|'ui'|'ip'='icon'){
+function existingJob():AiJobSnapshot{return {projectId:project.id,jobId:'STUDIO-RUN-icon-demo-0123abcd',revision:1,state:'unknown',sourceRevision:'a'.repeat(40),requestHash:'b'.repeat(64),profile:'local-icon-v1',budget:{maxAssets:2,candidatesPerAsset:1,submissionAttempts:1},createdAt:'2026-10-22T06:00:00Z',assets:[{assetId:'gem',relativePath:'assets/icons/gem.png'}],candidates:[],selectedIds:[],import:null,workerResident:false,productionVerified:false}}
+function taskReader(rows:AiJobSnapshot[]=[existingJob()]):AiJobsReadProvider{return markRaw({label:'isolated read only',readJobs:vi.fn(async()=>({schemaVersion:'companion-icons-v1',projectId:project.id,sourceRevision:'a'.repeat(40),jobs:rows,profile:{id:'local-icon-v1',maxAssets:2,candidatesPerAsset:1,submissionAttempts:1},schedulerEnabled:false,workerResident:false} satisfies AiJobsView)),readStatus:vi.fn(),previewCandidate:vi.fn()})}
+function setup(category:'icon'|'ui'|'ip'='icon',jobs:AiJobsReadProvider|null=taskReader()){
+ aiJobsReadProvider.value=jobs
  const pinia=createPinia();setActivePinia(pinia)
  selection.project={...project};selection.currentSource=source
  const resource=useAiResourceReadStore();resource.setContext(project,source);resource.resource=resourceView();savedSpec()
@@ -33,8 +38,8 @@ function setup(category:'icon'|'ui'|'ip'='icon'){
  wrapper=mount(ArtProductionFlow,{props:{embedded:true,category},global:{plugins:[pinia,ElementPlus],stubs:{ArtStatusBar:true,AiResourceReadView:true,AiTaskCreationPanel:{template:'<div data-testid="icon-create-stub"/>'},AiJobsReadPanel:{template:'<div data-testid="icon-jobs-stub"/>'}}}})
  return resource
 }
-function button(label:string){return wrapper!.findAll('button').find(item=>item.text()===label)!}
-afterEach(()=>{wrapper?.unmount();wrapper=undefined;aiTaskCreationProvider.value=null;projectArtSpecProvider.value=null})
+function button(label:string){return wrapper!.findAll('button').find(item=>item.text()===label || item.attributes('aria-label')===label)!}
+afterEach(()=>{wrapper?.unmount();wrapper=undefined;aiTaskCreationProvider.value=null;projectArtSpecProvider.value=null;aiJobsReadProvider.value=null})
 describe('unified production stage evidence',()=>{
  it('cannot jump to a future or invalid step',()=>{expect(canChooseArtStage(4,1)).toBe(false);expect(canChooseArtStage(-1,5)).toBe(false);expect(canChooseArtStage(1.5,5)).toBe(false);expect(canChooseArtStage(6,6)).toBe(false);expect(canChooseArtStage(1,1)).toBe(true)})
  it('derives progress from observed task states and never claims production success',()=>{
@@ -118,7 +123,7 @@ describe('saved specification dependency fence',()=>{
 
 describe('retained original work under changed upstream dependencies',()=>{
  it('keeps the original task panel while disabling its operations after specification edits',async()=>{
-  setup();await button('使用已保存规范').trigger('click');
+  setup();await flushPromises();await button('使用已保存规范').trigger('click');
   (wrapper!.vm as unknown as {chooseStep:(n:number)=>boolean}).chooseStep(0);await nextTick();await button('继续已有任务').trigger('click');
   const original=wrapper!.get('[data-testid="icon-jobs-stub"]').element;
   const art=useProjectArtSpecStore();art.draft!.project.content='Edited upstream';await nextTick();
@@ -138,5 +143,14 @@ describe('retained original work under changed upstream dependencies',()=>{
 });
 
 it('does not present a legacy-only result as a saved new art specification',async()=>{
- setup();const art=useProjectArtSpecStore();art.bind(null,null);projectArtSpecProvider.value=null;await nextTick();expect(useAiResourceReadStore().resource?.state).toBe('valid');expect(button('使用已保存规范').attributes('disabled')).toBeDefined();await button('继续已有任务').trigger('click');expect(wrapper!.find('[data-testid="icon-jobs-stub"]').exists()).toBe(true);
+ setup();await flushPromises();const art=useProjectArtSpecStore();art.bind(null,null);projectArtSpecProvider.value=null;await nextTick();expect(useAiResourceReadStore().resource?.state).toBe('valid');expect(button('使用已保存规范')).toBeUndefined();await button('继续已有任务').trigger('click');expect(wrapper!.find('[data-testid="icon-jobs-stub"]').exists()).toBe(true);
 });
+
+
+describe('observed existing task entry',()=>{
+ it('never turns an art draft or empty history into an existing task',async()=>{setup('icon',taskReader([]));expect(button('继续已有任务')).toBeUndefined();await flushPromises();const art=useProjectArtSpecStore();art.draft!.project.content='Draft';await flushPromises();expect(button('继续已有任务')).toBeUndefined();expect(wrapper!.find('[data-testid="icon-jobs-stub"]').exists()).toBe(false)})
+ it('shows continuation only after a validated bound task read',async()=>{const reader=taskReader();setup('icon',reader);expect(button('继续已有任务')).toBeUndefined();await flushPromises();expect(reader.readJobs).toHaveBeenCalledTimes(1);expect(button('继续已有任务')).toBeDefined();await button('继续已有任务').trigger('click');expect(wrapper!.find('[data-testid="icon-jobs-stub"]').exists()).toBe(true)})
+ it('offers a record view rather than continuation for failed or history-only tasks',async()=>{setup('icon',taskReader([{...existingJob(),state:'failed'}]));await flushPromises();expect(button('继续已有任务')).toBeUndefined();expect(button('查看任务记录')).toBeDefined()})
+ it('keeps failure distinct from no tasks and retries only explicitly',async()=>{const reader=taskReader();reader.readJobs=vi.fn(async()=>{throw Error('fixture')});setup('icon',reader);await flushPromises();expect(button('继续已有任务')).toBeUndefined();expect(wrapper!.text()).toContain('已有任务读取失败');expect(reader.readJobs).toHaveBeenCalledTimes(1);await button('重试读取任务').trigger('click');await flushPromises();expect(reader.readJobs).toHaveBeenCalledTimes(2)})
+ it('does not expose another project task after a project switch',async()=>{setup();await flushPromises();expect(button('继续已有任务')).toBeDefined();selection.project={...project,id:'1123456789abcdef',path:'/fixture/B'};await flushPromises();expect(button('继续已有任务')).toBeUndefined()})
+})

@@ -9,6 +9,19 @@ const store = useProjectArtSpecStore(), category = ref<ArtCategory>('icon')
 const section = ref(0), editing = ref(false)
 const sectionNames = ['项目设定', '规范内容', '核对保存']
 const reached = ref(0)
+const canvasPresets = [
+  {id:'mobile-game',label:'移动端小游戏 · 750 × 1334',width:750,height:1334},
+  {id:'mobile-hd',label:'移动端高清 · 1080 × 1920',width:1080,height:1920},
+  {id:'pc-hd',label:'PC 1080P · 1920 × 1080',width:1920,height:1080},
+] as const
+const canvasChoice=ref('custom')
+watch(()=>store.draft,value=>{if(value)canvasChoice.value=canvasPresets.find(p=>p.width===value.project.designResolution.width&&p.height===value.project.designResolution.height)?.id??'custom'},{immediate:true,flush:'sync'})
+function chooseCanvas(event:Event){
+  if(!store.draft || store.pending || store.blocked)return
+  canvasChoice.value=(event.target as HTMLSelectElement).value
+  const preset=canvasPresets.find(p=>p.id===canvasChoice.value)
+  if(preset){store.draft.project.designResolution={width:preset.width,height:preset.height};store.touch()}
+}
 let editorRevision=0
 watch(() => store.context, () => { editorRevision++; section.value = 0; reached.value = 0; editing.value = false }, { flush: 'sync' })
 watch(() => store.draft, value => { if (value && !store.base) editing.value = true })
@@ -16,9 +29,13 @@ function openEditor() {
   if (!store.context || store.pending || store.blocked || (!!writer.value && store.hash === undefined)) return
   if (store.retained && !store.dirty) store.restoreRetained()
   if (!store.draft) store.startDraft(props.project?.name ?? '')
-  if (store.draft) { editorRevision++; editing.value = true; section.value = 0; reached.value = 0 }
+  if (store.draft) {
+    if(props.project && store.draft.project.name!==props.project.name){store.draft.project.name=props.project.name;store.touch()}
+    if(!store.base && store.legacyVersion===null && store.draft.project.designResolution.width===0 && store.draft.project.designResolution.height===0){store.draft.project.designResolution={width:750,height:1334};canvasChoice.value='mobile-game';store.touch()}
+    editorRevision++; editing.value = true; section.value = 0; reached.value = 0 }
 }
 function closeEditor() { editorRevision++; editing.value = false }
+function goToSection(index:number){if(index<=reached.value && !store.pending && !store.blocked && (index<=section.value || !currentErrors.value.length))section.value=index}
 function next() { if (currentErrors.value.length) return; section.value = Math.min(2, section.value + 1); reached.value = Math.max(reached.value, section.value) }
 async function saveAndRead() { const context=store.context, provider=store.provider, revision=editorRevision; await store.save(); if (revision!==editorRevision || !editing.value || store.context!==context || store.provider!==provider) return; if (store.phase === 'saved') { await store.read(); if (revision===editorRevision && editing.value && store.context===context && store.provider===provider) editing.value = ['error','unknown'].includes(store.phase) } }
 defineExpose({ openEditor })
@@ -99,28 +116,32 @@ const friendlyErrors = computed(() => currentErrors.value.map(error => {
   <div v-if="!sharedHeader" class="art-heading"><h2>美术规范</h2><button type="button" :disabled="!store.context || !writer || store.pending || store.dirty" @click="store.read">读取 / 刷新美术规范</button></div>
   <p v-if="!project">请先选择已登记工程。</p>
   <template v-else>
-    <div v-if="store.base" class="art-saved-summary" data-testid="art-saved-summary"><strong>{{ store.base.project.name }} · v{{ store.base.version }}</strong><span>{{ store.base.project.designResolution.width }} × {{ store.base.project.designResolution.height }}</span><button type="button" :disabled="store.pending || store.blocked" @click="openEditor">查看 / 编辑美术规范</button></div>
-    <div v-else-if="store.hash === null || store.legacyVersion !== null"><p>当前工程尚未配置项目美术规范。</p><button type="button" :disabled="store.pending || store.blocked" @click="openEditor">新建美术规范</button><small v-if="store.legacyVersion !== null">已有图标配置 v{{ store.legacyVersion }}，新建时保留原文件并带入可兼容字段。</small></div>
-    <p v-else-if="store.phase === 'error'" role="alert">规范读取失败，请重试。</p>
-    <p v-else-if="!store.pending && !store.draft">请读取当前工程美术规范。<button v-if="!writer && store.context" type="button" @click="openEditor">新建美术规范</button></p>
+    <p v-if="store.pending" role="status">{{ store.phase==='saving' ? '正在保存规范…' : '正在读取规范…' }}</p>
+    <p v-else-if="store.blocked || store.phase==='unknown'" role="status">规范结果待核对，不能创建新规范。</p>
+    <p v-else-if="store.phase==='error'" role="alert">规范读取失败，请重试。</p>
+    <div v-else-if="store.base" class="art-saved-summary" data-testid="art-saved-summary"><strong>{{ store.base.project.name }} · v{{ store.base.version }}</strong><span>{{ store.base.project.designResolution.width }} × {{ store.base.project.designResolution.height }}</span><button v-if="!sharedHeader" type="button" :disabled="store.pending || store.blocked" @click="openEditor">查看 / 编辑美术规范</button></div>
+    <div v-else-if="store.hash === null || store.legacyVersion !== null"><p>当前工程尚未配置项目美术规范。</p><el-button v-if="!sharedHeader" type="primary" :disabled="store.pending || store.blocked" @click="openEditor">新建美术规范</el-button><small v-if="store.legacyVersion !== null">已有图标配置 v{{ store.legacyVersion }}，新建时保留原文件并带入可兼容字段。</small></div>
+    <p v-else-if="!store.pending && !store.draft">请读取当前工程美术规范。</p>
     <p v-if="store.dirty && !editing" role="status">有未保存的规范草稿。<button type="button" @click="openEditor">继续编辑</button></p>
     <p v-if="store.blocked" role="status">保存结果待核对。<button type="button" :disabled="store.pending || !writer" @click="store.recover">核对原保存结果</button></p>
   </template>
-  <el-dialog class="project-setup-dialog art-spec-dialog" modal-class="project-setup-overlay" :model-value="editing" :title="store.base ? '编辑项目美术规范' : '新建项目美术规范'" width="760px" :close-on-click-modal="false" :close-on-press-escape="!store.pending" :show-close="!store.pending" @update:model-value="!$event && closeEditor()">
+  <el-dialog class="project-setup-dialog art-spec-dialog" modal-class="project-setup-overlay" :model-value="editing" :title="store.base ? '编辑项目美术规范' : '新建项目美术规范'" width="min(760px, calc(100vw - 24px))" :close-on-click-modal="false" :close-on-press-escape="!store.pending" :show-close="!store.pending" @update:model-value="!$event && closeEditor()">
    <template v-if="store.draft">
     <p class="art-project">{{ project?.name }} · {{ project?.path }}</p>
     <p v-if="!writer" class="art-notice" role="status">工程保存接口未接入；仅可保留草稿。</p>
     <p v-if="store.message && ['error','unknown','saving'].includes(store.phase)" role="status">{{ store.message }}</p>
     <p v-if="store.retained">有此工程保留的草稿。<button type="button" :disabled="store.pending || store.blocked" @click="store.restoreRetained">恢复此工程草稿</button></p>
+    <el-steps data-testid="art-wizard-progress" :active="section" finish-status="success" align-center><el-step v-for="(title,index) in sectionNames" :key="title" :title="title" :status="section===index?'process':index<section?'success':'wait'" :description="section===index?'当前步骤':index<section?'已完成':index<=reached?'已到达':'未到达'" @click="goToSection(index)"/></el-steps>
     <div class="setup-timeline" data-testid="art-spec-wizard">
      <section v-for="(title,index) in sectionNames.slice(0,reached+1)" :key="title" class="setup-timeline-item" :class="{active:section===index,done:section>index}">
-      <button class="setup-timeline-heading" type="button" :disabled="store.pending || store.blocked" :aria-expanded="section===index" @click="section=index"><span class="setup-timeline-node"/>{{ title }}<small v-if="section>index"> · 返回修改</small></button>
+      <button class="setup-timeline-heading" type="button" :disabled="store.pending || store.blocked" :aria-expanded="section===index" @click="goToSection(index)"><span class="setup-timeline-node"/>{{ title }}<small v-if="section>index"> · 返回修改</small></button>
       <div v-if="section===index" class="setup-timeline-panel">
        <h3 data-testid="art-current-section" class="visually-hidden">{{ title }}</h3>
     <fieldset v-if="section === 0" :disabled="store.pending || store.blocked" data-testid="art-project-section"><legend>项目设定</legend>
-      <div class="art-grid"><label>项目名称<input v-model="store.draft.project.name" aria-label="美术项目名称" maxlength="128" @input="store.touch"></label><label>引擎<input value="Cocos Creator" readonly></label></div>
-      <label>项目内容说明<textarea v-model="store.draft.project.content" aria-label="美术项目内容" rows="2" maxlength="1500" @input="store.touch"/></label>
-      <div class="art-grid"><label>设计画布宽<input v-model.number="store.draft.project.designResolution.width" aria-label="美术画布宽" type="number" min="1" max="8192" @input="store.touch"></label><label>设计画布高<input v-model.number="store.draft.project.designResolution.height" aria-label="美术画布高" type="number" min="1" max="8192" @input="store.touch"></label></div>
+      <div class="art-grid"><label>项目名称<input :value="project?.name" aria-label="美术项目名称" readonly></label><label>引擎<input value="Cocos Creator" aria-label="项目引擎" readonly></label></div>
+      <label>项目内容说明<textarea v-model="store.draft.project.content" aria-label="美术项目内容" rows="3" maxlength="1500" placeholder="写清游戏类型、核心玩法、世界观或场景、目标用户和美术主题。例：面向休闲玩家的蚂蚁经营小游戏，收集食材扩建厨房，明亮卡通风格。" @input="store.touch"/></label>
+      <label>设计分辨率<select aria-label="设计画布预设" :value="canvasChoice" @change="chooseCanvas"><option v-for="preset in canvasPresets" :key="preset.id" :value="preset.id">{{ preset.label }}</option><option value="custom">自定义</option></select><small>游戏设计画布，不是 AI 出图尺寸。</small></label>
+      <div class="art-grid"><label>设计画布宽<input v-model.number="store.draft.project.designResolution.width" aria-label="美术画布宽" :readonly="canvasChoice!=='custom'" type="number" min="1" max="8192" @input="store.touch"></label><label>设计画布高<input v-model.number="store.draft.project.designResolution.height" aria-label="美术画布高" :readonly="canvasChoice!=='custom'" type="number" min="1" max="8192" @input="store.touch"></label></div>
     </fieldset>
 <template v-if="section === 1">
     <fieldset v-if="section === 1" :disabled="store.pending || store.blocked" data-testid="art-global-section"><legend>继承的全局设定</legend>
@@ -165,3 +186,5 @@ const friendlyErrors = computed(() => currentErrors.value.map(error => {
 </style>
 
 <style scoped>.art-saved-summary{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.art-confirm-summary{display:grid;grid-template-columns:100px 1fr;gap:8px}.art-confirm-summary dd{margin:0;overflow-wrap:anywhere}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.setup-timeline-panel{display:grid;gap:12px}.setup-timeline-heading small{font-weight:400}</style>
+
+<style scoped>.art-spec-dialog :deep(.el-steps){margin:8px 0 16px}.art-spec-dialog :deep(.el-step__title){font-size:14px}.art-spec-dialog :deep(.el-step__description){font-size:12px}.art-spec-dialog :deep(.el-step){cursor:pointer}.art-spec-dialog select{width:100%;box-sizing:border-box;padding:8px;border:1px solid var(--el-border-color);border-radius:4px;background:var(--el-bg-color);color:inherit;font:inherit}.art-spec-dialog input[readonly]{background:var(--el-fill-color-light)}@media(max-width:520px){.art-spec-dialog :deep(.el-step__title){font-size:12px}.art-spec-dialog :deep(.el-step__description){font-size:11px}.art-grid{grid-template-columns:1fr}}</style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, reactive, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue'
 import ArtStatusBar from './ArtStatusBar.vue'
 import AiResourceReadView from '../views/AiResourceReadView.vue'
 import AiTaskCreationPanel from './AiTaskCreationPanel.vue'
@@ -12,10 +12,22 @@ import { aiTaskCreationProvider } from '../ai-task-creation-integration'
 import type { AiTaskCreatedEvent } from '../stores/ai-task-creation'
 import { artProductionStage, canChooseArtStage, savedArtSpecDependency, sameArtSpecDependency, type ArtSpecDependency } from '../domain/art-production-flow'
 import { projectArtSpecProvider } from '../project-art-spec-integration'
+import { aiJobsReadProvider } from '../ai-jobs-read-integration'
+import { createAiJobsReadState } from '../stores/ai-jobs-read'
 const props=withDefaults(defineProps<{ game?:boolean; embedded?:boolean; category?:'icon'|'ui'|'ip'; active?:boolean }>(),{embedded:false,category:'icon',active:true})
 const emit=defineEmits<{ 'stage-change':[value:{step:number;reached:number}] }>()
 const selection=useRegisteredProjectStore(), art=useProjectArtSpecStore(), editor=useAiResourceEditorStore()
 const step=ref(0), reached=ref(0), jobsVisited=ref(false)
+const existingTasks=reactive(createAiJobsReadState())
+const observedTasks=computed(()=>existingTasks.provider===aiJobsReadProvider.value && existingTasks.project?.id===selection.project?.id && existingTasks.project?.path===selection.project?.path && !existingTasks.loading && !existingTasks.error ? existingTasks.history?.jobs??[] : [])
+const resumableTasks=computed(()=>observedTasks.value.filter(job=>!job.historyOnly && !['failed','blocked'].includes(job.state)))
+function refreshExisting(){if(props.category==='icon' && props.active && aiJobsReadProvider.value && !existingTasks.busy)void existingTasks.readJobs(aiJobsReadProvider.value)}
+watch([()=>selection.project?.id,()=>selection.project?.path,()=>selection.currentSource,()=>props.category,()=>props.active,()=>step.value,aiJobsReadProvider],()=>{
+ existingTasks.setContext(selection.project,selection.currentSource)
+ if(existingTasks.provider && existingTasks.provider!==aiJobsReadProvider.value)existingTasks.invalidateProvider()
+ if(step.value===0 && !existingTasks.history && !existingTasks.error && !existingTasks.loading)refreshExisting()
+},{immediate:true,flush:'post'})
+onBeforeUnmount(()=>existingTasks.disconnect())
 const planning=reactive({name:'',purpose:'',prompt:''})
 const acceptedSpec=shallowRef<ArtSpecDependency|null>(null), dependencyReview=ref(false), resultReview=ref(false)
 const projectStates=new WeakMap<object,Map<string,{step:number;reached:number;jobsVisited:boolean;planning:typeof planning;acceptedSpec:ArtSpecDependency|null;dependencyReview:boolean;resultReview:boolean}>>()
@@ -50,14 +62,21 @@ watch(taskStage,value=>{if(jobsVisited.value && !dependencyReview.value && !resu
 function chooseStep(index:number){if(!canChooseArtStage(index,reached.value))return false;step.value=index;return true}
 defineExpose({chooseStep,step,reached})
 function plan(){if(!props.active || !specDependency.value)return;acceptedSpec.value=specDependency.value;dependencyReview.value=false;reached.value=Math.max(reached.value,1);step.value=1}
-function resume(){if(!props.active || props.category!=='icon')return;jobsVisited.value=true;reached.value=Math.max(reached.value,2);step.value=2}
+async function resume(historyOnly=false){
+ const jobs=historyOnly?observedTasks.value:resumableTasks.value, target=selection.project, source=selection.currentSource, reader=aiJobsReadProvider.value
+ if(!props.active || props.category!=='icon' || !jobs.length || !target || !source || !reader)return
+ const snapshot=jobs[0]!
+ jobsVisited.value=true;reached.value=Math.max(reached.value,2);step.value=2
+ await nextTick()
+ if(selection.project?.id===target.id && selection.project.path===target.path && selection.currentSource===source && aiJobsReadProvider.value===reader)await jobsPanel.value?.readCreatedTask?.({snapshot,project:target,source,jobsReader:reader})
+}
 async function created(input:AiTaskCreatedEvent){
  const current=()=>selection.project?.id===input.project.id && selection.project.path===input.project.path && selection.currentSource===input.source
  if(props.category!=='icon'||!current())return
  resultReview.value=!taskReady.value
  jobsVisited.value=true;reached.value=Math.max(reached.value,2);step.value=2
  await nextTick()
- if(current())await jobsPanel.value?.readCreatedTask(input)
+ if(current()){await jobsPanel.value?.readCreatedTask(input);refreshExisting()}
 }
 function checkCategorySupport(){if(!props.active || !taskReady.value || !planning.name.trim() || !planning.purpose.trim() || !planning.prompt.trim())return;step.value=2;reached.value=Math.max(reached.value,2)}
 </script>
@@ -73,7 +92,8 @@ function checkCategorySupport(){if(!props.active || !taskReady.value || !plannin
    <p v-if="step===0 && jobsVisited" class="form-help">原任务和素材保留。修改规范仅影响后续新任务，原任务仍使用封存规范。</p>
    <div v-show="step===0">
     <AiResourceReadView v-if="!props.embedded" embedded/>
-    <div class="production-buttons"><el-button type="primary" :disabled="!props.active||!specReady" @click="plan">使用已保存规范</el-button><el-button v-if="props.category==='icon'" :disabled="!props.active" @click="resume">继续已有任务</el-button></div>
+    <div class="production-buttons"><el-button v-if="art.base" type="primary" :disabled="!props.active||!specReady" @click="plan">使用已保存规范</el-button><el-button v-if="props.category==='icon' && resumableTasks.length" text aria-label="继续已有任务" :disabled="!props.active" @click="resume(false)">继续已有任务<span class="existing-task-count">{{ resumableTasks.length }}</span></el-button><el-button v-else-if="props.category==='icon' && observedTasks.length" text :disabled="!props.active" @click="resume(true)">查看任务记录</el-button></div>
+    <p v-if="props.category==='icon' && existingTasks.loading" class="form-help" role="status">正在检查已有任务…</p><p v-if="props.category==='icon' && existingTasks.error" class="form-help" role="status">已有任务读取失败。<el-button text :disabled="!props.active" @click="refreshExisting">重试读取任务</el-button></p>
    </div>
    <div v-show="step===1">
     <p v-if="!specReady && !dependencyReview" role="status">规范已变化或尚未保存。输入保留，请返回项目规范核对。</p>
@@ -94,5 +114,5 @@ function checkCategorySupport(){if(!props.active || !taskReady.value || !plannin
  </section>
 </template>
 <style scoped>
-.category-planning{display:grid;gap:12px;max-width:760px}.category-planning label{display:grid;gap:7px}.art-production-flow{display:grid;gap:16px}.completed-production{display:flex;gap:8px;flex-wrap:wrap}.completed-production button{border:1px solid var(--el-border-color);border-radius:6px;background:var(--el-bg-color);padding:7px 11px;color:var(--el-text-color-primary);cursor:pointer}.completed-production span{font-size:12px;color:var(--el-text-color-secondary);margin-left:8px}.production-heading{display:flex;align-items:center;gap:10px}.production-heading h2{margin:0;font-size:20px}.production-heading>span{background:var(--el-fill-color-light);border-radius:50%;padding:4px 9px;color:var(--el-text-color-secondary)}.production-buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.category-planning{display:grid;gap:12px;max-width:760px}.category-planning label{display:grid;gap:7px}.art-production-flow{display:grid;gap:16px}.completed-production{display:flex;gap:8px;flex-wrap:wrap}.completed-production button{border:1px solid var(--el-border-color);border-radius:6px;background:var(--el-bg-color);padding:7px 11px;color:var(--el-text-color-primary);cursor:pointer}.completed-production span{font-size:12px;color:var(--el-text-color-secondary);margin-left:8px}.production-heading{display:flex;align-items:center;gap:10px}.production-heading h2{margin:0;font-size:20px}.production-heading>span{background:var(--el-fill-color-light);border-radius:50%;padding:4px 9px;color:var(--el-text-color-secondary)}.existing-task-count{margin-left:5px;font-size:12px}.production-buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
 </style>
