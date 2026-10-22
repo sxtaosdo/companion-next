@@ -19,7 +19,7 @@ Use [source and reuse policy](source-and-reuse-policy.md), [34-item audit](whole
 - Crop reuses the old canvas/ROI implementation and original save/status routes with deterministic cropId. Context changes discard stale replies. Saving a crop does not claim reference conditioning or automatically edit project specification references.
 - Referenced-preset deletion uses the old `confirm=true` capability only after explicit affected-project confirmation. Ordinary deletion never silently upgrades after 409. No actual user preset has been deleted.
 - Project hover actions covered Creator start: a real normal click timed out with zero start requests. CSS reserves the primary button and uses existing static actions on narrow screens; hit tests pass at 1440/1280/900/390.
-- Integrated regression: 271/271 tests, full vue-tsc exit 0. Handoff focused final regression 141/141. Crop actual Edge canvas fixture 23/23; handoff actual Edge fixture 19/19 (local HTTP, clipboard and Blob interception). Fixtures never count as current-service import success.
+- Integrated regression: 271/271 tests, full vue-tsc exit 0. Handoff focused final regression 141/141. Crop actual Edge canvas fixture 23/23; completion/preset actual Edge fixture 28/28; handoff actual Edge fixture 19/19 (local HTTP, clipboard and Blob interception). Fixtures never count as current-service import success.
 
 ## Remaining real acceptance
 
@@ -28,3 +28,5 @@ Current 32180 keeps eight projects and offline_import_only. Its task/adoption li
 ## Evidence locations
 
 Task evidence root: `C:/Users/33272/Documents/Codex/2026-10-17/task/migration-fixes-20261022/` (integrated report, pointer before/after, current-service preflight). Skill receipt: `../vue-testing-skill-install/installed-receipt.json`. Crop fixture: `../reference-crop-20261022/render-result.json`. Release/HTTP evidence is recorded separately after actual static update; source edits alone are not deployment.
+
+Browser rendering found a 375px overflow in the existing UNKNOWN preset manual-check checkbox. The shared panel checkbox wrapping now covers that section; actual Edge recheck passed. These checks use isolated responses and do not delete presets or operate Creator.
