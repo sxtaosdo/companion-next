@@ -47,4 +47,4 @@
 
 See [delivery](../../../docs/migration-completion-20261022.md). 6.4 remains partly unverified: the real setup task completed and eight identities were retained; Agent configuration was not submitted and its skip/final completion UI was only fixture-rendered. Do not replay completed setup just for evidence. Scene binding/runtime and new GPU generation remain out of this completed import proof.
 
-- Follow-up defect: actual post-import96px handoff returned409; exact business code not captured. The fixture rendering is passed, actual host post-import handoff is NOT passed. See delivery document for evidence, automatic-review rejection/retry accounting and minimal host repair recommendation.
+- Resolved post-import handoff409: exact error VARIANT_PROVENANCE_UNAVAILABLE, immutable export revision3 vs current task6. Host0.3.145 is running on original32180/PID3988. Actual UI prepares HTTP200/copyable packet; wrong target rejects409 VARIANT_BINDING_MISMATCH; isolated transport negative stale revision rejects409 STALE_JOB. 75 targeted tests/typecheck pass. Task/PNG/meta unchanged. See delivery evidence; 6.4 remains honestly partial and this change is not archived.

@@ -200,3 +200,10 @@ results.json是16条记录、15个不同stage；保留重复读取及初次失�
 - 添加向导UI提交7dd8f6e2-7354-475a-be9b-2dc8c2c0c9f8，后台任务complete，Bridge current0.3.138，8工程无重复；configureCodex=false。未提交Agent配置；最终跳过/完成页仍只有隔离渲染验证，不重跑安装补证据。
 
 证据在 task/migration-fixes-20261022/ 的creator-open184-result、art-spec184-file-readback、adopt184-result、select-export184-result、import184-readback、import184-file-uuid-readback、setup184-readback和deployed184 JSON；完整说明见[migration-completion-20261022.md](migration-completion-20261022.md)。没有宣称场景绑定、运行生产验收、参考图入模或新一轮模型生成通过。
+
+
+## 2026-10-22 后续交接包409修复（同一32180）
+
+准确错误为 VARIANT_PROVENANCE_UNAVAILABLE：原尺寸导出凭据绑定r3，导入后任务为r6。现复用原导入operation的不可变凭据，继续严格检查当前任务、候选/素材、工程、配置、目标、文件及回执哈希。宿主d3376a5 / 0.3.145已在原32180/PID3988/OPEN实际生效，前端仍1.3.184。75项定向测试和完整类型检查通过。原UI准备96px交接包HTTP200、可复制；错误目标仍409 VARIANT_BINDING_MISMATCH；负向传输测试旧r3仍409 STALE_JOB。任务JSON、导出PNG、导入PNG/meta四文件原哈希未变，任务仍r6，没有重新生成/导出/导入、Agent派发或Creator操作。原Creator31024保持。
+
+证据及六文件可回退备份见task/handoff409-20261022，完整说明见migration-completion-20261022.md。添加安装原任务已完成，不重复安装制造最终页证据；Agent跳过/完成页现场仍未验。导入文件成功不能当作场景绑定或运行验收通过。
