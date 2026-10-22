@@ -173,3 +173,26 @@ describe('tool preset writes freeze confirmation and isolate uncertain outcomes'
   })
 
 })
+
+
+describe('separately confirmed linked-preset removal preserves store protections',()=>{
+ it('freezes the explicit reset flag, requires approval, and reports only validated affected ids',async()=>{
+  const {store,writer}=fixture();writer.execute=vi.fn<ToolPresetWriteProvider['execute']>(async()=>({kind:'deleted',projectIds:['p1','p2']}))
+  const plan=store.prepareDelete(true)!;expect(plan.title).toContain('关联工程回退全部工具');expect(Object.isFrozen(plan.operation)).toBe(true)
+  expect(plan.operation).toMatchObject({kind:'delete',preset:{id:'custom'},resetLinkedProjects:true});expect(writer.execute).not.toHaveBeenCalled()
+  expect(await store.confirm(plan,false)).toBe(false);expect(writer.execute).not.toHaveBeenCalled()
+  expect(await store.confirm(plan,true)).toBe(true);expect(writer.execute).toHaveBeenCalledOnce();expect(store.notice).toContain('2 个关联工程已回退 full');expect(store.receipt).toEqual({kind:'deleted',projectIds:['p1','p2']})
+  expect(store.needsRefresh).toBe(true);expect(store.prepareDelete(true)).toBeUndefined()
+ })
+ it('invalidates explicit reset confirmation when the registration snapshot changes and returns',async()=>{
+  const {store,writer,context}=fixture(),plan=store.prepareDelete(true)!
+  store.syncContext({...context,registrationRevision:context.registrationRevision+1});store.syncContext(context)
+  expect(await store.confirm(plan,true)).toBe(false);expect(writer.execute).not.toHaveBeenCalled()
+ })
+ it('retains UNKNOWN after reset timeout and matching readback, without ordinary or reset resubmission',async()=>{
+  const {store,writer,reader}=fixture();writer.execute=vi.fn(async()=>{throw new ToolPresetWriteError('timeout','unknown')})
+  const plan=store.prepareDelete(true)!;expect(await store.confirm(plan,true)).toBe(false)
+  vi.mocked(reader.loadPresets).mockResolvedValue({presets:builtins,selectedPresetId:'full'})
+  await store.readBack();expect(store.observation?.matches).toBe(true);expect(store.status).toBe('unknown');expect(store.prepareDelete()).toBeUndefined();expect(store.prepareDelete(true)).toBeUndefined();expect(writer.execute).toHaveBeenCalledOnce()
+ })
+})

@@ -46,7 +46,7 @@ test('shared knowledge keys are removed only from child environment',()=>{
 });
 
 
-test('approved machine config has exactly six explicit bindings and rejects mode/path/key drift',()=>{
+test('approved machine config has exactly seven explicit bindings and rejects mode/path/key drift',()=>{
  const binding={...APPROVED_STARTUP_CONFIG};assert.deepEqual(validateStartupConfiguration(binding),binding);
  for(const value of [null,[],{}, {...binding,CREATOR_AI_ICONS_ENDPOINT:'http://127.0.0.1:8188'}, {...binding,CREATOR_AI_ICONS_MODE:'generation'}, {...binding,CREATOR_AI_ICONS_STORE:'D:/Elsewhere'}, {...binding,CREATOR_AI_ICONS_NODE:'node.exe'}, {...binding,CREATOR_AI_ICONS_NODE:123}]) assert.throws(()=>validateStartupConfiguration(value),StartupError);
  const getter={...binding};Object.defineProperty(getter,'CREATOR_AI_ICONS_STORE',{get:()=>assert.fail('getter must not run'),enumerable:true});assert.throws(()=>validateStartupConfiguration(getter),/LOCAL_CONFIG_VALUE_INVALID/);
@@ -93,4 +93,15 @@ test('account dependency uses existing Node22 backend-only launcher and validate
 });
 test('unconfirmed auth dependency prevents Companion startup and browser creation without retry',async()=>{
  let calls=0;await assert.rejects(startCompanion({}, {ensureAuth:async()=>{calls++;throw new StartupError('ACCOUNT_PROVIDER_UNCONFIRMED')},start:()=>assert.fail('must not start'),createBrowser:()=>assert.fail('must not open')}),/ACCOUNT_PROVIDER_UNCONFIRMED/);assert.equal(calls,1);
+});
+
+
+test('approved existing mother-image source persists without allowing arbitrary manifest paths or generation',()=>{
+ const binding=loadStartupConfiguration();
+ assert.equal(binding.CREATOR_AI_ICONS_ADOPTION_MANIFEST,'D:/CompanionData/art-generation-acceptance-20261021/records/adoption-catalog.json');
+ const child=startupEnvironment({CREATOR_AI_ICONS_ADOPTION_MANIFEST:'D:/unapproved.json',CREATOR_AI_ICONS_ENDPOINT:'http://127.0.0.1:8188'},binding);
+ assert.equal(child.CREATOR_AI_ICONS_ADOPTION_MANIFEST,binding.CREATOR_AI_ICONS_ADOPTION_MANIFEST);
+ assert.equal(child.CREATOR_AI_ICONS_MODE,'offline_import_only');assert.equal(child.CREATOR_AI_ICONS_ENDPOINT,undefined);
+ assert.throws(()=>validateStartupConfiguration({...binding,CREATOR_AI_ICONS_ADOPTION_MANIFEST:'D:/other.json'}),/LOCAL_CONFIG_BINDING_NOT_APPROVED/);
+ const missing={...binding};delete missing.CREATOR_AI_ICONS_ADOPTION_MANIFEST;assert.throws(()=>validateStartupConfiguration(missing),/LOCAL_CONFIG_KEYS_INVALID/);
 });

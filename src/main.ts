@@ -1,3 +1,5 @@
+import { createReferenceCropProvider } from './adapters/ai-reference-crop'
+import { registerReferenceCropProvider } from './ai-reference-crop-integration'
 import { installCompanionSessionRecovery } from './domain/companion-session-recovery'
 import {createProjectArtSpecProvider} from './adapters/project-art-spec'
 import {registerProjectArtSpecProvider} from './project-art-spec-integration'
@@ -15,6 +17,8 @@ import { createPreviewActionsProvider } from './adapters/preview-actions'
 import { registerPreviewActionsProvider } from './preview-actions-integration'
 import { createLogToolsProvider } from './adapters/log-tools'
 import { registerLogToolsProvider } from './log-tools-integration'
+import { createIconHandoffProvider } from './adapters/icon-handoff'
+import { registerIconHandoffProvider } from './icon-handoff-integration'
 import { createAiJobActionsProvider } from './adapters/ai-job-actions'
 import { registerAiJobActionsProvider } from './ai-job-actions-integration'
 import { createAiTaskCreationProvider } from './adapters/ai-task-creation'
@@ -76,6 +80,7 @@ if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatH
     registerLogToolsProvider(createLogToolsProvider({fetch:window.fetch.bind(window)}))
     registerAiJobsReadProvider(createAiJobsReadProvider({fetch:window.fetch.bind(window)}))
     registerAiJobActionsProvider(createAiJobActionsProvider({fetch:window.fetch.bind(window)}))
+    registerIconHandoffProvider(createIconHandoffProvider({fetch:window.fetch.bind(window)}))
     registerAiTaskCreationProvider(createAiTaskCreationProvider({fetch:window.fetch.bind(window)}))
     registerCreatorOperationsProvider(createCreatorOperationsProvider({fetch:window.fetch.bind(window)}))
     registerProjectSetupProvider(createProjectSetupProvider({fetch:window.fetch.bind(window)}))
@@ -85,6 +90,7 @@ if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatH
   if (configEditorHost || normalWorkspaceHost) {
     registerAiResourceSaveProvider(createAiResourceSaveProvider({fetch:window.fetch.bind(window)}))
     registerAiReferenceUploadProvider(createAiReferenceUploadProvider({fetch:window.fetch.bind(window)}))
+    registerReferenceCropProvider(createReferenceCropProvider(window.fetch.bind(window)))
   }
   if (knowledgeChatHost || normalWorkspaceHost) registerKnowledgeConversationProvider(createKnowledgeConversationProvider({fetch:window.fetch.bind(window)}))
   registerAiResourceReadProvider(createAiResourceReadProvider({fetch:window.fetch.bind(window),referencePreview:!passiveReadHost}))

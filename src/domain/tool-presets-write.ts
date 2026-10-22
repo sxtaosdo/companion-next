@@ -7,7 +7,7 @@ export type ToolPresetWriteOperation =
   | { kind: 'update'; before: ToolPreset; preset: ToolPreset }
   | { kind: 'import'; presets: ToolPreset[] }
   | { kind: 'assign'; projectId: string; previous: ToolPreset; preset: ToolPreset }
-  | { kind: 'delete'; preset: ToolPreset }
+  | { kind: 'delete'; preset: ToolPreset; resetLinkedProjects?: true }
 export interface ToolPresetWriteInput { operation: ToolPresetWriteOperation; approved: true }
 export type ToolPresetWriteReceipt = { kind: 'preset'; preset: ToolPreset; batchSize: number } | { kind: 'deleted'; projectIds: string[] }
 export interface ToolPresetWriteProvider {
@@ -22,7 +22,7 @@ const messages: Record<ToolPresetWriteCode, string> = {
   'invalid-input': '工具预设参数或确认无效，未发送请求。', busy: '已有工具预设请求尚未结束，未发送新请求。',
   aborted: '已停止等待；宿主可能仍完成持久化，结果未知，不会自动重试。', timeout: '等待超时；持久化结果未知，不会自动重试。',
   unauthorized: '现有 Companion 会话无效，宿主拒绝本次请求（401）。', forbidden: '宿主拒绝本次请求（403）。',
-  'in-use': '该预设仍被工程使用，未删除。强制删除会使所有关联工程回退 full，工具可见范围可能扩大；此处不发送强制确认。',
+  'in-use': '该预设仍被工程使用，普通删除已拒绝。若要删除并使所有关联工程回退 full，须另行准备并明确确认；不会自动重试。',
   'invalid-shape': '回执无法与本次确认内容对应，持久化结果未知。', 'response-too-large': '回执超过安全预算，持久化结果未知。',
   'network-error': '连接未正常完成，持久化结果未知。', unconfirmed: '宿主未返回可确认的操作回执，结果未知。',
 }
@@ -70,7 +70,10 @@ export function validateToolPresetWriteInput(value: unknown): ToolPresetWriteInp
       if (!isToolPresetProjectId(op.projectId)) throw invalid()
       operation = { kind, projectId: op.projectId, previous: preset(op.previous), preset: preset(op.preset) }
     } else if (kind === 'delete') {
-      const op = exact(raw.operation, ['kind', 'preset']); operation = { kind, preset: custom(op.preset) }
+      const reset = Object.prototype.hasOwnProperty.call(raw.operation, 'resetLinkedProjects')
+      const op = exact(raw.operation, reset ? ['kind', 'preset', 'resetLinkedProjects'] : ['kind', 'preset'])
+      if (reset && op.resetLinkedProjects !== true) throw invalid()
+      operation = { kind, preset: custom(op.preset), ...(reset ? { resetLinkedProjects: true as const } : {}) }
     } else throw invalid()
     if (new TextEncoder().encode(JSON.stringify(operation)).byteLength > TOOL_PRESET_WRITE_LIMITS.maxRequestBytes) throw invalid()
     return { operation, approved: true }
@@ -107,9 +110,9 @@ export function decodeToolPresetWriteReceipt(raw: unknown, operation: ToolPreset
   try {
     if (operation.kind === 'delete') {
       const value = exact(raw, ['deleted', 'projectIds'])
-      // A normal DELETE must never reset an associated project to full.
-      if (value.deleted !== true || !Array.isArray(value.projectIds) || value.projectIds.length) throw mismatch()
-      return { kind: 'deleted', projectIds: [] }
+      // Only the separately confirmed legacy deletion may reset associations.
+      if (value.deleted !== true || !Array.isArray(value.projectIds) || value.projectIds.length > 1000 || !value.projectIds.every(isToolPresetProjectId) || new Set(value.projectIds).size !== value.projectIds.length || (!operation.resetLinkedProjects && value.projectIds.length)) throw mismatch()
+      return { kind: 'deleted', projectIds: [...value.projectIds] }
     }
     const result = decodeToolPreset(raw), expected = operation.kind === 'import' ? operation.presets[0]! : operation.preset
     const ignore = operation.kind === 'create' ? ['id', 'updatedAt'] as const : operation.kind === 'update' ? ['updatedAt'] as const : []

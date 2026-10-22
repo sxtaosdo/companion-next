@@ -1,0 +1,33 @@
+schema: spec-driven
+
+context: |
+  Language: Chinese
+  All artifacts must be written in Chinese.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+  Companion Next is Vue 3 / Element Plus; the only running backend is 127.0.0.1:32180.
+  AGENTS.md and docs/source-and-reuse-policy.md remain authoritative; do not duplicate or override them.
+  The current approved scope is docs/whole-migration-audit-20261022.md migration gaps, not new product capabilities.
+  All real Creator operations originate from the backend UI. No new backend, GPU generation, formal-asset writes, credentials, or security changes.
+  Record code/test/browser/real-32180 evidence separately; fixture or prior 32181 evidence is not current E2E.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

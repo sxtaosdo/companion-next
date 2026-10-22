@@ -81,7 +81,7 @@ export const useToolPresetsWriteStore = defineStore('tool-presets-write', () => 
       const before = checked.kind === 'update' ? checked.before : checked.kind === 'assign' ? checked.previous : checked.kind === 'create' ? checked.source : null
       const after = checked.kind === 'import' ? null : checked.preset
       const oldSet = before ? effectiveToolNames(before, context.tools) : new Set<string>(), newSet = after ? effectiveToolNames(after, context.tools) : new Set<string>()
-      const title = { create: '创建自定义工具预设', update: '保存自定义工具预设', import: '导入工具预设到宿主', assign: '保存工程工具范围', delete: '删除未被使用的自定义预设' }[checked.kind]
+      const title = { create: '创建自定义工具预设', update: '保存自定义工具预设', import: '导入工具预设到宿主', assign: '保存工程工具范围', delete: checked.kind === 'delete' && checked.resetLinkedProjects ? '删除自定义预设并使关联工程回退全部工具' : '删除未被使用的自定义预设' }[checked.kind]
       const registered = context.registeredProjects.find(project => project.id === context!.projectId)
       const prepared = freeze({ operation: checked, draftSource: draftSource ? decodeToolPreset(draftSource) : null, sourceLabel: context.reader!.label, projectId: context.projectId, projectName: registered?.name ?? '', projectPath: registered?.path ?? '', registrationLabel: context.registrationProvider?.label ?? '登记来源未核验', title,
         added: [...newSet].filter(name => !oldSet.has(name)).sort(), removed: [...oldSet].filter(name => !newSet.has(name)).sort(), revision: revision.value })
@@ -109,10 +109,10 @@ export const useToolPresetsWriteStore = defineStore('tool-presets-write', () => 
     if (!context?.projectId || !preset || !previous) { error.value = '请先选择并读取一个已登记工程。'; return }
     return prepare({ kind: 'assign', projectId: context.projectId, preset, previous })
   }
-  function prepareDelete() {
+  function prepareDelete(resetLinkedProjects = false) {
     const preset = context?.presets.find(item => item.id === context?.previewPresetId)
     if (!preset || preset.builtIn) { error.value = 'core/full 内置范围不可删除。'; return }
-    return prepare({ kind: 'delete', preset })
+    return prepare({ kind: 'delete', preset, ...(resetLinkedProjects === true ? { resetLinkedProjects: true as const } : {}) })
   }
   function dismiss() { plan.value = null; if (status.value === 'review') status.value = 'idle' }
   function cancelWait() {
@@ -137,7 +137,7 @@ export const useToolPresetsWriteStore = defineStore('tool-presets-write', () => 
       if (result.kind === 'preset' && (checked.kind !== 'preset' || result.batchSize !== checked.batchSize)) throw new ToolPresetWriteError('invalid-shape', 'unknown')
       if (prepared.operation.kind === 'create' && checked.kind === 'preset' && context.presets.some(item => item.id === checked.preset.id)) throw new ToolPresetWriteError('invalid-shape', 'unknown')
       receipt.value = freeze(checked); status.value = 'acknowledged'
-      notice.value = prepared.operation.kind === 'import' ? '宿主返回导入回执，仅包含批次首项；请显式回读核对完整批次。' : prepared.operation.kind === 'assign' ? '宿主已返回工程范围保存回执；已连接的 MCP 客户端需重连后生效。工具范围不会提升 Creator 权限。' : '宿主已返回本次持久化回执；请刷新核对。已连接的 MCP 客户端需重连后使用更新范围。'
+      notice.value = prepared.operation.kind === 'delete' && prepared.operation.resetLinkedProjects && checked.kind === 'deleted' ? `宿主返回删除回执，${checked.projectIds.length} 个关联工程已回退 full（全部工具）：${checked.projectIds.join('、') || '无关联工程'}。请刷新并核对；已连接 MCP 客户端需重连。` : prepared.operation.kind === 'import' ? '宿主返回导入回执，仅包含批次首项；请显式回读核对完整批次。' : prepared.operation.kind === 'assign' ? '宿主已返回工程范围保存回执；已连接的 MCP 客户端需重连后生效。工具范围不会提升 Creator 权限。' : '宿主已返回本次持久化回执；请刷新核对。已连接的 MCP 客户端需重连后使用更新范围。'
       return true
     } catch (cause) {
       const failure = cause instanceof ToolPresetWriteError ? cause : new ToolPresetWriteError('unconfirmed', 'unknown')

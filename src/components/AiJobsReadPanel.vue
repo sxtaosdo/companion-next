@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { CircleCheck, CircleClose, Loading, Minus, Warning } from '@element-plus/icons-vue'
+import IconHandoffPanel from "./IconHandoffPanel.vue"
 import AiJobActionsPanel from './AiJobActionsPanel.vue'
 import type { AiJobAction } from '../domain/ai-job-actions'
 import { aiJobActionsProvider } from '../ai-job-actions-integration'
@@ -105,6 +106,7 @@ onBeforeUnmount(() => store.disconnect())
       </template>
     </article>
     <section v-if="store.previewCandidateId" v-show="!props.progressive || workflowStep === 4" aria-live="polite" class="job-preview"><div class="section-heading"><h4>候选预览 · {{ store.previewCandidateId }}</h4><el-button @click="store.clearPreview()">关闭候选预览</el-button></div><p v-if="store.previewLoading">正在核对候选字节与原任务 SHA-256…</p><el-alert v-if="store.previewError" type="error" :closable="false" :title="store.previewError"/><template v-if="store.preview"><img ref="previewImage" :key="`${store.preview.candidateId}/${store.preview.sha256}`" :data-candidate="store.preview.candidateId" :data-sha="store.preview.sha256" :src="`data:image/png;base64,${store.preview.base64}`" alt="已核对任务候选的预览" @load="previewLoaded" @error="previewFailed"/><p>{{ store.preview.width }} × {{ store.preview.height }} · SHA-256 {{ store.preview.sha256 }}</p><p>像素可显示和文件一致不等于风格、用途、透明效果或生产验收通过。</p></template></section>
+    <IconHandoffPanel v-if="store.status && (!props.progressive || (props.workflowStep ?? 4) >= 4)" :project="store.project" :source="props.source" :job="store.status" :reader="store.provider" :active="props.active" :ready="!store.busy && !store.error && !store.statusError && !!store.statusObservedAt"/>
     <AiJobActionsPanel v-if="aiJobActionsProvider && store.status" :project="store.project" :source="props.source" :job="store.status" :preview="store.preview" :preview-shown="store.previewShown" :reader="store.provider" :provider="aiJobActionsProvider" :allowed-operations="allowedOperations" :offline-only="store.history?.mode === 'offline_import_only' ? true : store.history?.mode === 'generation' ? false : undefined" @readback="(input: AiJobActionReadback) => store.acceptActionReadback(input)"/>
   </section>
 </template>

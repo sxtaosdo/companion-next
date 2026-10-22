@@ -2,6 +2,7 @@
 import { computed,onBeforeUnmount,ref,watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import AgentRegistrationPanel from './AgentRegistrationPanel.vue'
+import SetupCompletionUsage from './SetupCompletionUsage.vue'
 import { useCompanionBrowserStore } from '../stores/companion-browser'
 import { useProjectSetupAddStore } from '../stores/project-setup-add'
 import { useProjectOperationLaneStore } from '../stores/project-operation-lane'
@@ -10,7 +11,7 @@ import { projectSetupProvider } from '../project-setup-integration'
 import { projectDisplayPathKey,projectDisplayRank } from '../domain/companion-project-display'
 import type { DashboardProject } from '../domain/companion-browser'
 import { runtimeStateLabel } from '../domain/companion-browser'
-import { setupStageLabel,validateProjectPath,ProjectSetupError } from '../domain/project-setup'
+import { setupStageLabel,validateProjectPath,ProjectSetupError,buildSetupCompletionPrompt } from '../domain/project-setup'
 const emit=defineEmits<{(event:'dialog-visibility',open:boolean):void}>(),browser=useCompanionBrowserStore(),store=useProjectSetupAddStore(),lane=useProjectOperationLaneStore(),scaffold=useProjectScaffoldStore()
 const open=ref(false),step=ref(1),mode=ref<'custom'|'dashboard'|'create'|'initialize'>('custom'),path=ref(''),parent=ref(''),name=ref(''),localError=ref(''),working=ref(false)
 const labels={custom:'自定义项目目录',dashboard:'来自 Cocos Dashboard',create:'创建 Cocos 项目',initialize:'初始化空目录'}
@@ -48,6 +49,12 @@ async function pick(parentOnly=false){
 async function launch(){if(await store.start())return}
 async function nextAgents(){if(store.phase==='complete'&&store.project)step.value=4}
 function finish(){step.value=5}
+const completionUsage=computed(()=>{
+ const project=store.project,snapshot=store.snapshot
+ if(!open.value||store.phase!=='complete'||!browser.connected||!project||!snapshot||snapshot.stage!=='complete'||snapshot.id!==store.operationId||snapshot.projectId!==project.id||projectDisplayPathKey(snapshot.projectPath)!==projectDisplayPathKey(project.path)||!browser.projects.some(item=>item.id===project.id&&item.name===project.name&&item.path===project.path))return null
+ const prompt=buildSetupCompletionPrompt(snapshot.mcpName)
+ return prompt?{project:{...project},prompt}:null
+})
 defineExpose({open:show,close})
 onBeforeUnmount(()=>{alive=false;dialogEpoch++;browser.cancelDashboardRead();store.pause();emit('dialog-visibility',false)})
 </script>
@@ -61,7 +68,7 @@ onBeforeUnmount(()=>{alive=false;dialogEpoch++;browser.cancelDashboardRead();sto
    <template v-if="n===2"><template v-if="mode==='create'"><label>父目录</label><div class="path-row"><el-input v-model="parent" aria-label="新工程父目录"/><el-button v-if="projectSetupProvider?.pickDirectory" :disabled="lane.locked||working" @click="pick(true)">选择父目录…</el-button></div><label>项目名称</label><el-input v-model="name" aria-label="新工程名称"/></template><template v-else><label>{{ mode==='initialize'?'空目录':'工程路径' }}</label><div class="path-row"><el-input v-model="path" aria-label="已有工程绝对路径"/><el-button v-if="projectSetupProvider?.pickDirectory" :disabled="lane.locked||working" @click="pick()">选择目录…</el-button></div></template><p v-if="mode==='create'&&parent&&name">请求目标：{{ createTarget }}</p><p v-if="mode==='create'||mode==='initialize'">Creator 3.8.8</p><template v-if="mode==='dashboard'"><el-button :loading="browser.dashboardLoading" :disabled="browser.dashboardLoading||lane.locked" @click="browser.refreshDashboard">刷新 Dashboard 工程</el-button><p v-if="browser.dashboardError" role="alert">Dashboard 工程读取失败</p><p v-else-if="!browser.dashboardRead&&!browser.dashboardLoading">尚未读取 Dashboard 工程</p><p v-else-if="browser.dashboardRead&&!browser.dashboard.length">本机未发现 Dashboard 工程</p><button v-for="item in dashboardItems" :key="item.path" type="button" class="dashboard-item" :disabled="!item.exists" :aria-pressed="path===item.path" @click="path=item.path">{{ item.name }} · {{ dashboardStatus(item) }} · {{ item.version?`Creator ${item.version}`:'' }} {{ item.progress?`状态 ${item.progress}`:'' }} · {{ item.path }}</button></template><div class="actions"><el-button @click="step=1">上一步</el-button><el-button type="primary" :loading="working" :disabled="lane.locked||((mode==='create'||mode==='initialize')&&!projectSetupProvider?.scaffold)" @click="nextProject">下一步</el-button></div></template>
    <template v-if="n===3"><p>确认工程后由 Cocos Dashboard 启动对应 Creator（Bridge / 工程登记）；不会直接执行 Creator --project。</p><label>工程路径</label><p>{{ store.target }}</p><label>工具范围</label><el-select popper-class="project-setup-select-popper" :model-value="store.presetId" aria-label="向导工具范围" :disabled="hasTask||store.busy" @update:model-value="store.selectPreset"><el-option v-for="preset in store.presets?.presets??[]" :key="preset.id" :value="preset.id" :label="preset.name"/></el-select><p>新工程默认全部工具；已有工程保留当前范围，只有明确改变选择才更新。</p><el-button :disabled="lane.locked" @click="step=2">上一步</el-button><el-button type="primary" :loading="store.phase==='submitting'" :disabled="!store.canStart" @click="launch">通过 Dashboard 启动 Creator</el-button><section v-if="hasTask||store.snapshot" data-testid="add-setup-receipt" role="status"><strong>{{ phases[store.phase] }}</strong><p v-if="store.operationId">任务 ID：{{ store.operationId }}</p><p v-if="store.snapshot">{{ setupStageLabel(store.snapshot.stage) }}</p><el-button v-if="store.canResume" @click="store.resume">继续读取原任务</el-button><el-button v-if="store.phase==='tracking'||store.phase==='submitting'" @click="store.pause">停止等待</el-button></section><el-button v-if="store.phase==='complete'" type="primary" @click="nextAgents">下一步</el-button></template>
    <template v-if="n===4"><AgentRegistrationPanel v-if="store.project" :project-id="store.project.id" wizard single-confirm @skip="finish" @complete="finish"/></template>
-   <template v-if="n===5"><p>添加流程完成。当前工程状态以工程页实时读取为准。</p></template>
+   <template v-if="n===5"><p>添加流程完成。当前工程状态以工程页实时读取为准。</p><SetupCompletionUsage v-if="completionUsage" :usage="completionUsage"/></template>
   </div></section>
  </div><section v-if="scaffold.receipt" data-testid="scaffold-receipt" role="status"><p>{{ scaffold.receipt.message }}</p><p>{{ scaffold.receipt.result?.path }}</p></section><el-alert v-if="localError||store.error||scaffold.error" :title="localError||errorText[store.error]||store.error||scaffold.error" type="warning" :closable="false"/><template #footer><el-button @click="close">关闭向导</el-button></template>
  </el-dialog>

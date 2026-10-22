@@ -124,3 +124,31 @@ describe('tool preset legacy write contract, synthetic transport only', () => {
     expect(() => validateToolPresetWriteInput(input({ kind: 'import', presets: [{ ...custom(), disabled: ['scene_save'] }] }))).toThrow()
   })
 })
+
+
+describe('explicit legacy delete with linked-project reset, simulated transport only', () => {
+  it('sends confirm=true only for the separately approved reset operation and accepts validated affected ids', async () => {
+    const transport=vi.fn<ToolPresetWriteFetch>(async()=>response({deleted:true,projectIds:['p1','p2']}))
+    const provider=createToolPresetWriteProvider({fetch:transport})
+    const result=await provider.execute(input({kind:'delete',preset:custom(),resetLinkedProjects:true}))
+    expect(transport).toHaveBeenCalledExactlyOnceWith('/api/tool-presets/custom?confirm=true',expect.objectContaining({method:'DELETE',credentials:'same-origin',redirect:'error'}))
+    expect(transport.mock.calls[0]![1].body).toBeUndefined();expect(result).toEqual({kind:'deleted',projectIds:['p1','p2']})
+  })
+  it('rejects false, string, built-in and extra reset fields before any request', async () => {
+    const transport=vi.fn<ToolPresetWriteFetch>(),provider=createToolPresetWriteProvider({fetch:transport})
+    for(const operation of [{kind:'delete',preset:custom(),resetLinkedProjects:false},{kind:'delete',preset:custom(),resetLinkedProjects:'true'},{kind:'delete',preset:builtins[0],resetLinkedProjects:true},{kind:'delete',preset:custom(),resetLinkedProjects:true,confirm:true}])
+      await expect(provider.execute({operation,approved:true} as ToolPresetWriteInput)).rejects.toMatchObject({code:'invalid-input',outcome:'not-sent'})
+    expect(transport).not.toHaveBeenCalled()
+  })
+  it('keeps malformed affected ids or unexpected association changes unknown', () => {
+    const operation={kind:'delete',preset:custom(),resetLinkedProjects:true} as const
+    for(const projectIds of [['p1','p1'],['../outside'],Array.from({length:1001},(_,n)=>'p'+n)])
+      expect(()=>decodeToolPresetWriteReceipt({deleted:true,projectIds},operation)).toThrow(ToolPresetWriteError)
+    expect(()=>decodeToolPresetWriteReceipt({deleted:true,projectIds:['p1']},{kind:'delete',preset:custom()})).toThrow(ToolPresetWriteError)
+  })
+  it('does not automatically upgrade an ordinary 409 into a reset deletion', async () => {
+    const transport=vi.fn<ToolPresetWriteFetch>(async()=>response({projectIds:['p1']},409)),provider=createToolPresetWriteProvider({fetch:transport})
+    await expect(provider.execute(input({kind:'delete',preset:custom()}))).rejects.toMatchObject({code:'in-use',outcome:'rejected',projectIds:['p1']})
+    await provider.waitForIdle();expect(transport).toHaveBeenCalledTimes(1);expect(transport.mock.calls[0]![0]).toBe('/api/tool-presets/custom')
+  })
+})

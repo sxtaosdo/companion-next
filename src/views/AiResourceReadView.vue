@@ -12,6 +12,9 @@ import ProjectArtSpecPanel from '../components/ProjectArtSpecPanel.vue'
 import AiResourceConfigDialog from '../components/AiResourceConfigDialog.vue'
 import { aiResourceSaveProvider } from '../ai-resource-save-integration'
 import { isAiReferencePath } from '../domain/ai-resource-read'
+import AiReferenceCropPanel from '../components/AiReferenceCropPanel.vue'
+import { referenceCropProvider } from '../ai-reference-crop-integration'
+const cropContext = computed(() => props.referenceTools && selection.project && selection.currentSource && referenceCropProvider.value && store.resource && store.provider === aiResourceReadProvider.value && store.project?.id === selection.project.id && store.project.path === selection.project.path && store.resource.projectId === selection.project.id && !store.loading && !store.error ? { projectId: selection.project.id, projectPath: selection.project.path, source: selection.currentSource, hash: store.resource.hash, provider: referenceCropProvider.value } : null)
 const props = withDefaults(defineProps<{ embedded?: boolean; sharedHeader?: boolean; referenceTools?: boolean }>(), { embedded: false, referenceTools: false })
 // The resource workflow already owns entry reads. Its embedded first step must
 // not mount a second registration lifecycle or choose a different project.
@@ -69,6 +72,7 @@ onBeforeUnmount(() => { if (!props.sharedHeader) store.disconnect() })
         </template>
       </template>
       <section v-if="store.previewPath" class="reference-preview" aria-live="polite"><div class="ai-read-actions"><strong>参考图预览</strong><el-button @click="store.clearPreview">关闭预览</el-button></div><p v-if="store.previewLoading" role="status">正在核对图片…</p><p v-if="store.previewError" role="alert">{{ store.previewError }}</p><template v-if="store.preview"><img class="ai-reference-preview" :src="`data:image/png;base64,${store.preview.base64}`" alt="已核对 SHA 的工程参考图" @error="store.previewDisplayFailed"/><p class="reference-note">{{ store.preview.width }} × {{ store.preview.height }} · SHA-256 {{ store.preview.sha256 }}</p></template></section>
+      <AiReferenceCropPanel :context="cropContext"/>
     </details>
     <ArtProductionFlow v-else-if="!props.embedded"/>
     <template v-else>

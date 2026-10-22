@@ -8,7 +8,7 @@ import { companionBrowserProvider } from '../companion-browser-integration'
 import { toolPresetReadProvider } from '../tool-presets-read-integration'
 import { toolPresetWriteProvider } from '../tool-presets-write-integration'
 const read = useToolPresetsReadStore(), drafts = useToolPresetDraftsStore(), write = useToolPresetsWriteStore(), projects = useCompanionBrowserStore()
-const confirmed = ref(false), recovered = ref(false), rename = ref('')
+const confirmed = ref(false), resetConfirmed = ref(false), recovered = ref(false), rename = ref('')
 function sync() {
   write.syncContext({ reader: read.provider === toolPresetReadProvider.value ? read.provider : null, writer: toolPresetWriteProvider.value,
     projectId: read.projectId, registeredProjects: projects.connected && projects.provider && projects.provider === companionBrowserProvider.value ? projects.projects.map(project => ({ ...project })) : [],
@@ -18,15 +18,16 @@ function sync() {
 }
 watch([() => read.provider, toolPresetReadProvider, toolPresetWriteProvider, () => read.projectId, () => read.tools, () => read.presets, () => read.selectedPresetId, () => read.previewPresetId, () => read.toolsRead, () => read.presetsRead, () => read.toolsLoading, () => read.presetsLoading, () => projects.connected, () => projects.provider, companionBrowserProvider, () => projects.projectLoading, () => projects.projectSnapshotRevision, () => projects.projects, () => drafts.revision], sync, { deep: true, immediate: true, flush: 'sync' })
 watch(rename, () => write.dismiss(), { flush: 'sync' })
-watch(() => write.plan, () => { confirmed.value = false }, { flush: 'sync' })
+watch(() => write.plan, () => { confirmed.value = false; resetConfirmed.value = false }, { flush: 'sync' })
 watch(() => write.observation, () => { recovered.value = false }, { flush: 'sync' })
 const ready = computed(() => Boolean(toolPresetWriteProvider.value && read.provider && read.provider === toolPresetReadProvider.value && read.toolsRead && read.presetsRead && !read.toolsLoading && !read.presetsLoading && !write.locked && !write.needsRefresh))
 const canAssign = computed(() => projects.connected && !!projects.provider && projects.provider === companionBrowserProvider.value && !projects.projectLoading && projects.projects.some(project => project.id === read.projectId && !!project.path))
 const preview = computed(() => read.preview)
 const review = computed(() => write.plan)
 const reviewPresets = computed(() => { const operation = review.value?.operation; return operation ? operation.kind === 'import' ? operation.presets : [operation.preset] : [] })
+const resetDeletion = computed(() => review.value?.operation.kind === 'delete' && review.value.operation.resetLinkedProjects === true)
 const before = computed(() => { const op = review.value?.operation; return op?.kind === 'update' ? op.before : op?.kind === 'assign' ? op.previous : op?.kind === 'create' ? op.source : null })
-async function submit() { const plan = write.plan; if (!plan || !confirmed.value) return; const approval = confirmed.value; confirmed.value = false; await write.confirm(plan, approval) }
+async function submit() { const plan = write.plan; if (!plan || !confirmed.value || resetDeletion.value && !resetConfirmed.value) return; const approval = confirmed.value; confirmed.value = false; resetConfirmed.value = false; await write.confirm(plan, approval) }
 let refreshRevision = 0
 watch([() => read.projectId, () => read.provider, toolPresetReadProvider], () => { refreshRevision++ }, { flush: 'sync' })
 async function refresh() { const reader = toolPresetReadProvider.value; if (!reader || write.sending || write.readingBack) return; const pending = read.loadTools(reader), version = refreshRevision; await pending; if (version === refreshRevision && read.provider === reader && toolPresetReadProvider.value === reader) await read.loadPresets() }
@@ -45,11 +46,11 @@ onBeforeUnmount(() => { refreshRevision++; write.leave() })
       <el-button :disabled="!ready || !drafts.drafts.length" @click="write.prepareImport(drafts.drafts.map(item => item.preset))">将全部页面草稿导入宿主</el-button>
     </div>
     <p class="form-help">创建由宿主生成新 ID；正式导入保留 JSON ID。重名、ID 冲突、未知工具、core/full 保护、最多 20 个自定义预设和 1 MiB 上限均会检查，未通过不会发送。保存已有预设会影响所有选择该预设的工程，当前接口不提供完整关联工程列表。</p>
-    <div class="write-actions"><el-input v-model="rename" maxlength="40" aria-label="正式预设新名称" placeholder="预览自定义预设的新名称" :disabled="write.locked"/><el-button :disabled="!ready || !preview || preview.builtIn || !rename.trim()" @click="write.prepareRename(rename)">改名并确认</el-button><el-button :disabled="!ready || !canAssign || !preview" @click="write.prepareAssign()">为当前工程确认分配预览范围</el-button><el-button type="danger" :disabled="!ready || !preview || preview.builtIn" @click="write.prepareDelete()">确认删除预览自定义预设</el-button></div>
-    <p>删除仅发送原普通 DELETE。若预设被使用，宿主会返回关联工程并拒绝删除；强制删除会使关联工程回退 full，可能扩大工具可见范围。当前接口无法原子锁定这些关联工程，此页不会发送 confirm=true。</p>
+    <div class="write-actions"><el-input v-model="rename" maxlength="40" aria-label="正式预设新名称" placeholder="预览自定义预设的新名称" :disabled="write.locked"/><el-button :disabled="!ready || !preview || preview.builtIn || !rename.trim()" @click="write.prepareRename(rename)">改名并确认</el-button><el-button :disabled="!ready || !canAssign || !preview" @click="write.prepareAssign()">为当前工程确认分配预览范围</el-button><el-button type="danger" :disabled="!ready || !preview || preview.builtIn" @click="write.prepareDelete()">确认删除预览自定义预设</el-button><el-button type="danger" plain :disabled="!ready || !preview || preview.builtIn" @click="write.prepareDelete(true)">删除并将关联工程回退全部工具</el-button></div>
+    <p>普通删除在预设被使用时由宿主拒绝。另一个删除入口会使所有关联工程回退 full（全部工具），可能扩大工具可见范围；必须另行核对和确认。原接口无法原子锁定关联工程列表，确认期间新增的关联也可能受影响。</p>
     <el-alert v-if="write.error" type="error" :closable="false" :title="write.error"/>
     <p v-if="write.notice" role="status">{{ write.notice }}</p>
-    <p v-if="write.inUseProjectIds.length">宿主返回的关联工程 ID：{{ write.inUseProjectIds.join('、') }}。请逐个核对并明确分配所需范围，再刷新重试普通删除。</p>
+    <p v-if="write.inUseProjectIds.length">宿主返回的关联工程 ID：{{ write.inUseProjectIds.join('、') }}。可逐个重新分配后刷新并准备普通删除；如需全部回退 full，请刷新后另行准备对应删除，不会自动重试。</p>
     <div v-if="review" class="write-review" role="region" aria-label="本次工具预设持久化确认">
       <h4>{{ review.title }}</h4>
       <p>固定来源：{{ review.sourceLabel }}。读取工程：{{ review.projectName || '无工程' }}（{{ review.projectId || '无工程 ID' }}）。路径：{{ review.projectPath || '不适用' }}。登记来源：{{ review.registrationLabel }}。</p>
@@ -61,9 +62,10 @@ onBeforeUnmount(() => { refreshRevision++; write.leave() })
       <p v-if="review.operation.kind === 'import'">将新增整批 {{ reviewPresets.length }} 项，保留这些 ID；原接口只返回首项回执，需要回读核对整批。</p>
       <article v-for="preset in reviewPresets" :key="preset.id"><strong>{{ preset.name }}</strong><p>ID：{{ preset.id }}；基础范围：{{ preset.baseProfile }}；更新时间：{{ preset.updatedAt }}；内置：{{ preset.builtIn ? '是' : '否' }}。</p><p>显式启用：[{{ preset.enabled.join('、') }}]；显式禁用：[{{ preset.disabled.join('、') }}]。</p></article>
       <p v-if="before">有效工具变化：新增 {{ review.added.length }} 项 [{{ review.added.join('、') }}]；移除 {{ review.removed.length }} 项 [{{ review.removed.join('、') }}]。</p>
-      <p v-if="review.operation.kind === 'delete'">确认删除此自定义预设。若当前有任何工程使用它，删除将被拒绝。不会默认同意关联工程回退全部工具。</p>
+      <p v-if="review.operation.kind === 'delete' && !resetDeletion">确认删除此自定义预设。若当前有任何工程使用它，删除将被拒绝。不会默认同意关联工程回退全部工具。</p>
+      <template v-if="resetDeletion"><p>将删除上方指定预设，并使所有关联工程回退 full（全部工具）；可能扩大工具可见范围。不是只影响当前工程，当前接口不能提供或锁定完整关联清单，也不能保证与此前409返回的清单一致。原接口没有撤销；不会修改 Creator 权限或自动重连客户端。</p><el-checkbox v-model="resetConfirmed" aria-label="确认关联工程回退全部工具">我确认删除此预设，并允许所有关联工程（含确认期间新增关联）回退 full</el-checkbox></template>
       <el-checkbox v-model="confirmed" aria-label="确认本次工具预设持久化">我已核对上述固定来源、目标与全部内容，了解同宿主并发覆盖风险，确认仅执行这一次操作</el-checkbox>
-      <div class="write-actions"><el-button @click="write.dismiss()">取消本次确认</el-button><el-button type="primary" :disabled="!confirmed || write.locked" @click="submit">确认并写入宿主一次</el-button></div>
+      <div class="write-actions"><el-button @click="write.dismiss()">取消本次确认</el-button><el-button type="primary" :disabled="!confirmed || (resetDeletion && !resetConfirmed) || write.locked" @click="submit">确认并写入宿主一次</el-button></div>
     </div>
     <div class="write-actions"><el-button v-if="write.sending" @click="write.cancelWait()">停止等待（不保证撤销）</el-button><el-button :disabled="write.sending || write.readingBack || !toolPresetReadProvider" @click="refresh">显式刷新目录和预设</el-button><el-button :disabled="!write.attempt || write.sending || write.readingBack" :loading="write.readingBack" @click="write.readBack()">回读核对上次操作</el-button></div>
     <p v-if="write.needsRefresh">下次写入前须重新读取工具目录和预设。回读核对不会将 UNKNOWN 自动改成成功。</p>

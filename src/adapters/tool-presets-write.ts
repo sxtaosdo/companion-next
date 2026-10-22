@@ -33,7 +33,7 @@ async function json(response: Response, signal: AbortSignal, aborted: () => Tool
   } catch (error) { if (error instanceof ToolPresetWriteError) throw error; throw fail('invalid-shape') }
   finally { if (!complete) { try { void track(reader.cancel()).catch(() => undefined) } catch { /* Ignore. */ } }; try { reader.releaseLock() } catch { /* Injected stream may still be pending. */ } }
 }
-/** Existing same-origin cookie session only. No forced-delete query, credentials, registration, automatic retry or readback. */
+/** Existing same-origin cookie session only. Only the explicitly approved reset-linked-projects operation adds legacy confirm=true. No credentials, registration, automatic retry or readback. */
 export function createToolPresetWriteProvider(options: { fetch: ToolPresetWriteFetch; timeoutMs?: number }): ToolPresetWriteProvider {
   if (typeof options?.fetch !== 'function') throw new TypeError('工具预设写入需要显式注入 fetch。')
   const timeoutMs = options.timeoutMs ?? TOOL_PRESET_WRITE_LIMITS.defaultTimeoutMs
@@ -47,7 +47,7 @@ export function createToolPresetWriteProvider(options: { fetch: ToolPresetWriteF
       if (signal?.aborted) throw fail('aborted', 'not-sent')
       const { operation } = validateToolPresetWriteInput(input)
       let path: ToolPresetWritePath, method: 'POST' | 'PATCH' | 'DELETE', body: string | undefined
-      if (operation.kind === 'delete') { path = `/api/tool-presets/${encodeURIComponent(operation.preset.id)}`; method = 'DELETE' }
+      if (operation.kind === 'delete') { path = `/api/tool-presets/${encodeURIComponent(operation.preset.id)}${operation.resetLinkedProjects ? '?confirm=true' : ''}`; method = 'DELETE' }
       else if (operation.kind === 'assign') { path = `/api/projects/${encodeURIComponent(operation.projectId)}/tool-preset`; method = 'POST'; body = JSON.stringify({ presetId: operation.preset.id }) }
       else if (operation.kind === 'import') { path = '/api/tool-presets/import'; method = 'POST'; body = JSON.stringify({ schemaVersion: 1, presets: operation.presets }) }
       else {
