@@ -78,3 +78,10 @@ test('tracked example matches the bounded allowlist and does not become an autom
  assert.deepEqual(validateStartupConfiguration(example),APPROVED_STARTUP_CONFIG);
  assert.throws(()=>loadStartupConfiguration(join(tmpdir(),'nonexistent-companion-machine-config-'+process.pid+'.json')),/LOCAL_CONFIG_MISSING/);
 });
+
+test('readiness retries only the snapshot generation race without repeating startup or issuing a ticket',async()=>{
+ let starts=0,reads=0;const result=await startCompanion({noBrowser:true},{start:async()=>{starts++},discover:async()=>({baseUrl:BASE,request:async(method,path)=>{assert.equal(method,'GET');assert.equal(path,'/v1/daemon/inflight');if(++reads<3)throw Object.assign(Error('race'),{status:409,code:'DAEMON_GENERATION_CHANGED'});return {phase:'OPEN',identity:{pid:456}}}}),createBrowser:()=>assert.fail('browser')});assert.equal(starts,1);assert.equal(reads,3);assert.equal(result.pid,456);
+});
+test('permission refusal is not retried as readiness and persistent generation races are bounded',async()=>{
+ for(const code of ['FORBIDDEN','DAEMON_GENERATION_CHANGED']){let starts=0,reads=0;await assert.rejects(startCompanion({noBrowser:true},{start:async()=>{starts++},discover:async()=>({baseUrl:BASE,request:async()=>{reads++;throw Object.assign(Error(code),{status:code==='FORBIDDEN'?403:409,code})}}),createBrowser:()=>assert.fail('browser')}),new RegExp(code));assert.equal(starts,1);assert.equal(reads,code==='FORBIDDEN'?1:5);}
+});

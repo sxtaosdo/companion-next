@@ -119,7 +119,17 @@ export async function startCompanion({ noBrowser = false } = {}, deps) {
   }
   const client = await discoverBounded(deps.discover);
   if (client.baseUrl !== BASE) throw new StartupError('UNEXPECTED_DAEMON_URL');
-  const status = await client.request('GET', '/v1/daemon/inflight', undefined, AbortSignal.timeout(10_000));
+  // Page polling can change the read-only snapshot generation after startup.
+  // Re-observe only that specific race; never start again or replay a mutation.
+  const deadline = Date.now() + 10_000;
+  let status;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try { status = await client.request('GET', '/v1/daemon/inflight', undefined, AbortSignal.timeout(Math.max(1, deadline - Date.now()))); break; }
+    catch (error) {
+      if (error?.status !== 409 || error?.code !== 'DAEMON_GENERATION_CHANGED' || attempt === 4 || Date.now() >= deadline) throw error;
+      await new Promise(done => setTimeout(done, Math.min(100, Math.max(1, deadline - Date.now()))));
+    }
+  }
   if (status?.phase !== 'OPEN' || !Number.isSafeInteger(status?.identity?.pid) || status.identity.pid <= 0) throw new StartupError('DAEMON_NOT_READY');
   if (noBrowser) return { url: NEXT, pid: status.identity.pid, lateReady };
   return { url: NEXT, pid: status.identity.pid, lateReady, ...await openNext(client, deps.createBrowser) };

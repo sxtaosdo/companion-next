@@ -1,6 +1,6 @@
 # Local authorization guidance - 2026-10-22
 
-Status: source implementation and isolated verification complete; NOT deployed.
+Status: DEPLOYED and verified on the sole production loopback instance 127.0.0.1:32180. Frontend1.3.179 / backend0.3.143.
 
 ## Reuse and scope
 
@@ -28,14 +28,32 @@ Proven gaps: the host returned raw403 for missing browser sessions; the CLI had 
 Evidence directory: C:/Users/33272/Documents/Codex/2026-10-17/task/login-guidance-20261022/
 Key files: session-recovery-render.json, session-recovery-render.mjs, build/creator-ai.js, build/companion-daemon.js. Local screenshots retained, not uploaded.
 
-## Current runtime and deployment blocker
+## Actual service recovery and deployment
 
-Fresh read-only check: sole listener127.0.0.1:32180 PID11604, epoch4b5a46e4-44f0-434b-952f-b3870736d9a9, OPEN. Eight registered projects remain readable. nativeEpochUnproven=2 and NATIVE_PRIOR_EPOCH_UNVERIFIED remain present. Existing daemon SHA256 acce4593a02e50e90eac0045d6b7dd26e03da47cf4b9d8744d8bd728c734a915. An unauthenticated GET /next/index.html still returns403/Forbidden with no code: the source fix is not live.
+User explicitly authorized service-only recovery, recoverable history cleanup if necessary, and termination of the exact verified idle daemon if its confirmed lifecycle bug prevented graceful exit. No Windows restart was performed.
 
-No stop/restart, installed bundle replacement, static deployment, extra backend/window, Creator operation or model request occurred in this task. Frontend product version remains1.3.178; no product release was invented for a pending patch.
+The old normal stop returned409 with only prior history remaining. PID11604 was rechecked against its full startup identity, entry SHA256, OS creation identity, v2 writer owner, OPEN phase, and zero current activity. Only that PID was then terminated, without a process tree or other application. This is recorded as a bounded process termination, not a graceful close or cancellation proof.
 
-## Minimum remaining step
+Fix: service-local idle ignores only nativeEpochUnproven and NATIVE_PRIOR_EPOCH_UNVERIFIED. Current work, nativeUncertain, other unknown states, identities, generation, observations, and writer cleanup still protect stopping. No global Creator quiescence is claimed. Code and tests: shared commit dd3eacd477ac7e0e03e459f4874d5816134abe0b. Independent review passed. Backend targeted regression80/80 and TypeScript passed.
 
-Apply matching CLI, daemon and Next static artifacts together only after a legitimate normal shutdown/maintenance path is available and the current process is confirmed stopped. Preserve the installed originals and data; use the original single32180 startup path and verify navigation, expiry recovery, versions and eight projects on that instance. Do not retry the known blocked stop, clear historical records, forge exit evidence, inject running code or force-kill to deploy. No compatible static-only change can make unauthenticated host navigation work while the old handler still rejects it.
+The six matching CLI/daemon/map/version files and Next static assets were backed up, installed offline and hash checked. The existing v2 protocol retained the exited old writer lock and acquired the canonical lock after OS identity verification. No manual lock deletion was used. Both historical UNKNOWN entries remain unchanged;0 history records deleted,0 quiescence proofs fabricated. User-authorized deletion proved unnecessary once the application lifecycle defect was fixed.
 
-The previous task-only checkpoint branch is checkpoints/login-guidance-before-20261022 in both repositories. Shared pre-existing edits are preserved; no remote push.
+Current sole host PID33432, epoch c873e8c2-28fc-4b9d-a855-7be8023f479c, OPEN. /api/projects and /v1/projects both200 with the same8 registrations. Backend0.3.143, build dd3eacd477ac-ac2afa7a3e54, daemon SHA256 ac2afa7a3e541ed26f8400c235e8b15916898f26f4bc4862761307c79eebb013. Frontend1.3.179, static source e47c84d; HTTP index and JavaScript hashes match installed bytes. No new backend instance or visible browser window was created; no Creator/model/resource generation operations occurred.
+
+Actual Edge acceptance15/15: unauthenticated navigation, preserved internal hash/query, official one-use exchange, Cookie authentication, one-use rejection, visible frontend version, Host/Origin/Bearer403 retained, expired Cookie401, actual project search input DOM/value preserved, failed authorization does not dismiss guidance, and successful same-session recovery. Earlier14 fixture render checks and33 new+53 existing frontend tests remain separate evidence, not substitutes for this live acceptance.
+
+A readiness snapshot can race with normal page polling after successful startup. The entry now retries only409/DAEMON_GENERATION_CHANGED GET observations, at most5 times in10 seconds, never restarting again or retrying a mutation/permission denial. Startup tests14/14. The real npm run start:next -- --no-browser command exits0 and reuses PID33432. The frontend product/build are unchanged by this script-only follow-up.
+
+## Backup, audit and recovery
+
+Evidence root: C:/Users/33272/Documents/Codex/2026-10-17/task/login-guidance-20261022/
+
+- deployment-live-verification.json: actual identity, versions, HTTP hashes and eight project IDs.
+- live-login-browser-final.json:15 live browser checks; live-login-browser.mjs is the repeatable test.
+- service-termination-audit.json: exact old PID identity, zero-current-work observation, normal-stop failure and narrowly authorized termination.
+- deployment-before/: original six installed files and complete previous Next static folder; manifest.json records old hashes.
+- history-backup/:5 copied historical maintenance files with JSON/readability/SHA256 validation, manifest and RESTORE.txt. No files were removed from live history.
+
+Rollback only during an authorized service maintenance window after its normal guarded stop has completed and the exact process is confirmed exited. Restore the six matched deployment-before files and its Next folder together, then use the existing single32180 official startup entry. Preserve current configuration, projects and history. Do not restore old lock ownership into an active writer. The old version has the historical-stop defect, so rollback is an emergency fallback, not a reason to repeat the old maintenance loop.
+
+Source/reuse rules remain centralized in source-and-reuse-policy.md and referenced by AGENTS.md. Prior task-only checkpoint branches and backups remain; no remote push.
