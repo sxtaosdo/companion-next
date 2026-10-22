@@ -18,6 +18,7 @@ export const APPROVED_STARTUP_CONFIG = Object.freeze({
   CREATOR_AI_ICONS_CLI: 'D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js',
   CREATOR_AI_ICONS_STORE: 'D:/CompanionData/art-task-store-v1',
   CREATOR_AI_ICONS_MODE: 'offline_import_only',
+  CREATOR_AI_ICONS_ADOPTION_MANIFEST: 'D:/CompanionData/art-generation-acceptance-20261021/records/adoption-catalog.json',
 });
 export function validateStartupConfiguration(value) {
   const expected = Object.keys(APPROVED_STARTUP_CONFIG);
