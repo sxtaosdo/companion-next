@@ -48,3 +48,17 @@ Fresh regression: provider launcher34/34, Next startup16/16, Companion auth71/71
 Rollback: preserve all account data and protected secrets. Restore only the backed-up configuration/launcher files and source target if a rollback is approved, then use normal identity-checked service lifecycle; do not restore a database or stop FlClash. The original8001 conflict would remain, so rollback is not a functioning port workaround.
 
 Observed side-effect boundary: operations web build/cool/eps.d.ts and eps.json are dirty generated API metadata. No initial web-worktree baseline was captured in this port phase, so this record cannot attribute every difference to startup. These files were neither staged nor reverted. Existing provider EPS remains enabled; no database initialization or credential generation command was executed.
+
+## Approved account and live delivery
+
+The user explicitly approved sxaosdo. Its exact existing identity and enabled status were verified using only id/username/status; the local ignored policy now contains only that username. No password, account, role or credential was changed.
+
+Normal guarded daemon stop returned PASSED; oldPID33432 exited normally. Matched CLI/daemon/manifest/package and Next/login assets were installed in the same existing path after hash-verified backups. One npm start was issued with --no-browser. NewPID28744, epoch181145b3-7214-440e-91e2-a94ce4c5b617, is OPEN at32180; providerPID32848 remains at18001. HistoricalUNKNOWN2 and all8 registrations remain. No force kill, Windows restart, new backend port or Creator action occurred.
+
+Actual served versions: frontend1.3.180, sourcec328ffd; backend0.3.144, sourcec14014f2df6b6ecdbd0e5387e5b5214926a108c8, buildc14014f2df6b-c17649c862cf. DaemonSHA256c17649c862cfa0986f2b9d6eabf64dbe741862347fac8bb01b33c7069be0bd69.
+
+Real headless Edge acceptance passed27 checks: username/password/captcha rendering without terminal instructions, real provider readiness and captcha refresh, exact allowlist and synthetic nonlisted-account rejection,401/403 boundaries, safe hash/query return, original trusted one-time Cookie compatibility,8 projects, actual product versions, expired-session input retention and account-login iframe, logout, and no script errors. No actual account password was submitted. User password/captcha success remains the one user acceptance step. Evidence: task/web-account-login-20261022/live-account-login.json.
+
+The initial npm command reported LOCAL_START_FAILED at its final confirmation even though it had started the daemon. No second start was issued. Independent authenticated reads confirmed OPEN and8 projects; the exact post-start read-only confirmation is checked separately. This command anomaly must not be represented as a failed service or hidden by repeating restart.
+
+Entry: http://127.0.0.1:32180/next/index.html . Use sxaosdo with the existing password and the displayed captcha; never send the password to the agent.
