@@ -1,3 +1,5 @@
+2026-10-22 当前核对入口：[整体迁移只读矩阵与处理计划](whole-migration-audit-20261022.md)。状态UI已在原32180交付1.3.183，但整体迁移尚未全闭环；本表下方旧完成比例和运行状态只属于其原日期。新增确认参考裁剪、任务交接包、添加完成示例的代码差距及多项真实验收缺口，详见新矩阵。
+
 2026-10-20 02:54 UTC：已批准两处窄修完成。完整CLI正常入口exit0/PASSED，耗时11171ms；Companion PID6564/32180/OPEN，WeKnora PID600/8081持续运行。原reader限定KB/文档/分片/2235B原文与关键词检索全200，auth/keyword verified；UNKNOWN2、原权限、共享22修改与9业务表保持。总体仍13通过/6部分/2暂停，不等于全部对齐。详见[本轮实证](startup-reader-fixes-20261020.md)和[当前逐项矩阵](parity-matrix-20261020.md)。
 
 2026-10-20 02:07 UTC：按授权经独立启动门禁后，原WeKnora一次恢复PID600/8081/health200；原reader同KB的6只读POST+2状态GET全部200，原文2235B同SHA，auth/keyword verified。Companion7156/OPEN及全部保护保持，CLI/worker代码仍未改。#19限定只读可用性已恢复；历史13/6/2不增加。见[服务恢复与复验](knowledge-service-resume-20261020.md)。

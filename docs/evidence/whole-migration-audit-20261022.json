@@ -1,0 +1,36 @@
+{
+  "scope": "Read-only whole migration review after status UI delivery",
+  "date": "2026-10-22",
+  "baseline": {
+    "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\index.html": {
+      "sha256": "009de5fa040e53c3893921ae95a980578ccff90c210af3ef34961f3ede0abdd9",
+      "lines": 817
+    },
+    "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\src\\app.ts": {
+      "sha256": "ff22b00dcc31213d810b2a63daba4263f9e424d803590b6b0d2c8c63f6b09be6",
+      "lines": 3560
+    },
+    "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\src\\ai-icons-page.ts": {
+      "sha256": "16afa111eb008d9becee5d4eda2bb9050f24cd7db400fe2b508ec232afc1cf23",
+      "lines": 549
+    },
+    "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\src\\icon-handoff-dialog.ts": {
+      "sha256": "c6901b67270b3422973a06c7b35920cb62c89c26f375c807da5481e03d6d96ca",
+      "lines": 103
+    },
+    "D:\\code\\shidai3\\P8000\\cocos-mcp\\web\\app.css": {
+      "sha256": "372134c5cc48405844d91ea328ba6dcf4d9671094519241aedf56c101bd6667b",
+      "lines": 2274
+    }
+  },
+  "frontend": "1.3.183",
+  "frontendBuild": "516ab9af+working",
+  "backend": "0.3.144",
+  "pid": 28744,
+  "epoch": "181145b3-7214-440e-91e2-a94ce4c5b617",
+  "phase": "OPEN",
+  "projectCount": 8,
+  "liveReadonlyChecks": 30,
+  "noNewBusinessActions": true,
+  "note": "This snapshot does not revalidate historical business operations."
+}
