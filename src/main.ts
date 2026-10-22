@@ -1,3 +1,4 @@
+import { installCompanionSessionRecovery } from './domain/companion-session-recovery'
 import {createProjectArtSpecProvider} from './adapters/project-art-spec'
 import {registerProjectArtSpecProvider} from './project-art-spec-integration'
 import {createProductVersionReadProvider} from './adapters/product-version-read'
@@ -52,13 +53,14 @@ import { createToolPresetReadProvider } from './adapters/tool-presets-read'
 import { registerToolPresetReadProvider } from './tool-presets-read-integration'
 import { createCompanionEventProvider } from './adapters/companion-events'
 import { createCompanionBrowserProvider } from './adapters/companion-browser'
-import { isCompanionReadHost, registerCompanionBrowserProvider } from './companion-browser-integration'
+import { companionBrowserProvider, isCompanionReadHost, registerCompanionBrowserProvider } from './companion-browser-integration'
 // Only explicitly identified local builds register these providers. The normal workspace reads on project-page entry; other builds retain manual connection.
 const knowledgeChatHost = isCompanionKnowledgeChatHost(import.meta.env.MODE,window.location)
 const configEditorHost = isCompanionConfigEditHost(import.meta.env.MODE,window.location)
 const normalWorkspaceHost = isCompanionWorkspaceHost(import.meta.env.MODE,window.location)
 const passiveReadHost = isCompanionReadHost(import.meta.env.MODE,window.location)
 if (passiveReadHost || normalWorkspaceHost || configEditorHost || knowledgeChatHost) {
+  installCompanionSessionRecovery(window, () => companionBrowserProvider.value)
   productVersionReadProvider.value=createProductVersionReadProvider(window.fetch.bind(window))
   // Normal workspace exposes the approved existing capabilities; readonly keeps
   // its passive boundary. Loopback never replaces session or per-action consent.

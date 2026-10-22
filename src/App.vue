@@ -10,6 +10,7 @@ import { useRegisteredProjectStore } from './stores/registered-project'
 import { allowsLegacyWorkspace } from './domain/project-workspace'
 import { frontendIdentity, frontendBuildIdentity } from './domain/product-information'
 import InfoTip from './components/InfoTip.vue'
+import CompanionSessionRecovery from './components/CompanionSessionRecovery.vue'
 import {useProductVersionStore} from './stores/product-version'
 import {productVersionReadProvider} from './product-version-integration'
 import ArtWorkspaceView from './views/ArtWorkspaceView.vue'
@@ -172,6 +173,7 @@ const dateLabel = computed(() => {
         </RouterView>
       </main>
     </div>
+    <CompanionSessionRecovery/>
   </div>
 </template>
 <style scoped>
