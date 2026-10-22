@@ -4,8 +4,17 @@ import { ART_CATEGORIES, ART_CANON_USAGES, type CanonArtUsage, type ArtCategory,
 import type { AiResourceConfigV2 } from '../domain/ai-resource-read'
 import { projectArtSpecProvider, type ProjectArtSpecProvider } from '../project-art-spec-integration'
 import { useProjectArtSpecStore } from '../stores/project-art-spec'
-const props = defineProps<{ project: { id: string; name: string; path: string } | null; source: object | null; legacy?: AiResourceConfigV2 | null; provider?: ProjectArtSpecProvider | null }>()
+const props = defineProps<{ project: { id: string; name: string; path: string } | null; source: object | null; legacy?: AiResourceConfigV2 | null; provider?: ProjectArtSpecProvider | null; sharedHeader?: boolean }>()
 const store = useProjectArtSpecStore(), category = ref<ArtCategory>('icon')
+const section = ref(0), editing = ref(false)
+const sectionNames = ['全局继承', '项目设定', '素材分类', '核对保存']
+watch(() => store.context, () => { section.value = 0; editing.value = false }, { flush: 'sync' })
+watch(() => store.draft, value => { if (value && !store.base) editing.value = true })
+watch(() => store.phase, value => { if (value === 'saved') { editing.value = false; section.value = 0 } })
+function edit() { editing.value = true; section.value = 0 }
+function next() { section.value = Math.min(3, section.value + 1) }
+const currentErrors = computed(() => store.errors.filter(error => section.value === 3 || (section.value === 0 ? /INHERITANCE|SOURCE_|CANON_|inheritance/.test(error) : section.value === 1 ? /project\.|overrides\./.test(error) : /categories\./.test(error))))
+
 const writer = computed(() => props.provider === undefined ? projectArtSpecProvider.value : props.provider)
 watch([() => props.project, () => props.source, writer], () => store.bind(props.project && props.source ? { projectId: props.project.id, projectPath: props.project.path, source: props.source } : null, writer.value), { immediate: true, flush: 'sync' })
 onBeforeUnmount(store.leave)
@@ -60,7 +69,7 @@ const changedSections = computed(() => {
   for (const item of ART_CATEGORIES) if (JSON.stringify(store.draft.categories[item]) !== JSON.stringify(store.base?.categories[item])) result.push(labels[item] + '类别差异')
   return result
 })
-const friendlyErrors = computed(() => store.errors.map(error => {
+const friendlyErrors = computed(() => currentErrors.value.map(error => {
   if (error.startsWith('INHERITANCE_CHANGE')) return '已保存的继承范围与固定版本不能在此移除，请先审阅迁移。'
   if (error.startsWith('LOCKED_OVERRIDE')) return '存在与继承锁定项不同的设定，请核对。'
   if (error.startsWith('SOURCE_DEPENDENCY_REQUIRED')) return '所选来源还需同时继承其依赖来源。'
@@ -71,15 +80,18 @@ const friendlyErrors = computed(() => store.errors.map(error => {
 </script>
 <template>
 <section class="project-art-spec section-card" data-testid="project-art-spec-panel" aria-label="项目美术规范">
-  <header class="art-heading"><div><h2>美术规范</h2><span class="art-phase" :class="store.phase" role="status">{{ phaseLabels[store.phase] }}</span></div><div class="art-actions"><button type="button" :disabled="!store.context || !writer || store.pending" @click="store.read">读取 / 刷新美术规范</button><button type="button" :disabled="!store.context || !!store.draft || store.pending || store.blocked" @click="store.startDraft(project?.name ?? '')">编写项目美术草稿</button></div></header>
+  <header class="art-heading"><div><h2>美术规范</h2><span class="art-phase" :class="store.phase" role="status">{{ phaseLabels[store.phase] }}</span></div><div class="art-actions"><button v-if="!props.sharedHeader" type="button" :disabled="!store.context || !writer || store.pending || store.dirty" @click="store.read">读取 / 刷新美术规范</button><button type="button" :disabled="!store.context || (!!writer && store.hash === undefined) || !!store.draft || store.pending || store.blocked" @click="store.startDraft(project?.name ?? '')">编写项目美术草稿</button></div></header>
   <p v-if="!project">请先选择已登记工程。</p>
   <p v-else class="art-project">{{ project.name }} · {{ project.path }}</p>
   <p v-if="!writer" class="art-notice" role="status">工程保存接口未接入；可编写候选草稿，尚不能保存到工程。</p>
   <p v-if="store.message" role="status">{{ store.message }}</p><button v-if="store.blocked" type="button" :disabled="store.pending || !writer" @click="store.recover">核对原保存结果</button>
   <p v-if="store.retained">有保留的未保存草稿。<button type="button" :disabled="store.pending || store.blocked || store.retained.context.projectId !== project?.id || store.retained.context.projectPath !== project?.path || store.retained.context.source !== source" @click="store.restoreRetained">恢复此工程草稿</button></p>
-  <p v-if="legacy">原图标规范 v{{ legacy.version }} · {{ legacy.iconSize.width }} × {{ legacy.iconSize.height }}；原配置和图标流程在下方保留，不自动迁移。</p>
-  <template v-if="store.draft">
-    <fieldset :disabled="store.pending || store.blocked" data-testid="art-global-section"><legend>全局继承</legend>
+  <p v-if="legacy">原图标规范 v{{ legacy.version }} · {{ legacy.iconSize.width }} × {{ legacy.iconSize.height }}；保留原配置，不自动迁移。</p>
+  <div v-if="store.draft && !editing" class="art-saved-summary" data-testid="art-saved-summary"><strong>{{ store.draft.project.name }} · v{{ store.draft.version }}</strong><span>{{ store.draft.project.designResolution.width }} × {{ store.draft.project.designResolution.height }}</span><button type="button" @click="edit">修改美术规范</button></div>
+  <template v-if="store.draft && editing">
+    <div class="art-completed" aria-label="已完成规范步骤"><button v-for="(name,index) in sectionNames.slice(0,section)" :key="name" type="button" :disabled="store.pending || store.blocked" @click="section=index">{{ name }} · 返回修改</button></div>
+    <h3 data-testid="art-current-section">{{ sectionNames[section] }}</h3>
+    <fieldset v-if="section === 0" :disabled="store.pending || store.blocked" data-testid="art-global-section"><legend>全局继承</legend>
       <label class="art-check"><input type="radio" name="art-inheritance" :disabled="store.base?.inheritance.mode === 'canon'" :checked="store.draft.inheritance.mode === 'none'" @change="independent">不继承共享 Canon</label>
       <label v-if="store.draft.inheritance.mode === 'none'">适用范围说明<input v-model="store.draft.inheritance.reason" aria-label="不继承原因" maxlength="1500" @input="store.touch"></label>
       <p v-if="!available.length">尚无经过后台核实的适用来源；不能手工填写权威或锁定项。</p>
@@ -88,7 +100,7 @@ const friendlyErrors = computed(() => store.errors.map(error => {
         <p>允许用途：{{ (authority.allowedUsages ?? []).map(value => usageLabels[value]).join(' / ') || '未授权' }}</p><p v-if="Object.keys(authority.locked).length">锁定：{{ Object.keys(authority.locked).map(key => fieldLabels[key as keyof ArtValues] ?? key).join('、') }}</p><p v-if="Object.keys(authority.defaults).length">可覆盖默认：{{ Object.keys(authority.defaults).map(key => fieldLabels[key as keyof ArtValues] ?? key).join('、') }}</p>
       </article>
     </fieldset>
-    <fieldset :disabled="store.pending || store.blocked" data-testid="art-project-section"><legend>项目设定</legend>
+    <fieldset v-if="section === 1" :disabled="store.pending || store.blocked" data-testid="art-project-section"><legend>项目设定</legend>
       <div class="art-grid"><label>项目名称<input v-model="store.draft.project.name" aria-label="美术项目名称" maxlength="128" @input="store.touch"></label><label>引擎<input value="Cocos Creator" readonly></label></div>
       <label>项目内容说明<textarea v-model="store.draft.project.content" aria-label="美术项目内容" rows="2" maxlength="1500" @input="store.touch"/></label>
       <div class="art-grid"><label>设计画布宽<input v-model.number="store.draft.project.designResolution.width" aria-label="美术画布宽" type="number" min="1" max="8192" @input="store.touch"></label><label>设计画布高<input v-model.number="store.draft.project.designResolution.height" aria-label="美术画布高" type="number" min="1" max="8192" @input="store.touch"></label></div>
@@ -97,7 +109,7 @@ const friendlyErrors = computed(() => store.errors.map(error => {
       <div class="art-grid"><label v-for="field in (['exportDirectory','backgroundColor'] as const)" :key="field">{{ fieldLabels[field] }}<input :value="shown(field,'project')" :disabled="lock(field,'project') !== undefined" :aria-label="`项目${fieldLabels[field]}`" :placeholder="field === 'exportDirectory' ? 'art/final/icons' : '#ffffff'" @input="update($event,field,'project')"></label></div>
       <label class="art-check"><input type="checkbox" :checked="shown('transparent','project') === true" :disabled="lock('transparent','project') !== undefined" @change="store.setValue('project','transparent',($event.target as HTMLInputElement).checked)">透明 PNG</label>
     </fieldset>
-    <fieldset :disabled="store.pending || store.blocked" data-testid="art-category-section"><legend>素材分类</legend>
+    <fieldset v-if="section === 2" :disabled="store.pending || store.blocked" data-testid="art-category-section"><legend>素材分类</legend>
       <div class="art-tabs" role="group" aria-label="美术素材类别"><button v-for="item in ART_CATEGORIES" :key="item" type="button" :aria-pressed="category === item" @click="category=item">{{ labels[item] }}</button></div>
       <div class="art-grid"><label v-for="field in categoryFields[category]" :key="`${category}-${field}`">{{ fieldLabels[field] }}<span v-if="lock(field,category)!==undefined" class="art-lock">继承锁定</span><input :value="shown(field,category)" :disabled="lock(field,category)!==undefined" :aria-label="`${labels[category]}${fieldLabels[field]}`" maxlength="1500" placeholder="此类别的内容要求或差异" @input="update($event,field,category)"></label></div>
       <div class="art-grid" data-testid="art-category-technical"><label v-for="field in (['width','height'] as const)" :key="field">{{ labels[category] }}{{ fieldLabels[field] }}<input :value="store.draft.categories[category]?.[field] ?? ''" :disabled="lock(field,category)!==undefined" :aria-label="`${labels[category]}${fieldLabels[field]}`" type="number" min="1" max="4096" :placeholder="String(effective(field) ?? '沿用项目')" @input="update($event,field,category,true)"><small>有效值 {{ effective(field) ?? '未填写' }} · {{ valueSource(field) }}</small></label>
@@ -108,8 +120,9 @@ const friendlyErrors = computed(() => store.errors.map(error => {
       <p class="art-secondary">类别配置不代表生成器已支持该类别；人物一致性与参考图入模仍未实现。</p>
     </fieldset>
     <ul v-if="friendlyErrors.length" role="alert"><li v-for="error in friendlyErrors" :key="error">{{ error }}</li></ul>
-    <p v-if="store.dirty" class="art-secondary" aria-label="美术规范待保存差异">待保存：{{ changedSections.join('、') }}</p>
-    <footer><p v-if="store.legacyVersion !== null" class="art-secondary">本次确认将保留原图标文件，并创建统一美术规范（版本 {{ store.legacyVersion + 1 }}）。</p><label class="art-check"><input v-model="store.confirmed" aria-label="确认美术规范保存" type="checkbox" :disabled="!writer || store.pending || store.blocked || !!store.errors.length">我已核对当前工程、继承来源和项目差异，批准本次保存。</label><button type="button" :disabled="!store.canSave" @click="store.save">保存美术规范到工程</button><small v-if="store.hash === undefined">尚未读取工程原文件，不能保存。</small></footer>
+    <p v-if="store.dirty && section === 3" class="art-secondary" aria-label="美术规范待保存差异">待保存：{{ changedSections.join('、') }}</p>
+    <div v-if="section < 3" class="art-actions"><button v-if="section > 0" type="button" :disabled="store.pending || store.blocked" @click="section--">返回修改</button><button type="button" :disabled="store.pending || store.blocked || !!currentErrors.length" @click="next">继续</button></div>
+    <footer v-if="section === 3"><p v-if="store.legacyVersion !== null" class="art-secondary">本次确认将保留原图标文件，并创建统一美术规范（版本 {{ store.legacyVersion + 1 }}）。</p><label class="art-check"><input v-model="store.confirmed" aria-label="确认美术规范保存" type="checkbox" :disabled="!writer || store.pending || store.blocked || !!store.errors.length">我已核对当前工程、继承来源和项目差异，批准本次保存。</label><button type="button" :disabled="!store.canSave" @click="store.save">保存美术规范到工程</button><small v-if="store.hash === undefined">尚未读取工程原文件，不能保存。</small></footer>
   </template>
 </section>
 </template>

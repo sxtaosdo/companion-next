@@ -6,6 +6,7 @@ import { createMemoryHistory, createRouter } from 'vue-router'
 import ElementPlus from 'element-plus'
 import App from '../src/App.vue'
 import ServicesView from '../src/views/ServicesView.vue'
+import ResourcesView from '../src/views/ResourcesView.vue'
 import { routes } from '../src/router'
 import { useWorkspaceStore } from '../src/stores/workspace'
 let wrapper: VueWrapper | undefined
@@ -13,7 +14,14 @@ beforeEach(() => { localStorage.clear(); Object.defineProperty(navigator, 'locks
 afterEach(() => { wrapper?.unmount(); wrapper = undefined; document.body.innerHTML = ''; Reflect.deleteProperty(navigator, 'locks') })
 async function setup(path = '/resources', retainedLegacyServices = false) {
   const pinia = createPinia()
-  const router = createRouter({ history: createMemoryHistory(), routes: retainedLegacyServices ? routes.map(route => route.path === '/services' ? { path: '/services', component: ServicesView } : route) : routes })
+  // These cases exercise the retained legacy demo component, independently of
+  // the production /resources redirect to the unified real-project workbench.
+  const fixtureRoutes = routes.map(route => route.path === '/resources'
+    ? { path: '/resources', component: ResourcesView }
+    : retainedLegacyServices && route.path === '/services'
+      ? { path: '/services', component: ServicesView }
+      : route)
+  const router = createRouter({ history: createMemoryHistory(), routes: fixtureRoutes })
   await router.push(path)
   wrapper = mount(App, { attachTo: document.body, global: { plugins: [pinia, router, ElementPlus] } })
   await flushPromises()
@@ -27,9 +35,11 @@ function button(text: string) {
 describe('mounted UI boundaries (jsdom, not browser rendering)', () => {
   it('opens disconnected with no fixtures and an explicit demo action', async () => {
     await setup()
-    expect(wrapper!.text()).toContain('请先选择已登记工程')
+    expect(wrapper!.text()).toContain('请选择已登记工程')
     expect(wrapper!.text()).not.toContain('灵魂石图标')
-    await button('查看示例工作台').trigger('click'); await flushPromises()
+    await button('数据源').trigger('click'); await flushPromises()
+    const demo = new DOMWrapper(document.body).findAll('.el-dropdown-menu__item').find(item => item.text() === '查看示例资料')!
+    await demo.trigger('click'); await flushPromises()
     expect(wrapper!.text()).toContain('正在浏览示例资料')
     expect(wrapper!.findAll('.resource-row')).toHaveLength(5)
   })

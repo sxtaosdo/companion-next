@@ -70,7 +70,9 @@ describe('project art editor real-provider boundary', () => {
   it('allows new save only after explicit missing receipt, not a read error', async () => {
     const store = useProjectArtSpecStore(), host = provider(); host.read = vi.fn(async () => receipt(null, null)); store.bind(context, host); await store.read(); store.startDraft('Project'); store.draft = config(); store.confirmed = true
     expect(store.canSave).toBe(true)
-    host.read = vi.fn(async () => { throw Error('private diagnostics') }); await store.read(); expect(store.message).not.toContain('private'); expect(store.phase).toBe('error'); store.confirmed = true; expect(store.canSave).toBe(false)
+    host.read = vi.fn(async () => { throw Error('private diagnostics') }); await store.read(); expect(host.read).not.toHaveBeenCalled(); expect(store.draft).not.toBeNull()
+    // Refresh preserves an unsaved draft. A clean read failure must still invalidate the save baseline.
+    store.draft = null; await store.read(); expect(store.message).not.toContain('private'); expect(store.phase).toBe('error'); store.confirmed = true; expect(store.canSave).toBe(false)
   })
   it('keeps unknown fence after readback and prevents a repeated write', async () => {
     const { store, host } = await setup(); host.save = vi.fn(async () => { throw Error('private token') }); await store.save()

@@ -39,7 +39,7 @@ afterEach(() => { wrapper?.unmount(); wrapper = undefined; activeHistory?.destro
 describe('help, about and visible frontend identity', () => {
   it('uses one frontend version in package, lock, header, sidebar and about without implying a daemon version', async () => {
     await setup('/about')
-    expect(frontendIdentity.version).toBe(packageInfo.version); expect(frontendIdentity.version).toBe('1.3.177'); expect(frontendIdentity.hostBase).toBe('0.3.150'); expect(frontendIdentity.nextRevision).toBe(23); expect(packageInfo.companionVersion.rule).toContain('historical migration provenance'); expect(lock.version).toBe(packageInfo.version); expect(lock.packages[''].version).toBe(packageInfo.version)
+    expect(frontendIdentity.version).toBe(packageInfo.version); expect(frontendIdentity.version).toBe('1.3.178'); expect(frontendIdentity.hostBase).toBe('0.3.150'); expect(frontendIdentity.nextRevision).toBe(23); expect(packageInfo.companionVersion.rule).toContain('historical migration provenance'); expect(lock.version).toBe(packageInfo.version); expect(lock.packages[''].version).toBe(packageInfo.version)
     expect(wrapper!.find('.frontend-version').text()).toBe(`Next v${packageInfo.version}`)
     expect(wrapper!.find('.sidebar-footer').text()).toContain(`前端 v${packageInfo.version}`)
     expect(wrapper!.text()).toContain('宿主版本未读取')
@@ -141,7 +141,7 @@ describe('help, about and visible frontend identity', () => {
   it('does not trust an unobserved browser history position or external back URL when returning', async () => {
     const { router } = await setupBrowser('/resources?stage=plan')
     await router.push('/help'); await flushPromises()
-    expect(wrapper!.find('.page-back').attributes('aria-label')).toBe('返回游戏资源')
+    expect(wrapper!.find('.page-back').attributes('aria-label')).toBe('返回美术资源')
     // An embedder-created history entry was not observed as a route transition.
     router.options.history.push('/help', { back: 'https://example.org/outside' })
     const back = vi.spyOn(router, 'back')
@@ -173,9 +173,9 @@ describe('help, about and visible frontend identity', () => {
     const project = workspace.selectedProjectId; const plan = JSON.stringify(planning.get('demo', project))
     await router.push('/help?topic=resources'); await flushPromises()
     await wrapper!.find('.page-back').trigger('click')
-    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/resources?stage=plan')); await flushPromises()
+    await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/art-resources?stage=plan&type=icon')); await flushPromises()
     expect(workspace.selectedProjectId).toBe(project); expect(JSON.stringify(planning.get('demo', project))).toBe(plan)
-    expect(wrapper!.find('.source-banner').text()).toContain('正在浏览示例资料')
+    expect(wrapper!.find('.source-banner').exists()).toBe(false); expect(wrapper!.find('[data-testid="art-workspace"]').exists()).toBe(true)
   })
   it('preserves project choice, in-memory plan and Picker manifest when opening and closing utilities', async () => {
     const { router, workspace, planning, review } = await setup('/resources')
@@ -185,7 +185,7 @@ describe('help, about and visible frontend identity', () => {
     const project = workspace.selectedProjectId; const plan = JSON.stringify(planning.get('demo', project)); const manifest = JSON.stringify(review.manifest)
     for (const path of ['/help?topic=resources', '/about', '/changelog', '/migration', '/resources']) { await router.push(path); await flushPromises() }
     expect(workspace.selectedProjectId).toBe(project); expect(JSON.stringify(planning.get('demo', project))).toBe(plan); expect(JSON.stringify(review.manifest)).toBe(manifest)
-    expect(wrapper!.find('.source-banner').text()).toContain('正在浏览示例资料')
+    expect(wrapper!.find('.source-banner').exists()).toBe(false); expect(wrapper!.find('[data-testid="art-workspace"]').exists()).toBe(true)
   })
   it('closes the mobile menu when using help and keeps version outside the hidden sidebar', async () => {
     await setup('/overview'); await wrapper!.find('button[aria-label="打开导航"]').trigger('click')
@@ -203,13 +203,11 @@ describe('help, about and visible frontend identity', () => {
     expect((wrapper!.find('textarea[aria-label="Picker 候选 JSON"]').element as HTMLTextAreaElement).value).toBe(text)
     expect(review.manifest).toBeNull()
     await button('解析候选清单').trigger('click'); await flushPromises()
-    const confirmation = wrapper!.findAll('label.el-checkbox').find((item) => item.text().includes('确认由本机'))!
-    await confirmation.find('input').setValue(true)
+    expect(wrapper!.findAll('label.el-checkbox').some(item=>item.text().includes('确认由本机'))).toBe(false)
     await router.push('/about'); await flushPromises(); await router.push('/image-assets'); await flushPromises()
     expect(review.manifest?.images).toHaveLength(1)
     expect((wrapper!.find('textarea[aria-label="Picker 候选 JSON"]').element as HTMLTextAreaElement).value).toBe(text)
-    expect((wrapper!.findAll('label.el-checkbox').find((item) => item.text().includes('确认由本机'))!.find('input').element as HTMLInputElement).checked).toBe(false)
-    expect(button('导入并下载').attributes('disabled')).toBeDefined()
+    expect(review.connected).toBe(false);expect(review.mutation).toBe('none');expect(review.canSave).toBe(false); expect(wrapper!.findAll('button').some(item=>item.text().includes('导入并下载'))).toBe(false)
   })
   it('preserves parsed A separately from unparsed B across utilities and keeps submission blocked', async () => {
     const { router, review } = await setup('/image-assets'); await wrapper!.get('[data-testid="review-tab"]').trigger('click'); await flushPromises()
@@ -220,8 +218,7 @@ describe('help, about and visible frontend identity', () => {
     await router.push('/help'); await flushPromises(); await router.push('/image-assets'); await flushPromises()
     expect(review.importDraftText).toBe(b); expect(review.parsedDraftText).toBe(a); expect(review.manifest?.images[0]?.image_url).toBe('https://example.org/a.png')
     expect((wrapper!.find('textarea[aria-label="Picker 候选 JSON"]').element as HTMLTextAreaElement).value).toBe(b)
-    expect(wrapper!.findAll('label.el-checkbox').find((item) => item.text().includes('确认由本机'))!.find('input').attributes('disabled')).toBeDefined()
-    expect(button('导入并下载').attributes('disabled')).toBeDefined()
+    expect(review.connected).toBe(false);expect(review.mutation).toBe('none');expect(review.canSave).toBe(false); expect(wrapper!.findAll('button').some(item=>item.text().includes('导入并下载'))).toBe(false)
   })
   it('does not unlock an active Picker write or clear an uncertain outcome through help navigation', async () => {
     let reject!: (reason: Error) => void
@@ -279,7 +276,7 @@ describe('help, about and visible frontend identity', () => {
   it('uses the approved overview-first order and preserves other navigation groups, destinations and brand-about access', async () => {
     await setup('/overview')
     const navigation = wrapper!.find('nav[aria-label="主导航"]')
-    expect(navigation.findAll('a').map((a) => a.attributes('href'))).toEqual(['/overview', '/projects', '/ai-icons', '/resources', '/image-assets', '/knowledge', '/knowledge/qa', '/knowledge/manage', '/knowledge?tab=models'])
+    expect(navigation.findAll('a').map((a) => a.attributes('href'))).toEqual(['/overview', '/projects', '/art-resources', '/knowledge', '/knowledge/qa', '/knowledge/manage', '/knowledge?tab=models'])
     expect(wrapper!.find('nav[aria-label="补充入口"]').exists()).toBe(false)
     expect(wrapper!.find('.sidebar a[href="/services"]').exists()).toBe(false)
     expect(wrapper!.find('nav[aria-label="旧版功能入口"]').exists()).toBe(false)
@@ -295,7 +292,7 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.find('.sidebar a[href="/migration"]').exists()).toBe(false)
     expect(wrapper!.find('.workspace-label').exists()).toBe(false)
     expect(wrapper!.find('a.nav-item .el-icon').exists()).toBe(false)
-    expect(wrapper!.find('.art-nav-toggle .el-icon').attributes('aria-hidden')).toBe('true')
+    expect(wrapper!.find('.art-nav-toggle').exists()).toBe(false); expect(wrapper!.findAll('.sidebar a[href="/art-resources"]')).toHaveLength(1)
   })
   it('keeps the shell compact and page help keyboard-accessible without migration captions', async () => {
     await setup('/projects')
@@ -393,67 +390,38 @@ describe('implemented feature help navigation',()=>{
 })
 
 
-describe('restored Companion navigation categories', () => {
-  it('toggles the art parent without navigating or requests, and closes mobile navigation only on child selection', async () => {
-    const fetch = vi.fn(); vi.stubGlobal('fetch', fetch)
-    const { router } = await setup('/help')
-    const toggle = wrapper!.get('.art-nav-toggle')
-    expect(toggle.attributes('type')).toBe('button'); expect(toggle.attributes('aria-expanded')).toBe('false')
-    expect(wrapper!.get('#art-navigation').isVisible()).toBe(false)
+describe('unified art workspace navigation', () => {
+  it('uses one art link and closes mobile navigation on selection without requests', async () => {
+    const fetch=vi.fn();vi.stubGlobal('fetch',fetch)
+    const {router}=await setup('/help')
+    expect(wrapper!.find('.art-nav-toggle').exists()).toBe(false)
     await wrapper!.get('button[aria-label="打开导航"]').trigger('click')
-    await toggle.trigger('click'); await flushPromises()
-    expect(router.currentRoute.value.fullPath).toBe('/help'); expect(fetch).not.toHaveBeenCalled()
-    expect(toggle.attributes('aria-expanded')).toBe('true'); expect(wrapper!.get('.sidebar').classes()).toContain('is-open')
-    await wrapper!.get('.art-nav-child[href="/image-assets"]').trigger('click'); await flushPromises()
-    expect(router.currentRoute.value.path).toBe('/image-assets'); expect(wrapper!.get('.sidebar').classes()).not.toContain('is-open')
-    expect(wrapper!.findAll('.sidebar [aria-current="page"]').map(item => item.text())).toEqual(['图片素材'])
-    await toggle.trigger('click'); expect(wrapper!.get('#art-navigation').isVisible()).toBe(false)
-    await router.push('/help'); await router.push('/resources?project=invalid'); await flushPromises()
-    expect(toggle.attributes('aria-expanded')).toBe('true')
-    expect(wrapper!.findAll('.sidebar [aria-current="page"]').map(item => item.text())).toEqual(['游戏资源'])
+    await wrapper!.get('.sidebar a[href="/art-resources"]').trigger('click');await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/art-resources')
+    expect(wrapper!.get('.sidebar').classes()).not.toContain('is-open')
+    expect(wrapper!.findAll('.sidebar [aria-current="page"]').map(item=>item.text())).toEqual(['美术资源'])
     expect(fetch).not.toHaveBeenCalled()
   })
-  it.each(['/ai-icons', '/resources', '/image-assets'])('expands art navigation for a direct %s link and browser return', async path => {
-    const { router } = await setupBrowser(path)
-    expect(wrapper!.get('.art-nav-toggle').attributes('aria-expanded')).toBe('true')
-    expect(wrapper!.findAll('.sidebar [aria-current="page"]')).toHaveLength(1)
-    await wrapper!.get('.art-nav-toggle').trigger('click')
-    await router.push('/help'); await flushPromises()
-    router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe(path)); await flushPromises()
-    expect(wrapper!.get('.art-nav-toggle').attributes('aria-expanded')).toBe('true')
-    router.forward(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/help')); await flushPromises()
+  it.each(['/ai-icons','/resources','/image-assets'])('redirects legacy %s preserving context and browser history',async path=>{
+    const {router}=await setupBrowser(path+'?project=invalid')
+    expect(router.currentRoute.value.path).toBe('/art-resources');expect(router.currentRoute.value.query.project).toBe('invalid');expect(router.currentRoute.value.query.type).toBe('icon')
+    if(path==='/image-assets')expect(router.currentRoute.value.query.references).toBe('1')
+    expect(wrapper!.findAll('.sidebar [aria-current="page"]').map(item=>item.text())).toEqual(['美术资源'])
+    await router.push('/help');await flushPromises();router.back()
+    await vi.waitFor(()=>expect(router.currentRoute.value.path).toBe('/art-resources'));await flushPromises()
+    expect(router.currentRoute.value.query.project).toBe('invalid')
+    router.forward();await vi.waitFor(()=>expect(router.currentRoute.value.path).toBe('/help'));await flushPromises()
     expect(wrapper!.findAll('.sidebar [aria-current="page"]')).toHaveLength(0)
   })
-
-  it('keeps the approved art hierarchy, one engineering link and every supplementary route reachable', async () => {
-    const fetch = vi.fn(); vi.stubGlobal('fetch', fetch)
-    const { router } = await setup('/knowledge?tab=models')
-    expect(wrapper!.findAll('.nav-list .nav-item').map(item => item.text())).toEqual(['看板', '工程', '美术资源', 'AI 图标', '游戏资源', '图片素材', '知识库', '检索与文档', '问答', '连接与同步', '模型服务'])
-    const sidebar = wrapper!.get('.sidebar')
-    expect(sidebar.findAll('a[href="/projects"]')).toHaveLength(1)
-    expect(sidebar.findAll('a[href="/ai-icons"]')).toHaveLength(1)
-    expect(sidebar.findAll('[aria-current="page"]').map(item => item.text())).toEqual(['模型服务'])
-    for (const path of ['/overview', '/resources', '/image-assets']) expect(sidebar.find(`a[href="${path}"]`).exists()).toBe(true)
-    expect(sidebar.find('a[href="/services"]').exists()).toBe(false)
-    expect(sidebar.find('a[href="/help"]').exists()).toBe(false)
+  it('keeps one engineering and art link while supplementary routes stay reachable',async()=>{
+    const fetch=vi.fn();vi.stubGlobal('fetch',fetch);const {router}=await setup('/knowledge?tab=models')
+    expect(wrapper!.findAll('.nav-list .nav-item').map(item=>item.text())).toEqual(['看板','工程','美术资源','知识库','检索与文档','问答','连接与同步','模型服务'])
+    const sidebar=wrapper!.get('.sidebar')
+    expect(sidebar.findAll('a[href="/projects"]')).toHaveLength(1);expect(sidebar.findAll('a[href="/art-resources"]')).toHaveLength(1)
+    for(const path of ['/ai-icons','/resources','/image-assets'])expect(sidebar.find(`a[href="${path}"]`).exists()).toBe(false)
+    expect(sidebar.findAll('[aria-current="page"]').map(item=>item.text())).toEqual(['模型服务'])
     expect(wrapper!.findAll('a[href="/help"]')).toHaveLength(1)
-    await router.push('/knowledge'); await flushPromises()
-    expect(sidebar.findAll('[aria-current="page"]').map(item => item.text())).toEqual(['检索与文档'])
+    await router.push('/knowledge');await flushPromises();expect(sidebar.findAll('[aria-current="page"]').map(item=>item.text())).toEqual(['检索与文档'])
     expect(fetch).not.toHaveBeenCalled()
   })
-})
-
-it('labels frontend and unavailable backend consistently without inventing a backend version or issuing a probe',async()=>{
- const fetch=vi.fn();vi.stubGlobal('fetch',fetch);const write=vi.fn(async(_value:string)=>{});Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:write}})
- await setup('/about')
- expect(wrapper!.get('.sidebar-footer').text()).toContain('\u524d\u7aef v1.3.177');expect(wrapper!.get('.sidebar-footer .backend-version').text()).toBe('\u540e\u7aef\uff1a\u5bbf\u4e3b\u7248\u672c\u672a\u8bfb\u53d6')
- expect(wrapper!.get('.about-product-heading .backend-version').text()).toBe('\u540e\u7aef\uff1a\u5bbf\u4e3b\u7248\u672c\u672a\u8bfb\u53d6')
- await wrapper!.get('button[aria-label="\u590d\u5236\u7248\u672c\u4fe1\u606f"]').trigger('click');await flushPromises()
- const copied=write.mock.calls[0]?.[0];expect(copied).toContain('\u524d\u7aef\u4ea7\u54c1\u7248\u672c\uff1a1.3.177');expect(copied).toContain('\u5bbf\u4e3b\u5305\u7248\u672c\uff1a\u5bbf\u4e3b\u7248\u672c\u672a\u8bfb\u53d6');expect(copied).not.toMatch(/1\.3\.173\.(196|197)/);expect(fetch).not.toHaveBeenCalled()
-})
-
-it('copies version information from Enter and Space while preventing tooltip key interception',async()=>{
- const write=vi.fn(async(_text:string)=>{});Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:write}});await setup('/about')
- const control=wrapper!.get('button[aria-label="\u590d\u5236\u7248\u672c\u4fe1\u606f"]');await control.trigger('keydown',{key:'Enter'});await flushPromises();expect(write).toHaveBeenCalledTimes(1)
- await control.trigger('keydown',{key:' '});await flushPromises();expect(write).toHaveBeenCalledTimes(2)
 })

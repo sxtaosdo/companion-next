@@ -47,7 +47,7 @@ describe('registered project overview and resource context', () => {
     expect(router.currentRoute.value.path).toBe('/overview')
     expect(wrapper!.findAll('.nav-list .nav-item')[0]!.attributes('href')).toBe('/overview')
     for (const path of ['/projects?tab=logs', `/resources?project=${other}&step=6`, '/help?topic=cli']) {
-      await router.push(path); await flushPromises(); expect(router.currentRoute.value.fullPath).toBe(path)
+      await router.push(path); await flushPromises(); expect(router.currentRoute.value.fullPath).toBe(path.startsWith('/resources?')?path.replace('/resources?','/art-resources?')+'&type=icon':path)
     }
   })
   it('merges the old services deep link into overview without losing explicit project context or history', async () => {
@@ -100,14 +100,14 @@ describe('registered project overview and resource context', () => {
   it('retains B through AI, engineering, knowledge and models navigation before returning to resources or overview', async () => {
     const { selection, router } = await setup(`/overview?project=${other}`)
     const go = async (path: string) => { await wrapper!.get(`.sidebar a[href^="${path}"]`).trigger('click'); await flushPromises(); expect(selection.project?.id).toBe(other) }
-    await go('/ai-icons')
+    await go('/art-resources')
     expect(router.currentRoute.value.query.project).toBe(other)
     await go('/projects')
     await go('/knowledge')
     await wrapper!.get('.sidebar a[href="/knowledge?tab=models"]').trigger('click'); await flushPromises()
     expect(selection.project?.id).toBe(other)
-    expect(wrapper!.get('.sidebar a[href^="/resources"]').attributes('href')).toBe(`/resources?project=${other}`)
-    await go('/resources')
+    expect(wrapper!.get('.sidebar a[href^="/art-resources"]').attributes('href')).toBe(`/art-resources?project=${other}`)
+    await go('/art-resources')
     expect(router.currentRoute.value.query.project).toBe(other)
     await go('/overview')
     expect(router.currentRoute.value.query.project).toBe(other)
@@ -119,11 +119,11 @@ describe('registered project overview and resource context', () => {
     await router.push('/help?topic=cli'); await flushPromises(); expect(selection.project?.id).toBe(other)
     await router.push('/projects'); await flushPromises(); expect(selection.project?.id).toBe(other)
     router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/help')); await flushPromises(); expect(selection.project?.id).toBe(other)
-    router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/ai-icons')); await flushPromises(); expect(selection.project?.id).toBe(other)
+    router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/art-resources')); await flushPromises(); expect(selection.project?.id).toBe(other)
     router.forward(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/help')); await flushPromises(); expect(selection.project?.id).toBe(other)
     await router.push(`/resources?project=${id}&step=1`); await flushPromises(); expect(selection.project?.id).toBe(id)
     router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/help')); await flushPromises(); expect(selection.project?.id).toBe(id)
-    router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/ai-icons')); await flushPromises(); expect(selection.project?.id).toBe(other)
+    router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/art-resources')); await flushPromises(); expect(selection.project?.id).toBe(other)
     expect(fetch).not.toHaveBeenCalled()
   })
   it.each(['not-registered', '', 'x'.repeat(129)])('preserves explicit invalid overview intent across engineering and help without defaulting: %s', async intent => {
@@ -217,12 +217,12 @@ describe('registered project overview and resource context', () => {
     router.forward(); await vi.waitFor(() => expect(router.currentRoute.value.query.project).toBe(other)); await flushPromises()
     expect(selection.project?.id).toBe(other); expect(reader.resource).toBeNull(); expect(config.readConfig).toHaveBeenCalledTimes(1)
   })
-  it('keeps local entry empty until explicitly choosing samples, and removes them when a real reader is registered', async () => {
+  it('keeps the unified production entry empty without sample controls before and after a real reader is registered', async () => {
     const pinia = createPinia(), router = createRouter({ history: history = createMemoryHistory(), routes })
-    await router.push('/resources'); await router.isReady()
+    await router.push('/art-resources'); await router.isReady()
     wrapper = mount(App, { attachTo: document.body, global: { plugins: [pinia, router, ElementPlus] } }); await flushPromises()
     expect(wrapper!.text()).toContain('请先选择已登记工程'); expect(wrapper!.findAll('.resource-row')).toHaveLength(0)
-    await button('查看示例工作台').trigger('click'); await flushPromises(); expect(wrapper!.findAll('.resource-row')).toHaveLength(5)
+    expect(wrapper!.findAll('button').some(item=>item.text().includes('查看示例工作台'))).toBe(false); expect(useWorkspaceStore(pinia).mode).toBe('disconnected')
     const api = source(); registerCompanionBrowserProvider(api); await useCompanionBrowserStore(pinia).connect(api); await flushPromises()
     expect(wrapper!.findAll('.resource-row')).toHaveLength(0); expect(useWorkspaceStore(pinia).mode).toBe('disconnected')
     expect(wrapper!.text()).not.toContain('查看示例工作台'); expect(fetch).not.toHaveBeenCalled()
@@ -238,25 +238,22 @@ describe('registered project overview and resource context', () => {
   it('preserves selected real identity into resources and across step changes without sample resources or fabricated counts', async () => {
     const { router, workspace } = await setup(`/overview?project=${id}`, { demo: true })
     expect(workspace.mode).toBe('disconnected')
-    await wrapper!.get('.art-nav-toggle').trigger('click')
-    await wrapper!.get('.art-nav-child[href^="/resources"]').trigger('click'); await flushPromises()
+    await wrapper!.get('.sidebar a[href^="/art-resources"]').trigger('click'); await flushPromises()
     expect(router.currentRoute.value.query.project).toBe(id); expect(currentProjectIdentity()).toContain('/real/project-a')
     expect(wrapper!.findAll('.resource-row')).toHaveLength(0); expect(wrapper!.findAll('img')).toHaveLength(0)
-    expect(wrapper!.text()).toContain('尚未读取任务历史')
-    for (let index = 0; index < 6; index++) {
-      await wrapper!.findAll('.resource-steps button')[index]!.trigger('click'); await flushPromises()
-      expect(router.currentRoute.value.query.project).toBe(id); expect(router.currentRoute.value.query.step).toBe(String(index + 1))
-      expect(wrapper!.findAll('.resource-steps button.active')).toHaveLength(1)
-    }
+    expect(wrapper!.find('[data-testid="ai-jobs-read-panel"]').exists()).toBe(false)
+    const steps=wrapper!.findAll('.resource-steps button');expect(steps).toHaveLength(6)
+    for(let index=1;index<6;index++){expect(steps[index]!.attributes('disabled')).toBeDefined();await steps[index]!.trigger('click');expect(wrapper!.find('.resource-steps button.active').text()).toContain('项目规范')}
+    expect(router.currentRoute.value.query.project).toBe(id)
     expect(fetch).not.toHaveBeenCalled()
   })
-  it('restores a real project and step from a direct resource link, never choosing the first project', async () => {
+  it('restores the exact real project but never lets a deep-link step skip prerequisites', async () => {
     const { selection, router } = await setup(`/resources?project=${other}&step=4`)
     expect(selection.project?.id).toBe(other)
-    expect(wrapper!.find('.resource-steps button.active').text()).toContain('视觉审阅')
+    expect(wrapper!.find('.resource-steps button.active').text()).toContain('项目规范');expect(wrapper!.findAll('.resource-steps button')[3]!.attributes('disabled')).toBeDefined()
     await router.push('/resources?project=not-registered&step=2'); await flushPromises()
     expect(selection.project).toBeNull(); expect(wrapper!.text()).toContain('所选工程不可用')
-    expect(wrapper!.get('.real-resource-empty').text()).toContain('所选工程不可用')
+    expect(wrapper!.find('[data-testid="ai-task-creation-panel"]').exists()).toBe(false)
   })
   it('does not create a selection from duplicated or missing query parameters', async () => {
     const { router, selection } = await setup(`/overview?project=${id}&project=${other}`)

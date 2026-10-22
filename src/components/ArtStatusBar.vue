@@ -8,7 +8,8 @@ import { CircleCheck, Loading, Minus, Warning } from '@element-plus/icons-vue'
 import InfoTip from './InfoTip.vue'
 import ProjectStatusTag from './ProjectStatusTag.vue'
 import { useRegisteredProjectStore } from '../stores/registered-project'
-import { useAiResourceReadStore } from '../stores/ai-resource-read'
+import { useArtSpecificationContext } from '../composables/useArtSpecificationContext'
+import { projectArtSpecProvider } from '../project-art-spec-integration'
 import { useCreatorOperationsStore } from '../stores/creator-operations'
 import { companionBrowserProvider } from '../companion-browser-integration'
 import { AI_JOB_STATE_LABELS, type AiJobState } from '../domain/ai-jobs-read'
@@ -18,13 +19,25 @@ const router=inject(routerKey,null),knowledge=useKnowledgeReadStore()
 function selectProject(id:string){selection.restoreRouteProject(id);if(router)void router.push({path:router.currentRoute.value.path,query:{...router.currentRoute.value.query,project:id}})}
 function refreshProjects(){if(directory.provider)void directory.refreshProjects();else if(companionBrowserProvider.value)void directory.connect(companionBrowserProvider.value)}
 const model=computed<State>(()=>knowledge.provider!==knowledgeReadProvider.value||!knowledge.provider?{text:'未读取',tone:'info'}:knowledge.statusLoading?{text:'读取中',tone:'info',busy:true}:knowledge.serviceError?{text:'读取失败',tone:'danger'}:knowledge.services?.model?.running===true?{text:'可达',tone:'success'}:knowledge.services?.model?.running===false?{text:'不可达',tone:'warning'}:{text:'未知',tone:'info'})
-const selection=useRegisteredProjectStore(), directory=selection.directory, resource=useAiResourceReadStore(), operations=useCreatorOperationsStore()
+const selection=useRegisteredProjectStore(), directory=selection.directory, operations=useCreatorOperationsStore()
+const {art,resource,busy:specBusy,canRefresh,refresh:refreshSpecification}=useArtSpecificationContext()
 type Tone='info'|'success'|'warning'|'danger'
 interface State { text:string; tone:Tone; busy?:boolean; detail?:string }
 const registration=computed<State>(()=>directory.projectLoading?{text:'登记读取中',tone:'info',busy:true}:directory.projectError?{text:'登记读取失败',tone:'danger',detail:directory.projectError}:selection.currentSource?{text:'登记已读取',tone:'success'}:!companionBrowserProvider.value?{text:'登记接口未接入',tone:'info'}:{text:'登记未连接',tone:'info'})
 const sameProject=computed(()=>!!selection.project&&!!selection.currentSource&&resource.project?.id===selection.project.id&&resource.project.path===selection.project.path&&resource.project.name===selection.project.name&&resource.provider===aiResourceReadProvider.value)
 const specification=computed<State>(()=>{
  if(!selection.project)return {text:'未选择工程',tone:'info'}
+ if(projectArtSpecProvider.value){
+  if(art.context?.projectId!==selection.project.id||art.context.projectPath!==selection.project.path||art.context.source!==selection.currentSource||art.provider!==projectArtSpecProvider.value)return {text:'规范未读取',tone:'info'}
+  if(art.pending)return {text:art.phase==='saving'?'规范保存中':'规范读取中',tone:'info',busy:true}
+  if(art.blocked||art.phase==='unknown')return {text:'规范保存待核对',tone:'warning',detail:art.message}
+  if(art.phase==='error')return {text:'规范读取失败',tone:'danger',detail:art.message}
+  if(art.dirty)return {text:'规范有未保存修改',tone:'warning'}
+  if(art.base)return {text:'规范已读取',tone:'success'}
+  if(art.legacyVersion!==null)return {text:'图标规范已读取',tone:'success'}
+  if(art.hash===null)return {text:'规范未配置',tone:'warning'}
+  return {text:'规范未读取',tone:'info'}
+ }
  if(!aiResourceReadProvider.value)return {text:'规范接口未接入',tone:'info'}
  if(!sameProject.value)return {text:'规范未读取',tone:'info'}
  if(resource.loading)return {text:'规范读取中',tone:'info',busy:true}
@@ -60,6 +73,7 @@ function icon(state:State){return state.busy?Loading:state.tone==='success'?Circ
    <el-tag v-if="showModel" size="small" :type="model.tone" data-status="model" title="仅表示模型启动器的已有观测，不代表生成模型已就绪"><el-icon :class="{'is-loading':model.busy}"><component :is="icon(model)"/></el-icon>模型启动器 · {{ model.text }}</el-tag>
    <el-tag v-if="service" size="small" :type="service.tone" data-status="service"><el-icon :class="{'is-loading':service.busy}"><component :is="icon(service)"/></el-icon>{{ service.label }} · {{ service.text }}</el-tag>
    <el-button v-if="projectPicker && companionBrowserProvider" :icon="Refresh" text aria-label="刷新登记工程" :loading="directory.projectLoading" @click="refreshProjects"/>
+   <el-button aria-label="读取工程规范" size="small" :loading="specBusy" :disabled="!canRefresh" :title="art.dirty ? '请先保存当前规范草稿；刷新不会丢弃未保存输入' : undefined" @click="refreshSpecification">读取 / 刷新工程规范</el-button>
    <InfoTip v-if="registration.detail||specification.detail||task?.detail" label="资源状态详情" :text="[registration.detail,specification.detail,task?.detail].filter(Boolean).join('；')"/>
   </div>
   <div v-if="$slots.default" class="art-status-actions"><slot/></div>

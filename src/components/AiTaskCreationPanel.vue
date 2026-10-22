@@ -34,19 +34,19 @@ onBeforeUnmount(() => { globalThis.removeEventListener?.('storage', storageChang
 </script>
 <template>
   <section class="section-card ai-task-creation" data-testid="ai-task-creation-panel">
-    <div class="section-heading"><div><h3>描述一张图标</h3><p>沿用原后台的单图流程：核对已保存资源配置、填写用途与画面，再检查目标并排队或采用可信 PNG。</p></div></div>
+    <div class="section-heading"><div><h3>{{ store.prepared ? '核对本次任务' : store.snapshot ? '任务已建立' : '描述一张图标' }}</h3></div></div>
     <p v-if="!provider || !resourceReader || !jobsReader" class="form-help">当前构建未接入任务创建；需要原 Companion 同源会话与已配置的任务后端。</p>
     <p v-if="!store.project">请先选择已登记工程。</p>
     <details v-else class="task-details" :open="!props.compact"><summary>工程信息</summary><p>工程 {{ store.project.name }} · {{ store.project.id }}<br>{{ store.project.path }}</p></details>
     <p v-if="provider && resourceReader && jobsReader && !store.drainAvailable">读取接口未提供请求清理确认，当前只允许读取，已阻止创建任务。</p>
     <p v-if="configDirty || artDirty">当前工程资源配置有未保存修改，请先完成或取消配置编辑。</p>
-    <div class="task-buttons"><el-button type="primary" plain :disabled="!store.active || !provider || !resourceReader || !jobsReader || !source || !store.project || store.busy || !!configDirty || artDirty" :loading="store.phase === 'reading'" @click="store.readContext()">读取生成所需配置</el-button></div>
-    <details class="task-details" :open="!props.compact"><summary>读取与生成说明</summary>    <p class="form-help">读取会使用原后台 Python、文件与 Git；不会自动运行模型。使用已保存的美术规范；尚未建立新规范时沿用原 v2，未保存草稿不能提交。</p></details>
+    <div v-if="!(store.config || store.artConfig) || !store.history" class="task-buttons"><el-button type="primary" plain :disabled="!store.active || !provider || !resourceReader || !jobsReader || !source || !store.project || store.busy || !!configDirty || artDirty" :loading="store.phase === 'reading'" @click="store.readContext()">读取生成所需配置</el-button></div>
+    <details v-if="!(store.config || store.artConfig)" class="task-details"><summary>读取说明</summary>    <p class="form-help">读取会使用原后台 Python、文件与 Git；不会自动运行模型。使用已保存的美术规范；尚未建立新规范时沿用原 v2，未保存草稿不能提交。</p></details>
     <el-alert v-if="store.error" type="error" :closable="false" :title="store.error"/>
     <p v-if="store.pending || store.storageBlocked">存在尚未确认的 AI 写操作，或无法可靠保存跨标签页保护记录；新任务已阻止。</p>
     <template v-if="(store.config || store.artConfig) && store.history">
-      <p>默认成品 {{ store.output?.width }} × {{ store.output?.height }}；母图固定 1024 × 1024 透明 PNG，每张一个候选、一次提交。</p>
-      <form @submit.prevent="store.prepare()" class="task-form">
+      <p v-if="!store.prepared && !store.snapshot">已读取规范 · 默认成品 {{ store.output?.width }} × {{ store.output?.height }}</p>
+      <form v-show="!store.prepared && !store.snapshot" @submit.prevent="store.prepare()" class="task-form">
         <label>资源名称<el-input aria-label="资源名称" :model-value="store.brief.name" maxlength="60" :disabled="lockedForm" placeholder="coin-pouch" @update:model-value="(value: unknown) => store.edit('name', String(value))"/></label>
         <label>用途<el-input aria-label="图标用途" :model-value="store.brief.purpose" maxlength="400" :disabled="lockedForm" placeholder="例如奖励、道具、按钮" @update:model-value="(value: unknown) => store.edit('purpose', String(value))"/></label>
         <label>画面<el-input aria-label="图标画面" type="textarea" :rows="3" :model-value="store.brief.prompt" maxlength="4096" :disabled="lockedForm" placeholder="主体、细节与要表达的含义" @update:model-value="(value: unknown) => store.edit('prompt', String(value))"/></label>
@@ -54,10 +54,10 @@ onBeforeUnmount(() => { globalThis.removeEventListener?.('storage', storageChang
         <details><summary>高级配置</summary><label>图标标识<el-input aria-label="图标标识" :model-value="store.brief.assetId" maxlength="60" :disabled="lockedForm" @update:model-value="(value: unknown) => store.edit('assetId', String(value))"/></label><label>工程目标路径（配置派生）<el-input aria-label="工程目标路径" :model-value="store.targetPath" readonly/></label><label>资源配置风格（只读）<el-input aria-label="资源配置风格" type="textarea" :model-value="store.artConfig?.project.content ?? store.config?.style.description" readonly/></label><p>配置版本 {{ store.artConfig?.version ?? store.resource?.version }} · SHA-256 {{ store.art?.hash ?? store.resource?.hash }}</p><p>本次 jobs 读取的工程 HEAD {{ store.history.sourceRevision }}（后台提交时仍会复核）</p></details>
         <label v-if="store.history.mode === 'offline_import_only' || store.history.adoptionSources?.length">现有 PNG 来源<el-select aria-label="现有 PNG 来源" :model-value="store.brief.sourceId" :disabled="lockedForm" @update:model-value="(value: unknown) => store.edit('sourceId', String(value))"><el-option v-if="store.history.mode !== 'offline_import_only'" value="" label="生成新候选（先排队）"/><el-option v-for="sourceItem in store.history.adoptionSources ?? []" :key="sourceItem.sourceId" :value="sourceItem.sourceId" :label="sourceItem.sourceId"/></el-select></label>
         <p v-if="store.history.mode === 'offline_import_only'">当前后端只允许采用可信目录已有 PNG，不能排队生成。</p>
-        <el-button native-type="submit" type="primary" :disabled="!store.canPrepare">继续到准备图标</el-button>
+        <el-button native-type="submit" type="primary" :disabled="!store.canPrepare">核对本次任务</el-button>
       </form>
       <section v-if="store.prepared" class="task-confirm" aria-label="确认单图任务">
-        <h4>准备图标</h4><p>原任务 ID {{ store.prepared.input.request.runId }}</p><p>{{ store.prepared.input.request.assets[0].assetId }} → {{ store.prepared.input.request.assets[0].relativePath }}</p>
+        <h4>准备图标</h4><el-button :disabled="store.busy || !!store.retainedRunId" @click="store.returnToBrief()">返回修改</el-button><p>原任务 ID {{ store.prepared.input.request.runId }}</p><p>{{ store.prepared.input.request.assets[0].assetId }} → {{ store.prepared.input.request.assets[0].relativePath }}</p>
         <p v-if="store.prepared.operation === 'adopt'">采用 {{ store.prepared.input.sourceId }} 的可信 PNG，绑定当前工程、用途与目标；不生成新图，也不导入 Creator。</p>
         <p v-else>本次会封存当前资源配置与参考证据并持久入队；排队不等于 GPU 生成。实际运行需原任务另行批准。</p>
         <p>目标已存在时一律阻止，包含 REUSABLE。参考图仅封存记录，不作为模型图像输入。风格由服务端覆盖并附加到画面要求。</p>

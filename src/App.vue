@@ -12,7 +12,7 @@ import { frontendIdentity, frontendBuildIdentity } from './domain/product-inform
 import InfoTip from './components/InfoTip.vue'
 import {useProductVersionStore} from './stores/product-version'
 import {productVersionReadProvider} from './product-version-integration'
-import ImageAssetsView from './views/ImageAssetsView.vue'
+import ArtWorkspaceView from './views/ArtWorkspaceView.vue'
 import { knowledgeNavigation, knowledgePageFor } from './domain/knowledge-navigation'
 const backendVersionInformation=useProductVersionStore()
 watch(productVersionReadProvider,()=>{void backendVersionInformation.read()},{immediate:true})
@@ -21,8 +21,8 @@ const route = useRoute()
 const router = useRouter()
 const menuOpen = ref(false)
 // Keep the iframe in the document: moving it through a deactivated route cache can reload its browsing context.
-const imageAssetsVisited=ref(route.path==='/image-assets')
-watch(()=>route.path,path=>{if(path==='/image-assets')imageAssetsVisited.value=true},{flush:'sync'})
+const artWorkspaceVisited=ref(route.path==='/art-resources')
+watch(()=>route.path,path=>{if(path==='/art-resources')artWorkspaceVisited.value=true},{flush:'sync'})
 const registered = useRegisteredProjectStore()
 const legacyWorkspace = computed(() => allowsLegacyWorkspace(import.meta.env.MODE, Boolean(companionBrowserProvider.value)))
 const usesLegacySnapshot = computed(() => legacyWorkspace.value && store.mode !== 'disconnected')
@@ -36,10 +36,10 @@ watch(legacyWorkspace, allowed => { if (!allowed && store.mode !== 'disconnected
 // registered store's source/path-bound project and never trusts this query.
 const registeredRouteIntent = ref<LocationQueryValue | LocationQueryValue[] | undefined>()
 watch(() => route.fullPath, () => {
-  if (['/overview', '/resources', '/ai-icons', '/image-assets'].includes(route.path)) registeredRouteIntent.value = route.query.project
+  if (['/overview', '/art-resources', '/resources', '/ai-icons', '/image-assets'].includes(route.path)) registeredRouteIntent.value = route.query.project
 }, { immediate: true, flush: 'sync' })
 function projectLink(path: string) {
-  if (!['/overview', '/resources', '/ai-icons', '/image-assets'].includes(path)) return path
+  if (!['/overview', '/art-resources', '/resources', '/ai-icons', '/image-assets'].includes(path)) return path
   const intent = registered.project?.id ?? (registered.requestedId || registeredRouteIntent.value)
   return intent !== undefined ? { path, query: { project: intent } } : path
 }
@@ -54,11 +54,6 @@ const nav = [
   { path: '/knowledge', label: '知识库' },
   { path: '/knowledge?tab=models', label: '模型服务' },
 ]
-const artNav = [
-  { path: '/ai-icons', label: 'AI 图标' },
-  { path: '/resources', label: '游戏资源' },
-  { path: '/image-assets', label: '图片素材' },
-]
 const knowledgeExpanded = ref(false)
 const knowledgeActive = computed(() => Boolean(knowledgePageFor(route)))
 const knowledgeCacheEpoch = ref(0)
@@ -68,10 +63,6 @@ watch(knowledgeActive, (active, previous) => {
 }, { flush: 'sync' })
 watch(() => route.fullPath, () => {
   if (knowledgeActive.value) knowledgeExpanded.value = true
-}, { immediate: true })
-const artExpanded = ref(false)
-watch(() => route.fullPath, () => {
-  if (artNav.some(item => item.path === route.path)) artExpanded.value = true
 }, { immediate: true })
 function isNavActive(path: string) {
   if (path === '/knowledge?tab=models') return route.path === '/knowledge' && route.query.tab === 'models'
@@ -151,12 +142,7 @@ const dateLabel = computed(() => {
             </div>
           </div>
           <RouterLink v-else :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><span>{{ item.label }}</span></RouterLink>
-          <div v-if="item.path === '/projects'" class="art-nav-group">
-            <button class="nav-item art-nav-toggle" type="button" :aria-expanded="artExpanded" aria-controls="art-navigation" @click="artExpanded = !artExpanded"><span>美术资源</span><el-icon aria-hidden="true" :class="{ 'is-expanded': artExpanded }"><ArrowDown/></el-icon></button>
-            <div v-show="artExpanded" id="art-navigation" class="art-nav-children">
-              <RouterLink v-for="child in artNav" :key="child.path" :to="projectLink(child.path)" class="nav-item art-nav-child" :class="{ 'is-active': isNavActive(child.path) }" active-class="" :aria-current="isNavActive(child.path) ? 'page' : undefined" @click="menuOpen = false">{{ child.label }}</RouterLink>
-            </div>
-          </div>
+          <RouterLink v-if="item.path === '/projects'" :to="projectLink('/art-resources')" class="nav-item" :class="{'is-active':route.path==='/art-resources'}" :aria-current="route.path==='/art-resources'?'page':undefined" @click="menuOpen=false">美术资源</RouterLink>
         </template>
       </nav>
 
@@ -176,13 +162,13 @@ const dateLabel = computed(() => {
         <el-alert v-if="showRegisteredChrome && registered.directory.projectError" type="error" :closable="false" title="工程读取失败" :description="registered.directory.projectError"/>
         <div v-if="showRegisteredChrome && registered.directory.warnings.length" class="registered-read-warnings"><InfoTip label="工程读取限制" :text="registered.directory.warnings.join('；')"/><span>部分状态或发现信息未读取</span></div>
         <KeepAlive>
-          <ImageAssetsView v-if="imageAssetsVisited" v-show="route.path==='/image-assets'"/>
+          <ArtWorkspaceView v-if="artWorkspaceVisited" v-show="route.path==='/art-resources'"/>
         </KeepAlive>
         <RouterView v-slot="{ Component }">
           <KeepAlive :key="knowledgeCacheEpoch">
             <component :is="Component" v-if="knowledgeActive" :key="route.path" />
           </KeepAlive>
-          <component :is="Component" v-if="!knowledgeActive && route.path!=='/image-assets'" />
+          <component :is="Component" v-if="!knowledgeActive && route.path!=='/art-resources'" />
         </RouterView>
       </main>
     </div>

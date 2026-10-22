@@ -74,6 +74,7 @@ function service(guardedExport = true) {
   return { server, fetch, provider, holdNext }
 }
 let wrapper: VueWrapper | undefined
+let activeReview: ReturnType<typeof useImageReviewStore> | undefined
 async function mountReview(local: ReturnType<typeof service>) {
   registerImageReviewProvider(local.provider)
   const pinia = createPinia()
@@ -81,19 +82,29 @@ async function mountReview(local: ReturnType<typeof service>) {
   await flushPromises()
   await button('连接本机').trigger('click')
   await flushPromises()
-  return useImageReviewStore(pinia)
+  activeReview=useImageReviewStore(pinia)
+  return activeReview
 }
 function button(label: string) {
   const result = wrapper!.findAll('button').find(item => item.text().includes(label))
   if (!result) throw new Error(`Missing button: ${label}`)
   return result
 }
-function saveDisabled() { return button('保存选中').attributes('disabled') !== undefined }
+async function saveDisabled() {
+  // Reach the approved save stage only after a real selected snapshot. If the
+  // prerequisite is unavailable, absence is also a closed save action.
+  const confirm=wrapper!.findAll('button').find(item=>item.text()==='确认选择')
+  if(confirm&&confirm.attributes('disabled')===undefined){await confirm.trigger('click');await flushPromises()}
+  const save=wrapper!.findAll('button').find(item=>item.text().includes('保存选中'))
+  if(!save)expect(activeReview?.canSave).toBe(false)
+  return !save||save.attributes('disabled')!==undefined
+}
 function checkbox() { return wrapper!.find<HTMLInputElement>('.image-review-row input[type=checkbox]') }
 function exportCalls(local: ReturnType<typeof service>) { return local.fetch.mock.calls.filter(([path]) => path === exportPath) }
 afterEach(() => {
   wrapper?.unmount()
   wrapper = undefined
+  activeReview=undefined
   imageReviewProvider.value = null
   document.body.innerHTML = ''
   vi.restoreAllMocks()
@@ -143,16 +154,16 @@ describe('real same-origin adapter refresh readiness with offline transport', ()
     const store = await mountReview(local)
     await checkbox().setValue(true)
     await flushPromises()
-    expect(checkbox().element.checked).toBe(true)
-    expect(saveDisabled()).toBe(false)
+    expect(store.selectedIds).toEqual([imageId])
+    expect(await saveDisabled()).toBe(false)
     expect(wrapper!.text()).not.toContain(guardWarning)
 
     const pending = local.holdNext(statePath)
     await button('刷新真实状态').trigger('click')
     await flushPromises()
     expect(store.loading).toBe(true)
-    expect(saveDisabled()).toBe(true)
-    expect(checkbox().element.checked).toBe(true)
+    expect(await saveDisabled()).toBe(true)
+    expect(store.selectedIds).toEqual([imageId])
     expect(wrapper!.text()).toContain(guardWarning)
 
     pending.resolve(response(local.server.state))
@@ -160,8 +171,8 @@ describe('real same-origin adapter refresh readiness with offline transport', ()
     expect(store.loading).toBe(false)
     expect(store.snapshot.busy).toBe(false)
     expect(store.snapshot.items[0]?.status).toBe('ready')
-    expect(checkbox().element.checked).toBe(true)
-    expect(saveDisabled()).toBe(false)
+    expect(store.selectedIds).toEqual([imageId])
+    expect(await saveDisabled()).toBe(false)
     expect(wrapper!.text()).not.toContain(guardWarning)
     await button('保存选中').trigger('click')
     await flushPromises()
@@ -186,12 +197,12 @@ describe('refresh failures keep saving closed', () => {
     const store = await mountReview(local)
     await checkbox().setValue(true)
     await flushPromises()
-    expect(saveDisabled()).toBe(false)
+    expect(await saveDisabled()).toBe(false)
 
     const pending = local.holdNext(path)
     const refreshing = store.refresh()
     await flushPromises()
-    expect(saveDisabled()).toBe(true)
+    expect(await saveDisabled()).toBe(true)
     expect(wrapper!.text()).toContain(guardWarning)
     pending.resolve(failedResponse())
     await refreshing
@@ -202,8 +213,8 @@ describe('refresh failures keep saving closed', () => {
     expect(store.selectedIds).toEqual([])
     expect(store.error).not.toBe('')
     expect(store.canSave).toBe(false)
-    expect(saveDisabled()).toBe(true)
-    expect(wrapper!.text()).toContain(guardWarning)
+    expect(await saveDisabled()).toBe(true)
+    expect(wrapper!.find('[data-testid=image-save-step]').exists()).toBe(false)
     await expect(store.save()).rejects.toThrow('未就绪')
     expect(exportCalls(local)).toHaveLength(0)
 
@@ -212,7 +223,7 @@ describe('refresh failures keep saving closed', () => {
     await checkbox().setValue(true)
     await flushPromises()
     expect(store.connected).toBe(true)
-    expect(saveDisabled()).toBe(false)
+    expect(await saveDisabled()).toBe(false)
     expect(wrapper!.text()).not.toContain(guardWarning)
   })
 
@@ -221,16 +232,16 @@ describe('refresh failures keep saving closed', () => {
     // The server may already have a selection even when this client cannot change it.
     local.server.state.task.selected = [imageId]
     const store = await mountReview(local)
-    expect(checkbox().element.checked).toBe(true)
+    expect(store.selectedIds).toEqual([imageId])
     expect(checkbox().element.disabled).toBe(true)
     expect(store.connected).toBe(true)
     expect(store.snapshot.items[0]?.status).toBe('ready')
     expect(store.selectedIds).toEqual([imageId])
-    expect(saveDisabled()).toBe(true)
+    expect(await saveDisabled()).toBe(true)
     expect(wrapper!.text()).toContain(guardWarning)
     await store.refresh()
     await flushPromises()
-    expect(saveDisabled()).toBe(true)
+    expect(await saveDisabled()).toBe(true)
     await expect(store.save()).rejects.toThrow('未就绪')
     expect(local.fetch.mock.calls.map(([path]) => path)).toEqual([statePath, statePath])
   })
@@ -276,7 +287,7 @@ describe('server authority and selection remain intact across refresh', () => {
     await flushPromises()
     await button('刷新真实状态').trigger('click')
     await flushPromises()
-    expect(saveDisabled()).toBe(false)
+    expect(await saveDisabled()).toBe(false)
     local.server.exportStatus = 409
     await button('保存选中').trigger('click')
     await flushPromises()
@@ -301,15 +312,15 @@ describe('server authority and selection remain intact across refresh', () => {
     await flushPromises()
     expect(store.snapshot.busy).toBe(true)
     expect(store.selectedIds).toEqual([imageId])
-    expect(checkbox().element.checked).toBe(true)
-    expect(saveDisabled()).toBe(true)
+    expect(store.selectedIds).toEqual([imageId])
+    expect(await saveDisabled()).toBe(true)
     await expect(store.save()).rejects.toThrow('未就绪')
     expect(exportCalls(local)).toHaveLength(0)
     local.server.state.busy = false
     await button('刷新真实状态').trigger('click')
     await flushPromises()
-    expect(checkbox().element.checked).toBe(true)
-    expect(saveDisabled()).toBe(false)
+    expect(store.selectedIds).toEqual([imageId])
+    expect(await saveDisabled()).toBe(false)
   })
 
   it('clears old local selections and receipts when a different task arrives', async () => {
@@ -344,15 +355,15 @@ describe('server authority and selection remain intact across refresh', () => {
     expect(store.selectedIds).toEqual([])
     expect(checkbox().element.checked).toBe(false)
     expect(checkbox().element.disabled).toBe(true)
-    expect(saveDisabled()).toBe(true)
+    expect(await saveDisabled()).toBe(true)
     local.server.state.task.items[0]!.status = 'ready'
     await button('刷新真实状态').trigger('click')
     await flushPromises()
     expect(store.selectedIds).toEqual([])
-    expect(saveDisabled()).toBe(true)
+    expect(await saveDisabled()).toBe(true)
     await checkbox().setValue(true)
     await flushPromises()
-    expect(saveDisabled()).toBe(false)
+    expect(await saveDisabled()).toBe(false)
     expect(exportCalls(local)).toHaveLength(0)
   })
 })
@@ -409,12 +420,12 @@ describe('only the newest completed refresh can restore readiness', () => {
     expect(local.provider.saveSelectionGuard).toBe('verified')
     expect(store.loading).toBe(true)
     expect(store.canSave).toBe(false)
-    expect(saveDisabled()).toBe(true)
-    expect(wrapper!.text()).toContain(guardWarning)
+    expect(await saveDisabled()).toBe(true)
+    expect(wrapper!.find('[data-testid=image-save-step]').exists()).toBe(false)
     newestResponse.resolve(response(local.server.state))
     await newestRefresh
     await flushPromises()
-    expect(saveDisabled()).toBe(false)
+    expect(await saveDisabled()).toBe(false)
     expect(wrapper!.text()).not.toContain(guardWarning)
   })
 
@@ -436,8 +447,8 @@ describe('only the newest completed refresh can restore readiness', () => {
     expect(store.snapshot.items).toEqual([])
     expect(store.selectedIds).toEqual([])
     expect(store.canSave).toBe(false)
-    expect(saveDisabled()).toBe(true)
-    expect(wrapper!.text()).toContain(guardWarning)
+    expect(await saveDisabled()).toBe(true)
+    expect(wrapper!.find('[data-testid=image-save-step]').exists()).toBe(false)
     expect(exportCalls(local)).toHaveLength(0)
   })
 })

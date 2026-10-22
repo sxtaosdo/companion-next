@@ -15,6 +15,15 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
   const authorities = shallowRef<readonly ArtAuthority[]>([])
   const phase = ref<'idle' | 'reading' | 'editing' | 'saving' | 'saved' | 'unknown' | 'error'>('idle'), message = ref(''), confirmed = ref(false), pending = ref(false)
   const retained = shallowRef<{ context: ProjectArtSpecContext; draft: ProjectArtSpec } | null>(null)
+  const retainedDrafts = new WeakMap<object, Map<string, { context: ProjectArtSpecContext; draft: ProjectArtSpec }>>()
+  const draftKey = (value: ProjectArtSpecContext) => JSON.stringify([value.projectId, value.projectPath])
+  function retainDraft() {
+    if (!dirty.value || !context.value || !draft.value) return
+    const value = { context: context.value, draft: copy(draft.value) }
+    let entries = retainedDrafts.get(context.value.source)
+    if (!entries) { entries = new Map(); retainedDrafts.set(context.value.source, entries) }
+    entries.set(draftKey(context.value), value); retained.value = value
+  }
   let epoch = 0, controller: AbortController | null = null
   const observedPath = ref<string | null>(null)
   const blocked = computed(() => {
@@ -36,9 +45,9 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
   const canSave = computed(() => !!context.value && !!provider.value && !!draft.value && hash.value !== undefined && !errors.value.length && !pending.value && !blocked.value && confirmed.value && dirty.value)
   function bind(next: ProjectArtSpecContext | null, writer: ProjectArtSpecProvider | null) {
     if (same(context.value, next) && provider.value === writer) return
-    if (dirty.value && context.value && draft.value) retained.value = { context: context.value, draft: copy(draft.value) }
-    epoch++; controller?.abort(); confirmed.value = false
-    context.value = next; provider.value = writer; draft.value = null; base.value = null; hash.value = undefined; authorities.value = []
+    retainDraft()
+    epoch++; controller?.abort(); pending.value = false; confirmed.value = false
+    context.value = next; retained.value = next ? retainedDrafts.get(next.source)?.get(draftKey(next)) ?? null : null; provider.value = writer; draft.value = null; base.value = null; hash.value = undefined; authorities.value = []
     observedPath.value = null; legacyVersion.value = null; legacyConfig = null
     phase.value = blocked.value ? 'unknown' : 'idle'
     message.value = phase.value === 'unknown' ? '此工程保存结果未知；请回读核对，不能重复保存。' : ''
@@ -52,6 +61,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
   async function read() {
     const captured = context.value, reader = provider.value, revision = epoch
     if (!captured || !reader || pending.value) return
+    if (dirty.value && !blocked.value) { message.value = '请先保存当前草稿；刷新未覆盖未保存修改。'; return }
     if (blocked.value) { await recover(); return }
     pending.value = true; phase.value = 'reading'; confirmed.value = false; hash.value = undefined; legacyVersion.value = null; controller = new AbortController()
     const signal = controller.signal
@@ -67,7 +77,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
       phase.value = blocked.value ? 'unknown' : 'editing'
       message.value = blocked.value ? '已回读文件；这不是原保存回执，未知保护仍保留。' : parsed?.kind === 'legacy-v2' ? '读取到旧 v2；旧图标流程保留，未自动迁移。' : parsed ? '已读取工程美术规范。' : '工程尚无美术规范，可新建草稿。'
     } catch { if (revision === epoch) { phase.value = blocked.value ? 'unknown' : 'error'; message.value = '美术规范读取未确认，请重新读取。' } }
-    finally { clearTimeout(timer); pending.value = false }
+    finally { clearTimeout(timer); if (revision === epoch) pending.value = false }
   }
   function startDraft(name: string) {
     if (!context.value || pending.value || blocked.value || draft.value) return
@@ -86,7 +96,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
   function touch() { confirmed.value = false; if (!blocked.value) phase.value = 'editing' }
   function restoreRetained() {
     if (!retained.value || !same(context.value, retained.value.context) || pending.value || blocked.value) return
-    draft.value = copy(retained.value.draft); retained.value = null; touch()
+    draft.value = copy(retained.value.draft); if (context.value) retainedDrafts.get(context.value.source)?.delete(draftKey(context.value)); retained.value = null; touch()
   }
   function acceptSaved(receipt: ProjectArtSpecReceipt, captured: ProjectArtSpecContext, record: PendingArtWrite) {
     const parsed = checkedReceipt(receipt, captured)
@@ -115,7 +125,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
       clearPendingArtWrite(captured, writer, record); legacyVersion.value = null; base.value = copy(saved); draft.value = copy(saved); hash.value = state.receipt.hash; authorities.value = copy(state.receipt.authorities); observedPath.value = state.receipt.projectPath
       phase.value = 'saved'; message.value = '原保存回执已确认；可重新读取当前工程文件。'
     } catch { if (revision === epoch) { phase.value = 'unknown'; message.value = '原保存结果仍未知，保护保留；未重发保存。' } }
-    finally { clearTimeout(timer); pending.value = false }
+    finally { clearTimeout(timer); if (revision === epoch) pending.value = false }
   }
   async function save() {
     if (!canSave.value || !context.value || !provider.value || !draft.value || hash.value === undefined) return
@@ -136,8 +146,8 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
       const notSent = error instanceof ProjectArtSpecWriteError && error.outcome === 'not-sent'
       if (notSent && record) clearPendingArtWrite(captured, writer, record)
       if (revision === epoch) { phase.value = record && !notSent ? 'unknown' : 'error'; message.value = record && !notSent ? '保存结果未知；只查询原操作，不重复发送。' : '未确认保存保护，未发送保存；请检查浏览器存储或重新读取。' }
-    } finally { clearTimeout(timer); pending.value = false }
+    } finally { clearTimeout(timer); if (revision === epoch) pending.value = false }
   }
-  function leave() { epoch++; controller?.abort(); confirmed.value = false; if (phase.value === 'saving') { phase.value = 'unknown'; message.value = '保存结果未知，保护保留。' } else if (phase.value === 'reading') phase.value = 'idle'; if (context.value && dirty.value && draft.value) retained.value = { context: context.value, draft: copy(draft.value) } }
+  function leave() { epoch++; controller?.abort(); pending.value = false; confirmed.value = false; if (phase.value === 'saving') { phase.value = 'unknown'; message.value = '保存结果未知，保护保留。' } else if (phase.value === 'reading') phase.value = 'idle'; retainDraft() }
   return { context, provider, draft, base, legacyVersion, hash, authorities, phase, message, confirmed, pending, retained, blocked, dirty, errors, canSave, bind, read, startDraft, setValue, touch, restoreRetained, save, recover, leave }
 })

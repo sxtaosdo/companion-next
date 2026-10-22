@@ -59,15 +59,15 @@ describe('collector iframe feedback and retry',()=>{
 describe('existing image assets route retains the independent document',()=>{
  it('keeps one connected iframe across labels, routes, query edits and knowledge cache expiry',async()=>{
   vi.stubGlobal('fetch',vi.fn())
-  const empty={template:'<p>Other page</p>'},router=createRouter({history:createMemoryHistory(),routes:[{path:'/image-assets',component:ImageAssetsView},{path:'/overview',component:empty},{path:'/help',component:empty},{path:'/knowledge',component:empty}]})
-  await router.push('/image-assets?url=https://untrusted.example/');await router.isReady()
+  const empty={template:'<p>Other page</p>'},router=createRouter({history:createMemoryHistory(),routes:[{path:'/art-resources',component:ImageAssetsView},{path:'/overview',component:empty},{path:'/help',component:empty},{path:'/knowledge',component:empty}]})
+  await router.push('/art-resources?references=1&url=https://untrusted.example/');await router.isReady()
   wrapper=mount(App,{attachTo:document.body,global:{plugins:[createPinia(),router,ElementPlus]}});await flushPromises()
   const frame=wrapper.get('iframe.collector-frame').element as HTMLIFrameElement
   deliver(frame);await flushPromises();expect(wrapper.text()).toContain('已就绪')
   expect(wrapper.find('[data-testid="companion-image-review-panel"]').exists()).toBe(false)
   await wrapper.get('[data-testid="review-tab"]').trigger('click');expect(wrapper.find('[data-testid="companion-image-review-panel"]').exists()).toBe(true)
-  await wrapper.get('[role="tablist"]').trigger('keydown',{key:'Home'});await flushPromises();expect(wrapper.get('iframe.collector-frame').element).toBe(frame)
-  for(const path of ['/help','/knowledge','/overview','/image-assets?ignored=1']){await router.push(path);await flushPromises();expect(wrapper.get('iframe.collector-frame').element).toBe(frame);expect(frame.isConnected).toBe(true)}
+  await wrapper.get('[aria-label="图片素材工具"]').trigger('keydown',{key:'Home'});await flushPromises();expect(wrapper.get('iframe.collector-frame').element).toBe(frame)
+  for(const path of ['/help','/knowledge','/overview','/art-resources?references=1&ignored=1']){await router.push(path);await flushPromises();expect(wrapper.get('iframe.collector-frame').element).toBe(frame);expect(frame.isConnected).toBe(true)}
   expect(frame.getAttribute('src')).toBe(PUBLIC_IMAGE_COLLECTOR_URL);expect(wrapper.findAll('iframe.collector-frame')).toHaveLength(1)
   expect(wrapper.get('iframe.collector-frame').isVisible()).toBe(true);expect(fetch).not.toHaveBeenCalled()
  })

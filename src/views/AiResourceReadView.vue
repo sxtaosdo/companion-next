@@ -6,29 +6,21 @@ import { useRegisteredProjectPage } from '../composables/use-registered-project-
 import { useAiResourceEditorStore } from '../stores/ai-resource-editor'
 import { useAiResourceReadStore } from '../stores/ai-resource-read'
 import { aiResourceReadProvider } from '../ai-resource-read-integration'
-import ArtStatusBar from '../components/ArtStatusBar.vue'
+import ArtProductionFlow from '../components/ArtProductionFlow.vue'
 import ProjectArtSpecPanel from '../components/ProjectArtSpecPanel.vue'
 import AiResourceConfigDialog from '../components/AiResourceConfigDialog.vue'
-import AiTaskCreationPanel from '../components/AiTaskCreationPanel.vue'
-import { aiTaskCreationProvider } from '../ai-task-creation-integration'
-import AiJobsReadPanel from '../components/AiJobsReadPanel.vue'
 import { aiResourceSaveProvider } from '../ai-resource-save-integration'
 import { isAiProjectId, isAiReferencePath } from '../domain/ai-resource-read'
-const props = withDefaults(defineProps<{ embedded?: boolean }>(), { embedded: false })
+const props = withDefaults(defineProps<{ embedded?: boolean; sharedHeader?: boolean }>(), { embedded: false })
 // The resource workflow already owns entry reads. Its embedded first step must
 // not mount a second registration lifecycle or choose a different project.
 const selection = useRegisteredProjectStore()
 if (!props.embedded) useRegisteredProjectPage()
 const directory = selection.directory, store = useAiResourceReadStore(), editor = useAiResourceEditorStore()
-const jobsPanel = ref<InstanceType<typeof AiJobsReadPanel> | null>(null)
-const configDirty = computed(() => !!editor.project && editor.project.id === selection.project?.id && editor.project.path === selection.project?.path
-  && (editor.dirty || editor.busy || !!editor.pendingFence))
 const editorDialog = ref<InstanceType<typeof AiResourceConfigDialog> | null>(null)
 const editorContext = computed(() => store.project && selection.project && selection.currentSource
   && store.project.id === selection.project.id && store.project.path === selection.project.path
   ? { project: store.project, source: selection.currentSource } : null)
-const resourcesLink = computed(() => ({ path: '/resources', query: { ...(selection.project ? { project: selection.project.id } : {}), step: 1 } }))
-const aiIconsLink = computed(() => ({ path: '/ai-icons', query: selection.project ? { project: selection.project.id } : {} }))
 const saved = computed(() => store.resource?.config)
 const draft = computed(() => store.resource?.draft)
 const size = (value: { width: number; height: number }) => value.width > 0 && value.height > 0 ? `${value.width} × ${value.height}` : '待填写'
@@ -43,21 +35,21 @@ function refreshAfterSave() {
   if (editor.phase === 'saved' && editor.contextValid && editorContext.value && aiResourceReadProvider.value
     && editor.project?.id === store.project?.id && editor.project?.path === store.project?.path) void store.readConfig(aiResourceReadProvider.value)
 }
-onBeforeUnmount(() => store.disconnect())
+// The persistent workspace owns its context; standalone legacy views still cancel on disposal.
+onBeforeUnmount(() => { if (!props.sharedHeader) store.disconnect() })
 </script>
 <template>
   <section class="ai-resource-read">
-    <ArtStatusBar v-if="!props.embedded" :show-creator="false" :jobs="jobsPanel?.readStatusSnapshot ?? null"><div class="ai-read-actions ai-status-read-actions"><el-button aria-label="读取工程规范" type="primary" :disabled="!store.project || !aiResourceReadProvider || store.loading" :loading="store.loading" @click="aiResourceReadProvider && store.readConfig(aiResourceReadProvider)">读取 / 刷新工程规范</el-button><el-button v-if="store.loading || store.previewLoading" @click="store.clearReads">取消读取</el-button><el-button v-if="store.resource" @click="store.clearReads">清空读取结果</el-button></div></ArtStatusBar>
-    <el-alert v-if="!props.embedded && store.error" class="ai-config-error" type="error" :closable="false" :title="store.error"/>
-    <AiTaskCreationPanel compact v-if="!props.embedded && aiTaskCreationProvider" :project="selection.project" :source="selection.currentSource" :config-dirty="configDirty" @created="payload => jobsPanel?.readCreatedTask(payload)"/>
-    <AiJobsReadPanel compact v-if="!props.embedded" ref="jobsPanel" :project="selection.project" :source="selection.currentSource"/>
-    <ProjectArtSpecPanel :project="selection.project" :source="selection.currentSource" :legacy="saved?.schemaVersion === 'project-resource-config-v2' ? saved : null"/>
-    <details class="ai-icon-config section-card" :open="props.embedded"><summary>工程规范与参考图</summary>
+    <ArtProductionFlow v-if="!props.embedded"/>
+    <template v-else>
+    <ProjectArtSpecPanel :shared-header="props.sharedHeader" :project="selection.project" :source="selection.currentSource" :legacy="saved?.schemaVersion === 'project-resource-config-v2' ? saved : null"/>
+    <p v-if="store.error" class="ai-config-error" role="alert">{{ store.error }}</p>
+    <details class="ai-icon-config section-card" ><summary>旧版图标配置与参考图</summary>
     <section class="section-card">
-      <div class="section-heading"><div><h2>{{ props.embedded ? '工程已保存规范' : '工程资源规范' }}</h2><p>核对当前登记工程的已保存配置与参考图。新建、迁移和编辑共用同一配置弹窗。</p></div><RouterLink v-if="props.embedded" :to="aiIconsLink">打开 AI 图标</RouterLink><RouterLink v-else :to="resourcesLink">返回游戏资源 · 项目规范</RouterLink></div>
+      <div class="section-heading"><div><h2>{{ props.embedded ? '工程已保存规范' : '工程资源规范' }}</h2><p>核对当前登记工程的已保存配置与参考图。新建、迁移和编辑共用同一配置弹窗。</p></div></div>
       <el-alert v-if="!aiResourceReadProvider" type="info" :closable="false" title="当前宿主未接入原 Companion AI 读取接口" description="请通过原 Companion 同源工程服务打开；读取能力以当前实际连接为准。"/>
       <p v-if="!directory.connected"><RouterLink to="/projects">先到工程页读取真实登记</RouterLink>，再选择目标工程。工程登记以实际读取结果为准，不加载示例。</p>
-      <div v-if="props.embedded" class="ai-read-actions"><el-button aria-label="读取工程规范" type="primary" :disabled="!store.project || !aiResourceReadProvider || store.loading" :loading="store.loading" @click="aiResourceReadProvider && store.readConfig(aiResourceReadProvider)">读取 / 刷新工程规范</el-button><el-button v-if="store.loading || store.previewLoading" @click="store.clearReads">取消读取</el-button><el-button v-if="store.resource" @click="store.clearReads">清空读取结果</el-button></div>
+      <div v-if="props.embedded" class="ai-read-actions"><el-button aria-label="读取旧版图标配置" type="primary" :disabled="!store.project || !aiResourceReadProvider || store.loading" :loading="store.loading" @click="aiResourceReadProvider && store.readConfig(aiResourceReadProvider)">读取旧版图标配置</el-button><el-button v-if="store.loading || store.previewLoading" @click="store.clearReads">取消读取</el-button></div>
       <p v-if="selection.requestedId && !selection.project" class="form-help">所选工程不可用，请重新选择已登记工程；未把其他工程作为替代。</p>
       <p v-if="selection.project && !isAiProjectId(selection.project.id)" class="form-help">当前登记 ID 不符合已核验的规范读取合同，未发起查询。</p>
       <dl v-if="store.project" class="ai-read-identity"><dt>工程</dt><dd>{{ store.project.name }}</dd><dt>完整 ID</dt><dd>{{ store.project.id }}</dd><dt>工程路径</dt><dd>{{ store.project.path }}</dd></dl>
@@ -84,8 +76,9 @@ onBeforeUnmount(() => store.disconnect())
     </section>
     <section v-if="store.previewPath" class="section-card" aria-live="polite"><div class="section-heading"><h3>参考预览 · {{ store.previewPath }}</h3><el-button @click="store.clearPreview">关闭预览</el-button></div><p v-if="store.previewLoading">正在读取本地参考图…</p><el-alert v-if="store.previewError" type="error" :closable="false" :title="store.previewError"/><template v-if="store.preview"><img class="ai-reference-preview" :src="`data:image/png;base64,${store.preview.base64}`" alt="工程已保存参考的当前预览" @error="store.previewDisplayFailed"/><p>{{ store.preview.width }} × {{ store.preview.height }} · PNG · SHA-256 {{ store.preview.sha256 }}</p></template></section>
     <p v-if="!store.resource && !store.loading && !store.error" class="ai-read-empty">尚未读取工程规范。没有用本地草稿或示例替代真实配置。</p>
-    <section v-if="!props.embedded" class="section-card"><h3>资源生产六步</h3><p>配置新建、v1 迁移、v2 编辑和参考上传使用当前工程服务，每次写入独立确认。下方可读取原任务、状态和候选。正常工作区按原一图流程准备任务、批准执行、审阅选择和导入；尺寸导出与Creator运行验收分别核对。保存结果未知时须回读核对，不能直接重发。</p><RouterLink :to="resourcesLink">查看当前工程的资源步骤</RouterLink></section>
+    <section v-if="!props.embedded" class="section-card"><h3>资源生产六步</h3><p>配置新建、v1 迁移、v2 编辑和参考上传使用当前工程服务，每次写入独立确认。下方可读取原任务、状态和候选。正常工作区按原一图流程准备任务、批准执行、审阅选择和导入；尺寸导出与Creator运行验收分别核对。保存结果未知时须回读核对，不能直接重发。</p></section>
     </details>
+    </template>
     <AiResourceConfigDialog ref="editorDialog" :context="editorContext" :resource="store.resource" :reader="aiResourceReadProvider" :writer="aiResourceSaveProvider" @saved="refreshAfterSave"/>
   </section>
 </template>

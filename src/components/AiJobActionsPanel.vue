@@ -50,14 +50,14 @@ onBeforeUnmount(() => store.leave())
     <h4>原任务操作</h4>
     <p v-if="!writer">当前构建未接入原任务写操作。</p>
     <template v-else-if="store.job">
-      <p>每项操作单独核对并批准；确认绑定当前工程、来源、原任务版本和候选 SHA-256。跨标签页保护只协调当前站点，后台仍按原版本与状态拒绝冲突。</p>
+
       <p v-if="!store.drainAvailable || store.readDrainBlocked">读取或写入提供者未能确认底层请求清理结束，写操作保持不可用；仍可读取原任务。</p>
       <p v-if="!store.generationEnabled && ['queued','waiting_service','unknown','running'].includes(store.job.state)">生成模式未明确启用或当前为仅离线导入；执行与恢复入口不可用。</p>
-      <div class="job-action-buttons">
+      <div v-if="!store.confirmation && !store.busy" class="job-action-buttons">
         <el-button v-if="operationVisible('run-next') && ['queued','waiting_service'].includes(store.job.state)" :disabled="!store.allowed('run-next')" @click="store.prepare('run-next')">执行原任务</el-button>
         <el-button v-if="operationVisible('resume') && ['unknown','running'].includes(store.job.state)" :disabled="!store.allowed('resume')" @click="store.prepare('resume')">恢复原任务查询</el-button>
       </div>
-      <div v-if="operationVisible('select') && ['awaiting_selection','selected'].includes(store.job.state)" class="job-selection">
+      <div v-if="!store.confirmation && !store.busy && operationVisible('select') && ['awaiting_selection','selected'].includes(store.job.state)" class="job-selection">
         <p>先在上方逐个预览并查看候选，再勾选需要保存的一张候选。</p>
         <label v-for="candidate in store.job.candidates" :key="candidate.candidateId">
           <input type="checkbox" :checked="store.selectedIds.includes(candidate.candidateId)" :disabled="store.busy || store.previewed[candidate.candidateId] !== candidate.fileSha256" @change="choose(candidate.candidateId, checked($event))">
@@ -65,11 +65,11 @@ onBeforeUnmount(() => store.leave())
         </label>
         <el-button :disabled="!store.allowed('select') || !store.selectedIds.length" @click="store.prepare('select')">保存候选选择</el-button>
       </div>
-      <div class="job-action-buttons">
+      <div v-if="!store.confirmation && !store.busy" class="job-action-buttons">
         <el-button v-if="operationVisible('import') && store.job.state === 'selected'" :disabled="!store.allowed('import')" @click="store.prepare('import')">导入已选母图（1024）</el-button>
         <template v-if="operationVisible('export-variant') && ['selected','imported_pending_verification'].includes(store.job.state)"><el-button :disabled="!store.allowed('export-variant')" @click="store.prepare('export-variant')">导出默认尺寸 PNG</el-button><el-button :disabled="!store.allowed('export-variant')" @click="openCustom()">导出其他尺寸</el-button></template>
       </div>
-      <p v-if="operationVisible('export-variant') && ['selected','imported_pending_verification'].includes(store.job.state) && (!aiResourceSnapshotOutput(store.job.resourceSnapshot,store.job.candidates.find(c=>c.candidateId===store.job?.selectedIds[0])?.assetId) || store.job.selectedIds.length !== 1)">默认尺寸导出需要这个原任务的有效 v2 单尺寸封存配置和唯一已保存候选；缺少证据时保持不可用。</p>
+      <p v-if="!store.confirmation && operationVisible('export-variant') && ['selected','imported_pending_verification'].includes(store.job.state) && (!aiResourceSnapshotOutput(store.job.resourceSnapshot,store.job.candidates.find(c=>c.candidateId===store.job?.selectedIds[0])?.assetId) || store.job.selectedIds.length !== 1)">默认尺寸导出需要这个原任务的有效 v2 单尺寸封存配置和唯一已保存候选；缺少证据时保持不可用。</p>
       <p v-if="store.job.state === 'import_unknown'">导入可能已写入，写入效果与租约释放相互独立。这里只能读取原任务，不重试导入。</p>
       <p v-if="store.hasPending">此工程存在待核对操作保护记录。离开页面、切换来源或重载不会清除未知结果。</p>
       <el-button :disabled="store.refreshing || store.busy" :loading="store.refreshing" @click="store.refreshStatus()">刷新原任务并核对保护记录</el-button>

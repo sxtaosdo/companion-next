@@ -3,8 +3,8 @@ import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import ElementPlus from 'element-plus'
-import AiResourceReadView from '../src/views/AiResourceReadView.vue'
-import ResourcesView from '../src/views/ResourcesView.vue'
+import ArtWorkspaceView from '../src/views/ArtWorkspaceView.vue'
+import ArtProductionFlow from '../src/components/ArtProductionFlow.vue'
 import AiTaskCreationPanel from '../src/components/AiTaskCreationPanel.vue'
 import AiJobsReadPanel from '../src/components/AiJobsReadPanel.vue'
 import { aiTaskCreationProvider } from '../src/ai-task-creation-integration'
@@ -70,7 +70,9 @@ async function setup(path = `/resources?project=${id}&step=1`, options: { value?
   const storage = { getItem: (key: string) => memory.get(key) ?? null, setItem: (key: string, value: string) => { memory.set(key, value) } }
   editor.setFenceStorage(storage); upload.setFenceStorage(storage)
   const router = createRouter({ history: history = createMemoryHistory(), routes: [
-    { path: '/resources', component: ResourcesView }, { path: '/ai-icons', component: AiResourceReadView },
+    { path: '/art-resources', component: ArtWorkspaceView },
+    { path: '/resources', redirect: to=>({path:'/art-resources',query:{...to.query,type:'icon'}}) },
+    { path: '/ai-icons', redirect: to=>({path:'/art-resources',query:{...to.query,type:'icon'}}) },
     { path: '/overview', component: { template: '<p>overview</p>' } }, { path: '/projects', component: { template: '<p>projects</p>' } },
   ] })
   await router.push(path); await router.isReady()
@@ -130,6 +132,7 @@ describe('registered production resource configuration', () => {
     const writer: AiResourceSaveProvider = { label: 'fixture unknown', saveConfig: vi.fn(async () => { throw new AiResourceSaveError('timeout', 'unknown') }) }
     const { editor, router } = await setup(undefined, { writer }); await readAndOpen(); await editAndApprove(); await button('确认保存到工程').trigger('click')
     await vi.waitFor(() => expect(editor.phase).toBe('unknown')); expect(editor.pendingFence).not.toBeNull()
+    await router.push('/overview');await flushPromises();expect(editor.pendingFence).not.toBeNull();expect(writer.saveConfig).toHaveBeenCalledTimes(1)
     await router.push(`/ai-icons?project=${id}`); await flushPromises()
     await button('查看保留的编辑草稿').trigger('click'); await flushPromises()
     expect(button('确认保存到工程').attributes('disabled')).toBeDefined(); expect(editor.pendingFence).not.toBeNull()
@@ -150,19 +153,16 @@ describe('registered production resource configuration', () => {
     await editAndApprove(); expect(button('确认保存到工程').attributes('disabled')).toBeDefined(); expect(fetch).not.toHaveBeenCalled()
   })
 
-  it('shares project deep links between resources and AI icons, including back/forward', async () => {
+  it('normalizes legacy deep links into the same workspace and preserves project choice through back/forward', async () => {
     const { router, selection, reader } = await setup(`/resources?project=${other}&step=1`)
-    const target = wrapper!.findAll('a').find(value => value.text() === '打开 AI 图标')!
-    expect(target.attributes('href')).toContain(`project=${other}`); await target.trigger('click'); await flushPromises()
-    expect(router.currentRoute.value.path).toBe('/ai-icons'); expect(selection.project?.id).toBe(other)
+    expect(router.currentRoute.value.path).toBe('/art-resources');expect(router.currentRoute.value.query.type).toBe('icon');expect(selection.project?.id).toBe(other)
     expect(wrapper!.getComponent({ name: 'ElSelect' }).props('modelValue')).toBe(other)
     await wrapper!.getComponent({ name: 'ElSelect' }).vm.$emit('update:modelValue', id); await flushPromises()
-    expect(router.currentRoute.value.query.project).toBe(id); expect(selection.project?.id).toBe(id)
-    router.back(); await vi.waitFor(() => expect(router.currentRoute.value.query.project).toBe(other)); await flushPromises()
-    expect(selection.project?.id).toBe(other)
-    router.forward(); await vi.waitFor(() => expect(router.currentRoute.value.query.project).toBe(id)); await flushPromises()
-    expect(selection.project?.id).toBe(id); expect(reader.readConfig).not.toHaveBeenCalled()
-    expect(wrapper!.findAll('a').find(value => value.text().startsWith('返回游戏资源'))!.attributes('href')).toBe(`/resources?project=${id}&step=1`)
+    expect(router.currentRoute.value.query.project).toBe(id);expect(selection.project?.id).toBe(id)
+    router.back();await vi.waitFor(()=>expect(router.currentRoute.value.query.project).toBe(other));await flushPromises();expect(selection.project?.id).toBe(other)
+    router.forward();await vi.waitFor(()=>expect(router.currentRoute.value.query.project).toBe(id));await flushPromises();expect(selection.project?.id).toBe(id)
+    await router.push(`/ai-icons?project=${other}`);await flushPromises();expect(router.currentRoute.value.path).toBe('/art-resources');expect(selection.project?.id).toBe(other)
+    expect(reader.readConfig).not.toHaveBeenCalled()
   })
 
   it.each(['config', 'preview'] as const)('discards late %s reads from A after selecting B', async kind => {
@@ -199,41 +199,37 @@ describe('registered production resource configuration', () => {
     expect(selection.project?.path).toBe('/fixture/A-changed'); expect(reader.readConfig).toHaveBeenCalledTimes(1)
   })
 
-  it('mounts exactly one normal registration-entry read on either route and never auto-reads config', async () => {
+  it('deduplicates registration entry across aliases of the same workspace and never auto-reads config', async () => {
     const { source, reader, router } = await setup(undefined, { automatic: true, connected: false })
     expect(source.loadProjects).toHaveBeenCalledTimes(1); expect(reader.readConfig).not.toHaveBeenCalled()
     await router.push(`/ai-icons?project=${id}`); await flushPromises()
-    expect(source.loadProjects).toHaveBeenCalledTimes(2); expect(reader.readConfig).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
+    expect(source.loadProjects).toHaveBeenCalledTimes(1); expect(reader.readConfig).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
   })
 
-  it('keeps unimplemented steps explicit and task reads manual without invoking config, preview or mutation APIs', async () => {
-    const { reader, writer, router } = await setup()
-    for (const step of [2, 3, 4, 5, 6]) {
-      await router.push(`/resources?project=${id}&step=${step}`); await flushPromises()
-      if (step >= 3) expect(wrapper!.get('[data-testid="ai-jobs-read-panel"]').text()).toContain('尚未读取任务历史')
-      else expect(wrapper!.get('[data-testid="real-resource-empty"]').text()).toContain('Owner 资产保持保护')
-      expect(wrapper!.findComponent(AiResourceConfigDialog).exists()).toBe(false)
+  it('keeps future stages disabled and ignores route step requests without issuing resource actions', async () => {
+    const { reader, writer, router }=await setup()
+    for(const step of [2,3,4,5,6]){
+      await router.push(`/resources?project=${id}&step=${step}`);await flushPromises()
+      const stages=wrapper!.findAll('nav[aria-label="资源生产步骤"] button')
+      expect(stages).toHaveLength(6);expect(stages.slice(1).every(value=>value.attributes('disabled')!==undefined)).toBe(true)
+      expect(wrapper!.get('[data-testid="art-current-stage"]').attributes('aria-label')).toBe('项目规范')
+      expect(wrapper!.findComponent(AiJobsReadPanel).exists()).toBe(false)
     }
-    expect(reader.readConfig).not.toHaveBeenCalled(); expect(reader.previewReference).not.toHaveBeenCalled(); expect(writer!.saveConfig).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
+    expect(reader.readConfig).not.toHaveBeenCalled();expect(reader.previewReference).not.toHaveBeenCalled();expect(writer!.saveConfig).not.toHaveBeenCalled();expect(fetch).not.toHaveBeenCalled()
   })
 
-  it('binds task reads to the selected real project and drops late history across project and route changes', async () => {
-    let finish!: (value: AiJobsView) => void
-    const jobs: AiJobsReadProvider = { label: 'fake task reader', readJobs: vi.fn(() => new Promise<AiJobsView>(resolve => { finish = resolve })), readStatus: vi.fn(), previewCandidate: vi.fn() }
-    aiJobsReadProvider.value = jobs
-    const { router } = await setup(`/resources?project=${id}&step=3`)
-    expect(jobs.readJobs).not.toHaveBeenCalled()
-    await button('读取 / 刷新任务历史').trigger('click'); await flushPromises()
-    expect(jobs.readJobs).toHaveBeenCalledWith(id, expect.any(AbortSignal))
-    await router.push(`/resources?project=${other}&step=4`); await flushPromises()
-    finish({ schemaVersion: 'companion-icons-v1', projectId: id, sourceRevision: 'a'.repeat(40), jobs: [], profile: { id: 'fake', maxAssets: 2, candidatesPerAsset: 1, submissionAttempts: 1 }, schedulerEnabled: false, workerResident: false })
-    await flushPromises()
-    expect(wrapper!.get('[data-testid="ai-jobs-read-panel"]').text()).toContain(other)
-    expect(wrapper!.text()).not.toContain('原后台本次返回空任务历史')
-    expect(wrapper!.text()).toContain('尚未读取任务历史')
-    await router.push(`/ai-icons?project=${other}`); await flushPromises()
-    expect(wrapper!.get('[data-testid="ai-jobs-read-panel"]').text()).toContain(other)
-    expect(jobs.readJobs).toHaveBeenCalledTimes(1); expect(jobs.readStatus).not.toHaveBeenCalled(); expect(jobs.previewCandidate).not.toHaveBeenCalled()
+  it('binds explicit task recovery to its real project and rejects a late history after project change', async () => {
+    let finish!:(value:AiJobsView)=>void, signal:AbortSignal|undefined
+    const jobs:AiJobsReadProvider={label:'fake task reader',readJobs:vi.fn((_id,current)=>{signal=current;return new Promise<AiJobsView>(resolve=>{finish=resolve})}),readStatus:vi.fn(),previewCandidate:vi.fn()}
+    aiJobsReadProvider.value=jobs
+    const {router}=await setup(`/resources?project=${id}&step=3`)
+    expect(jobs.readJobs).not.toHaveBeenCalled();await button('继续已有任务').trigger('click');await flushPromises();await button('读取 / 刷新任务历史').trigger('click');await flushPromises()
+    expect(jobs.readJobs).toHaveBeenCalledWith(id,expect.any(AbortSignal))
+    await router.push(`/resources?project=${other}&step=4`);await flushPromises();expect(signal?.aborted).toBe(true)
+    finish({schemaVersion:'companion-icons-v1',projectId:id,sourceRevision:'a'.repeat(40),jobs:[],profile:{id:'fake',maxAssets:2,candidatesPerAsset:1,submissionAttempts:1},schedulerEnabled:false,workerResident:false});await flushPromises()
+    expect(wrapper!.findComponent(AiJobsReadPanel).exists()).toBe(false);expect(wrapper!.text()).not.toContain('原后台本次返回空任务历史')
+    await button('继续已有任务').trigger('click');await flushPromises();expect(wrapper!.get('[data-testid="ai-jobs-read-panel"]').text()).toContain(other)
+    expect(wrapper!.text()).toContain('尚未读取任务历史');expect(jobs.readJobs).toHaveBeenCalledTimes(1);expect(jobs.readStatus).not.toHaveBeenCalled();expect(jobs.previewCandidate).not.toHaveBeenCalled()
   })
 
   it('keeps separately confirmed reference uploads in the draft until configuration is saved', async () => {
@@ -262,19 +258,16 @@ describe('registered production resource configuration', () => {
 
 
 describe('original task six-step composition', () => {
-  it('keeps the same task panel across steps without repeating reads and explicitly deactivates the creation step', async () => {
-    const jobs: AiJobsReadProvider = { label: 'fake original jobs', waitForIdle: async () => {}, readJobs: vi.fn(async () => ({ schemaVersion: 'companion-icons-v1', projectId: id, sourceRevision: 'a'.repeat(40), jobs: [], profile: { id: 'local-icon-v1', maxAssets: 2, candidatesPerAsset: 1, submissionAttempts: 1 }, workerResident: false, schedulerEnabled: false } as AiJobsView)), readStatus: vi.fn(), previewCandidate: vi.fn() }
-    aiJobsReadProvider.value = jobs
-    aiTaskCreationProvider.value = { label: 'fake creation', inspect: vi.fn(), execute: vi.fn(), waitForIdle: async () => {} }
-    const { router } = await setup(`/resources?project=${id}&step=3`), panel = wrapper!.getComponent(AiJobsReadPanel).element
-    await button('读取 / 刷新任务历史').trigger('click'); await flushPromises()
-    expect(wrapper!.getComponent(AiTaskCreationPanel).props('active')).toBe(false)
-    for (const step of [4, 5, 6, 2, 3]) {
-      await router.push(`/resources?project=${id}&step=${step}`); await flushPromises()
-      expect(wrapper!.getComponent(AiJobsReadPanel).element).toBe(panel)
-      expect(wrapper!.getComponent(AiJobsReadPanel).text()).toContain('原后台本次返回空任务历史')
-      expect(wrapper!.getComponent(AiTaskCreationPanel).props('active')).toBe(step === 2)
-    }
-    expect(jobs.readJobs).toHaveBeenCalledTimes(1); expect(aiTaskCreationProvider.value.execute).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
+  it('keeps one task panel across reached stages, blocks future jumps, and revokes inactive creation approval', async () => {
+    const jobs:AiJobsReadProvider={label:'fake original jobs',waitForIdle:async()=>{},readJobs:vi.fn(async()=>({schemaVersion:'companion-icons-v1',projectId:id,sourceRevision:'a'.repeat(40),jobs:[],profile:{id:'local-icon-v1',maxAssets:2,candidatesPerAsset:1,submissionAttempts:1},workerResident:false,schedulerEnabled:false} as AiJobsView)),readStatus:vi.fn(),previewCandidate:vi.fn()}
+    aiJobsReadProvider.value=jobs;aiTaskCreationProvider.value={label:'fake creation',inspect:vi.fn(),execute:vi.fn(),waitForIdle:async()=>{}}
+    await setup(`/resources?project=${id}&step=3`);await button('继续已有任务').trigger('click');await flushPromises()
+    const panel=wrapper!.getComponent(AiJobsReadPanel).element
+    await button('读取 / 刷新任务历史').trigger('click');await flushPromises()
+    const flow=wrapper!.findAllComponents(ArtProductionFlow)[0]!.vm as unknown as {chooseStep:(step:number)=>boolean}
+    for(const future of [3,4,5])expect(flow.chooseStep(future)).toBe(false)
+    expect(flow.chooseStep(0)).toBe(true);await flushPromises();expect(wrapper!.getComponent(AiTaskCreationPanel).props('active')).toBe(false)
+    expect(flow.chooseStep(2)).toBe(true);await flushPromises();expect(wrapper!.getComponent(AiJobsReadPanel).element).toBe(panel)
+    expect(wrapper!.getComponent(AiJobsReadPanel).text()).toContain('原后台本次返回空任务历史');expect(jobs.readJobs).toHaveBeenCalledTimes(1);expect(aiTaskCreationProvider.value.execute).not.toHaveBeenCalled();expect(fetch).not.toHaveBeenCalled()
   })
 })

@@ -27,7 +27,7 @@ describe('overview project controls and primary navigation',()=>{
   const primary=wrapper!.findAll('.nav-list > .nav-item')
   expect(primary.slice(0,2).map(node=>node.attributes('href'))).toEqual(['/overview','/projects'])
   const children=Array.from(wrapper!.get('.nav-list').element.children)
-  expect(children.indexOf(primary[1]!.element)).toBeLessThan(children.findIndex(node=>node.classList.contains('art-nav-group')))
+  expect(children.indexOf(primary[1]!.element)).toBeLessThan(children.findIndex(node=>node.getAttribute('href')==='/art-resources'))
  })
  it('uses the same runtime tag as projects, an accessible arrow link, and no sorting instruction',async()=>{
   const {router}=await enter(),card=wrapper!.get('[data-project-id="project-a"]')

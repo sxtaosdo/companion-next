@@ -26,6 +26,15 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   const art = shallowRef<ProjectArtSpecReceipt | null>(null)
   const artConfig = computed(() => { if(!art.value?.config || !project.value)return null; const parsed=parseProjectArtSpec(art.value.config,project.value.id);return parsed.kind==='project'?parsed.spec:null })
   const brief = reactive<AiTaskBrief>({ name: '', assetId: '', purpose: '', prompt: '', sourceId: '' })
+  const briefCache = new WeakMap<object,Map<string,AiTaskBrief>>()
+  let briefContext:{source:object;key:string}|null=null
+  function bindBrief(next:AiTaskProject|null,source:object|null){
+    const key=validProject(next)?JSON.stringify([next.id,next.path]):''
+    if(briefContext?.source===source && briefContext.key===key)return
+    if(briefContext){let cache=briefCache.get(briefContext.source);if(!cache){cache=new Map();briefCache.set(briefContext.source,cache)}cache.set(briefContext.key,copy(brief))}
+    Object.assign(brief,source&&key?briefCache.get(source)?.get(key)??{name:'',assetId:'',purpose:'',prompt:'',sourceId:''}:{name:'',assetId:'',purpose:'',prompt:'',sourceId:''})
+    briefContext=source&&key?{source,key}:null
+  }
   const active = ref(true), contextVersion = ref(0), pendingRunIds = ref<string[]>([]), recovered = ref(false)
   const phase = ref<AiTaskCreationPhase>('idle'), error = ref(''), confirmed = ref(false), busy = ref(false), dirty = ref(false), storageBlocked = ref(false), pending = ref(false)
   const prepared = shallowRef<AiTaskCreationSubmission | null>(null), inspection = shallowRef<AiTaskInspection | null>(null), snapshot = shallowRef<AiJobSnapshot | null>(null), retainedRunId = ref('')
@@ -57,6 +66,7 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
     const valid = validProject(next) && !!source && typeof source === 'object' && !!resourceReader && !!jobsReader && !!provider
     const same = valid && binding && equal(binding.project, next) && binding.source === source && binding.resourceReader === resourceReader && binding.jobsReader === jobsReader && binding.provider === provider && binding.artReader === artReader
     if (same && dirty.value === configDirty) return
+    bindBrief(next,source)
     invalidate(); dirty.value = configDirty
     if (!same) { resource.value = null; art.value = null; history.value = null; snapshot.value = null }
     project.value = validProject(next) ? freeze({ ...next }) : null
@@ -75,6 +85,11 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
     brief[field] = value
     if (field === 'name') brief.assetId = value.trim()
     clearApproval(); prepared.value = null; inspection.value = null; phase.value = history.value && (config.value || artConfig.value) ? 'ready' : 'idle'; error.value = ''
+  }
+  function returnToBrief(){
+    if(!active.value || busy.value || phase.value==='unknown' || retainedRunId.value)return false
+    clearApproval();prepared.value=null;inspection.value=null;phase.value=history.value&&(config.value||artConfig.value)?'ready':'idle';error.value=''
+    return true
   }
   const current = (bound: Binding, token: number, frozen?: AiTaskCreationSubmission) => active.value && binding === bound && epoch === token && !dirty.value && (!frozen || prepared.value === frozen)
   const message = (cause: unknown) => cause instanceof AiTaskCreationError ? new AiTaskCreationError(cause.code).message : cause instanceof AiWriteCoordinationError ? cause.message : '原任务读取或核对未完成；未显示内部诊断。'
@@ -223,5 +238,5 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   function storageChanged() { refreshFenceState(); if (busy.value) invalidate(); else clearApproval() }
   function leave() { invalidate(); binding = null; contextVersion.value++ }
   return { active, project, resource, history, brief, config, artConfig, art, output, targetPath, phase, error, confirmed, busy, dirty, pending, pendingRunIds, recovered, storageBlocked, prepared, inspection, snapshot, retainedRunId,
-    drainAvailable, canPrepare, canSubmit, canRecover, recoverOriginal, setActive, setContext, edit, readContext, prepare, confirm, submit, newBrief, storageChanged, leave }
+    drainAvailable, canPrepare, canSubmit, canRecover, recoverOriginal, setActive, setContext, edit, returnToBrief, readContext, prepare, confirm, submit, newBrief, storageChanged, leave }
 }
