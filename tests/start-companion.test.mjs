@@ -85,3 +85,12 @@ test('readiness retries only the snapshot generation race without repeating star
 test('permission refusal is not retried as readiness and persistent generation races are bounded',async()=>{
  for(const code of ['FORBIDDEN','DAEMON_GENERATION_CHANGED']){let starts=0,reads=0;await assert.rejects(startCompanion({noBrowser:true},{start:async()=>{starts++},discover:async()=>({baseUrl:BASE,request:async()=>{reads++;throw Object.assign(Error(code),{status:code==='FORBIDDEN'?403:409,code})}}),createBrowser:()=>assert.fail('browser')}),new RegExp(code));assert.equal(starts,1);assert.equal(reads,code==='FORBIDDEN'?1:5);}
 });
+
+const { ensureAccountProvider } = await import('../scripts/start-companion.mjs');
+test('account dependency uses existing Node22 backend-only launcher and validates exact readiness',async()=>{
+ let count=0;const result=await ensureAccountProvider((command,args,options,callback)=>{count++;assert.match(command,/dual-game-build/);assert.equal(args[1],'--backend-only');assert.equal(options.windowsHide,true);callback(null,JSON.stringify({ready:true,port:18001,pid:42}));});assert.equal(result.pid,42);assert.equal(count,1);
+ for(const bad of ['{}',JSON.stringify({ready:true,port:8001,pid:42}),'invalid'])await assert.rejects(ensureAccountProvider((_c,_a,_o,callback)=>callback(null,bad)),/ACCOUNT_PROVIDER_UNCONFIRMED/);
+});
+test('unconfirmed auth dependency prevents Companion startup and browser creation without retry',async()=>{
+ let calls=0;await assert.rejects(startCompanion({}, {ensureAuth:async()=>{calls++;throw new StartupError('ACCOUNT_PROVIDER_UNCONFIRMED')},start:()=>assert.fail('must not start'),createBrowser:()=>assert.fail('must not open')}),/ACCOUNT_PROVIDER_UNCONFIRMED/);assert.equal(calls,1);
+});

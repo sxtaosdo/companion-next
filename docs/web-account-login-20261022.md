@@ -32,3 +32,19 @@ The provider configuration has synchronize=false, initDB=false and initMenu=fals
 Read-only port check: 18001 currently has no TCP entry; 8002 is also Bound and is not a usable recommendation. Port availability is only a snapshot and must be rechecked before an approved start. Using 18001 would require changing both the existing provider local port configuration and the Companion fixed provider endpoint, with tests updated to the same exact address. It would remain loopback-only; no change has been made.
 
 Remaining prerequisites: an explicitly permitted existing username, and a decision resolving the provider port conflict. Deployment and real browser login acceptance follow only after these prerequisites; do not substitute a mock account result or leave an unusable login page on the running backend.
+
+## Approved port change and actual readiness
+
+The user subsequently approved 127.0.0.1:18001. The original binding and executable consumers were backed up in task/web-account-login-20261022/port18001-before/manifest.json. Provider source and installed config now bind only that address. Existing launcher/listener checks and operations frontend proxy targets use the same exact port. Companion's source adapter target is also18001; the running32180 bundle has not been replaced.
+
+The official protected-config launcher started wrapper5548/backend32848. Actual version and captcha endpoints returned HTTP200 and business code1000. Captcha verification recorded only presence/format, not challenge contents. Actual adapter readiness returned available=true/configured=false, and default-policy captcha access was denied. No credentials/login were submitted. Current provider build metadata remains0.1.0.19; this port configuration update is not represented as a new complete product build.
+
+Read-only account inventory returned one existing enabled username, sxaosdo, role label gameops-owner. It has NOT been granted Companion access. No password/hash, signing values or personal fields were read. The user must explicitly choose an allowed username.
+
+Next npm start now calls the existing Node22 launcher in backend-only mode before Companion startup. It reuses existing process ownership/readiness inspection, never invokes account initialization, opens no9000 frontend or browser, and does not restart an existing provider. Missing accounts/config or unknown ownership stops the dependency path. Cold/reuse behavior is simulated in tests; real reuse returned ready=true/port18001/PID32848.
+
+Fresh regression: provider launcher34/34, Next startup16/16, Companion auth71/71. The source adapter's real provider connection also passed with empty allowlist. No extra Companion instance, Creator action, model request, FlClash change or32180 restart occurred. Full real account login/deployment remains blocked only by the permitted username.
+
+Rollback: preserve all account data and protected secrets. Restore only the backed-up configuration/launcher files and source target if a rollback is approved, then use normal identity-checked service lifecycle; do not restore a database or stop FlClash. The original8001 conflict would remain, so rollback is not a functioning port workaround.
+
+Observed side-effect boundary: operations web build/cool/eps.d.ts and eps.json are dirty generated API metadata. No initial web-worktree baseline was captured in this port phase, so this record cannot attribute every difference to startup. These files were neither staged nor reverted. Existing provider EPS remains enabled; no database initialization or credential generation command was executed.

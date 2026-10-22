@@ -68,6 +68,18 @@ export function startupEnvironment(env = process.env, configuration) {
   delete value.WEKNORA_API_KEY; delete value.KNOWLEDGE_SYNC_API_KEY;
   return value;
 }
+export function ensureAccountProvider(run = execFile) {
+  return new Promise((done, reject) => {
+    run('D:/code/shidai3/P8000/dual-game-build/node_modules/node/bin/node.exe',
+      [resolve(root, '../game-ops-admin/server/local-launcher.cjs'), '--backend-only'],
+      { cwd: resolve(root, '../game-ops-admin/server'), windowsHide: true, timeout: 125_000, maxBuffer: 32 * 1024 },
+      (error, stdout) => {
+        if (error) { reject(new StartupError('ACCOUNT_PROVIDER_UNCONFIRMED')); return; }
+        try { const value = JSON.parse(stdout); if (value.ready !== true || value.port !== 18001 || !Number.isSafeInteger(value.pid) || value.pid <= 0) throw Error(); done(value); }
+        catch { reject(new StartupError('ACCOUNT_PROVIDER_UNCONFIRMED')); }
+      });
+  });
+}
 function officialStart(env) {
   return new Promise((done, reject) => {
     execFile(process.execPath, [join(host, 'dist/companion/creator-ai.js'), 'daemon', 'start'],
@@ -110,6 +122,7 @@ export async function waitForOwnedBrowser(browser) {
   finally { process.removeListener('SIGINT', finish); process.removeListener('SIGTERM', finish); }
 }
 export async function startCompanion({ noBrowser = false } = {}, deps) {
+  await deps.ensureAuth?.();
   let lateReady = false;
   try { await deps.start(); }
   catch (error) {
@@ -142,7 +155,7 @@ export async function main(args = process.argv.slice(2)) {
   delete process.env.DEBUG; delete process.env.PWDEBUG;
   const { CompanionApiClient } = await import(pathToFileURL(join(host, 'dist/companion-api-client.js')).href);
   const result = await startCompanion({ noBrowser: args.includes('--no-browser') }, {
-    start: () => officialStart(env), discover: () => CompanionApiClient.discover(),
+    ensureAuth: () => ensureAccountProvider(), start: () => officialStart(env), discover: () => CompanionApiClient.discover(),
     createBrowser: async () => {
       const { chromium } = createRequire(join(host, 'package.json'))('playwright');
       const executablePath = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(existsSync);
