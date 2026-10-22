@@ -3,6 +3,10 @@ import { mount, flushPromises, type VueWrapper } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import ArtStatusBar from '../src/components/ArtStatusBar.vue'
+import ProjectArtSpecPanel from '../src/components/ProjectArtSpecPanel.vue'
+import { defineComponent, ref } from 'vue'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { useRegisteredProjectPage } from '../src/composables/use-registered-project-page'
 import { useRegisteredProjectStore } from '../src/stores/registered-project'
 import { useCreatorOperationsStore } from '../src/stores/creator-operations'
 import { CreatorOperationError } from '../src/domain/creator-operations'
@@ -13,19 +17,22 @@ import { aiResourceReadProvider } from '../src/ai-resource-read-integration'
 import { AiResourceReadError, type AiResourceReadProvider, type AiResourceView } from '../src/domain/ai-resource-read'
 import type { CompanionBrowserProvider } from '../src/domain/companion-browser'
 import { resourceView } from './fixtures/ai-resource-read'
+import { useProjectArtSpecStore } from '../src/stores/project-art-spec'
+import { projectArtSpecProvider, type ProjectArtSpecContext, type ProjectArtSpecProvider, type ProjectArtSpecReceipt } from '../src/project-art-spec-integration'
+import type { ProjectArtSpec } from '../src/domain/project-art-spec'
 const id='0123456789abcdef', project={id,name:'Alpha',path:'D:/Alpha'}
 let wrapper:VueWrapper|undefined
-async function enter(){
+async function enter(modern:ProjectArtSpecProvider|null=null){
  const pinia=createPinia(), selection=useRegisteredProjectStore(pinia), resource=useAiResourceReadStore(pinia)
  const source:CompanionBrowserProvider={label:'isolated registration',runtimeProbesEnabled:true,loadProjects:vi.fn(async()=>({projects:[project],statuses:[{projectId:id,state:'stopped' as const,capabilityProfile:'unknown' as const}],dashboard:[],warnings:[]})),loadCounts:vi.fn(),loadLogs:vi.fn(),loadCalls:vi.fn()}
  const reader:AiResourceReadProvider={label:'isolated resource',readConfig:vi.fn(async()=>resourceView(id)),previewReference:vi.fn()}
- registerCompanionBrowserProvider(source);aiResourceReadProvider.value=reader
+ registerCompanionBrowserProvider(source);aiResourceReadProvider.value=reader;projectArtSpecProvider.value=modern
  await selection.directory.connect(source);selection.restoreRouteProject(id);resource.setContext(selection.project,selection.currentSource)
  wrapper=mount(ArtStatusBar,{props:{projectPicker:false,showCreator:true},global:{plugins:[pinia,ElementPlus]}});await flushPromises()
- return {selection,resource,source,reader,operations:useCreatorOperationsStore(pinia)}
+ return {pinia,art:useProjectArtSpecStore(pinia),selection,resource,source,reader,operations:useCreatorOperationsStore(pinia)}
 }
 function tag(kind:string){const node=wrapper!.get(`[data-status="${kind}"]`);return node.classes().includes('el-tag')?node:node.get('.el-tag')}
-afterEach(()=>{wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;companionProjectEntryProvider.value=null;aiResourceReadProvider.value=null;creatorOperationsProvider.value=null;vi.restoreAllMocks()})
+afterEach(()=>{wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;companionProjectEntryProvider.value=null;aiResourceReadProvider.value=null;creatorOperationsProvider.value=null;projectArtSpecProvider.value=null;vi.restoreAllMocks()})
 describe('shared compact art status',()=>{
  it('shows the selected real project and independent unobserved resource status without requesting reads',async()=>{
   const {source,reader}=await enter()
@@ -48,7 +55,7 @@ describe('shared compact art status',()=>{
  })
  it('clears ready-looking specification state when project path or provider no longer matches',async()=>{
   const {resource,reader,selection}=await enter();await resource.readConfig(reader);await flushPromises()
-  expect(tag('specification').text()).toBe('规范已读取')
+  expect(tag('specification').text()).toBe('项目规范未配置');expect(tag('specification').classes()).toContain('el-tag--warning')
   resource.project={...project,path:'D:/Other'};await flushPromises()
   expect(tag('specification').text()).toBe('规范未读取')
   selection.directory.disconnect();await flushPromises()
@@ -91,7 +98,142 @@ describe('shared compact art status',()=>{
  })
  it.each(['missing','invalid'] as const)('shows %s as a specification condition after a successful real-shaped read',async state=>{
   const {resource,reader}=await enter();await resource.readConfig(reader);resource.resource={...resource.resource!,state};await flushPromises()
-  expect(tag('specification').classes()).toContain('el-tag--warning')
-  expect(tag('specification').text()).toBe(state==='missing'?'规范未配置':'规范待修正')
+  expect(tag('specification').classes()).toContain(state==='missing'?'el-tag--warning':'el-tag--danger')
+  expect(tag('specification').text()).toBe(state==='missing'?'规范未配置':'规范读取失败')
+ })
+})
+
+function specification(version=1):ProjectArtSpec { return {schemaVersion:'project-art-spec-v1',projectId:id,version,project:{name:'Alpha',content:'Isolated test project',engine:'cocos-creator',designResolution:{width:720,height:1280}},inheritance:{mode:'none',reason:'Independent test art direction'},overrides:{width:128,height:128},categories:{}} }
+function receipt(config:unknown=specification()):ProjectArtSpecReceipt { return {projectId:id,projectPath:project.path,config,hash:config===null?null:'a'.repeat(64),authorities:[]} }
+function modern(read:ProjectArtSpecProvider['read']=vi.fn(async()=>receipt())):ProjectArtSpecProvider { return {label:'isolated art provider',endpoint:'http://127.0.0.1:32180',read,save:vi.fn(async()=>{throw Error('not used')}),status:vi.fn(async()=>{throw Error('not used')})} }
+describe('shared project art specification status and actions',()=>{
+ it('automatically reads once per exact bound project and deduplicates multiple header instances',async()=>{
+  const provider=modern(),{pinia,reader,art}=await enter(provider)
+  expect(provider.read).toHaveBeenCalledTimes(1);expect(reader.readConfig).not.toHaveBeenCalled();expect(art.base?.version).toBe(1)
+  expect(tag('specification').text()).toBe('规范已配置');expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('configured')
+  const second=mount(ArtStatusBar,{props:{projectPicker:false},global:{plugins:[pinia,ElementPlus]}})
+  await flushPromises();expect(provider.read).toHaveBeenCalledTimes(1);second.unmount()
+  expect(wrapper!.get('.art-spec-source').text()).toBe('v1 · 项目自定义')
+  await wrapper!.get('[data-testid="open-art-specification"]').trigger('click');expect(wrapper!.emitted('open-specification')).toHaveLength(1)
+  expect(provider.save).not.toHaveBeenCalled()
+ })
+ it('shows reading before the first receipt and never offers creation from unread or loading state',async()=>{
+  let resolve!:(value:ProjectArtSpecReceipt)=>void
+  const provider=modern(vi.fn(()=>new Promise<ProjectArtSpecReceipt>(res=>resolve=res))),{art}=await enter(provider)
+  expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('reading');expect(tag('specification').find('.is-loading').exists()).toBe(true)
+  expect(wrapper!.find('[data-testid="open-art-specification"]').exists()).toBe(false)
+  resolve(receipt(null));await flushPromises()
+  expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('missing');expect(wrapper!.get('[data-testid="open-art-specification"]').text()).toBe('新建美术规范')
+  expect(art.draft).toBeNull();expect(provider.save).not.toHaveBeenCalled()
+ })
+ it('does not classify read failure as missing, auto-retry it, or offer new creation',async()=>{
+  const provider=modern(vi.fn(async()=>{throw Error('isolated read failure')})),{pinia,selection}=await enter(provider)
+  expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('error');expect(tag('specification').classes()).toContain('el-tag--danger')
+  expect(wrapper!.find('[data-testid="open-art-specification"]').exists()).toBe(false)
+  const second=mount(ArtStatusBar,{props:{projectPicker:false},global:{plugins:[pinia,ElementPlus]}});await flushPromises()
+  selection.directory.statuses=[{projectId:id,state:'ready',capabilityProfile:'authoring'}];await flushPromises()
+  expect(provider.read).toHaveBeenCalledTimes(1);second.unmount()
+  await wrapper!.get('button[aria-label="读取工程规范"]').trigger('click');await flushPromises();expect(provider.read).toHaveBeenCalledTimes(2)
+ })
+ it('identifies legacy icon configuration honestly and permits only explicit project-spec creation',async()=>{
+  const legacy=resourceView().config!,provider=modern(vi.fn(async()=>receipt(legacy))),{reader,art}=await enter(provider)
+  expect(tag('specification').text()).toBe('项目规范未配置');expect(tag('specification').classes()).not.toContain('el-tag--success')
+  expect(wrapper!.get('.art-spec-source').text()).toBe('旧图标 v1');expect(wrapper!.get('[data-testid="open-art-specification"]').text()).toBe('新建美术规范')
+  expect(art.draft).toBeNull();expect(reader.readConfig).not.toHaveBeenCalled();expect(provider.save).not.toHaveBeenCalled()
+  await wrapper!.get('button[aria-label="读取工程规范"]').trigger('click');await flushPromises();expect(reader.readConfig).toHaveBeenCalledTimes(1)
+ })
+ it('preserves local draft editing but never presents that draft as a configured project',async()=>{
+  const provider=modern(vi.fn(async()=>receipt(null))),{art}=await enter(provider)
+  art.startDraft('Alpha');await flushPromises()
+  expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('missing');expect(wrapper!.get('[data-testid="open-art-specification"]').text()).toBe('查看 / 编辑')
+  expect(wrapper!.get('.art-spec-source').text()).toBe('有未保存修改');expect(wrapper!.get('button[aria-label="读取工程规范"]').attributes('disabled')).toBeDefined()
+  expect(art.draft?.project.name).toBe('Alpha');expect(provider.save).not.toHaveBeenCalled()
+ })
+ it('distinguishes saving, result awaiting verification and errors without losing the existing draft',async()=>{
+  const {art}=await enter(modern());const draft=art.draft
+  art.pending=true;art.phase='saving';await flushPromises();expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('saving')
+  expect(wrapper!.find('[data-testid="open-art-specification"]').exists()).toBe(false)
+  art.pending=false;art.phase='unknown';await flushPromises();expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('unknown')
+  expect(tag('specification').text()).toBe('规范结果待核对');expect(wrapper!.get('[data-testid="open-art-specification"]').text()).toBe('查看 / 编辑')
+  art.phase='error';await flushPromises();expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('error');expect(art.draft).toBe(draft)
+  expect(wrapper!.get('[data-testid="open-art-specification"]').text()).toBe('查看 / 编辑')
+ })
+ it('rejects stale provider receipts and automatically reads the newly bound provider once',async()=>{
+  let resolve!:(value:ProjectArtSpecReceipt)=>void
+  const old=modern(vi.fn(()=>new Promise<ProjectArtSpecReceipt>(res=>resolve=res))),{art}=await enter(old)
+  const replacement=modern(vi.fn(async()=>receipt(specification(2))));projectArtSpecProvider.value=replacement;await flushPromises()
+  resolve(receipt(specification(1)));await flushPromises()
+  expect(art.base?.version).toBe(2);expect(replacement.read).toHaveBeenCalledTimes(1);expect(old.read).toHaveBeenCalledTimes(1)
+  expect(wrapper!.get('.art-spec-source').text()).toBe('v2 · 项目自定义')
+ })
+ it('rejects a late receipt after the selected project path changes',async()=>{
+  let resolve!:(value:ProjectArtSpecReceipt)=>void
+  const provider=modern(vi.fn(()=>new Promise<ProjectArtSpecReceipt>(res=>resolve=res))),{selection,art}=await enter(provider)
+  selection.directory.projects=[{...project,path:'D:/Changed'}];await flushPromises();resolve(receipt());await flushPromises()
+  expect(selection.project).toBeNull();expect(art.base).toBeNull();expect(tag('specification').classes()).not.toContain('el-tag--success')
+  expect(wrapper!.find('[data-testid="open-art-specification"]').exists()).toBe(false)
+ })
+ it('does not apply an older receipt after the project ID changes',async()=>{
+  const pending:Array<{context:ProjectArtSpecContext;resolve:(value:ProjectArtSpecReceipt)=>void}>=[]
+  const provider=modern(vi.fn((context:ProjectArtSpecContext)=>new Promise<ProjectArtSpecReceipt>(resolve=>pending.push({context,resolve}))))
+  const {selection,art}=await enter(provider),second={id:'fedcba9876543210',name:'Beta',path:'D:/Beta'}
+  selection.directory.projects=[project,second];selection.restoreRouteProject(second.id);await flushPromises()
+  expect(provider.read).toHaveBeenCalledTimes(2)
+  const config={...specification(2),projectId:second.id}
+  pending[1]!.resolve({projectId:second.id,projectPath:second.path,config,hash:'b'.repeat(64),authorities:[]});await flushPromises()
+  pending[0]!.resolve(receipt());await flushPromises()
+  expect(art.base?.projectId).toBe(second.id);expect(art.base?.version).toBe(2);expect(wrapper!.get('.art-current-project strong').text()).toBe('Beta')
+ })
+ it('binds automatic reads and results to the exact registration source identity',async()=>{
+  const pending:Array<{context:ProjectArtSpecContext;resolve:(value:ProjectArtSpecReceipt)=>void}>=[]
+  const provider=modern(vi.fn((context:ProjectArtSpecContext)=>new Promise<ProjectArtSpecReceipt>(resolve=>pending.push({context,resolve}))))
+  const {selection,source,art}=await enter(provider),replacement={...source,label:'another isolated registration source'}
+  registerCompanionBrowserProvider(replacement);await selection.directory.connect(replacement);selection.restoreRouteProject(id);await flushPromises()
+  expect(provider.read).toHaveBeenCalledTimes(2);expect(pending[1]!.context.source).toBe(replacement)
+  pending[1]!.resolve(receipt(specification(2)));await flushPromises();pending[0]!.resolve(receipt());await flushPromises()
+  expect(art.context?.source).toBe(replacement);expect(art.base?.version).toBe(2);expect(wrapper!.get('.art-spec-source').text()).toBe('v2 · 项目自定义')
+ })
+ it('cannot continue the legacy follow-up read after its provider changes during refresh',async()=>{
+  const provider=modern(vi.fn(async()=>receipt(resourceView().config!))),{reader}=await enter(provider)
+  let resolve!:(value:ProjectArtSpecReceipt)=>void;provider.read=vi.fn(()=>new Promise<ProjectArtSpecReceipt>(res=>resolve=res))
+  await wrapper!.get('button[aria-label="读取工程规范"]').trigger('click');await flushPromises()
+  const other={...reader,readConfig:vi.fn(async()=>resourceView())};aiResourceReadProvider.value=other
+  resolve(receipt(resourceView().config!));await flushPromises()
+  expect(reader.readConfig).not.toHaveBeenCalled();expect(other.readConfig).not.toHaveBeenCalled()
+ })
+})
+
+describe('specification automatic read during real panel replacement',()=>{
+ it('starts its one automatic read after the outgoing panel has left the shared store',async()=>{
+  const pinia=createPinia(),selection=useRegisteredProjectStore(pinia),art=useProjectArtSpecStore(pinia),provider=modern(),show=ref(false)
+  const source:CompanionBrowserProvider={label:'isolated transition source',runtimeProbesEnabled:true,loadProjects:vi.fn(async()=>({projects:[project],statuses:[],dashboard:[],warnings:[]})),loadCounts:vi.fn(),loadLogs:vi.fn(),loadCalls:vi.fn()}
+  registerCompanionBrowserProvider(source);projectArtSpecProvider.value=provider;aiResourceReadProvider.value=null
+  await selection.directory.connect(source);selection.restoreRouteProject(id)
+  const Host=defineComponent({components:{ArtStatusBar,ProjectArtSpecPanel},setup:()=>({show,selection}),template:'<main><ArtStatusBar v-if="show" :project-picker="false"/><ProjectArtSpecPanel v-if="show" key="incoming" :project="selection.project" :source="selection.currentSource" shared-header/><ProjectArtSpecPanel v-if="!show" key="outgoing" :project="selection.project" :source="selection.currentSource" shared-header/></main>'})
+  wrapper=mount(Host,{global:{plugins:[pinia,ElementPlus]}});await flushPromises()
+  expect(provider.read).not.toHaveBeenCalled()
+  show.value=true;await flushPromises()
+  expect(provider.read).toHaveBeenCalledTimes(1);expect(art.base?.version).toBe(1)
+  expect(art.phase).not.toBe('idle');expect(tag('specification').text()).toBe('规范已配置')
+ })
+})
+
+describe('specification project selection through the actual router binding',()=>{
+ it('reads B once and retains its receipt when the selector updates the route query',async()=>{
+  const pinia=createPinia(),selection=useRegisteredProjectStore(pinia),art=useProjectArtSpecStore(pinia),second={id:'fedcba9876543210',name:'Beta',path:'D:/Beta'}
+  const provider=modern(vi.fn(async(context:ProjectArtSpecContext)=>context.projectId===id?receipt():{projectId:second.id,projectPath:second.path,config:null,hash:null,authorities:[]}))
+  const source:CompanionBrowserProvider={label:'isolated routed source',runtimeProbesEnabled:true,loadProjects:vi.fn(async()=>({projects:[project,second],statuses:[],dashboard:[],warnings:[]})),loadCounts:vi.fn(),loadLogs:vi.fn(),loadCalls:vi.fn()}
+  registerCompanionBrowserProvider(source);projectArtSpecProvider.value=provider;aiResourceReadProvider.value=null
+  await selection.directory.connect(source)
+  const router=createRouter({history:createMemoryHistory(),routes:[{path:'/art-resources',component:{template:'<div/>'}}]})
+  await router.push({path:'/art-resources',query:{project:id}});await router.isReady()
+  const Host=defineComponent({components:{ArtStatusBar,ProjectArtSpecPanel},setup(){const selection=useRegisteredProjectPage();return{selection}},template:'<main><ArtStatusBar/><ProjectArtSpecPanel :project="selection.project" :source="selection.currentSource" shared-header/></main>'})
+  wrapper=mount(Host,{global:{plugins:[pinia,router,ElementPlus]}});await flushPromises()
+  expect(art.base?.projectId).toBe(id);expect(provider.read).toHaveBeenCalledTimes(1)
+  wrapper.findComponent({name:'ElSelect'}).vm.$emit('update:modelValue',second.id)
+  await flushPromises();await flushPromises()
+  expect(router.currentRoute.value.query.project).toBe(second.id);expect(selection.project?.id).toBe(second.id)
+  expect(provider.read).toHaveBeenCalledTimes(2);expect(art.hash).toBeNull();expect(art.phase).not.toBe('idle')
+  expect(tag('specification').text()).toBe('规范未配置');expect(wrapper.get('[data-testid="open-art-specification"]').text()).toBe('新建美术规范')
  })
 })

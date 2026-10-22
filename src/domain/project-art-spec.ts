@@ -86,6 +86,13 @@ function values(value: unknown, field: string): ArtValues {
   }
   return out as ArtValues
 }
+/** Reuses the stored contract for the first wizard step without validating future fields. */
+export function validateArtProjectSettings(value: unknown): ProjectArtSpec['project'] {
+  const project = object(value, 'project'); keys(project, ['name', 'content', 'engine', 'designResolution'], 'project')
+  if (project.engine !== 'cocos-creator') fail('UNSUPPORTED_ENGINE', 'project.engine')
+  const design = object(project.designResolution, 'project.designResolution'); keys(design, ['width', 'height'], 'project.designResolution')
+  return { name: text(project.name, 'project.name', 128), content: text(project.content, 'project.content'), engine: 'cocos-creator', designResolution: { width: integer(design.width, 'project.designResolution.width', 8192), height: integer(design.height, 'project.designResolution.height', 8192) } }
+}
 export function parseProjectArtSpec(value: unknown, expectedProjectId: string): ParsedArtSpec {
   if (!/^[a-f0-9]{16}$/.test(expectedProjectId)) fail('PROJECT_MISMATCH', 'projectId')
   const raw = object(value, 'config')
@@ -94,9 +101,7 @@ export function parseProjectArtSpec(value: unknown, expectedProjectId: string): 
   keys(raw, ['schemaVersion', 'projectId', 'version', 'project', 'inheritance', 'overrides', 'categories'], 'config')
   if (raw.schemaVersion !== 'project-art-spec-v1') fail('UNSUPPORTED_SCHEMA', 'schemaVersion')
   if (raw.projectId !== expectedProjectId) fail('PROJECT_MISMATCH', 'projectId')
-  const project = object(raw.project, 'project'); keys(project, ['name', 'content', 'engine', 'designResolution'], 'project')
-  if (project.engine !== 'cocos-creator') fail('UNSUPPORTED_ENGINE', 'project.engine')
-  const design = object(project.designResolution, 'project.designResolution'); keys(design, ['width', 'height'], 'project.designResolution')
+  const project = validateArtProjectSettings(raw.project)
   const inheritance = object(raw.inheritance, 'inheritance')
   let inherited: ProjectArtSpec['inheritance']
   if (inheritance.mode === 'none') {
@@ -114,7 +119,7 @@ export function parseProjectArtSpec(value: unknown, expectedProjectId: string): 
   for (const category of ART_CATEGORIES) if (Object.hasOwn(categories, category)) checked[category] = values(categories[category], `categories.${category}`)
   return { kind: 'project', spec: {
     schemaVersion: 'project-art-spec-v1', projectId: expectedProjectId, version: integer(raw.version, 'version', Number.MAX_SAFE_INTEGER),
-    project: { name: text(project.name, 'project.name', 128), content: text(project.content, 'project.content'), engine: 'cocos-creator', designResolution: { width: integer(design.width, 'design.width', 8192), height: integer(design.height, 'design.height', 8192) } },
+    project,
     inheritance: inherited, overrides: values(raw.overrides, 'overrides'), categories: checked,
   } }
 }

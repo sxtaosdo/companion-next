@@ -3,10 +3,13 @@ declare const __COMPANION_BUILD_ID__:string
 export const frontendBuildIdentity=typeof __COMPANION_BUILD_ID__==='string'?__COMPANION_BUILD_ID__:'unavailable'
 
 /** Frontend identity, never a claim about a connected daemon / Creator version. */
-export const frontendIdentity = { name: 'Companion Next', version, releaseDate: '2026-10-16', scope: 'Cocos 工程工作区', hostBase: companionVersion.hostBase, nextRevision: companionVersion.nextRevision } as const
+export const frontendIdentity = { name: 'Companion Next', version, releaseDate: '2026-10-22', scope: 'Cocos 工程工作区', hostBase: companionVersion.hostBase, nextRevision: companionVersion.nextRevision } as const
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；Vue迁移与宿主业务集成分别验收', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  {"version": "1.3.181", "date": "2026-10-22", "title": "美术规范状态与分步编辑", "changes": ["公共头区分规范已配置、未配置、读取失败和结果待核对，统一新建与编辑入口。", "参照添加项目改为项目设定、规范内容、核对保存三步弹窗，保留分项目草稿，未知保存只查询原操作。", "删除旧版图标大信息块，兼容读取和参考预览按需保留；规范变更要求下游重新核对，不删除已有任务或素材。"]},
+  {"version": "1.3.180", "date": "2026-10-22", "title": "复用现有账号网页登录", "changes": ["复用现有 Cool-admin/Midway 登录与验证码服务，经同源适配建立 Companion 会话，保留原授权机制。", "仅开放明确批准的用户名，用户已亲自确认登录成功；不新增密码认证系统。"]},
+
   {"version": "1.3.179", "date": "2026-10-22", "title": "\u672c\u673a\u6388\u6743\u5f15\u5bfc\u4e0e\u4f1a\u8bdd\u6062\u590d", "changes": ["\u672a\u767b\u5f55\u9875\u9762\u4f7f\u7528\u65e2\u6709\u672c\u673a\u6388\u6743\u5165\u53e3\u5f15\u5bfc\uff0c\u4e0d\u65b0\u589e\u5bc6\u7801\u7cfb\u7edf\u6216\u6269\u5927\u8bbf\u95ee\u8303\u56f4\u3002", "\u4f1a\u8bdd\u5931\u6548\u4fdd\u7559\u539f\u9875\u8f93\u5165\uff0c\u5b89\u5168\u56de\u8df3\uff1b\u6743\u9650\u62d2\u7edd\u4e0d\u5192\u5145\u767b\u5f55\u95ee\u9898\uff0c\u5199\u64cd\u4f5c\u4e0d\u81ea\u52a8\u91cd\u53d1\u3002"]},
   {"version": "1.3.178", "date": "2026-10-22", "title": "统一美术资源工作台与逐步生产流程", "changes": ["美术资源统一为一个入口，公共工程与规范头、六步流程条、图标/UI/人物图片任务标签依次排列；旧链接保留工程并进入相应入口。", "仅展示当前阶段操作，切换任务与返回修改保留输入；不同工程草稿隔离，未确认写操作和历史任务保护继续生效。", "参考素材采集与审阅作为辅助工具保留；UI和人物生成尚未接通，到达生成阶段才明确提示，不借用图标接口冒充支持。"]},
   {"version":"1.3.177","date":"2026-10-22","title":"美术规范接入实际宿主","changes":["发布已批准的全局继承、项目设定、素材分类界面，使用当前宿主的原子保存、回执与重读接口，兼容读取旧图标规范。","生成输入采用固定来源和配置版本的封存绑定，保留旧任务原回执；当前仍按离线模式运行，不代表本轮已执行生成或Creator导入。","宿主真实产品版本接口已在32180生效；参考图条件输入仍不支持，人物、装备、技能和UI配置不等于这些类别已获生成模型支持。"]},

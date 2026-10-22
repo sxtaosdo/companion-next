@@ -9,45 +9,23 @@ import InfoTip from './InfoTip.vue'
 import ProjectStatusTag from './ProjectStatusTag.vue'
 import { useRegisteredProjectStore } from '../stores/registered-project'
 import { useArtSpecificationContext } from '../composables/useArtSpecificationContext'
-import { projectArtSpecProvider } from '../project-art-spec-integration'
 import { useCreatorOperationsStore } from '../stores/creator-operations'
 import { companionBrowserProvider } from '../companion-browser-integration'
 import { AI_JOB_STATE_LABELS, type AiJobState } from '../domain/ai-jobs-read'
-import { aiResourceReadProvider } from '../ai-resource-read-integration'
 const props=withDefaults(defineProps<{projectPicker?:boolean;showCreator?:boolean;showModel?:boolean;service?:{label:string;text:string;tone:'info'|'success'|'warning'|'danger';busy?:boolean}|null;jobs?:{projectId:string;projectPath:string;source:object|null;loading:boolean;error:string;observedAt:string;hasRead:boolean;state:AiJobState|null}|null}>(),{projectPicker:true,showCreator:false,showModel:false,service:null})
+const emit=defineEmits<{ 'open-specification': [] }>()
 const router=inject(routerKey,null),knowledge=useKnowledgeReadStore()
-function selectProject(id:string){selection.restoreRouteProject(id);if(router)void router.push({path:router.currentRoute.value.path,query:{...router.currentRoute.value.query,project:id}})}
+// Routed pages own selection through their query watcher; selecting twice cancels the first read.
+function selectProject(id:string){if(router)void router.push({path:router.currentRoute.value.path,query:{...router.currentRoute.value.query,project:id}});else selection.restoreRouteProject(id)}
 function refreshProjects(){if(directory.provider)void directory.refreshProjects();else if(companionBrowserProvider.value)void directory.connect(companionBrowserProvider.value)}
 const model=computed<State>(()=>knowledge.provider!==knowledgeReadProvider.value||!knowledge.provider?{text:'未读取',tone:'info'}:knowledge.statusLoading?{text:'读取中',tone:'info',busy:true}:knowledge.serviceError?{text:'读取失败',tone:'danger'}:knowledge.services?.model?.running===true?{text:'可达',tone:'success'}:knowledge.services?.model?.running===false?{text:'不可达',tone:'warning'}:{text:'未知',tone:'info'})
 const selection=useRegisteredProjectStore(), directory=selection.directory, operations=useCreatorOperationsStore()
-const {art,resource,busy:specBusy,canRefresh,refresh:refreshSpecification}=useArtSpecificationContext()
+const {art,specification,specificationSource,specificationActionLabel,busy:specBusy,canRefresh,refresh:refreshSpecification}=useArtSpecificationContext()
+function openSpecification(){if(specificationActionLabel.value)emit('open-specification')}
+
 type Tone='info'|'success'|'warning'|'danger'
 interface State { text:string; tone:Tone; busy?:boolean; detail?:string }
 const registration=computed<State>(()=>directory.projectLoading?{text:'登记读取中',tone:'info',busy:true}:directory.projectError?{text:'登记读取失败',tone:'danger',detail:directory.projectError}:selection.currentSource?{text:'登记已读取',tone:'success'}:!companionBrowserProvider.value?{text:'登记接口未接入',tone:'info'}:{text:'登记未连接',tone:'info'})
-const sameProject=computed(()=>!!selection.project&&!!selection.currentSource&&resource.project?.id===selection.project.id&&resource.project.path===selection.project.path&&resource.project.name===selection.project.name&&resource.provider===aiResourceReadProvider.value)
-const specification=computed<State>(()=>{
- if(!selection.project)return {text:'未选择工程',tone:'info'}
- if(projectArtSpecProvider.value){
-  if(art.context?.projectId!==selection.project.id||art.context.projectPath!==selection.project.path||art.context.source!==selection.currentSource||art.provider!==projectArtSpecProvider.value)return {text:'规范未读取',tone:'info'}
-  if(art.pending)return {text:art.phase==='saving'?'规范保存中':'规范读取中',tone:'info',busy:true}
-  if(art.blocked||art.phase==='unknown')return {text:'规范保存待核对',tone:'warning',detail:art.message}
-  if(art.phase==='error')return {text:'规范读取失败',tone:'danger',detail:art.message}
-  if(art.dirty)return {text:'规范有未保存修改',tone:'warning'}
-  if(art.base)return {text:'规范已读取',tone:'success'}
-  if(art.legacyVersion!==null)return {text:'图标规范已读取',tone:'success'}
-  if(art.hash===null)return {text:'规范未配置',tone:'warning'}
-  return {text:'规范未读取',tone:'info'}
- }
- if(!aiResourceReadProvider.value)return {text:'规范接口未接入',tone:'info'}
- if(!sameProject.value)return {text:'规范未读取',tone:'info'}
- if(resource.loading)return {text:'规范读取中',tone:'info',busy:true}
- if(resource.error)return {text:'规范读取失败',tone:'danger',detail:resource.error}
- if(!resource.resource)return {text:'规范未读取',tone:'info'}
- if(resource.resource.state==='missing')return {text:'规范未配置',tone:'warning'}
- if(resource.resource.state==='invalid')return {text:'规范待修正',tone:'warning'}
- if(resource.resource.migrationRequired)return {text:'规范待迁移',tone:'warning'}
- return {text:'规范已读取',tone:'success'}
-})
 const task=computed<State|null>(()=>{
  const jobs=props.jobs
  if(!jobs||!selection.project||toRaw(jobs.source)!==selection.currentSource||jobs.projectId!==selection.project.id||jobs.projectPath!==selection.project.path)return null
@@ -68,7 +46,9 @@ function icon(state:State){return state.busy?Loading:state.tone==='success'?Circ
   <div class="art-status-items" role="status" aria-live="polite">
    <el-tag size="small" :type="registration.tone" data-status="registration"><el-icon :class="{'is-loading':registration.busy}"><component :is="icon(registration)"/></el-icon>{{ registration.text }}</el-tag>
    <span v-if="showCreator && selection.project" class="art-creator-state"><span>Creator</span><ProjectStatusTag :status="selection.status" :operation="operation" :passive="selection.currentSource?.runtimeProbesEnabled===false" :stop-acknowledged="operations.isExpectedStopDisconnect(selection.project.id)"/></span>
-   <el-tag size="small" :type="specification.tone" data-status="specification"><el-icon :class="{'is-loading':specification.busy}"><component :is="icon(specification)"/></el-icon>{{ specification.text }}</el-tag>
+   <el-tag size="small" :type="specification.tone" data-status="specification" :data-spec-state="specification.kind" :title="specification.detail"><el-icon :class="{'is-loading':specification.busy}"><component :is="icon(specification)"/></el-icon>{{ specification.text }}</el-tag>
+   <small v-if="specificationSource" class="art-spec-source" :title="specificationSource.title">{{ specificationSource.text }}</small>
+   <el-button v-if="specificationActionLabel" size="small" data-testid="open-art-specification" @click="openSpecification">{{ specificationActionLabel }}</el-button>
    <el-tag v-if="task" size="small" :type="task.tone" data-status="task"><el-icon :class="{'is-loading':task.busy}"><component :is="icon(task)"/></el-icon>{{ task.text }}</el-tag>
    <el-tag v-if="showModel" size="small" :type="model.tone" data-status="model" title="仅表示模型启动器的已有观测，不代表生成模型已就绪"><el-icon :class="{'is-loading':model.busy}"><component :is="icon(model)"/></el-icon>模型启动器 · {{ model.text }}</el-tag>
    <el-tag v-if="service" size="small" :type="service.tone" data-status="service"><el-icon :class="{'is-loading':service.busy}"><component :is="icon(service)"/></el-icon>{{ service.label }} · {{ service.text }}</el-tag>
@@ -80,5 +60,5 @@ function icon(state:State){return state.busy?Loading:state.tone==='success'?Circ
  </section>
 </template>
 <style scoped>
-.art-status-bar{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;padding:12px 14px;background:#fff;border:1px solid #e2e7f0;border-radius:10px;min-width:0}.art-current-project,.art-status-items,.art-creator-state{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.art-current-project{min-width:0}.art-current-project>span,.art-creator-state>span{font-size:12px;color:var(--el-text-color-secondary)}.art-current-project :deep(.el-select){width:200px}.art-current-project strong{font-size:13px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.art-status-bar :deep(.el-tag__content){display:inline-flex;align-items:center;gap:4px}.art-status-actions{margin-left:auto;font-size:12px}@media(max-width:600px){.art-current-project{flex-basis:100%}.art-current-project :deep(.el-select){width:200px}.art-current-project strong{max-width:calc(100vw - 150px)}}
+.art-status-bar{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;padding:12px 14px;background:#fff;border:1px solid #e2e7f0;border-radius:10px;min-width:0}.art-current-project,.art-status-items,.art-creator-state{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.art-current-project{min-width:0}.art-current-project>span,.art-creator-state>span{font-size:12px;color:var(--el-text-color-secondary)}.art-current-project :deep(.el-select){width:200px}.art-current-project strong{font-size:13px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.art-status-bar :deep(.el-tag__content){display:inline-flex;align-items:center;gap:4px}.art-spec-source{font-size:12px;color:var(--el-text-color-secondary)}.art-status-actions{margin-left:auto;font-size:12px}@media(max-width:600px){.art-current-project{flex-basis:100%}.art-current-project :deep(.el-select){width:200px}.art-current-project strong{max-width:calc(100vw - 150px)}}
 </style>
