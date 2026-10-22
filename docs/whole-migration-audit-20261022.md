@@ -1,5 +1,10 @@
 # Companion 整体迁移只读核对（2026-10-22）
 
+## 本轮补齐结果（2026-10-22）
+
+下表是实施前的34项审计基线。用户已批准的三处缺项现已补齐源码和针对测试；引用预设删除恢复明确确认，日志仍按批准保留手动查询。当前32180已更新前端1.3.184，70项隔离真实渲染、31项现场只读检查通过；同后台UI已完成e2e打开、规范保存回读、采用既有母图、预览选用、导出与Creator导入及PNG/meta/UUID回读。添加向导的实际宿主任务complete；最终Agent跳过/提示词页仅隔离渲染验证，未冒充现场全部通过。详细证据及未完成边界以[本轮交付](migration-completion-20261022.md)和[OpenSpec任务](../openspec/changes/complete-approved-companion-migration/tasks.md)为准；其他未触及行不因安装工具而自动升级验收状态。
+
+
 本表回答“旧功能是否整体迁过来”，不是新增功能实施计划，也不宣布迁移全部完成。本轮状态 UI 已先交付：当前唯一32180为前端1.3.183、构建516ab9af+working、后端0.3.144；PID28744/OPEN、8工程保持。30项现场只读检查与75项隔离真实浏览器渲染检查，不代表全部业务流程验收。
 
 旧基线为当前受保护的 `P8000/cocos-mcp/web` 实际源码，非猜测的远端版本。旧index.html、app.ts、ai-icons-page.ts、icon-handoff-dialog.ts及CSS的SHA256见[evidence](evidence/whole-migration-audit-20261022.json)。Next代码基线为516ab9af，后续文档提交不改变运行产物。既有10/18—10/21文档只作为其日期和限定工程的历史实证，不沿用13/6/2等旧比例，不推定当前全部仍通过。

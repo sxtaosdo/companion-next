@@ -29,16 +29,22 @@
 ## 6. 同一32180真实闭环
 
 - [x] 6.1 核对e2e身份、既有PNG摘要、当前任务/采用来源，记录无法采用时的确切配置前置。
-- [ ] 6.2 经后台UI正常打开测试工程，核对请求、回执及真实Bridge就绪；失败/超时先查原结果。
-- [ ] 6.3 经后台UI保存并重读测试规范、采用既有PNG、预览选用、导出和导入，核对文件/PNG/meta/UUID；不重复生成或直写工程。
+- [x] 6.2 经后台UI正常打开测试工程，核对请求、回执及真实Bridge就绪；失败/超时先查原结果。
+- [x] 6.3 经后台UI保存并重读测试规范、采用既有PNG、预览选用、导出和导入，核对文件/PNG/meta/UUID；不重复生成或直写工程。
 - [ ] 6.4 从同一后台完成该测试工程添加/安装原流程，核对原任务完整回执与部分失败恢复，不重复登记。
 
 ## 7. 集成与实际交付
 
 - [x] 7.1 全类型、针对合同/状态/切换回归和最终构建通过；真实渲染验收通过。
-- [ ] 7.2 备份后仅更新原32180静态，核验实际版本/哈希、原进程、8工程与登录不受影响。
-- [ ] 7.3 更新34项矩阵的代码/测试/真实证据状态，未完成业务项保持明确未通过，不归档假完成。
+- [x] 7.2 备份后仅更新原32180静态，核验实际版本/哈希、原进程、8工程与登录不受影响。
+- [x] 7.3 更新34项矩阵的代码/测试/真实证据状态，未完成业务项保持明确未通过，不归档假完成。
 
 ## Workflow follow-up
 
 - 只有所有批准范围与实际验收完成后才考虑归档；OpenSpec文档结构完成不等于验收通过。
+
+## 2026-10-22 current-service evidence
+
+See [delivery](../../../docs/migration-completion-20261022.md). 6.4 remains partly unverified: the real setup task completed and eight identities were retained; Agent configuration was not submitted and its skip/final completion UI was only fixture-rendered. Do not replay completed setup just for evidence. Scene binding/runtime and new GPU generation remain out of this completed import proof.
+
+- Follow-up defect: actual post-import96px handoff returned409; exact business code not captured. The fixture rendering is passed, actual host post-import handoff is NOT passed. See delivery document for evidence, automatic-review rejection/retry accounting and minimal host repair recommendation.

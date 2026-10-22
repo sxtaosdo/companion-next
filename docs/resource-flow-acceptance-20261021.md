@@ -185,3 +185,18 @@ results.json是16条记录、15个不同stage；保留重复读取及初次失�
 - 最小人工操作：在现有32180工程页点“添加已有工程”，填写 `D:/CompanionData/art-generation-acceptance-20261021/e2e-project` 后登记已有目录（不新建、不启动）。登记后应只读核验原7项完整和唯一新增目标。后续Creator UI操作仍须确认现有浏览器控件可控，不承诺登记后自动完成导入。
 - 本轮冻结bc7afdd独立复跑9个相关测试文件161项全过，完整workspace UI构建exit0。独立交付清单见candidate-bc7afdd-delivery-20261021.md。进程内真实存储合同不等于浏览器端保存/迁移验收。
 - 后端正式入口默认存储组合是已授权下一步候选源码工作；不以启动第二套服务验收，不直接替换正式包。
+
+
+## 2026-10-22：同一32180的真实导入闭环
+
+当前前端1.3.184/构建0b2532e8+working，后端0.3.144/PID31776，唯一32180/8工程。所有Creator动作由后台UI发起。
+
+- 工程页正常按钮打开e2e-project，Creator3.8.8/PID31024、Bridge ready。
+- 三步弹窗保存并读回规范v2，API/磁盘SHA一致：6e50038a779f8fc4d1853cd904768bfe0ce3450e3123e0046ab9836ada944706。
+- UI采用批准既有母图生成任务记录（非GPU生成）：STUDIO-RUN-icon-mvjaubwj-6a259b0c；预览、选择、96px CPU导出成功。
+- UI确认import-variant一次，operation icon-import-a8938c1fde760f0a0a8f1de81538d802。原任务回读：imported_pending_verification、effectApplied=true、active=false、租约RELEASED；asset_import/asset_get_info/asset_resolve_reference均PASSED。
+- PNG96×96 RGBA及meta真实存在，PNG SHA bc7898630727c26da62ee196da99652a6f9b0d2f9b64ba7cfcd5ed6891ff33ce；UUID 0a3df2e3-4f29-444e-978d-683d31a90677，SpriteFrame @f9941。
+- 实际输出：assets/generated/acceptance/acceptance-blue-crystal-20261022-96x96-bc7898630727.png。独立测试文件名，原素材不覆盖。
+- 添加向导UI提交7dd8f6e2-7354-475a-be9b-2dc8c2c0c9f8，后台任务complete，Bridge current0.3.138，8工程无重复；configureCodex=false。未提交Agent配置；最终跳过/完成页仍只有隔离渲染验证，不重跑安装补证据。
+
+证据在 task/migration-fixes-20261022/ 的creator-open184-result、art-spec184-file-readback、adopt184-result、select-export184-result、import184-readback、import184-file-uuid-readback、setup184-readback和deployed184 JSON；完整说明见[migration-completion-20261022.md](migration-completion-20261022.md)。没有宣称场景绑定、运行生产验收、参考图入模或新一轮模型生成通过。

@@ -176,7 +176,7 @@ export async function main(args = process.argv.slice(2)) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main().catch(error => {
     // Do not echo CLI output, credentials, auth tickets or Playwright request diagnostics.
-    if (error instanceof StartupError && error.code.startsWith('LOCAL_CONFIG_')) console.error('Check companion-start.local.json against companion-start.example.json; only the six approved offline bindings are accepted.');
+    if (error instanceof StartupError && error.code.startsWith('LOCAL_CONFIG_')) console.error('Check companion-start.local.json against companion-start.example.json; only the approved fixed offline bindings are accepted.');
     console.error('Companion Next startup failed [' + (error instanceof StartupError ? error.code : 'LOCAL_START_FAILED') + ']. No restart or retry was issued; a timed-out daemon may still be starting.');
     process.exitCode = 1;
   });
