@@ -1,3 +1,4 @@
+import {useProductVersionStore} from '../src/stores/product-version'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import type { VueWrapper } from '@vue/test-utils'
@@ -39,10 +40,10 @@ afterEach(() => { wrapper?.unmount(); wrapper = undefined; activeHistory?.destro
 describe('help, about and visible frontend identity', () => {
   it('uses one frontend version in package, lock, header, sidebar and about without implying a daemon version', async () => {
     await setup('/about')
-    expect(frontendIdentity.version).toBe(packageInfo.version); expect(frontendIdentity.version).toBe('1.3.178'); expect(frontendIdentity.hostBase).toBe('0.3.150'); expect(frontendIdentity.nextRevision).toBe(23); expect(packageInfo.companionVersion.rule).toContain('historical migration provenance'); expect(lock.version).toBe(packageInfo.version); expect(lock.packages[''].version).toBe(packageInfo.version)
-    expect(wrapper!.find('.frontend-version').text()).toBe(`Next v${packageInfo.version}`)
+    expect(frontendIdentity.version).toBe(packageInfo.version); expect(frontendIdentity.hostBase).toBe('0.3.150'); expect(frontendIdentity.nextRevision).toBe(23); expect(packageInfo.companionVersion.rule).toContain('historical migration provenance'); expect(lock.version).toBe(packageInfo.version); expect(lock.packages[''].version).toBe(packageInfo.version)
+    expect(wrapper!.find('.frontend-version').text()).toBe(`前端 v${packageInfo.version}`)
     expect(wrapper!.find('.sidebar-footer').text()).toContain(`前端 v${packageInfo.version}`)
-    expect(wrapper!.text()).toContain('宿主版本未读取')
+    expect(wrapper!.text()).toContain('版本未读取')
     expect(wrapper!.find('.frontend-version').attributes('href')).toBe('/changelog')
   })
   it('combines product identity while removing the data and compatibility display block',async()=>{
@@ -239,7 +240,7 @@ describe('help, about and visible frontend identity', () => {
     const writeText = vi.fn(async (_text: string) => {}); Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
     const fetch = vi.fn(); vi.stubGlobal('fetch', fetch); await setup('/about')
     await wrapper!.get('button[aria-label="复制版本信息"]').trigger('click'); await flushPromises()
-    expect(writeText).toHaveBeenCalledWith(expect.stringContaining(`Companion Next ${packageInfo.version}`))
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining(`Companion Next\n前端 v${packageInfo.version}`))
     expect(writeText.mock.calls[0]?.[0]).not.toMatch(/127\.0\.0\.1|X-Review-Token|Bearer|\/workspace\//)
     expect(fetch).not.toHaveBeenCalled()
     writeText.mockRejectedValueOnce(new Error('denied')); await wrapper!.get('button[aria-label="复制版本信息"]').trigger('click'); await flushPromises()
@@ -425,3 +426,6 @@ describe('unified art workspace navigation', () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 })
+
+
+it('uses the same frontend/backend version format in chrome about and copied information',async()=>{const writeText=vi.fn(async(_text:string)=>{});Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText}});await setup('/about');const version=useProductVersionStore();version.metadata={schemaVersion:'companion-product-version-v1',product:{name:'Creator AI Companion',version:'0.3.144'},build:{id:'fixture-build',sourceRevision:'a'.repeat(40)},identity:{entrySha256:'b'.repeat(64)}};await flushPromises();expect(wrapper!.get('.frontend-version').text()).toBe(`前端 v${packageInfo.version}`);for(const node of wrapper!.findAll('.backend-version'))expect(node.text()).toBe('后端 v0.3.144');expect(wrapper!.text()).not.toContain('宿主包');await wrapper!.get('button[aria-label="复制版本信息"]').trigger('click');await flushPromises();const text=writeText.mock.calls[0]![0];expect(text).toContain(`\n前端 v${packageInfo.version}\n构建 `);expect(text).toContain('\n后端 v0.3.144\n');expect(text).not.toContain('宿主包');expect(text).not.toContain('后端：')})
