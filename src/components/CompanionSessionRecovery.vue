@@ -49,17 +49,17 @@ onBeforeUnmount(() => {
 })
 </script>
 <template>
-  <el-dialog v-model="open" title="需要重新授权" width="min(640px, calc(100vw - 32px))" :close-on-click-modal="false" destroy-on-close>
-    <p class="session-recovery-note">当前页面和输入已保留。请在同一浏览器中完成本机授权；刚才的操作不会自动重发。</p>
-    <p v-if="frameError" role="alert">授权引导加载失败。请重试加载，或稍后从本机启动入口重新授权。</p>
-    <iframe v-if="open && !frameError" :key="frameRevision" ref="frame" class="session-recovery-frame" :src="`/login?embedded=1&returnTo=${encodeURIComponent(returnTo)}`" title="Companion 本机授权引导" @load="guideLoaded" @error="frameError = true"/>
+  <el-dialog v-model="open" title="需要重新登录" width="min(640px, calc(100vw - 32px))" :close-on-click-modal="false" destroy-on-close>
+    <p class="session-recovery-note">当前页面和输入已保留。请在下方使用账号、密码和图片验证码登录；刚才的操作不会自动重发。</p>
+    <p v-if="frameError" role="alert">登录页加载失败，请重试加载。</p>
+    <iframe v-if="open && !frameError" :key="frameRevision" ref="frame" class="session-recovery-frame" :src="`/login?embedded=1&returnTo=${encodeURIComponent(returnTo)}`" title="Companion 账号登录" @load="guideLoaded" @error="frameError = true"/>
     <template #footer>
-      <el-button @click="retryFrame">重新加载引导</el-button>
-      <el-button @click="close">暂不授权</el-button>
+      <el-button @click="retryFrame">重新加载登录页</el-button>
+      <el-button @click="close">暂不登录</el-button>
     </template>
   </el-dialog>
 </template>
 <style scoped>
 .session-recovery-note { margin: 0 0 12px; line-height: 1.7; color: var(--text-secondary, #637187); }
-.session-recovery-frame { display: block; width: 100%; height: 340px; border: 1px solid #dfe4ed; border-radius: 6px; background: #fff; }
+.session-recovery-frame { display: block; width: 100%; height: min(560px, 65vh); border: 1px solid #dfe4ed; border-radius: 6px; background: #fff; }
 </style>

@@ -19,3 +19,4 @@ dist-companion-workspace/
 
 # Machine-local approved Companion startup paths; no credentials.
 /companion-start.local.json
+/dist-companion-login/

@@ -47,7 +47,7 @@ describe('in-place authorization recovery', () => {
     await page(); await request()
     const frame = document.querySelector('iframe')!; frame.dispatchEvent(new Event('error')); await nextTick()
     expect(document.querySelector('iframe')).toBeNull()
-    const retry = [...document.querySelectorAll('button')].find(button => button.textContent?.includes('重新加载引导'))!
+    const retry = [...document.querySelectorAll('button')].find(button => button.textContent?.includes('重新加载登录页'))!
     retry.click(); await nextTick(); expect(document.querySelector('iframe')).not.toBeNull()
   })
 })

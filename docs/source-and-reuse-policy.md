@@ -24,9 +24,11 @@
 
 ## 当前认证工作的复用边界
 
-当前已批准方向是复用 Companion 现有一次性码换 Cookie 机制和官方本机授权入口，补齐未登录引导、会话失效提示和安全回跳。前端页面只能引导用户完成已有授权，不能自行授予后端权限；其他项目的登录外壳或演示 token 不能用于生产放行。
+The current approved browser login reuses the existing Cool-admin/Midway authentication provider. Companion adapts its existing Cookie session; it does not implement password hashing, copy signing keys, initialize an account database, or create accounts. The original Companion CLI authorization remains compatible, but a terminal-command guide is not the requested browser login experience.
 
-不新增密码系统、公开凭据签发入口或无凭证自动登录；不扩大 LAN 监听、Host/Origin 或会话安全边界。未认证、Host/Origin 拒绝和业务权限不足必须区分；写操作不得因重新授权而自动重发。回跳只允许本应用内部安全路径，输入保留不得持久保存凭据或敏感内容。
+Only explicitly allowed existing usernames may enter Companion. The allowlist defaults to empty; there is no default admin or automatic access for all operations accounts. Credentials and provider access tokens remain server-side and are not logged or persisted in browser storage. Session expiry, provider revocation, Host/Origin rejection, and business permission errors remain distinct. Writes are never automatically replayed.
+
+The approved provider address is loopback port 8001. A port conflict does not authorize stopping its owner or changing network/security configuration. An alternative port requires approval. Provider login retains its existing per-user token-cache behavior; Companion logout removes only its own browser session and does not invoke provider-wide logout.
 
 ## 运行与交付证据
 

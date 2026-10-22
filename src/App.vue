@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { safeCompanionReturnTo } from './domain/companion-session-recovery'
 import type { LocationQueryValue, RouteLocationNormalizedLoaded } from 'vue-router'
-import { ArrowDown, ArrowLeft, Refresh, Close, Menu } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowLeft, Refresh, Close, Menu, SwitchButton } from '@element-plus/icons-vue'
 import { useWorkspaceStore } from './stores/workspace'
 import { liveProvider } from './integration'
 import { companionBrowserProvider } from './companion-browser-integration'
@@ -21,6 +23,20 @@ const store = useWorkspaceStore()
 const route = useRoute()
 const router = useRouter()
 const menuOpen = ref(false)
+const loggingOut = ref(false)
+async function logoutBrowserSession() {
+  if (loggingOut.value) return
+  loggingOut.value = true
+  try {
+    const response = await window.fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}', signal: AbortSignal.timeout(5000) })
+    const data: unknown = await response.json()
+    if (!response.ok || !data || typeof data !== 'object' || (data as { loggedOut?: unknown }).loggedOut !== true) throw new Error('Logout was not confirmed')
+    const target = safeCompanionReturnTo(`/next/index.html${window.location.search}${window.location.hash}`) ?? '/next/index.html#/overview'
+    window.location.assign('/login?returnTo=' + encodeURIComponent(target))
+  } catch { ElMessage.error('\u9000\u51fa\u767b\u5f55\u672a\u5b8c\u6210\uff0c\u8bf7\u91cd\u8bd5\u3002') }
+  finally { loggingOut.value = false }
+}
+
 // Keep the iframe in the document: moving it through a deactivated route cache can reload its browsing context.
 const artWorkspaceVisited=ref(route.path==='/art-resources')
 watch(()=>route.path,path=>{if(path==='/art-resources')artWorkspaceVisited.value=true},{flush:'sync'})
@@ -152,7 +168,7 @@ const dateLabel = computed(() => {
     <div class="main-shell">
       <header class="topbar">
         <div class="topbar-left"><el-button class="mobile-menu" :icon="Menu" text aria-label="打开导航" @click="menuOpen = !menuOpen"/><button v-if="route.path === '/projects' || compactOverview" class="page-back compact-page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><div class="breadcrumb"><strong>{{ pageTitle }}</strong></div><InfoTip v-if="(route.path === '/projects' || compactOverview) && pageInfo" :label="`${pageTitle}说明`" :text="pageInfo"/></div>
-        <div class="topbar-right"><RouterLink to="/changelog" class="frontend-version" aria-label="查看前端版本与更新记录">Next v{{ frontendIdentity.version }}</RouterLink><RouterLink to="/help" class="utility-link" @click="menuOpen = false">帮助</RouterLink><RouterLink to="/about" class="utility-link" @click="menuOpen = false">关于</RouterLink><el-tag v-if="showRegisteredChrome" :type="registered.currentSource ? 'success' : 'info'" round>{{ registered.currentSource ? '真实工程' : '未连接' }}</el-tag><el-tag v-else-if="showProjectContext && store.mode === 'disconnected'" type="info" effect="plain" round>未连接</el-tag><el-tag v-else-if="showProjectContext && store.isDemo" class="demo-tag" effect="light" round>示例模式</el-tag><el-tag v-else-if="showProjectContext" :type="store.connection === 'connected' ? 'success' : 'warning'" round>{{ store.sourceLabel }}</el-tag></div>
+        <div class="topbar-right"><el-tooltip v-if="companionBrowserProvider" content="&#x9000;&#x51fa;&#x767b;&#x5f55;"><el-button :icon="SwitchButton" text circle aria-label="&#x9000;&#x51fa;&#x767b;&#x5f55;" :loading="loggingOut" @click="logoutBrowserSession"/></el-tooltip><RouterLink to="/changelog" class="frontend-version" aria-label="查看前端版本与更新记录">Next v{{ frontendIdentity.version }}</RouterLink><RouterLink to="/help" class="utility-link" @click="menuOpen = false">帮助</RouterLink><RouterLink to="/about" class="utility-link" @click="menuOpen = false">关于</RouterLink><el-tag v-if="showRegisteredChrome" :type="registered.currentSource ? 'success' : 'info'" round>{{ registered.currentSource ? '真实工程' : '未连接' }}</el-tag><el-tag v-else-if="showProjectContext && store.mode === 'disconnected'" type="info" effect="plain" round>未连接</el-tag><el-tag v-else-if="showProjectContext && store.isDemo" class="demo-tag" effect="light" round>示例模式</el-tag><el-tag v-else-if="showProjectContext" :type="store.connection === 'connected' ? 'success' : 'warning'" round>{{ store.sourceLabel }}</el-tag></div>
       </header>
       <main class="main-content" :class="{ 'projects-main': route.path === '/projects' || compactOverview }">
         <div v-if="route.path !== '/projects' && !compactOverview" class="page-heading"><div class="page-title"><button class="page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><h1>{{ pageTitle }}</h1><InfoTip v-if="pageInfo" :label="`${pageTitle}说明`" :text="pageInfo" /></div><div v-if="showRegisteredContext" class="page-heading-actions"><el-button v-if="legacyWorkspace" @click="store.openDemo">查看示例工作台</el-button><el-select v-if="registered.projects.length" :model-value="registered.project?.id ?? ''" class="project-select" aria-label="当前登记工程" placeholder="请选择工程" @update:model-value="selectRegisteredProject"><el-option v-for="project in registered.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-button v-if="companionBrowserProvider" :loading="registered.directory.projectLoading && !registered.directory.backgroundProjectRead" :disabled="registered.directory.projectLoading" @click="registered.directory.connect(companionBrowserProvider)">{{ registered.currentSource ? '重新连接工程' : '连接工程服务' }}</el-button><el-button v-if="registered.directory.provider" :icon="Refresh" text aria-label="刷新登记工程" :disabled="registered.directory.projectLoading" @click="registered.directory.refreshProjects()"/><el-button v-if="registered.directory.provider" :icon="Close" text aria-label="断开工程服务" @click="registered.directory.disconnect()"/></div><div v-else-if="showProjectContext" class="page-heading-actions"><el-select v-if="store.snapshot.projects.length" :model-value="store.selectedProjectId" class="project-select" aria-label="当前项目" @update:model-value="store.selectProject"><el-option v-for="project in store.snapshot.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-dropdown trigger="click"><el-button>数据源<el-icon class="button-trail"><ArrowDown/></el-icon></el-button><template #dropdown><el-dropdown-menu><el-dropdown-item @click="store.openDemo">查看示例资料</el-dropdown-item><el-dropdown-item v-if="liveProvider" @click="store.connect(liveProvider)">连接只读数据源</el-dropdown-item><el-dropdown-item :disabled="store.mode === 'disconnected'" divided @click="store.disconnect">断开并清空视图</el-dropdown-item></el-dropdown-menu></template></el-dropdown></div></div>
