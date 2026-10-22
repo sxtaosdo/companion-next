@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import ElementPlus from 'element-plus'
 import { createPinia } from 'pinia'
+import { CircleClose } from '@element-plus/icons-vue'
 import { aiJobActionsProvider } from '../src/ai-job-actions-integration'
 import type { AiJobActionsProvider } from '../src/domain/ai-job-actions'
 import type { AiJobsProject } from '../src/stores/ai-jobs-read'
@@ -81,4 +82,45 @@ describe('verified read-to-action DOM handoff', () => {
     expect(wrapper!.get('[data-testid="job-product-acceptance"]').text()).toContain('Owner 已手工确认：导入与运行可见')
     expect(wrapper!.text()).toContain('自动化状态仍为 UNKNOWN'); expect(wrapper!.text()).toContain('productionVerified：false')
   })
+})
+
+function statusTag(){const host=wrapper!.get('[data-testid="job-status-tag"]');return host.classes().includes('el-tag')?host:host.get('.el-tag')}
+describe('unified task heading status from existing store evidence',()=>{
+ it('is gray before a read, green only after a real-shaped history response, and passive throughout',async()=>{
+  const p=provider();setup(p)
+  expect(statusTag().text()).toBe('未读取');expect(statusTag().classes()).toContain('el-tag--info');expect(p.readJobs).not.toHaveBeenCalled()
+  expect(wrapper!.get('[data-testid="job-status-tag"]').classes()).toContain('companion-status-tag')
+  await button('读取 / 刷新任务').trigger('click');await flushPromises()
+  expect(statusTag().text()).toBe('任务列表已读取');expect(statusTag().classes()).toContain('el-tag--success');expect(statusTag().find('.is-loading').exists()).toBe(false)
+  expect(p.readJobs).toHaveBeenCalledTimes(1);expect(p.readStatus).not.toHaveBeenCalled()
+ })
+ it('shows an actual history request primary and its error red without automatic retry',async()=>{
+  const p=provider();let reject!:(reason:Error)=>void;p.readJobs=vi.fn(()=>new Promise<AiJobsView>((_resolve,fail)=>reject=fail));setup(p)
+  await button('读取 / 刷新任务').trigger('click');await flushPromises()
+  expect(statusTag().classes()).toContain('el-tag--primary');expect(statusTag().get('.companion-status-icon').classes()).toContain('is-loading')
+  reject(new Error('isolated failure'));await flushPromises()
+  expect(statusTag().text()).toBe('读取失败');expect(statusTag().classes()).toContain('el-tag--danger');expect(statusTag().findComponent(CircleClose).exists()).toBe(true)
+  expect(p.readJobs).toHaveBeenCalledTimes(1)
+ })
+ it.each([
+  ['queued','info',false],['waiting_service','warning',false],['running','primary',true],['unknown','warning',false],['import_unknown','warning',false],['failed','danger',false],['selected','success',false],['reusable','success',false],['awaiting_selection','warning',false],['imported_pending_verification','warning',false],['blocked','warning',false],
+ ] as const)('renders %s without inventing execution or runtime acceptance',async(state,tone,spinning)=>{
+  const p=provider();p.readJobs=vi.fn(async()=>({...jobs(),jobs:[{...job(),state}]}));setup(p);await select()
+  expect(statusTag().classes()).toContain('el-tag--'+tone);expect(statusTag().find('.is-loading').exists()).toBe(spinning)
+  if(state==='failed')expect(statusTag().findComponent(CircleClose).exists()).toBe(true)
+  if(['unknown','import_unknown'].includes(state))expect(statusTag().text()).toContain('待核对')
+  if(state==='imported_pending_verification'){expect(statusTag().text()).toContain('待运行验收');expect(statusTag().text()).not.toContain('验收完成')}
+  expect(p.readJobs).toHaveBeenCalledTimes(1);expect(p.readStatus).not.toHaveBeenCalled()
+ })
+ it('treats only an explicit historical binding as old and never spins historical running',async()=>{
+  const p=provider();p.readJobs=vi.fn(async()=>({...jobs(),jobs:[{...job(),state:'running' as const,historyOnly:{reason:'SOURCE_REVISION_CHANGED' as const,currentSourceRevision:'d'.repeat(40)}}]}));setup(p);await select()
+  expect((wrapper!.vm as unknown as {readStatusSnapshot:{historyOnly:boolean}}).readStatusSnapshot.historyOnly).toBe(true)
+  expect(statusTag().text()).toContain('历史任务');expect(statusTag().classes()).toContain('el-tag--warning');expect(statusTag().find('.is-loading').exists()).toBe(false)
+  expect(wrapper!.get('[data-testid="job-status-tag"]').attributes('title')).toContain('仅可查看')
+ })
+ it('clears the heading after source changes, without retrying the request',async()=>{
+  const p=provider();setup(p);await select();await wrapper!.setProps({source:{}})
+  expect(statusTag().text()).toBe('未读取');expect(statusTag().classes()).toContain('el-tag--info');expect(p.readJobs).toHaveBeenCalledTimes(1)
+  expect((wrapper!.vm as unknown as {readStatusSnapshot:{historyOnly:boolean}}).readStatusSnapshot.historyOnly).toBe(false)
+ })
 })

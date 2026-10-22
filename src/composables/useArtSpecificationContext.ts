@@ -9,7 +9,7 @@ export type ArtSpecificationKind = 'unread' | 'reading' | 'missing' | 'configure
 export interface ArtSpecificationState {
   kind: ArtSpecificationKind
   text: string
-  tone: 'info' | 'success' | 'warning' | 'danger'
+  tone: 'primary' | 'info' | 'success' | 'warning' | 'danger'
   busy?: boolean
   detail?: string
   legacy?: boolean
@@ -53,9 +53,9 @@ export function useArtSpecificationContext() {
     if (!selection.project) return { kind: 'unread', text: '未选择工程', tone: 'info' }
     if (projectArtSpecProvider.value) {
       if (!primaryBound.value) return { kind: 'unread', text: '规范未读取', tone: 'info' }
-      if (art.phase === 'saving') return { kind: 'saving', text: '规范保存中', tone: 'info', busy: true }
-      if (art.blocked || art.phase === 'unknown') return { kind: 'unknown', text: '规范结果待核对', tone: 'warning', busy: art.pending, detail: art.message }
-      if (art.pending) return { kind: 'reading', text: '规范读取中', tone: 'info', busy: true }
+      if (art.phase === 'saving') return { kind: 'saving', text: '规范保存中', tone: 'primary', busy: true }
+      if (art.blocked || art.phase === 'unknown') return { kind: 'unknown', text: '规范结果待核对', tone: 'warning', busy: false, detail: art.message }
+      if (art.pending) return { kind: 'reading', text: '规范读取中', tone: 'primary', busy: true }
       if (art.phase === 'error') return { kind: 'error', text: '规范读取失败', tone: 'danger', detail: art.message }
       if (art.base) return { kind: 'configured', text: '规范已配置', tone: 'success', detail: art.dirty ? '当前有未保存修改；已配置状态以保存版本为准。' : undefined }
       if (art.legacyVersion !== null) return { kind: 'missing', text: '项目规范未配置', tone: 'warning', legacy: true, detail: '仅有旧图标配置，尚未创建项目美术规范。' }
@@ -64,7 +64,7 @@ export function useArtSpecificationContext() {
     }
     if (!aiResourceReadProvider.value) return { kind: 'unread', text: '规范接口未接入', tone: 'info' }
     if (!legacyBound.value) return { kind: 'unread', text: '规范未读取', tone: 'info' }
-    if (resource.loading) return { kind: 'reading', text: '规范读取中', tone: 'info', busy: true }
+    if (resource.loading) return { kind: 'reading', text: '规范读取中', tone: 'primary', busy: true }
     if (resource.error) return { kind: 'error', text: '规范读取失败', tone: 'danger', detail: resource.error }
     if (!resource.resource) return { kind: 'unread', text: '规范未读取', tone: 'info' }
     if (resource.resource.state === 'invalid') return { kind: 'error', text: '规范读取失败', tone: 'danger', detail: '旧图标配置校验失败，不能据此判断项目规范未配置。' }

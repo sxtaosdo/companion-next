@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h, KeepAlive, nextTick, ref } from 'vue'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import OverviewServiceSummary from '../src/components/OverviewServiceSummary.vue'
+import { Link } from '@element-plus/icons-vue'
 import { OVERVIEW_SERVICE_INTERVAL, useOverviewServiceStatus } from '../src/composables/use-overview-service-status'
 import { companionBrowserProvider, companionProjectEntryProvider, registerCompanionBrowserProvider } from '../src/companion-browser-integration'
 import { knowledgeReadProvider } from '../src/knowledge-read-integration'
@@ -220,14 +221,95 @@ describe('dashboard honest service labels', () => {
   })
   it('distinguishes unchecked, checking and a verified unreachable service', async () => {
     directory.livePreferred = false; await mountSummary()
-    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('未检查')
+    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('未读取')
     const pending = deferred<KnowledgeServiceStates>(); knowledge.loadServiceStates = vi.fn(() => pending.promise)
     const refresh = wrapper!.findAll('button').find(button => button.text() === '刷新服务状态')!
     await refresh.trigger('click'); await flushPromises()
     expect(wrapper!.get('[data-service="知识库"]').text()).toContain('检查中')
     pending.resolve({ knowledge: { running: false, frameable: false }, model: { running: true }, warnings: [] }); await flushPromises()
-    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('未连接')
+    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('状态过期 · 待核对')
+    expect(wrapper!.get('[data-service="知识库"]').text()).toContain('本次探测未达')
     expect(wrapper!.get('[data-service="模型启动器"]').text()).toContain('仅启动器可达')
     expect(wrapper!.text()).not.toContain('全部正常')
+  })
+})
+
+
+describe('dashboard shared status presentation', () => {
+  async function mountSummary() {
+    wrapper = mount(OverviewServiceSummary, { global: { stubs: { RouterLink: { props: ['to'], template: '<a :href="to"><slot/></a>' } } } })
+    await flushPromises()
+  }
+  const card = (name: string) => wrapper!.get(`[data-service="${name}"]`)
+  const tag = (name: string) => card(name).get('.companion-status-tag')
+  it('uses shared Element Plus tags and icons for independently reachable and unreachable services', async () => {
+    knowledge.loadServiceStates = vi.fn(async () => ({ knowledge: { running: false, frameable: false }, model: { running: true }, warnings: [] }))
+    await mountSummary()
+    expect(tag('Companion').get('.el-tag').classes()).toContain('el-tag--success')
+    expect(tag('知识库').get('.el-tag').classes()).toContain('el-tag--info')
+    expect(tag('知识库').text()).toBe('未连接')
+    expect(card('知识库').findComponent(Link).exists()).toBe(true)
+    expect(tag('模型启动器').get('.el-tag').classes()).toContain('el-tag--success')
+    expect(tag('模型启动器').text()).toBe('已连接')
+    expect(card('模型启动器').text()).toContain('仅启动器可达')
+    expect(wrapper!.findAll('.companion-status-icon svg')).toHaveLength(3)
+    expect(wrapper!.find('.service-state').exists()).toBe(false)
+  })
+  it('shows real loading even with an earlier successful snapshot and restores the new result', async () => {
+    await mountSummary()
+    const pending = deferred<KnowledgeServiceStates>()
+    knowledge.loadServiceStates = vi.fn(() => pending.promise)
+    const oldTime = card('知识库').get('time').attributes('datetime')
+    await wrapper!.findAll('button')[0]!.trigger('click'); await flushPromises()
+    expect(tag('知识库').get('.el-tag').classes()).toContain('el-tag--primary')
+    expect(tag('知识库').attributes('aria-busy')).toBe('true')
+    expect(tag('知识库').text()).toBe('检查中')
+    expect(tag('知识库').find('.status-spin svg').exists()).toBe(true)
+    expect(card('知识库').get('time').attributes('datetime')).toBe(oldTime)
+    pending.resolve(good()); await flushPromises()
+    expect(tag('知识库').get('.el-tag').classes()).toContain('el-tag--success')
+    expect(tag('知识库').attributes('aria-busy')).toBe('false')
+  })
+  it('marks retained observations stale on pause and operation barriers without a green ready claim', async () => {
+    await mountSummary()
+    const time = card('知识库').get('time').attributes('datetime')
+    await wrapper!.findAll('button')[1]!.trigger('click'); await flushPromises()
+    for (const name of ['知识库', '模型启动器']) {
+      expect(tag(name).get('.el-tag').classes()).toContain('el-tag--warning')
+      expect(tag(name).text()).toBe('状态过期 · 待核对')
+      expect(tag(name).get('.el-tag').classes()).not.toContain('el-tag--success')
+      expect(card(name).get('time').attributes('datetime')).toBe(time)
+    }
+    const lane = useProjectOperationLaneStore(), lease = lane.acquire('隔离操作')!
+    await nextTick()
+    expect(tag('Companion').get('.el-tag').classes()).toContain('el-tag--warning')
+    expect(card('Companion').text()).toContain('工程操作仍在处理中')
+    lane.release(lease)
+  })
+  it('keeps unread states neutral and distinguishes an explicit blocked unknown without observation', async () => {
+    directory.livePreferred = false; directory.observedAt = ''
+    await mountSummary()
+    expect(tag('知识库').get('.el-tag').classes()).toContain('el-tag--info')
+    expect(tag('知识库').text()).toBe('未读取')
+    const lane = useProjectOperationLaneStore(), lease = lane.acquire('隔离操作')!
+    await nextTick()
+    expect(tag('Companion').get('.el-tag').classes()).toContain('el-tag--warning')
+    expect(tag('Companion').text()).toBe('状态未知 · 待核对')
+    expect(tag('知识库').text()).toBe('未读取')
+    lane.release(lease)
+  })
+  it('preserves failure reasons and timestamps while replacing an old green snapshot with a red failure', async () => {
+    await mountSummary()
+    const time = card('知识库').get('time').attributes('datetime')
+    knowledge.loadServiceStates = vi.fn(async () => { throw new KnowledgeReadError('forbidden') })
+    await wrapper!.findAll('button')[0]!.trigger('click'); await flushPromises()
+    expect(tag('知识库').get('.el-tag').classes()).toContain('el-tag--danger')
+    expect(tag('知识库').text()).toBe('鉴权失败')
+    expect(card('知识库').text()).toContain('本次服务状态读取失败')
+    expect(card('知识库').get('time').attributes('datetime')).toBe(time)
+    directory.projectError = '只读接口拒绝（403）：需要权限'; await nextTick()
+    expect(tag('Companion').get('.el-tag').classes()).toContain('el-tag--danger')
+    expect(card('Companion').text()).toContain('只读接口拒绝（403）：需要权限')
+    expect(wrapper!.findAll('button').map(button => button.text())).toEqual(['刷新服务状态', '暂停服务更新'])
   })
 })

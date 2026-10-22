@@ -16,6 +16,10 @@ import { companionBrowserProvider, companionProjectEntryProvider, registerCompan
 import { aiResourceReadProvider } from '../src/ai-resource-read-integration'
 import { AiResourceReadError, type AiResourceReadProvider, type AiResourceView } from '../src/domain/ai-resource-read'
 import type { CompanionBrowserProvider } from '../src/domain/companion-browser'
+import { useKnowledgeReadStore } from '../src/stores/knowledge-read'
+import { knowledgeReadProvider } from '../src/knowledge-read-integration'
+import type { KnowledgeReadProvider } from '../src/domain/knowledge-read'
+import { CircleClose } from '@element-plus/icons-vue'
 import { resourceView } from './fixtures/ai-resource-read'
 import { useProjectArtSpecStore } from '../src/stores/project-art-spec'
 import { projectArtSpecProvider, type ProjectArtSpecContext, type ProjectArtSpecProvider, type ProjectArtSpecReceipt } from '../src/project-art-spec-integration'
@@ -32,7 +36,7 @@ async function enter(modern:ProjectArtSpecProvider|null=null){
  return {pinia,art:useProjectArtSpecStore(pinia),selection,resource,source,reader,operations:useCreatorOperationsStore(pinia)}
 }
 function tag(kind:string){const node=wrapper!.get(`[data-status="${kind}"]`);return node.classes().includes('el-tag')?node:node.get('.el-tag')}
-afterEach(()=>{wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;companionProjectEntryProvider.value=null;aiResourceReadProvider.value=null;creatorOperationsProvider.value=null;projectArtSpecProvider.value=null;vi.restoreAllMocks()})
+afterEach(()=>{wrapper?.unmount();wrapper=undefined;companionBrowserProvider.value=null;companionProjectEntryProvider.value=null;aiResourceReadProvider.value=null;creatorOperationsProvider.value=null;projectArtSpecProvider.value=null;knowledgeReadProvider.value=null;vi.restoreAllMocks()})
 describe('shared compact art status',()=>{
  it('shows the selected real project and independent unobserved resource status without requesting reads',async()=>{
   const {source,reader}=await enter()
@@ -64,7 +68,7 @@ describe('shared compact art status',()=>{
  it('accepts only the local jobs panel snapshot bound to the current project and source',async()=>{
   const {source}=await enter()
   const jobs={projectId:id,projectPath:project.path,source,loading:false,error:'',observedAt:'2026-10-21T00:00:00Z',hasRead:true,state:'import_unknown' as const}
-  await wrapper!.setProps({jobs});expect(tag('task').text()).toBe('导入结果未知');expect(tag('task').classes()).toContain('el-tag--warning')
+  await wrapper!.setProps({jobs});expect(tag('task').text()).toBe('导入结果未知 · 待核对');expect(tag('task').classes()).toContain('el-tag--warning')
   await wrapper!.setProps({jobs:{...jobs,loading:true}});expect(tag('task').text()).toBe('任务读取中');expect(tag('task').find('.is-loading').exists()).toBe(true)
   await wrapper!.setProps({jobs:{...jobs,error:'isolated failure'}});expect(tag('task').text()).toBe('任务读取失败');expect(tag('task').classes()).toContain('el-tag--danger')
   await wrapper!.setProps({jobs:{...jobs,source:{}}});expect(wrapper!.find('[data-status="task"]').exists()).toBe(false)
@@ -235,5 +239,51 @@ describe('specification project selection through the actual router binding',()=
   expect(router.currentRoute.value.query.project).toBe(second.id);expect(selection.project?.id).toBe(second.id)
   expect(provider.read).toHaveBeenCalledTimes(2);expect(art.hash).toBeNull();expect(art.phase).not.toBe('idle')
   expect(tag('specification').text()).toBe('规范未配置');expect(wrapper.get('[data-testid="open-art-specification"]').text()).toBe('新建美术规范')
+ })
+})
+
+describe('unified art header status appearance',()=>{
+ it('uses shared classes and primary only while actually reading or saving',async()=>{
+  let resolve!:(value:ProjectArtSpecReceipt)=>void
+  const {art}=await enter(modern(vi.fn(()=>new Promise<ProjectArtSpecReceipt>(done=>resolve=done))))
+  expect(wrapper!.get('[data-status="specification"]').classes()).toContain('companion-status-tag')
+  expect(tag('specification').classes()).toContain('el-tag--primary');expect(tag('specification').get('.companion-status-icon').classes()).toContain('is-loading')
+  resolve(receipt());await flushPromises();expect(tag('specification').classes()).toContain('el-tag--success');expect(tag('specification').find('.is-loading').exists()).toBe(false)
+  art.pending=true;art.phase='saving';await flushPromises();expect(tag('specification').classes()).toContain('el-tag--primary')
+  art.phase='unknown';await flushPromises();expect(tag('specification').classes()).toContain('el-tag--warning');expect(tag('specification').find('.is-loading').exists()).toBe(false)
+  art.pending=false;art.phase='error';await flushPromises();expect(tag('specification').classes()).toContain('el-tag--danger');expect(tag('specification').findComponent(CircleClose).exists()).toBe(true)
+ })
+ it('shows a negative model reachability observation as gray disconnected, never stopped',async()=>{
+  const {pinia}=await enter(),knowledge=useKnowledgeReadStore(pinia),provider={} as KnowledgeReadProvider
+  knowledgeReadProvider.value=provider;knowledge.provider=provider;knowledge.services={model:{running:false},warnings:[]}
+  await wrapper!.setProps({showModel:true});expect(tag('model').text()).toContain('未连接');expect(tag('model').classes()).toContain('el-tag--info');expect(tag('model').text()).not.toContain('未启动')
+  knowledge.statusLoading=true;await flushPromises();expect(tag('model').classes()).toContain('el-tag--primary');expect(tag('model').find('.is-loading').exists()).toBe(true)
+  knowledge.statusLoading=false;knowledge.serviceError='isolated failure';await flushPromises();expect(tag('model').classes()).toContain('el-tag--danger');expect(tag('model').findComponent(CircleClose).exists()).toBe(true)
+ })
+ it.each([
+  ['queued','info',false],['waiting_service','warning',false],['running','primary',true],['unknown','warning',false],['import_unknown','warning',false],['failed','danger',false],['selected','success',false],['reusable','success',false],['awaiting_selection','warning',false],['imported_pending_verification','warning',false],['blocked','warning',false],
+ ] as const)('renders original task %s with %s and correct activity',async(state,tone,spinning)=>{
+  const {source}=await enter();await wrapper!.setProps({jobs:{projectId:id,projectPath:project.path,source,loading:false,error:'',observedAt:'2026-10-21T00:00:00Z',hasRead:true,state}})
+  expect(tag('task').classes()).toContain('el-tag--'+tone);expect(tag('task').find('.is-loading').exists()).toBe(spinning)
+  expect(wrapper!.get('[data-status="task"]').classes()).toContain('companion-status-tag')
+  if(state==='failed')expect(tag('task').findComponent(CircleClose).exists()).toBe(true)
+  if(['unknown','import_unknown'].includes(state))expect(tag('task').text()).toContain('待核对')
+  if(state==='imported_pending_verification'){expect(tag('task').text()).toContain('待运行验收');expect(tag('task').text()).not.toContain('验收完成')}
+ })
+})
+
+describe('art header explicit unknown and historical evidence',()=>{
+ it('keeps unobserved model gray but marks a valid response lacking model state as unknown awaiting verification',async()=>{
+  const {pinia}=await enter(),knowledge=useKnowledgeReadStore(pinia),provider={} as KnowledgeReadProvider
+  knowledgeReadProvider.value=provider;knowledge.provider=provider;await wrapper!.setProps({showModel:true})
+  expect(tag('model').text()).toContain('未读取');expect(tag('model').classes()).toContain('el-tag--info')
+  knowledge.services={warnings:[]};await flushPromises()
+  expect(tag('model').text()).toContain('未知，待核对');expect(tag('model').classes()).toContain('el-tag--warning');expect(tag('model').find('.is-loading').exists()).toBe(false)
+ })
+ it('shows explicitly historical running as static warning rather than present execution',async()=>{
+  const {source}=await enter();const jobs={projectId:id,projectPath:project.path,source,loading:false,error:'',observedAt:'2026-10-21T00:00:00Z',hasRead:true,state:'running' as const,historyOnly:true}
+  await wrapper!.setProps({jobs});expect(tag('task').classes()).toContain('el-tag--warning');expect(tag('task').find('.is-loading').exists()).toBe(false)
+  expect(tag('task').text()).toContain('历史任务');expect(tag('task').text()).toContain('只读，待核对')
+  await wrapper!.setProps({jobs:{...jobs,historyOnly:false}});expect(tag('task').classes()).toContain('el-tag--primary');expect(tag('task').find('.is-loading').exists()).toBe(true)
  })
 })

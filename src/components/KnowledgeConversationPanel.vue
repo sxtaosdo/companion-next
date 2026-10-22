@@ -8,6 +8,7 @@ import { useRegisteredProjectStore } from '../stores/registered-project'
 import { knowledgeReadProvider } from '../knowledge-read-integration'
 import { knowledgeConversationProvider } from '../knowledge-conversation-integration'
 import { companionBrowserProvider } from '../companion-browser-integration'
+import { Loading, CircleCheck, CircleClose, Minus, QuestionFilled } from '@element-plus/icons-vue'
 import { isKnowledgeRequestId } from '../domain/knowledge-read'
 const props=withDefaults(defineProps<{active?:boolean}>(),{active:true}),pageActive=ref(true)
 const enabled=computed(()=>props.active&&pageActive.value)
@@ -24,7 +25,8 @@ watch([knowledgeConversationProvider,knowledgeReadProvider,()=>read.provider,kbI
 watch(companionBrowserProvider,()=>{chat.leave();sync()},{flush:'sync'})
 watch(()=>chat.revision,()=>{resetConfirmed.value=false;clearConfirmed.value=false},{flush:'sync'})
 const statusLabels={sending:'发送中，尚无回执',succeeded:'已收到回答', 'not-dispatched':'未发出',rejected:'服务明确拒绝',unknown:'结果未确认'} as const
-function statusTone(status:string):'info'|'success'|'warning'|'danger'{return status==='succeeded'?'success':status==='rejected'?'danger':status==='unknown'?'warning':'info'}
+function statusTone(status:string):'primary'|'info'|'success'|'warning'|'danger'{return status==='sending'?'primary':status==='succeeded'?'success':status==='rejected'?'danger':status==='unknown'?'warning':'info'}
+function statusIcon(status:string){return status==='sending'?Loading:status==='succeeded'?CircleCheck:status==='rejected'?CircleClose:status==='unknown'?QuestionFilled:Minus}
 async function send(){const prepared=chat.prepareSend();if(prepared)await chat.send(prepared,true)}
 function reset(){chat.newConversation(resetConfirmed.value);resetConfirmed.value=false}
 function clear(){chat.clearCompleted(clearConfirmed.value);clearConfirmed.value=false}
@@ -42,11 +44,11 @@ onBeforeUnmount(()=>chat.leave())
     <label class="conversation-input">问题<el-input v-model="chat.query" type="textarea" :rows="3" maxlength="512" aria-label="知识库问题" placeholder="输入要向当前知识库提出的问题"/></label>
     <div class="conversation-actions"><el-button type="primary" :disabled="!chat.canPrepare" :loading="chat.busy" aria-label="发送知识库问题" @click="send">发送</el-button><el-button v-if="chat.busy" @click="chat.cancel">停止等待 / 本地中止</el-button><el-button v-if="chat.activeSessionId && !chat.requiresNewConversation" :disabled="chat.transportPending" @click="chat.newConversation(true)">新对话</el-button></div>
     <p v-if="chat.transportPending" role="status">{{ chat.busy ? '正在等待回答…' : '请求尚未结束，请稍候。' }}</p>
-    <el-alert v-if="chat.error" type="warning" :closable="false" :title="chat.error"/>
+    <el-alert v-if="chat.error" :type="chat.requiresNewConversation && chat.turns.at(-1)?.status==='unknown' ? 'warning' : 'error'" :closable="false" :title="chat.error"/>
     <p v-if="chat.requiresNewConversation">本次结果未确认或已被拒绝，不会自动重试。请先核对已有记录，再开始新对话。</p>
     <section class="conversation-history" aria-live="polite"><h4>回答与引用</h4><p v-if="!chat.turns.length" class="conversation-empty">输入问题后点击发送，回答会显示在这里。</p>
       <article v-for="turn in chat.turns" :key="turn.id" class="conversation-turn">
-        <div class="conversation-heading"><el-tag size="small" :type="statusTone(turn.status)">{{ statusLabels[turn.status] }}</el-tag><el-tag v-if="turn.detached" type="info">原上下文记录</el-tag></div>
+        <div class="conversation-heading"><el-tag class="companion-status-tag" size="small" :type="statusTone(turn.status)" role="status" :aria-busy="turn.status==='sending'"><el-icon class="companion-status-icon" :class="{'is-loading':turn.status==='sending'}" aria-hidden="true"><component :is="statusIcon(turn.status)"/></el-icon>{{ statusLabels[turn.status] }}</el-tag><el-tag v-if="turn.detached" type="info">原上下文记录</el-tag></div>
         <h5>问题</h5><pre>{{ turn.query }}</pre>
         <template v-if="turn.status==='succeeded'"><h5>回答</h5><pre v-if="turn.answer">{{ turn.answer }}</pre><p v-else>服务返回了空回答；收到回执不代表问题已解决。</p><h5>引用</h5><ul v-if="turn.references.length"><li v-for="(reference,index) in turn.references" :key="index">知识库：{{ reference.kbId ?? '未返回' }} · 切片：{{ reference.chunkId ?? '未返回' }}</li></ul><p v-else>服务未返回引用。</p></template>
         <p v-if="turn.error" role="alert">{{ turn.error }}</p><p v-if="turn.status==='unknown'">尚未确认服务端是否已生成回答，不会自动重试。</p>

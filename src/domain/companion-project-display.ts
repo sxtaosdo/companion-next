@@ -10,11 +10,12 @@ export function projectDisplayRank(state:string|undefined,lastOpenedAt:number|un
 }
 
 /** Original card state colours; unknown never implies stopped. */
-export function projectStateTone(status: ManagedStatus | undefined, passive = false, expectedStop = false): 'success' | 'danger' | 'warning' | 'info' {
- if(passive || expectedStop) return 'info'
+export function projectStateTone(status: ManagedStatus | undefined, passive = false, expectedStop = false): 'success' | 'danger' | 'warning' | 'info' | 'primary' {
+ if(passive || !status) return 'info'
+ if(expectedStop || status.state==='unknown') return 'warning'
  if(status?.state === 'ready') return 'success'
  if(['error','crashed','incompatible'].includes(status?.state ?? '')) return 'danger'
- if(['launching','bridge-wait','stopping'].includes(status?.state ?? '')) return 'warning'
+ if(['launching','bridge-wait','stopping'].includes(status?.state ?? '')) return 'primary'
  return 'info'
 }
 /** Bridge permission is independent from tool preset visibility. */

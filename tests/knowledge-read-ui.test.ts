@@ -14,8 +14,8 @@ async function setup(path='/knowledge'){const pinia=createPinia(),router=createR
 function button(text:string){return wrapper!.findAll('button').find(b=>b.text()===text)!}
 afterEach(()=>{wrapper?.unmount();wrapper=undefined;knowledgeReadProvider.value=null;vi.restoreAllMocks();vi.unstubAllEnvs()})
 describe('knowledge page read boundaries',()=>{
- it.each(['/knowledge','/knowledge/manage','/knowledge?tab=models'])('passive build keeps %s disconnected and explains no CLI probe',async path=>{vi.stubEnv('MODE','companion-readonly');await setup(path);if(path.includes('tab=models'))expect(button('读取当前服务状态').attributes('disabled')).toBeDefined();else {expect(button('连接知识服务').attributes('disabled')).toBeDefined();expect(wrapper!.get('.knowledge-connect').text()).toContain('未检查');if(path.includes('/manage')){expect(wrapper!.text()).toContain('此只读预览未启用状态探测');expect(wrapper!.text()).toContain('没有判断原服务离线')}}})
- it('shows missing host without requests, fixtures or guessed zero results',async()=>{await setup();expect(wrapper!.text()).toContain('当前宿主未接入');expect(wrapper!.get('.knowledge-connect').text()).toContain('未检查');expect(wrapper!.text()).toContain('点击“读取知识库列表”，或输入关键词搜索。');expect(button('连接知识服务').attributes('disabled')).toBeDefined();expect(wrapper!.findAll('iframe')).toHaveLength(0)})
+ it.each(['/knowledge','/knowledge/manage','/knowledge?tab=models'])('passive build keeps %s disconnected and explains no CLI probe',async path=>{vi.stubEnv('MODE','companion-readonly');await setup(path);if(path.includes('tab=models'))expect(button('读取当前服务状态').attributes('disabled')).toBeDefined();else {expect(button('连接知识服务').attributes('disabled')).toBeDefined();expect(wrapper!.get('.knowledge-connect').text()).toContain('未读取');if(path.includes('/manage')){expect(wrapper!.text()).toContain('此只读预览未启用状态探测');expect(wrapper!.text()).toContain('没有判断原服务离线')}}})
+ it('shows missing host without requests, fixtures or guessed zero results',async()=>{await setup();expect(wrapper!.text()).toContain('当前宿主未接入');expect(wrapper!.get('.knowledge-connect').text()).toContain('未读取');expect(wrapper!.text()).toContain('点击“读取知识库列表”，或输入关键词搜索。');expect(button('连接知识服务').attributes('disabled')).toBeDefined();expect(wrapper!.findAll('iframe')).toHaveLength(0)})
  it('does not query on mount, connect only reads status and no frameable iframe is created',async()=>{const p=knowledgeFixture();registerKnowledgeReadProvider(p);await setup();expect(p.status).not.toHaveBeenCalled();await button('连接知识服务').trigger('click');await flushPromises();expect(p.status).toHaveBeenCalledTimes(1);expect(p.search).not.toHaveBeenCalled();expect(wrapper!.get('.knowledge-connect').text()).toContain('服务可达');expect(wrapper!.text()).not.toContain('模型启动器');expect(wrapper!.text()).not.toContain('Comfy');expect(wrapper!.findAll('iframe')).toHaveLength(0);expect(wrapper!.findAll('a[href^="http"]')).toHaveLength(0)})
  it('selects a returned base without submitting a query and clears previous result',async()=>{const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p);await button('读取知识库列表').trigger('click');await flushPromises();expect(wrapper!.text()).toContain('Test KB');await button('选用此知识库').trigger('click');expect(store.kbId).toBe('kb1');expect(store.result).toBeNull();expect(p.viewKnowledgeBase).not.toHaveBeenCalled();expect(p.search).not.toHaveBeenCalled()})
  it('searches explicitly, and input edits invalidate the old display',async()=>{const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p);await wrapper!.get('input[aria-label="检索关键词"]').setValue('word');await button('检索知识库').trigger('click');await flushPromises();expect(wrapper!.text()).toContain('test result');await wrapper!.get('input[aria-label="检索关键词"]').setValue('other');expect(wrapper!.text()).not.toContain('test result');expect(wrapper!.text()).toContain('旧结果已清空');expect(p.search).toHaveBeenCalledTimes(1)})
@@ -70,9 +70,9 @@ describe('knowledge content-first presentation',()=>{
   const p=knowledgeFixture();let complete!: (value: Awaited<ReturnType<typeof p.loadServiceStates>>) => void
   vi.mocked(p.loadServiceStates).mockImplementation(()=>new Promise(resolve=>{complete=resolve}))
   registerKnowledgeReadProvider(p);const {store}=await setup()
-  expect(wrapper!.get('.knowledge-connect').text()).toContain('未检查')
+  expect(wrapper!.get('.knowledge-connect').text()).toContain('未读取')
   const pending=store.connect(p);await flushPromises()
-  expect(wrapper!.get('.knowledge-connect').text()).toContain('检查中')
+  expect(wrapper!.get('.knowledge-connect').text()).toContain('读取中')
   expect(wrapper!.get('.knowledge-connect').text()).not.toContain('离线')
   complete({knowledge:{running:true,frameable:false},warnings:[]});await pending;await flushPromises()
   expect(wrapper!.get('.knowledge-connect').text()).toContain('服务可达')
@@ -110,7 +110,7 @@ describe('knowledge list feedback stays beside its trigger',()=>{
  it('uses the same unreachable wording as service maintenance',async()=>{
   const p=knowledgeFixture();vi.mocked(p.loadServiceStates).mockResolvedValue({knowledge:{running:false,frameable:false},warnings:[]})
   registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p);await flushPromises()
-  expect(wrapper!.get('.knowledge-connect').text()).toContain('服务不可达')
+  expect(wrapper!.get('.knowledge-connect').text()).toContain('未连接');expect(wrapper!.get('.knowledge-connect .el-tag').classes()).toContain('el-tag--info');expect(wrapper!.get('.knowledge-connect .companion-status-icon').find('svg').exists()).toBe(true)
   expect(wrapper!.get('.knowledge-connect').text()).not.toContain('探测未达')
  })
 
@@ -138,10 +138,10 @@ describe('knowledge list feedback stays beside its trigger',()=>{
   let reject!:(reason:unknown)=>void
   vi.mocked(p.status).mockImplementationOnce(()=>new Promise((_resolve,fail)=>{reject=fail}))
   const pending=store.connect(p);await flushPromises()
-  expect(wrapper!.get('.knowledge-connect').findAll('.el-tag').every(tag=>tag.text()==='检查中')).toBe(true)
+  expect(wrapper!.get('.knowledge-connect').findAll('.el-tag').every(tag=>tag.text()==='读取中')).toBe(true);expect(wrapper!.get('.knowledge-connect').findAllComponents({name:'ElTag'}).every((tag:VueWrapper)=>(tag.props() as Record<string,unknown>).type==='primary')).toBe(true);expect(wrapper!.get('.knowledge-connect').findAll('.companion-status-icon.is-loading')).toHaveLength(2)
   reject(new Error('isolated status failure'));await pending;await flushPromises()
   expect(wrapper!.get('.knowledge-connect').text()).toContain('读取失败')
-  expect(wrapper!.get('.knowledge-connect').text()).not.toContain('检索未检查')
+  expect(wrapper!.get('.knowledge-connect').text()).not.toContain('检索未读取')
  })
  it('management keeps service state in the shared bar without a duplicate connection summary',async()=>{
   const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup('/knowledge/manage');await store.connect(p);await flushPromises()
@@ -150,3 +150,11 @@ describe('knowledge list feedback stays beside its trigger',()=>{
   expect(wrapper!.get('.knowledge-technical').attributes('open')).toBeUndefined()
  })
 })
+
+describe('knowledge status keeps authentication separate from connectivity',()=>{
+ it('uses neutral missing configuration and red denied authentication while service remains reachable',async()=>{
+  const p=knowledgeFixture();registerKnowledgeReadProvider(p);const {store}=await setup();await store.connect(p);await flushPromises();const original=store.status!;
+  store.status={...original,retrieval:{...original.retrieval,auth:'missing'}};await flushPromises();let tags=wrapper!.get('.knowledge-connect').findAllComponents({name:'ElTag'});expect(tags[0]!.props('type')).toBe('success');expect(tags[1]!.props('type')).toBe('info');expect(tags[1]!.text()).toBe('认证未配置');
+  store.status={...original,retrieval:{...original.retrieval,auth:'denied'}};await flushPromises();tags=wrapper!.get('.knowledge-connect').findAllComponents({name:'ElTag'});expect(tags[0]!.props('type')).toBe('success');expect(tags[1]!.props('type')).toBe('danger');expect(tags[1]!.text()).toBe('认证被拒绝');expect(wrapper!.get('.knowledge-connect').findAll('.companion-status-icon')).toHaveLength(2);expect(wrapper!.get('.knowledge-connect').findAll('.is-loading')).toHaveLength(0);expect(p.search).not.toHaveBeenCalled();
+ });
+});

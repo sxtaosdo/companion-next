@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
+import { CircleCheck, CircleClose, Loading, Minus, Warning } from '@element-plus/icons-vue'
 import AiJobActionsPanel from './AiJobActionsPanel.vue'
 import type { AiJobAction } from '../domain/ai-job-actions'
 import { aiJobActionsProvider } from '../ai-job-actions-integration'
@@ -27,17 +28,31 @@ async function readCreatedTask(input: { snapshot: import('../domain/ai-jobs-read
   await store.readJobs(input.jobsReader)
   if (current() && store.history?.jobs.some(job => job.jobId === input.snapshot.jobId)) store.selectJob(input.snapshot.jobId)
 }
-const readStatusSnapshot=computed(()=>({projectId:store.project?.id??'',projectPath:store.project?.path??'',source:props.source,loading:store.busy,error:store.error||store.statusError||'',observedAt:store.statusObservedAt||store.observedAt||'',hasRead:!!store.history,state:store.status?.state??null}))
+const readStatusSnapshot=computed(()=>({projectId:store.project?.id??'',projectPath:store.project?.path??'',source:props.source,loading:store.busy,error:store.error||store.statusError||'',observedAt:store.statusObservedAt||store.observedAt||'',hasRead:!!store.history,state:store.status?.state??null,historyOnly:!!store.status?.historyOnly}))
 const workflowSnapshot=computed(()=>store.status ? {state:store.status.state,candidates:store.status.candidates.length,selected:store.status.selectedIds.length,hasImport:[store.status.import,store.status.variantImport].some(receipt=>receipt?.state==='imported_pending_verification'&&receipt.effectApplied===true&&receipt.leaseState==='RELEASED')}:null)
 defineExpose({ readCreatedTask, readStatusSnapshot, workflowSnapshot })
 const actionsByStep: Record<number, readonly AiJobAction[]> = { 1: [], 2: [], 3: ['run-next', 'resume'], 4: ['select'], 5: ['import', 'export-variant', 'import-variant'], 6: [] }
 const allowedOperations = computed(() => props.active===false ? [] : props.workflowStep === undefined ? undefined : actionsByStep[props.workflowStep] ?? [])
 const uncertain = computed(() => store.status && ['unknown', 'import_unknown'].includes(store.status.state))
+// Presentation of existing read/task evidence only; never starts work or invents expiry.
+const taskStatus = computed<{ text:string; tone:'primary'|'success'|'warning'|'danger'|'info'; busy:boolean; detail?:string }>(() => {
+  if (!reader.value || !store.project) return { text:'未连接', tone:'info', busy:false }
+  if (store.loading || store.statusLoading || store.previewLoading || store.variantPreviewLoading) return { text:store.loading?'任务读取中':store.statusLoading?'状态读取中':store.previewLoading?'候选读取中':'变体读取中', tone:'primary', busy:true }
+  if (store.error || store.statusError) return { text:'读取失败', tone:'danger', busy:false, detail:store.error || store.statusError }
+  if (store.previewError || store.variantPreviewError) return { text:store.previewError?'候选读取失败':'变体读取失败', tone:'danger', busy:false, detail:store.previewError || store.variantPreviewError }
+  if (!store.history) return { text:'未读取', tone:'info', busy:false }
+  if (!store.status) return { text:'任务列表已读取', tone:'success', busy:false }
+  const state=store.status.state, historical=!!store.status.historyOnly
+  const tone=state==='failed'?'danger':historical?'warning':state==='running'?'primary':['selected','reusable'].includes(state)?'success':['queued'].includes(state)?'info':'warning'
+  return { text:(historical?'历史任务 · ':'')+AI_JOB_STATE_LABELS[state]+(['unknown','import_unknown'].includes(state)?' · 待核对':''), tone, busy:state==='running'&&!historical, detail:historical?'原回执明确绑定旧工程版本，仅可查看；不代表当前工程验收通过。':undefined }
+})
+const taskStatusIcon = computed(() => taskStatus.value.busy?Loading:taskStatus.value.tone==='danger'?CircleClose:taskStatus.value.tone==='success'?CircleCheck:taskStatus.value.tone==='warning'?Warning:Minus)
+
 onBeforeUnmount(() => store.disconnect())
 </script>
 <template>
   <section class="section-card ai-jobs-read" data-testid="ai-jobs-read-panel">
-    <div class="section-heading"><div><h3>{{ props.progressive ? (workflowStep === 4 ? '预览并选用' : workflowStep === 5 ? '输出与导入' : workflowStep === 6 ? '核对导入结果' : '任务进度') : '原图标任务与候选' }}</h3></div></div>
+    <div class="section-heading"><div class="job-status-heading"><h3>{{ props.progressive ? (workflowStep === 4 ? '预览并选用' : workflowStep === 5 ? '输出与导入' : workflowStep === 6 ? '核对导入结果' : '任务进度') : '原图标任务与候选' }}</h3><el-tag class="companion-status-tag" :type="taskStatus.tone" :title="taskStatus.detail" data-testid="job-status-tag"><el-icon class="companion-status-icon" :class="{'is-loading':taskStatus.busy}" aria-hidden="true"><component :is="taskStatusIcon"/></el-icon>{{ taskStatus.text }}</el-tag></div></div>
     <p v-if="!reader" class="form-help">当前构建未接入原任务读取；需原 Companion 同源会话与已配置的任务后端。</p>
     <p v-if="!store.project" class="form-help">请先选择已读取登记的工程。</p>
     <details v-else class="job-secondary" :open="!props.compact && !props.progressive"><summary>工程信息</summary><dl class="job-identity"><dt>工程</dt><dd>{{ store.project.name }} · {{ store.project.id }}</dd><dt>工程路径</dt><dd>{{ store.project.path }}</dd></dl></details>
@@ -94,7 +109,7 @@ onBeforeUnmount(() => store.disconnect())
   </section>
 </template>
 <style scoped>
-.ai-jobs-read{display:grid;gap:14px}.ai-jobs-read p{line-height:1.65;overflow-wrap:anywhere;margin:5px 0}.job-identity{display:grid;grid-template-columns:145px minmax(0,1fr);gap:8px;margin:0}.job-identity dt{color:var(--text-secondary,#637187)}.job-identity dd{margin:0;overflow-wrap:anywhere}.job-actions{display:flex;flex-wrap:wrap;gap:10px}.job-picker{display:grid;gap:8px}.job-detail{display:grid;gap:12px}.job-detail h4{margin:8px 0}.job-candidates{list-style:none;padding:0;display:grid;gap:12px}.job-candidates li{border:1px solid var(--border-color,#e3e8ef);padding:12px;border-radius:8px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.job-candidates li>div{flex:1;min-width:180px;overflow-wrap:anywhere}.job-preview img{display:block;max-width:100%;max-height:480px;object-fit:contain;border:1px solid #dfe5ed;background:repeating-conic-gradient(#f1f3f6 0% 25%,#fff 0% 50%) 0/20px 20px}.job-preview h4{overflow-wrap:anywhere}@media(max-width:600px){.job-identity{grid-template-columns:1fr}.job-identity dd{margin-bottom:6px}}
+.job-status-heading{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.ai-jobs-read{display:grid;gap:14px}.ai-jobs-read p{line-height:1.65;overflow-wrap:anywhere;margin:5px 0}.job-identity{display:grid;grid-template-columns:145px minmax(0,1fr);gap:8px;margin:0}.job-identity dt{color:var(--text-secondary,#637187)}.job-identity dd{margin:0;overflow-wrap:anywhere}.job-actions{display:flex;flex-wrap:wrap;gap:10px}.job-picker{display:grid;gap:8px}.job-detail{display:grid;gap:12px}.job-detail h4{margin:8px 0}.job-candidates{list-style:none;padding:0;display:grid;gap:12px}.job-candidates li{border:1px solid var(--border-color,#e3e8ef);padding:12px;border-radius:8px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.job-candidates li>div{flex:1;min-width:180px;overflow-wrap:anywhere}.job-preview img{display:block;max-width:100%;max-height:480px;object-fit:contain;border:1px solid #dfe5ed;background:repeating-conic-gradient(#f1f3f6 0% 25%,#fff 0% 50%) 0/20px 20px}.job-preview h4{overflow-wrap:anywhere}@media(max-width:600px){.job-identity{grid-template-columns:1fr}.job-identity dd{margin-bottom:6px}}
 </style>
 
 <style scoped>.job-secondary{font-size:12px;color:var(--el-text-color-secondary)}.job-secondary>summary{cursor:pointer;margin-bottom:8px}.job-detail>h4{color:var(--el-text-color-primary)}.job-actions :deep(.el-button:first-child){font-weight:600}</style>

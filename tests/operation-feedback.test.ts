@@ -29,3 +29,7 @@ describe('operation feedback preserves request versus runtime facts',()=>{
   await wrapper.setProps({phase:'rejected'});expect(wrapper.text()).toBe('请求被拒绝')
  })
 })
+
+
+it('uses primary only for real pending work and never green for request receipt or unknown runtime',async()=>{wrapper=mount(OperationFeedback,{props:{phase:'sending',action:'start'},global:{plugins:[ElementPlus]}});expect(wrapper.get('.el-tag').classes()).toContain('el-tag--primary');await wrapper.setProps({phase:'acknowledged'});expect(wrapper.get('.el-tag').classes()).toContain('el-tag--info');expect(wrapper.attributes('aria-busy')).toBe('false');expect(wrapper.text()).not.toContain('已就绪')})
+it('distinguishes not observed from observed unknown',async()=>{wrapper=mount(ProjectStatusTag,{global:{plugins:[ElementPlus]}});expect(wrapper.text()).toBe('未读取');expect(wrapper.get('.el-tag').classes()).toContain('el-tag--info');await wrapper.setProps({status:{projectId:'p',state:'unknown',capabilityProfile:'unknown'}});expect(wrapper.text()).toContain('待核对');expect(wrapper.get('.el-tag').classes()).toContain('el-tag--warning')})

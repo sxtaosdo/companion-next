@@ -57,7 +57,7 @@ describe('Companion read UI and host identity',()=>{
  it('reads only after explicit connect and leaves missing runtime and counts unknown',async()=>{
   const p=fixture();registerCompanionBrowserProvider(p);await setup();await button('连接 Companion').trigger('click');await flushPromises()
   expect(wrapper!.findAll('.companion-project-card')).toHaveLength(2);const missing=wrapper!.findAll('.companion-project-card')[1]!
-  await missing.get('.project-expand').trigger('click');expect(missing.text()).toContain('未知');expect(missing.text()).toContain('调用：未记录');const detail=missing.findAllComponents({name:'InfoTip'}).find((t:VueWrapper)=> (t.props() as Record<string,unknown>).label==='工程详情')!;expect(detail.props('text')).toContain('当前 Creator：未读取；工程要求版本：3.8.8');expect(p.loadLogs).not.toHaveBeenCalled();expect(p.loadCalls).not.toHaveBeenCalled()
+  await missing.get('.project-expand').trigger('click');expect(missing.text()).toContain('未读取');expect(missing.text()).not.toContain('已停止');expect(missing.text()).toContain('调用：未记录');const detail=missing.findAllComponents({name:'InfoTip'}).find((t:VueWrapper)=> (t.props() as Record<string,unknown>).label==='工程详情')!;expect(detail.props('text')).toContain('当前 Creator：未读取；工程要求版本：3.8.8');expect(p.loadLogs).not.toHaveBeenCalled();expect(p.loadCalls).not.toHaveBeenCalled()
   expect(await tip('调用统计说明')).toContain('没有记录不推断为零')
  })
  it('opens tools help for the exact project without extra project or call reads',async()=>{const p=fixture();registerCompanionBrowserProvider(p);const {store,router}=await setup();await store.connect(p);await flushPromises();const reads=vi.mocked(p.loadProjects).mock.calls.length;await button('工具范围').trigger('click');await flushPromises();expect(router.currentRoute.value.path).toBe('/help');expect(router.currentRoute.value.query).toEqual({topic:'tools',project:'p1'});expect(p.loadProjects).toHaveBeenCalledTimes(reads);expect(p.loadCalls).not.toHaveBeenCalled()})
@@ -146,7 +146,7 @@ describe('Companion read UI and host identity',()=>{
  it('keeps important read failures persistently visible in compact form with full tooltip details',async()=>{
   const p=fixture(),warning='运行状态未取得：Bridge 请求失败，请核对原后台日志。';vi.mocked(p.loadProjects).mockResolvedValue({projects:[{id:'p1',name:'状态失败',path:'/p1'}],statuses:[],dashboard:[],warnings:[warning]})
   registerCompanionBrowserProvider(p);const {store}=await setup();await store.connect(p);await flushPromises()
-  expect(wrapper!.get('.compact-warning').text()).toBe('运行状态读取失败，请刷新重试。');expect(wrapper!.get('.companion-project-card').text()).toContain('未知');expect(wrapper!.text()).not.toContain('Bridge 请求失败')
+  expect(wrapper!.get('.compact-warning').text()).toBe('运行状态读取失败，请刷新重试。');expect(wrapper!.get('.companion-project-card').text()).toContain('未读取');expect(wrapper!.get('.companion-project-card').text()).not.toContain('已停止');expect(wrapper!.text()).not.toContain('Bridge 请求失败')
   expect(await tip('读取问题详情')).toBe(warning);await store.refreshProjects();await flushPromises();expect(wrapper!.get('.compact-warning').text()).toContain('运行状态读取失败')
  })
  it('retains actual connection errors instead of reducing them to transient success notices',async()=>{

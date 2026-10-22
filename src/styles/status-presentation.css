@@ -1,0 +1,9 @@
+/* Presentation only. Business state and observation ownership remain in their existing stores. */
+/* Element Plus blue palette is semantic activity; the existing purple brand remains unchanged. */
+:root{--companion-status-active:#337ecc;--companion-status-active-bg:#ecf5ff;--companion-status-active-border:#a0cfff}
+.companion-status-tag.el-tag--primary{--el-tag-text-color:var(--companion-status-active);--el-tag-bg-color:var(--companion-status-active-bg);--el-tag-border-color:var(--companion-status-active-border)}
+.companion-status-tag.el-tag{height:24px;max-width:100%;padding:0 8px;border-radius:5px;font-size:12px;font-weight:500;line-height:22px;vertical-align:middle;flex-shrink:0}
+.companion-status-tag.el-tag .el-tag__content{display:inline-flex;align-items:center;gap:6px;line-height:22px}
+.companion-status-tag .companion-status-icon{width:14px;height:14px;font-size:14px;margin:0;flex-shrink:0;vertical-align:middle}
+.companion-status-tag .companion-status-icon svg{width:14px;height:14px}
+@media(prefers-reduced-motion:reduce){.companion-status-tag .is-loading,.companion-status-tag .status-spin,.companion-status-tag .service-state-spin,.companion-status-tag .operation-feedback-spin{animation:none!important}}

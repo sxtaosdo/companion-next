@@ -42,7 +42,10 @@ function projectStates(value: unknown, requestedService?: LocalService): Knowled
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw Error('invalid-state')
   const raw = value as Record<string, unknown>, result: KnowledgeServiceStates = { warnings: [] }
   for (const service of requestedService ? [requestedService] : ['knowledge', 'model'] as const) {
-    if (!Object.hasOwn(raw, service)) { result.warnings.push(`${service === 'knowledge' ? '知识库服务' : '模型启动器'}状态未知，不能按已关闭处理。`); continue }
+    const prefix = service === 'knowledge' ? '知识库服务状态未知：[' : '模型启动器状态未知：['
+    const failures = Array.isArray(raw.warnings) ? raw.warnings.filter((message): message is string => typeof message === 'string' && message.startsWith(prefix)) : []
+    result.warnings.push(...failures)
+    if (!Object.hasOwn(raw, service)) { if (!failures.length) result.warnings.push(`${service === 'knowledge' ? '知识库服务' : '模型启动器'}状态未知，不能按已关闭处理。`); continue }
     const state = raw[service]
     if (!state || typeof state !== 'object' || Array.isArray(state)) throw Error('invalid-state')
     const row = state as Record<string, unknown>

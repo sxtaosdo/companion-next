@@ -52,3 +52,10 @@ describe('compact explicit knowledge question flow',()=>{
  it.each(['agent','sync'] as const)('keeps the %s pending fence even on forced send',async kind=>{const {p}=await setup();await question();const fence=kind==='agent'?knowledgeAgentPending:knowledgeSyncPending;fence.value=true;await nextTick();expect(button('发送').attributes('disabled')).toBeDefined();await button('发送').trigger('click');await flushPromises();expect(p.chat).not.toHaveBeenCalled();fence.value=false;await nextTick();await click('发送');expect(p.chat).toHaveBeenCalledTimes(1)})
 
 })
+
+describe('conversation status presentation',()=>{
+ it('animates only sending and renders a definite rejection as red without retry',async()=>{
+  const p=provider(),pending=deferred<KnowledgeConversationReply>();vi.mocked(p.chat).mockReturnValueOnce(pending.promise);await setup({provider:p});await send('状态测试');let tag=wrapper!.get('.conversation-turn .el-tag');expect(tag.classes()).toContain('el-tag--primary');expect(wrapper!.get('.conversation-turn .companion-status-icon').classes()).toContain('is-loading');
+  pending.reject(new KnowledgeConversationError('chat-unavailable','rejected'));await flushPromises();tag=wrapper!.get('.conversation-turn .el-tag');expect(tag.classes()).toContain('el-tag--danger');expect(wrapper!.get('.conversation-turn .companion-status-icon').classes()).not.toContain('is-loading');expect(wrapper!.find('.el-alert--error').exists()).toBe(true);expect(p.chat).toHaveBeenCalledOnce();
+ });
+});

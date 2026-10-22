@@ -2,7 +2,7 @@
 import { computed, onActivated, onBeforeUnmount, onDeactivated, ref, watch } from 'vue'
 import InfoTip from './InfoTip.vue'
 import OperationFeedback from './OperationFeedback.vue'
-import { Loading, CircleCheck, InfoFilled, Warning, Refresh, VideoPlay, SwitchButton } from '@element-plus/icons-vue'
+import { Loading, CircleCheck, CircleClose, Link, Minus, QuestionFilled, Refresh, VideoPlay, SwitchButton } from '@element-plus/icons-vue'
 import { useKnowledgeReadStore } from '../stores/knowledge-read'
 import { useRoute } from 'vue-router'
 import { knowledgeReadProvider } from '../knowledge-read-integration'
@@ -53,9 +53,16 @@ const modelAction=computed<LocalServiceAction|null>(()=>{
 })
 function serviceReading(service:LocalService) { return props.knowledgeOnly && service==='knowledge' ? knowledge.statusLoading : store.reading }
 function serviceState(service:LocalService) { return props.knowledgeOnly && service==='knowledge' ? knowledge.provider===knowledgeReadProvider.value ? knowledge.services?.knowledge : undefined : store.states?.[service] }
-function serviceFailed(service:LocalService) { return props.knowledgeOnly && service==='knowledge' ? !!knowledge.serviceError || !!knowledge.services?.warnings.some(w=>w.startsWith('知识服务状态未取到')) : readFailed.value }
-function stateLabel(service:LocalService) { return serviceReading(service)?'检查中':serviceFailed(service)?'读取失败':serviceState(service)?.running===true?'服务可达':serviceState(service)?.running===false?'服务不可达':'未检查' }
-function stateTone(service:LocalService) { return serviceReading(service)?'info':serviceFailed(service)?'danger':serviceState(service)?.running===true?'success':serviceState(service)?.running===false?'warning':'info' }
+function serviceFailed(service:LocalService) {
+ const shared=props.knowledgeOnly && service==='knowledge'
+ const messages=shared?knowledge.services?.warnings:store.states?.warnings
+ const prefixes=service==='model'?['模型启动器状态未知：[']:['知识库服务状态未知：[','知识服务状态未取到']
+ return (shared?!!knowledge.serviceError:readFailed.value) || !!messages?.some(message=>prefixes.some(prefix=>message.startsWith(prefix)))
+}
+function serviceUnknown(service:LocalService) { return !!(props.knowledgeOnly&&service==='knowledge'?knowledge.services:store.states)&&!serviceState(service)&&!serviceFailed(service) }
+function stateLabel(service:LocalService) { return serviceReading(service)?'读取中':serviceFailed(service)?'读取失败':serviceState(service)?.running===true?'服务可达':serviceState(service)?.running===false?'未连接':serviceUnknown(service)?'状态未知 · 待核对':'未读取' }
+function stateTone(service:LocalService) { return serviceReading(service)?'primary':serviceFailed(service)?'danger':serviceState(service)?.running===true?'success':serviceUnknown(service)?'warning':'info' }
+function stateIcon(service:LocalService) { return serviceReading(service)?Loading:serviceFailed(service)?CircleClose:serviceState(service)?.running===true?CircleCheck:serviceState(service)?.running===false?Link:serviceUnknown(service)?QuestionFilled:Minus }
 async function refreshStates() {
  if(props.knowledgeOnly && knowledgeReadProvider.value) await Promise.all([store.refresh(),knowledge.provider===knowledgeReadProvider.value?knowledge.refreshStatus():knowledge.connect(knowledgeReadProvider.value)])
  else await store.refresh()
@@ -71,7 +78,7 @@ onBeforeUnmount(() => { entryGeneration++; stopPendingProbe?.(); stopPendingProb
 <template>
   <section class="section-card local-service-controls" :class="{'model-service-controls':props.modelsOnly}" aria-label="本机服务控制">
     <div v-if="props.modelsOnly" class="model-status-bar" data-testid="model-service-status-bar">
-      <div class="model-status-title"><strong>模型服务</strong><el-tag size="small" :type="stateTone('model')" role="status" :aria-busy="serviceReading('model')"><el-icon :class="{'service-state-spin':serviceReading('model')}" aria-hidden="true"><Loading v-if="serviceReading('model')"/><Warning v-else-if="serviceFailed('model')||serviceState('model')?.running===false"/><CircleCheck v-else-if="serviceState('model')?.running"/><InfoFilled v-else/></el-icon>{{ stateLabel('model') }}</el-tag><InfoTip label="模型服务说明" text="此状态表示本机启动器是否可达。模型和 ComfyUI 操作仍在下方原面板完成；启动器可达不表示模型已加载，关闭启动器不等于终止已运行的模型。"/><OperationFeedback v-if="currentRecord('model')" :phase="currentRecord('model')!.status" :action="currentRecord('model')!.action" :message="currentRecord('model')!.message"/></div>
+      <div class="model-status-title"><strong>模型服务</strong><el-tag class="companion-status-tag" size="small" :type="stateTone('model')" role="status" :aria-busy="serviceReading('model')"><el-icon class="companion-status-icon" :class="{'is-loading':serviceReading('model')}" aria-hidden="true"><component :is="stateIcon('model')"/></el-icon>{{ stateLabel('model') }}</el-tag><InfoTip label="模型服务说明" text="此状态表示本机启动器是否可达。模型和 ComfyUI 操作仍在下方原面板完成；启动器可达不表示模型已加载，关闭启动器不等于终止已运行的模型。"/><OperationFeedback v-if="currentRecord('model')" :phase="currentRecord('model')!.status" :action="currentRecord('model')!.action" :message="currentRecord('model')!.message"/></div>
       <div class="model-status-actions"><el-button :icon="Refresh" :disabled="!store.canRead" :loading="store.reading" @click="refreshStates">读取当前服务状态</el-button><el-button v-if="modelAction" :type="modelAction==='start'?'primary':'warning'" :icon="modelAction==='start'?VideoPlay:SwitchButton" :loading="currentRecord('model')?.status==='sending'" :disabled="!store.canPrepare('model',modelAction)" @click="operateModel(modelAction)">{{ modelAction==='start'?'启动服务':'关闭服务' }}</el-button><el-button v-else disabled :icon="SwitchButton">{{ store.blockedUnknown?'待核对':'等待状态' }}</el-button></div>
     </div>
     <div v-else class="service-heading"><div class="service-title"><h3>{{ props.modelsOnly ? '模型服务' : '本机服务控制' }}</h3><InfoTip v-if="props.modelsOnly" label="模型服务说明" text="启动后显示原本机启动器，各模型和 ComfyUI 的操作仍在原面板完成。启动器可达不代表模型已就绪。关闭启动器不等于终止已运行的模型；切换 GPU 服务前请核对当前任务。"/></div><el-button :disabled="!store.canRead" :loading="store.reading" @click="refreshStates">读取当前服务状态</el-button></div>
@@ -80,7 +87,7 @@ onBeforeUnmount(() => { entryGeneration++; stopPendingProbe?.(); stopPendingProb
     <div v-if="!props.modelsOnly" class="service-grid">
       <article v-for="service in services" :key="service" class="service-card">
         <h4 v-if="!props.modelsOnly">{{ localServiceLabel(service) }}</h4>
-        <div class="service-observed-state"><el-tag :type="stateTone(service)" role="status" :aria-busy="serviceReading(service)"><el-icon :class="{'service-state-spin':serviceReading(service)}" aria-hidden="true"><Loading v-if="serviceReading(service)"/><Warning v-else-if="serviceFailed(service)||serviceState(service)?.running===false"/><CircleCheck v-else-if="serviceState(service)?.running"/><InfoFilled v-else/></el-icon>{{ stateLabel(service) }}</el-tag><OperationFeedback v-if="currentRecord(service)" :phase="currentRecord(service)!.status" :action="currentRecord(service)!.action" :message="currentRecord(service)!.message"/></div>
+        <div class="service-observed-state"><el-tag class="companion-status-tag" :type="stateTone(service)" role="status" :aria-busy="serviceReading(service)"><el-icon class="companion-status-icon" :class="{'is-loading':serviceReading(service)}" aria-hidden="true"><component :is="stateIcon(service)"/></el-icon>{{ stateLabel(service) }}</el-tag><OperationFeedback v-if="currentRecord(service)" :phase="currentRecord(service)!.status" :action="currentRecord(service)!.action" :message="currentRecord(service)!.message"/></div>
         <small v-if="props.knowledgeOnly && !store.states?.knowledge">启停前请读取当前服务状态。</small>
         <p v-if="service==='model' && !props.modelsOnly">{{ LOCAL_SERVICE_START_GAPS.model }}</p>
         <p v-if="service==='model' && !props.modelsOnly">这里只表示启动器是否可达，不代表模型已加载、Comfy 已连接或 GPU 已就绪。关闭启动器不等于终止已运行的模型。</p>
@@ -92,7 +99,7 @@ onBeforeUnmount(() => { entryGeneration++; stopPendingProbe?.(); stopPendingProb
       </article>
     </div>
     <p v-if="warnings.length" role="alert">{{ warnings.join('；') }}</p>
-    <el-alert v-if="store.error" type="warning" :closable="false" :title="store.error"/>
+    <el-alert v-if="store.error" :type="readFailed ? 'error' : store.blockedUnknown || receipt?.status==='unknown' ? 'warning' : 'error'" :closable="false" :title="store.error"/>
     <p v-if="store.transportPending" role="status">底层服务请求尚未结束，其他启停请求已阻止。停止等待或离开页面不会撤销后台操作。</p>
     <el-button v-if="store.busy" @click="store.cancel">{{ receipt?.action==='start'?'停止等待启动回执':'停止等待关闭回执' }}</el-button>
     <iframe v-if="canEmbedModel" class="model-service-frame" src="http://127.0.0.1:8090/" title="本地 AI 服务启动器" referrerpolicy="no-referrer"></iframe>
@@ -110,6 +117,6 @@ onBeforeUnmount(() => { entryGeneration++; stopPendingProbe?.(); stopPendingProb
   </section>
 </template>
 <style scoped>
-.local-service-controls.model-service-controls{margin-top:0}.model-status-bar{box-sizing:border-box;display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;background:#fff;border:1px solid #e2e7f0;border-radius:10px;box-shadow:0 2px 2px #1c304603;padding:14px;margin:0 0 18px}.model-status-title,.model-status-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.model-status-actions{margin-left:auto}.model-status-actions :deep(.el-button+.el-button){margin-left:0}.model-status-title :deep(.el-tag__content){display:inline-flex;align-items:center;gap:4px}.model-service-controls>.model-service-frame{margin-top:0}@media(max-width:640px){.model-status-actions{margin-left:0;width:100%}}
+.local-service-controls.model-service-controls{margin-top:0}.model-status-bar{box-sizing:border-box;display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;background:#fff;border:1px solid #e2e7f0;border-radius:10px;box-shadow:0 2px 2px #1c304603;padding:14px;margin:0 0 18px}.model-status-title,.model-status-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}.model-status-actions{margin-left:auto}.model-status-actions :deep(.el-button+.el-button){margin-left:0}.model-service-controls>.model-service-frame{margin-top:0}@media(max-width:640px){.model-status-actions{margin-left:0;width:100%}}
 .service-observed-state{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}.service-observed-state .el-icon{vertical-align:-2px;margin-right:5px}.service-state-spin{animation:service-state-spin 1s linear infinite}@keyframes service-state-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.service-state-spin{animation:none}}.knowledge-service-frame,.model-service-frame{display:block;width:100%;height:min(820px,calc(100vh - 220px));min-height:480px;border:1px solid var(--el-border-color);border-radius:8px;background:#fff;margin:12px 0}.local-service-controls{margin:16px 0}.local-service-controls p{line-height:1.7;overflow-wrap:anywhere}.service-title{display:flex;align-items:center;gap:6px}.service-title h3{margin:0}.service-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}.service-card{border:1px solid #e2e7ef;border-radius:8px;padding:14px;margin:12px 0}.service-card h4{margin:0}.service-receipt{margin:14px 0}.service-confirm{padding:16px;border:1px solid #eac88e;background:#fff9ef;border-radius:8px;margin:16px 0}.service-confirm .el-button{display:block;margin-top:12px}.local-service-controls :deep(.el-checkbox){height:auto;align-items:flex-start;max-width:100%}.local-service-controls :deep(.el-checkbox__label){white-space:normal;line-height:1.6}
 </style>

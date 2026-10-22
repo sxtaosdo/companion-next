@@ -12,6 +12,7 @@ import { useKnowledgeReadStore } from '../src/stores/knowledge-read'
 import { useWorkspaceStore } from '../src/stores/workspace'
 import { LocalServiceOperationError, type LocalServiceOperationsProvider, type LocalServiceOperationReply } from '../src/domain/local-service-operations'
 import { knowledgeFixture, deferred } from './knowledge-read-fixture'
+import { createKnowledgeReadProvider, type KnowledgeFetch } from '../src/adapters/knowledge-read'
 let wrapper: VueWrapper | undefined
 function provider(): LocalServiceOperationsProvider { return { label: 'OFFLINE STOP UI', run: vi.fn(async (input): Promise<LocalServiceOperationReply> => input.action === 'start' ? input.service === 'model' ? { service: 'model', action: 'start', state: { running: true } } : { service: 'knowledge', action: 'start', state: { running: true, frameable: false } } : input.service === 'model' ? { service: 'model', action: 'stop', state: { running: false } } : { service: 'knowledge', action: 'stop', state: { running: false, frameable: false } }), waitForIdle: vi.fn(async () => {}) } }
 async function setup(options: { p?: LocalServiceOperationsProvider | null; modelsOnly?: boolean; knowledgeOnly?: boolean; r?: ReturnType<typeof knowledgeFixture> } = {}) {
@@ -230,7 +231,7 @@ describe('shared knowledge observation and independent operation admission',()=>
   const shared=useKnowledgeReadStore(pinia);await shared.connect(r);await flushPromises()
   expect(wrapper!.text()).toContain('服务可达');expect(wrapper!.text()).not.toContain('当前状态未读取 / 未知')
   expect(store.states).toBeNull();expect(store.canPrepare('knowledge','stop')).toBe(false);expect(p.run).not.toHaveBeenCalled()
-  shared.disconnect();await flushPromises();expect(wrapper!.text()).toContain('未检查')
+  shared.disconnect();await flushPromises();expect(wrapper!.text()).toContain('未读取')
  })
 })
 
@@ -239,7 +240,7 @@ describe('knowledge control result reads back shared state',()=>{
   const {r,p}=await setup({knowledgeOnly:true});await click('读取当前服务状态');await click('核对关闭知识库服务');await check()
   vi.mocked(r.loadServiceStates).mockResolvedValue({knowledge:{running:false,frameable:false},warnings:[]})
   await click('确认并关闭这一次')
-  expect(p.run).toHaveBeenCalledOnce();expect(wrapper!.text()).toContain('服务不可达');expect(wrapper!.text()).toContain('已收到停止回执');expect(wrapper!.text()).not.toContain('服务可达')
+  expect(p.run).toHaveBeenCalledOnce();expect(wrapper!.text()).toContain('未连接');expect(wrapper!.text()).toContain('已收到停止回执');expect(wrapper!.text()).not.toContain('服务可达')
  })
 })
 
@@ -258,9 +259,9 @@ describe('compact original model service status bar',()=>{
   vi.mocked(r.loadServiceStates).mockReturnValueOnce(read.promise)
   const {p}=await setup({modelsOnly:true,r})
   let bar=wrapper!.get('[data-testid="model-service-status-bar"]')
-  expect(bar.text()).toContain('检查中');expect(bar.get('[role="status"]').attributes('aria-busy')).toBe('true');expect(button('等待状态').attributes('disabled')).toBeDefined()
+  expect(bar.text()).toContain('读取中');expect(bar.get('.el-tag').classes()).toContain('el-tag--primary');expect(bar.get('.companion-status-icon').classes()).toContain('is-loading');expect(bar.get('[role="status"]').attributes('aria-busy')).toBe('true');expect(button('等待状态').attributes('disabled')).toBeDefined()
   read.resolve({warnings:[]});await flushPromises();bar=wrapper!.get('[data-testid="model-service-status-bar"]')
-  expect(bar.text()).toContain('未检查');expect(bar.text()).not.toContain('关闭服务');expect(bar.get('[role="status"]').attributes('aria-busy')).toBe('false')
+  expect(bar.text()).toContain('状态未知 · 待核对');expect(bar.get('.el-tag').classes()).toContain('el-tag--warning');expect(bar.text()).not.toContain('关闭服务');expect(bar.get('[role="status"]').attributes('aria-busy')).toBe('false')
   expect(p.run).not.toHaveBeenCalled()
  })
  it('keeps the start action visible and loading through dispatch then blocks unknown without confirmation or replay',async()=>{
@@ -272,5 +273,45 @@ describe('compact original model service status bar',()=>{
   expect(wrapper!.find('.service-confirm').exists()).toBe(false);await click('停止等待启动回执')
   expect(wrapper!.text()).toContain('结果未知，待核对');expect(button('待核对').attributes('disabled')).toBeDefined()
   result.resolve({service:'model',action:'start',state:{running:true}});await flushPromises();expect(p.run).toHaveBeenCalledOnce()
+ })
+})
+
+describe('unified local service state presentation',()=>{
+ it('shows a negative probe as neutral unconnected without claiming stopped',async()=>{
+  const r=knowledgeFixture();vi.mocked(r.loadServiceStates).mockResolvedValue({model:{running:false},warnings:[]});const {p}=await setup({modelsOnly:true,r});const bar=wrapper!.get('[data-testid="model-service-status-bar"]');expect(bar.get('.companion-status-tag').text()).toBe('未连接');expect(bar.get('.el-tag').classes()).toContain('el-tag--info');expect(bar.get('.companion-status-icon').classes()).not.toContain('is-loading');expect(bar.text()).not.toContain('已停止');expect(p.run).not.toHaveBeenCalled();
+ });
+ it('uses red for a definite read failure while preserving retry and not dispatching',async()=>{
+  const r=knowledgeFixture();vi.mocked(r.loadServiceStates).mockRejectedValue(Error('isolated read error'));const {p}=await setup({modelsOnly:true,r});const bar=wrapper!.get('[data-testid="model-service-status-bar"]');expect(bar.get('.companion-status-tag').text()).toBe('读取失败');expect(bar.get('.el-tag').classes()).toContain('el-tag--danger');expect(bar.get('.companion-status-icon').classes()).not.toContain('is-loading');expect(wrapper!.find('.el-alert--error').exists()).toBe(true);expect(button('读取当前服务状态').attributes('disabled')).toBeUndefined();expect(p.run).not.toHaveBeenCalled();
+ });
+});
+
+
+describe('service-specific adapter read failures',()=>{
+ it.each([
+  {name:'HTTP 503',status:503,body:{error:'isolated upstream error'},code:'http-error'},
+  {name:'business failure',status:200,body:{success:false,error:'isolated business error'},code:'invalid-shape'},
+ ])('shows $name as a red read failure when the adapter returns warnings',async({status,body,code})=>{
+  const fetcher=vi.fn<KnowledgeFetch>(async()=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json'}}))
+  const r=createKnowledgeReadProvider({fetch:fetcher}),{p,store}=await setup({modelsOnly:true,r})
+  expect(fetcher).toHaveBeenCalledOnce();expect(fetcher.mock.calls[0]![0]).toBe('/api/model-service/status')
+  expect(store.error).toBe('');expect(store.states?.warnings.join(' ')).toContain(`[${code}]`)
+  const bar=wrapper!.get('[data-testid="model-service-status-bar"]')
+  expect(bar.get('.companion-status-tag').text()).toBe('读取失败');expect(bar.get('.el-tag').classes()).toContain('el-tag--danger')
+  expect(bar.get('.companion-status-icon').classes()).not.toContain('is-loading');expect(bar.text()).not.toContain('已停止');expect(bar.text()).not.toContain('未连接')
+  expect(button('读取当前服务状态').attributes('disabled')).toBeUndefined();expect(p.run).not.toHaveBeenCalled()
+  await flushPromises();expect(fetcher).toHaveBeenCalledOnce()
+  await click('读取当前服务状态');expect(fetcher).toHaveBeenCalledTimes(2);expect(p.run).not.toHaveBeenCalled()
+ })
+ it('does not turn a missing model observation into failure because another service failed',async()=>{
+  const r=knowledgeFixture();vi.mocked(r.loadServiceStates).mockResolvedValue({warnings:['知识库服务状态未知：[http-error]；不能据此判定已停止。']})
+  const {p}=await setup({modelsOnly:true,r}),bar=wrapper!.get('[data-testid="model-service-status-bar"]')
+  expect(bar.get('.companion-status-tag').text()).toBe('状态未知 · 待核对');expect(bar.get('.el-tag').classes()).toContain('el-tag--warning')
+  expect(p.run).not.toHaveBeenCalled();expect(r.loadServiceStates).toHaveBeenCalledOnce()
+ })
+ it('recognizes the current knowledge service error prefix in the shared observation',async()=>{
+  const r=knowledgeFixture();vi.mocked(r.loadServiceStates).mockResolvedValue({warnings:['知识库服务状态未知：[http-error]；不能据此判定已停止。']})
+  const {p,pinia}=await setup({knowledgeOnly:true,r});await useKnowledgeReadStore(pinia).connect(r);await flushPromises()
+  expect(wrapper!.get('.service-observed-state .companion-status-tag').text()).toBe('读取失败')
+  expect(wrapper!.get('.service-observed-state .el-tag').classes()).toContain('el-tag--danger');expect(p.run).not.toHaveBeenCalled()
  })
 })
