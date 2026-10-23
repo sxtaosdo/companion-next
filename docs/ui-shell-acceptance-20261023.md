@@ -72,3 +72,13 @@
 透明导出复用原Pillow路径，源图和成品均检查实际alpha；RGB/全opaque RGBA报IMAGE_TRANSPARENCY_REQUIRED，全透明报IMAGE_CONTENT_EMPTY，文件与成功回执写入前失败。前端只把已证明HTTP400的两码当确定拒绝，其他未知故障仍保留UNKNOWN，不自动重发。
 
 当前本批前端273/273、构建和类型通过；构建只读渲染22项通过，模拟缺规范新建16项通过（明确是fixture，不是现场保存）；实际CPU透明图片23/23与适配器2/2已过。证据及备份在 `C:/Users/33272/Documents/Codex/2026-10-17/task/art-four-steps-20261023/`；部署结果待核实后补，不能以构建冒充生效。
+
+### 四步规范实际交付
+
+- 当前同一32180已生效：前端 **1.3.189** / 构建 **5772f7e3+working**；后端 **0.3.149** / 构建 **23bbb63c6786-a7e681ba6cc2**。代码检查点 Next5772f7e、宿主23bbb63，未推送。
+- 完成备份与预检后正常停止旧PID30852，确认释放端口再替换12文件；原npm入口启动现PID **10476 / OPEN**，9工程全部保留，认证仍PID23848/18001/0.1.0.25，无账号、权限、会话策略或全局映射变更。启动包装器再次先超时报LOCAL_START_FAILED，实际进程随后监听；只读取证，没有重复启动或强杀。
+- 最终前端 **350/350**（本批273+导航静默77），宿主与认证 **80/80**，Next构建/类型及宿主类型通过。实际Pillow覆盖透明成功、无alpha失败、空图失败及旧不透明兼容；不是GPU生成测试。
+- 实际32180旧规范编辑渲染 **22/22**，实际ant-cook无规范的新建内存草稿渲染 **16/16**，无mock、无业务写入/页面异常；另保留先前隔离fixture16项。核对四步、只读身份、2D/3D选择、真实默认目录、分类跳过、保存按钮可达、返回/关闭草稿、375px布局。所有现场浏览器都阻止POST，不点击保存，不改正式规范。6份实际HTTP静态SHA256一致。
+- ant-cook与e2e的规范读取实际HTTP200并返回unlinked/NO_PROJECT_ASSOCIATION；前者尚无规范，后者已有规范。没有把空来源视为明确排除，没有自动关联P0001。明确不适用及已继承分支以可信metadata单元合同验证，不伪称现场已有该映射。
+- 证据 `art-four-steps-20261023/{live-state,live-render,live-new-draft-render,live-inheritance,http-hashes,front-tests,shell-tests,host-tests}.json`；备份before-installed、before-data与deployment-plan。SQLite在线备份integrity_check=ok，无迁移或清历史；恢复需正常停同一服务后按原哈希恢复精确文件，保留后续新改动。
+- 未实施新需求表/规格模板、UI人物或3D模型生成、参考图入模；未运行Creator/GPU或读取密码，未重启Windows/新增后台/上传截图。后续原型必须标示模拟，不写本次真实业务库。
