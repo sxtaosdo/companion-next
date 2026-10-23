@@ -338,3 +338,7 @@ P4000接口还明确继承2049—2099时间范围、八层世界骨架、主要N
 ### 验收与证据
 
 本机task/art-wizard-20261023保留修改前检查点、83项规范domain/editor/adapter/panel回归、构建及渲染/HTTP证据（完成后补实际版本）。未修改任何正式工程规范或运行Creator/模型。
+
+本批实际已交付：前端v1.3.187，构建9b9337b2+working；后端仍v0.3.147，同一32180、PID1692/OPEN，9工程保留。83/83规范回归、前端类型检查及构建通过；部署前构建渲染14/14、部署后真实渲染14/14通过，desktop与375px已人工查看；6个实际HTTP静态文件SHA256一致。左侧竖向步骤、未来正文门控、必填/可选、各字段问号键盘焦点与Esc、前后返回草稿均覆盖。没有保存正式工程规范、启动Creator/模型或执行密码操作，也没有重启宿主。
+
+源码检查点9b9337b；证据task/art-wizard-20261023/tests.json、built-render.json、live-render.json、http-hashes.json、final-static-hashes.json、live-state.json。原静态文件备份before-static-final；回滚只恢复该目录对应原索引/文件，不动规范数据或运行进程。字段精简/移动与schema变化仍待确认，未随本批实施。
