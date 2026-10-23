@@ -310,3 +310,31 @@ P4000接口还明确继承2049—2099时间范围、八层世界骨架、主要N
 备份 `C:/Users/33272/Documents/Codex/2026-10-17/task/art-ui-controls-20261022/before182-static` 校验完整，全部旧资源/登录文件保留；仅恢复备份 index.html 即可切回旧静态入口。无需重启宿主或改工程数据。
 
 验收：刷新原页面，检查规范/任务按钮随真实数据显隐；打开规范核对只读名称引擎、设计画布四选项和内容提示；核对三步顶部进度、返回保留及统一的前端/后端/构建格式。全站状态样式仅完成只读审计，未实施。
+
+
+## 2026-10-23 规范弹窗字段评估与明确批准的交互调整
+
+### 已核实的字段职责
+
+- 项目内容(project.content)：非空必填，作为生成请求visualSpec的项目背景。不是分类提示词的替代。
+- 项目适用说明(inheritance.reason)：仅在mode=none时由schema要求非空，记录不继承的范围决策；未发现其直接进入生成提示词。不能只在UI取消必填而使保存失败。
+- 项目通用要求(overrides)：差异层，创建时允许空对象。生成解析按全局默认/锁定→项目→分类→单项叠加，未锁定值可覆盖。
+- 素材分类(categories)：创建时允许空对象，不要求五类全填；生成时才校验各类的subject/purpose/identity/state等字段及尺寸、透明、输出目录。保存配置不代表该类生成已接通。
+- paddingPercent：旧图标配置composition字段的0–40构图留白提示，用于图标prompt；非全项目UI布局留白。新schema可保存该可选默认，但当前实际已接通生成仍为icon。
+
+来源：src/domain/project-art-spec.ts 的parseProjectArtSpec/resolveArtGenerationInput，src/domain/ai-task-creation.ts的visualSpec绑定，旧宿主icon-resource-config.ts。
+
+### 本轮已批准并实施
+
+只改前端显示：顶部横向进度改左侧Element Plus竖向单进度，移除重复timeline；每项复用InfoTip给用途/影响/示例，标注必填、可选或自动带入。既有项目名引擎只读、设计画布预设、草稿、已存文件、全局固定版本与锁定、未知写入恢复保持原合同。隔离测试验证仅必要字段加inheritance.reason即可保存并读回，overrides/categories可空，不生成假分类。
+
+### 字段精简建议：待用户确认，不在本批实施
+
+1. 保留项目内容、设计画布及继承决策为创建核心。
+2. 将项目通用参数、分类差异按可选高级内容收起，或放到资源规划填写；创建时不强迫填满，不自动生成分类。
+3. 将留白参数移动到图标规划/图标高级构图；先兼容旧项目默认值，不能直接删字段。
+4. inheritance.reason若要从必填改为可选，需统一前后端共享schema、旧文件兼容与审计含义；不写虚假默认理由。本轮仅解释并保留现必填。
+
+### 验收与证据
+
+本机task/art-wizard-20261023保留修改前检查点、83项规范domain/editor/adapter/panel回归、构建及渲染/HTTP证据（完成后补实际版本）。未修改任何正式工程规范或运行Creator/模型。
