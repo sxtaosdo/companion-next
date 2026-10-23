@@ -24,7 +24,7 @@ describe('knowledge secondary navigation and visit lifetime',()=>{
   ])('deep links to %s with one active child and no project context',async(path,title)=>{
     const fetch=vi.fn();vi.stubGlobal('fetch',fetch)
     const {router}=await setup(path!)
-    expect(wrapper!.get('.page-heading h1').text()).toBe(title)
+    expect(wrapper!.get('.main-content h1').text()).toBe(title)
     expect(wrapper!.get('.knowledge-nav-toggle').attributes('aria-expanded')).toBe('true')
     const children=wrapper!.findAll('.knowledge-nav-child')
     expect(children.map(link=>link.text())).toEqual(['检索与文档','问答','连接与同步'])
@@ -51,14 +51,14 @@ describe('knowledge secondary navigation and visit lifetime',()=>{
   })
   it('keeps the legacy models root separate and ignores unknown old query tabs on read',async()=>{
     const {router}=await setup('/knowledge?tab=models&filter=local#status')
-    expect(wrapper!.get('.page-heading h1').text()).toBe('模型服务')
+    expect(wrapper!.get('.main-content h1').text()).toBe('模型服务')
     expect(wrapper!.find('.knowledge-connect').exists()).toBe(false)
     expect(wrapper!.get('.nav-item[aria-current="page"]').text()).toBe('模型服务')
     await router.push('/knowledge?tab=historical');await flushPromises()
-    expect(wrapper!.get('.page-heading h1').text()).toBe('检索与文档')
+    expect(wrapper!.get('.main-content h1').text()).toBe('检索与文档')
     expect(router.currentRoute.value.query.tab).toBe('historical')
     await router.push('/knowledge/manage?tab=models');await flushPromises()
-    expect(wrapper!.get('.page-heading h1').text()).toBe('连接与同步')
+    expect(wrapper!.get('.main-content h1').text()).toBe('连接与同步')
     expect(wrapper!.find('.knowledge-manage-workspace').exists()).toBe(true)
   })
   it('tracks native back/forward and reopens a collapsed knowledge section on child navigation',async()=>{

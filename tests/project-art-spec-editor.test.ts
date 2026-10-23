@@ -127,3 +127,11 @@ describe('project art editor real-provider boundary', () => {
     expect(store.errors.join()).toContain('LOCKED_OVERRIDE'); expect(store.canSave).toBe(false)
   })
 })
+
+
+describe('optional explanation exact write and recovery binding',()=>{
+ it.each([undefined,'','Existing explanation'])('saves, reads and recovers explanation %s without canonical drift',async(reason)=>{
+  const {store,host}=await setup();store.draft!.inheritance={mode:'none',...(reason===undefined?{}:{reason})};store.touch();store.confirmed=true;expect(store.errors).toEqual([]);await store.save();expect(store.phase).toBe('saved');const saved=structuredClone(JSON.parse(JSON.stringify(store.base!))) as ProjectArtSpec;expect(saved.inheritance).toEqual({mode:'none',...(reason===undefined?{}:{reason})});host.read=vi.fn(async()=>receipt(saved,'b'.repeat(64)));await store.read();expect(store.base!.inheritance).toEqual(saved.inheritance);
+  store.draft!.project.content='Second local edit';store.touch();store.confirmed=true;let completed!:ProjectArtSpecReceipt;host.save=vi.fn(async(binding,input)=>{completed={...receipt({...input.config,version:3},'c'.repeat(64)),operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed'}};throw new ProjectArtSpecWriteError('unknown')});await store.save();expect(store.phase).toBe('unknown');const frozen=pendingArtWrite(context,host)!;host.status=vi.fn(async()=>({schemaVersion:'project-art-write-v1' as const,projectId:context.projectId,projectPath:context.projectPath,operationId:frozen.input.operationId,bindingHash:frozen.bindingHash,state:'completed' as const,receipt:completed}));await store.recover();expect(store.phase).toBe('saved');expect(store.base!.inheritance).toEqual(saved.inheritance);expect(host.save).toHaveBeenCalledOnce();
+ })
+})

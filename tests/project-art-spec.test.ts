@@ -164,3 +164,10 @@ describe('project art specification boundary', () => {
     rejects('PROJECT_MISMATCH', () => parseProjectArtSpec({ ...v2, projectId: 'ffffffffffffffff' }, projectId))
   })
 })
+
+
+describe('optional independent-project explanation contract',()=>{
+ it.each([undefined,'','Explicit existing owner explanation'])('round-trips explanation %s without inventing or normalizing it',reason=>{const c=spec();c.inheritance={mode:'none',...(reason===undefined?{}:{reason})};const parsed=parseProjectArtSpec(JSON.parse(JSON.stringify(c)),projectId);expect(parsed.kind).toBe('project');if(parsed.kind!=='project')throw Error('unexpected legacy');expect(parsed.spec.inheritance).toEqual(c.inheritance);expect(Object.hasOwn(parsed.spec.inheritance,'reason')).toBe(reason!==undefined);expect(resolve(c).readyForGeneration).toBe(true);expect(resolve(c).values).toEqual(resolve(spec()).values)})
+ it.each([null,42,false,' ',' leading','trailing ','bad\u0001text'])('does not treat malformed explanation %j as an optional omission',reason=>{const c=spec();Object.assign(c,{inheritance:{mode:'none',reason}});rejects('INVALID_CONFIG',()=>parseProjectArtSpec(c,projectId))})
+ it('retains strict Canon use and required generation values without an independent explanation',()=>{const c=spec();c.inheritance={mode:'none'};delete c.overrides.width;rejects('REQUIRED_FIELD',()=>resolve(c));const pinned=inherited();if(pinned.inheritance.mode==='canon')delete pinned.inheritance.usage;rejects('SOURCE_USAGE_OUT_OF_SCOPE',()=>resolve(pinned,asset(),[authority()]))})
+})

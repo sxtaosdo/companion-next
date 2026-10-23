@@ -5,7 +5,7 @@ import { decodeAiJobSnapshot, decodeAiJobsView, isAiJobId } from './ai-jobs-read
 import type { AiJobSnapshot, AiJobsView } from './ai-jobs-read'
 
 /** The original UI creates one asset. The deployed protocol allows two, but this form does not. */
-export interface AiTaskBrief { name: string; assetId: string; purpose: string; prompt: string; sourceId: string }
+export interface AiTaskBrief { name: string; assetId: string; purpose: string; prompt: string; sourceId: string; paddingPercent?: string }
 export interface AiTaskRequest {
   schemaVersion: 'local-icon-requests-v1'; projectId: string; runId: string; sourceRevision: string; visualSpec: string
   assets: [{ assetId: string; relativePath: string; prompt: string; purpose: string; required: true }]
@@ -76,6 +76,7 @@ export function savedAiTaskConfig(value: AiResourceView, projectId: string): AiR
   return view.config
 }
 export function buildAiTaskSubmission(brief: AiTaskBrief, resource: AiResourceView, history: AiJobsView, runId = newAiTaskRunId()): AiLegacyTaskCreationSubmission {
+  if (brief.paddingPercent?.trim()) throw fail()
   const config = savedAiTaskConfig(resource, resource.projectId), jobs = decodeAiJobsView(history, resource.projectId)
   if (!asset.test(brief.name.trim()) || !asset.test(brief.assetId.trim()) || reserved.test(brief.assetId.trim()) || aiTaskHistoryBlocked(jobs) || jobs.jobs.some(job => job.jobId === runId)) throw fail()
   const selected = brief.sourceId ? jobs.adoptionSources?.find(source => source.sourceId === brief.sourceId) : undefined
@@ -138,12 +139,19 @@ export async function decodeAiTaskCreationResponse(value: unknown, submission: A
   catch { throw new AiTaskCreationError('invalid-shape') }
 }
 
+/** Shared planning preview and submitted asset input; saved specs remain unchanged. */
+export function artTaskAssetInput(brief:AiTaskBrief, preview=false):ArtAssetInput & {category:'icon'} {
+  const fallback=preview?'preview':''
+  const padding=brief.paddingPercent?.trim()
+  if(padding && (!/^\d+$/.test(padding)||Number(padding)>40))throw fail()
+  return {assetId:brief.assetId.trim()||fallback,category:'icon',prompt:brief.prompt.trim()||fallback,overrides:{subject:brief.prompt.trim()||fallback,purpose:brief.purpose.trim()||fallback,...(padding?{paddingPercent:Number(padding)}:{})},references:[]}
+}
 /** New single-authority path. Authorities are read from the host; never sent as an authority claim. */
 export function buildArtTaskSubmission(brief: AiTaskBrief, config: ProjectArtSpec, hash: string, authorities: readonly ArtAuthority[], history: AiJobsView, runId = newAiTaskRunId()): AiTaskCreationSubmission {
   const jobs=decodeAiJobsView(history,config.projectId), selected=brief.sourceId ? jobs.adoptionSources?.find(s=>s.sourceId===brief.sourceId) : undefined
   if (!asset.test(brief.name.trim()) || aiTaskHistoryBlocked(jobs) || jobs.jobs.some(j=>j.jobId===runId) || brief.sourceId && !selected || !selected && jobs.mode==='offline_import_only') throw fail()
-  const metadata:AiTaskArtMetadata={assetId:brief.assetId.trim(),category:'icon',overrides:{subject:brief.prompt.trim(),purpose:brief.purpose.trim()},references:[]}
-  const resolved=resolveArtGenerationInput(config,{...metadata,prompt:brief.prompt.trim()},authorities,{categories:['icon'],imageReferenceInput:false})
+  const {prompt:assetPrompt,...metadata}=artTaskAssetInput(brief)
+  const resolved=resolveArtGenerationInput(config,{...metadata,prompt:assetPrompt},authorities,{categories:['icon'],imageReferenceInput:false})
   if (!resolved.readyForGeneration) throw fail('image-reference-unsupported')
   return validateArtTaskSubmission(config.projectId,{operation:selected?'adopt':'enqueue',savedConfig:config,authorities:[...authorities],profileId:jobs.profile.id,sourceSha256:selected?.fileSha256??null,input:{request:{schemaVersion:'local-icon-requests-v1',projectId:config.projectId,runId,sourceRevision:jobs.sourceRevision,visualSpec:config.project.content,assets:[{assetId:metadata.assetId,relativePath:resolved.values.destination+'/'+metadata.assetId+'.png',prompt:brief.prompt.trim(),purpose:brief.purpose.trim(),required:true}]},artBinding:{version:config.version,hash},artAssets:[metadata],approved:true,...(selected?{sourceId:selected.sourceId}:{})}})
 }

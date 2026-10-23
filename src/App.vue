@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { safeCompanionReturnTo } from './domain/companion-session-recovery'
 import type { LocationQueryValue, RouteLocationNormalizedLoaded } from 'vue-router'
-import { ArrowDown, ArrowLeft, Refresh, Close, Menu } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowLeft, Refresh, Close, Menu, Fold, Expand, DataBoard, FolderOpened, Reading, Monitor, Picture } from '@element-plus/icons-vue'
 import { useWorkspaceStore } from './stores/workspace'
 import { liveProvider } from './integration'
 import { companionBrowserProvider } from './companion-browser-integration'
@@ -18,6 +18,7 @@ import {productVersionReadProvider} from './product-version-integration'
 import CompanionUserMenu from './components/CompanionUserMenu.vue'
 import ShellBreadcrumb from './components/ShellBreadcrumb.vue'
 import ShellRouteTabs from './components/ShellRouteTabs.vue'
+import CompanionDevTools from './components/CompanionDevTools.vue'
 import ArtWorkspaceView from './views/ArtWorkspaceView.vue'
 import { knowledgeNavigation, knowledgePageFor } from './domain/knowledge-navigation'
 const backendVersionInformation=useProductVersionStore()
@@ -25,7 +26,23 @@ watch(productVersionReadProvider,()=>{void backendVersionInformation.read()},{im
 const store = useWorkspaceStore()
 const route = useRoute()
 const router = useRouter()
+// Fold interaction follows Cool-admin 8.x app.fold/topbar/slider (MIT; see login/COOL-ADMIN-LICENSE.txt).
+// Keep the existing RouterLinks and session/cache system; persist only this display preference.
 const menuOpen = ref(false)
+const narrowNavigation = ref(window.innerWidth <= 760)
+const sidebarCollapsed = ref(false)
+try { sidebarCollapsed.value = localStorage.getItem('companion.navigation.collapsed') === 'true' } catch { /* optional display preference */ }
+const navigationCollapsed = computed(() => sidebarCollapsed.value && !narrowNavigation.value)
+const knowledgePopover = ref(false)
+function updateNavigationWidth() { narrowNavigation.value = window.innerWidth <= 760; knowledgePopover.value = false }
+window.addEventListener('resize', updateNavigationWidth)
+onBeforeUnmount(() => window.removeEventListener('resize', updateNavigationWidth))
+function toggleNavigation() {
+  if (narrowNavigation.value) { menuOpen.value = !menuOpen.value; return }
+  sidebarCollapsed.value = !sidebarCollapsed.value
+  knowledgePopover.value = false
+  try { localStorage.setItem('companion.navigation.collapsed', String(sidebarCollapsed.value)) } catch { /* optional display preference */ }
+}
 const loggingOut = ref(false)
 async function logoutBrowserSession() {
   if (loggingOut.value) return
@@ -69,10 +86,10 @@ function selectRegisteredProject(id: string) {
 }
 // Group only navigation; each art page keeps its existing route and business flow.
 const nav = [
-  { path: '/overview', label: '看板' },
-  { path: '/projects', label: '工程' },
-  { path: '/knowledge', label: '知识库' },
-  { path: '/knowledge?tab=models', label: '模型服务' },
+  { path: '/overview', label: '看板', icon: DataBoard },
+  { path: '/projects', label: '工程', icon: FolderOpened },
+  { path: '/knowledge', label: '知识库', icon: Reading },
+  { path: '/knowledge?tab=models', label: '模型服务', icon: Monitor },
 ]
 const knowledgeExpanded = ref(false)
 const knowledgeActive = computed(() => Boolean(knowledgePageFor(route)))
@@ -92,6 +109,7 @@ function titleFor(target: Pick<RouteLocationNormalizedLoaded, 'path' | 'query' |
   return target.path === '/projects' ? '工程' : target.path === '/ai-icons' ? 'AI 图标' : target.path === '/knowledge' && target.query.tab === 'models' ? '模型服务' : String(target.meta.title ?? '页面')
 }
 const pageTitle = computed(() => titleFor(route))
+const compactPageHeading = computed(() => route.path === '/art-resources' || knowledgeCached.value || route.path === '/services')
 // Only entries observed by this mounted app can authorize a browser-history return.
 // A deep link/reload must never follow a previous tab entry out of Companion.
 const visitedRoutes = new Map<number, string>()
@@ -113,6 +131,7 @@ recordRoute(route.fullPath)
 const removeNavigationHook = router.afterEach((to, _from, failure) => {
   returning.value = false
   menuOpen.value = false
+  knowledgePopover.value = false
   if (!failure) recordRoute(to.fullPath)
 })
 const removeErrorHook = router.onError(() => { returning.value = false })
@@ -146,33 +165,38 @@ const dateLabel = computed(() => {
 })
 </script>
 <template>
-  <div class="app-shell">
+  <div class="app-shell" :class="{ 'navigation-collapsed': navigationCollapsed }">
     <button v-if="menuOpen" class="sidebar-scrim" aria-label="关闭导航" @click="menuOpen = false"></button>
-    <aside class="sidebar" :class="{ 'is-open': menuOpen }">
-      <RouterLink to="/about" class="brand" aria-label="关于 Companion" @click="menuOpen = false"><span class="brand-mark">C</span><span>Companion</span></RouterLink>
+    <aside class="sidebar" :class="{ 'is-open': menuOpen, 'is-collapsed': navigationCollapsed }">
+      <RouterLink to="/about" class="brand" aria-label="关于 Companion" @click="menuOpen = false"><span class="brand-mark">C</span><span v-show="!navigationCollapsed">Companion</span></RouterLink>
       <nav class="nav-list" aria-label="主导航">
         <template v-for="item in nav" :key="item.path">
           <div v-if="item.path === '/knowledge'" class="knowledge-nav-group">
-            <button class="nav-item knowledge-nav-toggle" type="button" :aria-expanded="knowledgeExpanded" aria-controls="knowledge-navigation" @click="knowledgeExpanded = !knowledgeExpanded"><span>知识库</span><el-icon aria-hidden="true" :class="{ 'is-expanded': knowledgeExpanded }"><ArrowDown/></el-icon></button>
+            <el-popover v-if="navigationCollapsed" :visible="knowledgePopover" :show-after="0" :hide-after="0" placement="right-start" trigger="click" :width="190" popper-class="collapsed-knowledge-menu">
+              <template #reference><button class="nav-item knowledge-nav-toggle" type="button" :class="{'is-active':knowledgeActive}" :aria-expanded="knowledgePopover" aria-label="知识库" title="知识库" @click="knowledgePopover = !knowledgePopover"><el-icon aria-hidden="true"><Reading/></el-icon></button></template>
+              <nav aria-label="知识库子导航"><RouterLink v-for="child in knowledgeNavigation" :key="child.path" :to="child.path" class="collapsed-knowledge-link" :aria-current="isNavActive(child.path) ? 'page' : undefined">{{ child.label }}</RouterLink></nav>
+            </el-popover>
+            <template v-else><button class="nav-item knowledge-nav-toggle" type="button" :aria-expanded="knowledgeExpanded" aria-controls="knowledge-navigation" @click="knowledgeExpanded = !knowledgeExpanded"><el-icon class="navigation-icon" aria-hidden="true"><Reading/></el-icon><span class="navigation-label">知识库</span><el-icon class="navigation-chevron" aria-hidden="true" :class="{ 'is-expanded': knowledgeExpanded }"><ArrowDown/></el-icon></button>
             <div v-show="knowledgeExpanded" id="knowledge-navigation" class="knowledge-nav-children">
               <RouterLink v-for="child in knowledgeNavigation" :key="child.path" :to="child.path" class="nav-item knowledge-nav-child" :class="{ 'is-active': isNavActive(child.path) }" active-class="" :aria-current="isNavActive(child.path) ? 'page' : undefined" @click="menuOpen = false">{{ child.label }}</RouterLink>
-            </div>
+            </div></template>
           </div>
-          <RouterLink v-else :to="projectLink(item.path)" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><span>{{ item.label }}</span></RouterLink>
-          <RouterLink v-if="item.path === '/projects'" :to="projectLink('/art-resources')" class="nav-item" :class="{'is-active':route.path==='/art-resources'}" :aria-current="route.path==='/art-resources'?'page':undefined" @click="menuOpen=false">美术资源</RouterLink>
+          <RouterLink v-else :to="projectLink(item.path)" :title="navigationCollapsed ? item.label : undefined" :aria-label="item.label" class="nav-item" :class="{ 'is-active': isNavActive(item.path) }" active-class="" :aria-current="isNavActive(item.path) ? 'page' : undefined" @click="menuOpen = false"><el-icon class="navigation-icon" aria-hidden="true"><component :is="item.icon"/></el-icon><span v-show="!navigationCollapsed">{{ item.label }}</span></RouterLink>
+          <RouterLink v-if="item.path === '/projects'" :to="projectLink('/art-resources')" class="nav-item" :class="{'is-active':route.path==='/art-resources'}" :aria-current="route.path==='/art-resources'?'page':undefined" @click="menuOpen=false" aria-label="美术资源" :title="navigationCollapsed ? '美术资源' : undefined"><el-icon class="navigation-icon" aria-hidden="true"><Picture/></el-icon><span v-show="!navigationCollapsed">美术资源</span></RouterLink>
         </template>
       </nav>
 
-      <div class="sidebar-footer"><div>前端 v{{ frontendIdentity.version }}</div><div v-if="frontendBuildIdentity!=='unavailable'" class="frontend-build" title="源码构建标识，与产品版本分别记录">构建 {{ frontendBuildIdentity }}</div><div class="backend-version" :title="backendVersionInformation.detail">后端 {{ backendVersionInformation.label }}</div></div>
+      <RouterLink v-if="navigationCollapsed" to="/about" class="collapsed-about" title="版本与关于" aria-label="版本与关于">C</RouterLink><div v-show="!navigationCollapsed" class="sidebar-footer"><div>前端 v{{ frontendIdentity.version }}</div><div v-if="frontendBuildIdentity!=='unavailable'" class="frontend-build" title="源码构建标识，与产品版本分别记录">构建 {{ frontendBuildIdentity }}</div><div class="backend-version" :title="backendVersionInformation.detail">后端 {{ backendVersionInformation.label }}</div></div>
     </aside>
     <div class="main-shell">
       <header class="topbar">
-        <div class="topbar-left"><el-button class="mobile-menu" :icon="Menu" text aria-label="打开导航" @click="menuOpen = !menuOpen"/><button v-if="route.path === '/projects' || compactOverview" class="page-back compact-page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><ShellBreadcrumb/><InfoTip v-if="(route.path === '/projects' || compactOverview) && pageInfo" :label="`${pageTitle}说明`" :text="pageInfo"/></div>
+        <div class="topbar-left"><el-button class="navigation-toggle" :icon="narrowNavigation ? Menu : navigationCollapsed ? Expand : Fold" text :aria-label="narrowNavigation ? '打开导航' : navigationCollapsed ? '展开导航' : '收起导航'" :title="navigationCollapsed ? '展开导航' : '收起导航'" :aria-expanded="narrowNavigation ? menuOpen : !navigationCollapsed" @click="toggleNavigation"/><button v-if="route.path === '/projects' || compactOverview || compactPageHeading" class="page-back compact-page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><ShellBreadcrumb/><InfoTip v-if="(route.path === '/projects' || compactOverview || compactPageHeading) && pageInfo" :label="`${pageTitle}说明`" :text="pageInfo"/></div>
         <div class="topbar-right"><CompanionUserMenu v-if="companionBrowserProvider" :busy="loggingOut" @logout="logoutBrowserSession"/><RouterLink to="/changelog" class="frontend-version" aria-label="查看前端版本与更新记录">前端 v{{ frontendIdentity.version }}</RouterLink><RouterLink to="/help" class="utility-link" @click="menuOpen = false">帮助</RouterLink><RouterLink to="/about" class="utility-link" @click="menuOpen = false">关于</RouterLink><el-tag v-if="showRegisteredChrome" :type="registered.currentSource ? 'success' : 'info'" round>{{ registered.currentSource ? '真实工程' : '未连接' }}</el-tag><el-tag v-else-if="showProjectContext && store.mode === 'disconnected'" type="info" effect="plain" round>未连接</el-tag><el-tag v-else-if="showProjectContext && store.isDemo" class="demo-tag" effect="light" round>示例模式</el-tag><el-tag v-else-if="showProjectContext" :type="store.connection === 'connected' ? 'success' : 'warning'" round>{{ store.sourceLabel }}</el-tag></div>
       </header>
       <ShellRouteTabs/>
-      <main class="main-content" :class="{ 'projects-main': route.path === '/projects' || compactOverview }">
-        <div v-if="route.path !== '/projects' && !compactOverview" class="page-heading"><div class="page-title"><button class="page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><h1>{{ pageTitle }}</h1><InfoTip v-if="pageInfo" :label="`${pageTitle}说明`" :text="pageInfo" /></div><div v-if="showRegisteredContext" class="page-heading-actions"><el-button v-if="legacyWorkspace" @click="store.openDemo">查看示例工作台</el-button><el-select v-if="registered.projects.length" :model-value="registered.project?.id ?? ''" class="project-select" aria-label="当前登记工程" placeholder="请选择工程" @update:model-value="selectRegisteredProject"><el-option v-for="project in registered.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-button v-if="companionBrowserProvider" :loading="registered.directory.projectLoading && !registered.directory.backgroundProjectRead" :disabled="registered.directory.projectLoading" @click="registered.directory.connect(companionBrowserProvider)">{{ registered.currentSource ? '重新连接工程' : '连接工程服务' }}</el-button><el-button v-if="registered.directory.provider" :icon="Refresh" text aria-label="刷新登记工程" :disabled="registered.directory.projectLoading" @click="registered.directory.refreshProjects()"/><el-button v-if="registered.directory.provider" :icon="Close" text aria-label="断开工程服务" @click="registered.directory.disconnect()"/></div><div v-else-if="showProjectContext" class="page-heading-actions"><el-select v-if="store.snapshot.projects.length" :model-value="store.selectedProjectId" class="project-select" aria-label="当前项目" @update:model-value="store.selectProject"><el-option v-for="project in store.snapshot.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-dropdown trigger="click"><el-button>数据源<el-icon class="button-trail"><ArrowDown/></el-icon></el-button><template #dropdown><el-dropdown-menu><el-dropdown-item @click="store.openDemo">查看示例资料</el-dropdown-item><el-dropdown-item v-if="liveProvider" @click="store.connect(liveProvider)">连接只读数据源</el-dropdown-item><el-dropdown-item :disabled="store.mode === 'disconnected'" divided @click="store.disconnect">断开并清空视图</el-dropdown-item></el-dropdown-menu></template></el-dropdown></div></div>
+      <main class="main-content" :class="{ 'projects-main': route.path === '/projects' || compactOverview || compactPageHeading }">
+        <h1 v-if="compactPageHeading" class="sr-only">{{ pageTitle }}</h1>
+        <div v-if="route.path !== '/projects' && !compactOverview && !compactPageHeading" class="page-heading"><div class="page-title"><button class="page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><h1>{{ pageTitle }}</h1><InfoTip v-if="pageInfo" :label="`${pageTitle}说明`" :text="pageInfo" /></div><div v-if="showRegisteredContext" class="page-heading-actions"><el-button v-if="legacyWorkspace" @click="store.openDemo">查看示例工作台</el-button><el-select v-if="registered.projects.length" :model-value="registered.project?.id ?? ''" class="project-select" aria-label="当前登记工程" placeholder="请选择工程" @update:model-value="selectRegisteredProject"><el-option v-for="project in registered.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-button v-if="companionBrowserProvider" :loading="registered.directory.projectLoading && !registered.directory.backgroundProjectRead" :disabled="registered.directory.projectLoading" @click="registered.directory.connect(companionBrowserProvider)">{{ registered.currentSource ? '重新连接工程' : '连接工程服务' }}</el-button><el-button v-if="registered.directory.provider" :icon="Refresh" text aria-label="刷新登记工程" :disabled="registered.directory.projectLoading" @click="registered.directory.refreshProjects()"/><el-button v-if="registered.directory.provider" :icon="Close" text aria-label="断开工程服务" @click="registered.directory.disconnect()"/></div><div v-else-if="showProjectContext" class="page-heading-actions"><el-select v-if="store.snapshot.projects.length" :model-value="store.selectedProjectId" class="project-select" aria-label="当前项目" @update:model-value="store.selectProject"><el-option v-for="project in store.snapshot.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-dropdown trigger="click"><el-button>数据源<el-icon class="button-trail"><ArrowDown/></el-icon></el-button><template #dropdown><el-dropdown-menu><el-dropdown-item @click="store.openDemo">查看示例资料</el-dropdown-item><el-dropdown-item v-if="liveProvider" @click="store.connect(liveProvider)">连接只读数据源</el-dropdown-item><el-dropdown-item :disabled="store.mode === 'disconnected'" divided @click="store.disconnect">断开并清空视图</el-dropdown-item></el-dropdown-menu></template></el-dropdown></div></div>
         <div v-if="showProjectContext && store.mode !== 'disconnected'" class="source-banner" :class="{ 'source-live': !store.isDemo }" role="status"><span class="source-dot"></span><div><strong>{{ store.isDemo ? '正在浏览示例资料' : store.sourceLabel }}</strong><span>{{ store.isDemo ? '演示数据 · 无真实服务连接' : `${store.snapshot.source.label} · ${dateLabel}` }}</span></div><InfoTip v-if="store.isDemo" label="示例数据说明" text="项目、资源与状态均为演示。未探测真实服务，未执行任何工程写入。"/><el-button :icon="Refresh" text aria-label="刷新数据源" :loading="store.loading" @click="store.refresh"/><el-button :icon="Close" text aria-label="断开数据源" @click="store.disconnect"/></div>
         <el-alert v-if="showProjectContext && store.error" type="error" show-icon :closable="false" title="读取失败，未显示任何缓存或示例数据" :description="store.error" class="connection-error"/>
         <div v-if="showRegisteredChrome && registered.currentSource" class="registered-source-note" role="status">{{ registered.currentSource.label }}<span v-if="registered.directory.observedAt"> · 读取于 {{ registered.directory.observedAt }}</span><InfoTip label="登记与状态读取说明" :text="registered.currentSource.runtimeProbesEnabled === false ? '当前仅读取工程登记，运行状态未探测。' : '运行状态来自原 Bridge 查询；可能更新后台状态和诊断日志，不启动 Creator。资源库存与验收记录没有包含在工程登记中。'"/></div>
@@ -191,6 +215,7 @@ const dateLabel = computed(() => {
       </main>
     </div>
     <CompanionSessionRecovery/>
+    <CompanionDevTools/>
   </div>
 </template>
 <style scoped>
@@ -201,8 +226,8 @@ const dateLabel = computed(() => {
 .nav-list { gap: 3px; }
 .nav-item { padding: 10px 14px; }
 .art-nav-toggle, .knowledge-nav-toggle { width: 100%; border: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; text-align: left; cursor: pointer; justify-content: space-between; }
-.art-nav-toggle .el-icon, .knowledge-nav-toggle .el-icon { transform: rotate(-90deg); transition: transform .15s; }
-.art-nav-toggle .el-icon.is-expanded, .knowledge-nav-toggle .el-icon.is-expanded { transform: rotate(0); }
+.art-nav-toggle .el-icon, .knowledge-nav-toggle .navigation-chevron { transform: rotate(-90deg); transition: transform .15s; }
+.art-nav-toggle .el-icon.is-expanded, .knowledge-nav-toggle .navigation-chevron.is-expanded { transform: rotate(0); }
 .art-nav-children, .knowledge-nav-children { display: grid; gap: 3px; margin-top: 3px; }
 .art-nav-child, .knowledge-nav-child { padding-left: 30px; }
 .art-nav-toggle:focus-visible, .knowledge-nav-toggle:focus-visible { outline: 2px solid #cfc3ff; outline-offset: 2px; }
@@ -210,7 +235,7 @@ const dateLabel = computed(() => {
 .registered-source-note,.registered-read-warnings { display:flex; align-items:center; flex-wrap:wrap; gap:6px; color:var(--text-secondary,#637187); font-size:12px; margin-bottom:16px; overflow-wrap:anywhere; }
 .projects-main { padding-top: 18px; }
 .compact-page-back { flex-basis: 28px; width: 28px; height: 28px; }
-.page-heading { margin-bottom: 18px; }
+.page-heading { margin-bottom: 10px; }
 .page-title { display: flex; align-items: center; gap: 9px; }
 .page-back { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 36px; width: 36px; height: 36px; padding: 0; border: 1px solid #dfe4ed; border-radius: 7px; background: #fff; color: #51607a; font-size: 17px; }
 .page-back:hover:not(:disabled) { background: #f0ebfd; color: #7660bf; border-color: #d9cff3; }
@@ -222,4 +247,16 @@ const dateLabel = computed(() => {
   .page-back { flex-basis: 44px; width: 44px; height: 44px; }
   .page-heading-actions { gap: 8px; }
 }
+.navigation-toggle { flex-shrink:0; padding:6px; min-height:32px; }
+.navigation-icon { flex:0 0 18px; font-size:18px; }
+.navigation-label { flex:1; }
+.sidebar.is-collapsed { width:64px; padding:18px 8px; }
+.sidebar.is-collapsed .brand { padding:0; justify-content:center; }
+.sidebar.is-collapsed .nav-item { padding:11px; justify-content:center; }
+.sidebar.is-collapsed .nav-list { margin-top:18px; }
+.collapsed-about { margin-top:auto; text-align:center; border-top:1px solid #334057; padding:14px 0 0; }
+.navigation-collapsed .main-shell { margin-left:64px; }
+.collapsed-knowledge-link { display:block; padding:10px; border-radius:5px; }
+.collapsed-knowledge-link:hover,.collapsed-knowledge-link[aria-current=page] { color:var(--el-color-primary); background:var(--el-color-primary-light-9); }
+@media(max-width:760px) { .navigation-collapsed .main-shell { margin-left:0; } }
 </style>

@@ -36,7 +36,7 @@ async function setupBrowser(path: string) {
   return setup(path, createWebHashHistory())
 }
 function button(label: string) { const found = wrapper!.findAll('button').find((item) => item.text().includes(label)); if (!found) throw new Error(label); return found }
-afterEach(() => { wrapper?.unmount(); wrapper = undefined; activeHistory?.destroy(); activeHistory = undefined; window.history.replaceState(null, '', '/'); imageReviewProvider.value = null; companionBrowserProvider.value = null; document.body.innerHTML = ''; localStorage.clear(); vi.unstubAllGlobals(); vi.restoreAllMocks(); Reflect.deleteProperty(navigator, 'clipboard') })
+afterEach(() => { wrapper?.unmount(); wrapper = undefined; activeHistory?.destroy(); activeHistory = undefined; window.history.replaceState(null, '', '/'); imageReviewProvider.value = null; companionBrowserProvider.value = null; document.body.innerHTML = ''; localStorage.clear(); window.innerWidth=1024; vi.unstubAllGlobals(); vi.restoreAllMocks(); Reflect.deleteProperty(navigator, 'clipboard') })
 describe('help, about and visible frontend identity', () => {
   it('uses one frontend version in package, lock, header, sidebar and about without implying a daemon version', async () => {
     await setup('/about')
@@ -98,7 +98,7 @@ describe('help, about and visible frontend identity', () => {
     await router.push('/help?topic=models'); await router.push('/about'); await flushPromises()
     expect(wrapper!.find('.page-back').attributes('aria-label')).toBe('返回帮助')
     const back = vi.spyOn(router, 'back')
-    await wrapper!.find('button[aria-label="打开导航"]').trigger('click')
+    window.innerWidth=375;window.dispatchEvent(new Event('resize'));await flushPromises();await wrapper!.find('button[aria-label="打开导航"]').trigger('click')
     const control = wrapper!.find('.page-back')
     await control.trigger('click'); await control.trigger('click')
     expect(back).toHaveBeenCalledTimes(1)
@@ -107,7 +107,7 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.find('.page-back').attributes('aria-label')).toBe('返回模型服务')
     await wrapper!.find('.page-back').trigger('click')
     await vi.waitFor(() => expect(router.currentRoute.value.fullPath).toBe('/knowledge?tab=models&filter=local#status')); await flushPromises()
-    expect(wrapper!.find('.page-heading h1').text()).toBe('模型服务')
+    expect(wrapper!.find('.main-content h1').text()).toBe('模型服务')
     expect(wrapper!.find('.page-back').attributes('aria-label')).toBe('返回工程')
   })
   it('keeps return history aligned through native back/forward, query replacement and a new branch', async () => {
@@ -189,7 +189,7 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.find('.source-banner').exists()).toBe(false); expect(wrapper!.find('[data-testid="art-workspace"]').exists()).toBe(true)
   })
   it('closes the mobile menu when using help and keeps version outside the hidden sidebar', async () => {
-    await setup('/overview'); await wrapper!.find('button[aria-label="打开导航"]').trigger('click')
+    await setup('/overview'); window.innerWidth=375;window.dispatchEvent(new Event('resize'));await flushPromises();await wrapper!.find('button[aria-label="打开导航"]').trigger('click')
     expect(wrapper!.find('.sidebar').classes()).toContain('is-open')
     await wrapper!.find('.topbar a[href="/help"]').trigger('click'); await flushPromises()
     expect(wrapper!.find('.sidebar').classes()).not.toContain('is-open')
@@ -292,7 +292,7 @@ describe('help, about and visible frontend identity', () => {
     expect(wrapper!.find('.sidebar a[href="/history"]').exists()).toBe(false)
     expect(wrapper!.find('.sidebar a[href="/migration"]').exists()).toBe(false)
     expect(wrapper!.find('.workspace-label').exists()).toBe(false)
-    expect(wrapper!.find('a.nav-item .el-icon').exists()).toBe(false)
+    expect(wrapper!.find('a.nav-item .navigation-icon').exists()).toBe(true)
     expect(wrapper!.find('.art-nav-toggle').exists()).toBe(false); expect(wrapper!.findAll('.sidebar a[href="/art-resources"]')).toHaveLength(1)
   })
   it('keeps the shell compact and page help keyboard-accessible without migration captions', async () => {
@@ -396,7 +396,7 @@ describe('unified art workspace navigation', () => {
     const fetch=vi.fn();vi.stubGlobal('fetch',fetch)
     const {router}=await setup('/help')
     expect(wrapper!.find('.art-nav-toggle').exists()).toBe(false)
-    await wrapper!.get('button[aria-label="打开导航"]').trigger('click')
+    window.innerWidth=375;window.dispatchEvent(new Event('resize'));await flushPromises();await wrapper!.get('button[aria-label="打开导航"]').trigger('click')
     await wrapper!.get('.sidebar a[href="/art-resources"]').trigger('click');await flushPromises()
     expect(router.currentRoute.value.path).toBe('/art-resources')
     expect(wrapper!.get('.sidebar').classes()).not.toContain('is-open')

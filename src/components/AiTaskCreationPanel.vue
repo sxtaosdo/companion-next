@@ -6,8 +6,6 @@ import { aiTaskCreationProvider } from '../ai-task-creation-integration'
 import { aiResourceReadProvider } from '../ai-resource-read-integration'
 import { aiJobsReadProvider } from '../ai-jobs-read-integration'
 import type { AiTaskCreationProvider } from '../domain/ai-task-creation'
-import { resolveArtGenerationInput } from '../domain/project-art-spec'
-import { aiTaskPromptSuffix, artTaskCompiledPrompt } from '../domain/ai-task-creation'
 import type { AiResourceReadProvider } from '../domain/ai-resource-read'
 import type { AiJobsReadProvider } from '../domain/ai-jobs-read'
 import { AI_JOB_STATE_LABELS } from '../domain/ai-jobs-read'
@@ -24,7 +22,6 @@ const artDirty = computed(()=>!!props.project && artEditor.context?.projectId===
 const provider = computed(() => props.provider === undefined ? aiTaskCreationProvider.value : props.provider)
 watch(() => [props.project?.id, props.project?.name, props.project?.path, props.source, resourceReader.value, jobsReader.value, provider.value, projectArtSpecProvider.value, props.configDirty, artDirty.value], () => store.setContext(props.project, props.source, resourceReader.value, jobsReader.value, provider.value, (props.configDirty ?? false) || artDirty.value, projectArtSpecProvider.value), { immediate: true, flush: 'sync' })
 watch(() => props.active, value => store.setActive(value !== false), { immediate: true, flush: 'sync' })
-const compiledPromptLength = computed(() => {if(store.artConfig && store.art){try{return artTaskCompiledPrompt(resolveArtGenerationInput(store.artConfig,{assetId:store.brief.assetId.trim()||'preview',category:'icon',prompt:store.brief.prompt.trim()||'preview',overrides:{subject:store.brief.prompt.trim()||'preview',purpose:store.brief.purpose.trim()||'preview'},references:[]},store.art.authorities,{imageReferenceInput:false,categories:['icon']})).length}catch{return '未就绪'}}return store.config ? store.brief.prompt.trim().length + aiTaskPromptSuffix(store.config).length : 0})
 const lockedForm = computed(() => !store.active || store.busy || !!store.retainedRunId || store.phase === 'unknown')
 async function submit() { const result = await store.submit(); if (result) emit('created', result) }
 async function recover() { const result = await store.recoverOriginal(); if (result) emit('created', result) }
@@ -50,7 +47,8 @@ onBeforeUnmount(() => { globalThis.removeEventListener?.('storage', storageChang
         <label>资源名称<el-input aria-label="资源名称" :model-value="store.brief.name" maxlength="60" :disabled="lockedForm" placeholder="coin-pouch" @update:model-value="(value: unknown) => store.edit('name', String(value))"/></label>
         <label>用途<el-input aria-label="图标用途" :model-value="store.brief.purpose" maxlength="400" :disabled="lockedForm" placeholder="例如奖励、道具、按钮" @update:model-value="(value: unknown) => store.edit('purpose', String(value))"/></label>
         <label>画面<el-input aria-label="图标画面" type="textarea" :rows="3" :model-value="store.brief.prompt" maxlength="4096" :disabled="lockedForm" placeholder="主体、细节与要表达的含义" @update:model-value="(value: unknown) => store.edit('prompt', String(value))"/></label>
-        <p>加入已保存风格与留白要求后：{{ compiledPromptLength }} / 4096 字符。超过上限不能提交。</p>
+        <label>图标四周留白（%）<el-input v-if="store.artConfig" aria-label="本次图标留白百分比" type="number" min="0" max="40" :model-value="store.brief.paddingPercent ?? ''" :placeholder="store.inheritedPadding === undefined ? '未设置' : `沿用规范 ${store.inheritedPadding}%`" :disabled="lockedForm || store.paddingLocked" @update:model-value="(value: unknown) => store.edit('paddingPercent', String(value))"/><el-input v-else aria-label="旧规范图标留白百分比" :model-value="String(store.inheritedPadding ?? '')" readonly/><small>{{ store.artConfig ? store.paddingLocked ? '全局设定已锁定，不能覆盖。' : '0–40；留空沿用规范，仅影响本次图标任务。' : '沿用旧版规范，只读。' }}</small></label>
+        <p>加入已保存风格与留白要求后：{{ store.compiledPromptLength }} / 4096 字符。超过上限不能提交。</p>
         <details><summary>高级配置</summary><label>图标标识<el-input aria-label="图标标识" :model-value="store.brief.assetId" maxlength="60" :disabled="lockedForm" @update:model-value="(value: unknown) => store.edit('assetId', String(value))"/></label><label>工程目标路径（配置派生）<el-input aria-label="工程目标路径" :model-value="store.targetPath" readonly/></label><label>资源配置风格（只读）<el-input aria-label="资源配置风格" type="textarea" :model-value="store.artConfig?.project.content ?? store.config?.style.description" readonly/></label><p>配置版本 {{ store.artConfig?.version ?? store.resource?.version }} · SHA-256 {{ store.art?.hash ?? store.resource?.hash }}</p><p>本次 jobs 读取的工程 HEAD {{ store.history.sourceRevision }}（后台提交时仍会复核）</p></details>
         <label v-if="store.history.mode === 'offline_import_only' || store.history.adoptionSources?.length">现有 PNG 来源<el-select aria-label="现有 PNG 来源" :model-value="store.brief.sourceId" :disabled="lockedForm" @update:model-value="(value: unknown) => store.edit('sourceId', String(value))"><el-option v-if="store.history.mode !== 'offline_import_only'" value="" label="生成新候选（先排队）"/><el-option v-for="sourceItem in store.history.adoptionSources ?? []" :key="sourceItem.sourceId" :value="sourceItem.sourceId" :label="sourceItem.sourceId"/></el-select></label>
         <p v-if="store.history.mode === 'offline_import_only'">当前后端只允许采用可信目录已有 PNG，不能排队生成。</p>

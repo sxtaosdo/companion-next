@@ -26,7 +26,7 @@ export interface ProjectArtSpec {
   projectId: string
   version: number
   project: { name: string; content: string; engine: 'cocos-creator'; designResolution: { width: number; height: number } }
-  inheritance: { mode: 'none'; reason: string } | { mode: 'canon'; sources: ArtSourcePin[]; usage?: CanonArtUsage }
+  inheritance: { mode: 'none'; reason?: string } | { mode: 'canon'; sources: ArtSourcePin[]; usage?: CanonArtUsage }
   overrides: ArtValues
   categories: Partial<Record<ArtCategory, ArtValues>>
 }
@@ -105,7 +105,9 @@ export function parseProjectArtSpec(value: unknown, expectedProjectId: string): 
   const inheritance = object(raw.inheritance, 'inheritance')
   let inherited: ProjectArtSpec['inheritance']
   if (inheritance.mode === 'none') {
-    keys(inheritance, ['mode', 'reason'], 'inheritance'); inherited = { mode: 'none', reason: text(inheritance.reason, 'inheritance.reason') }
+    keys(inheritance, ['mode', 'reason'], 'inheritance')
+    // Omission and an explicit empty UI value remain distinct for exact save/recovery bindings.
+    inherited = { mode: 'none', ...(inheritance.reason === undefined ? {} : { reason: inheritance.reason === '' ? '' : text(inheritance.reason, 'inheritance.reason') }) }
   } else if (inheritance.mode === 'canon') {
     keys(inheritance, ['mode', 'sources', 'usage'], 'inheritance')
     if (inheritance.usage !== undefined && !(ART_CANON_USAGES as readonly unknown[]).includes(inheritance.usage)) fail('SOURCE_USAGE_OUT_OF_SCOPE', 'inheritance.usage')
