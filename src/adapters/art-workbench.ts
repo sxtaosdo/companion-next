@@ -1,0 +1,40 @@
+import { validateWorkbenchDocument, type WorkbenchDocument, type WorkbenchReceipt, type WorkbenchOperation } from '../domain/art-workbench'
+export class WorkbenchRequestError extends Error { constructor(readonly outcome:'rejected'|'unknown',message:string){super(message)} }
+export interface WorkbenchContext { projectId:string;projectPath:string;source:object }
+export interface WorkbenchProvider {
+ read(context:WorkbenchContext,signal:AbortSignal):Promise<WorkbenchReceipt>
+ save(context:WorkbenchContext,input:{operationId:string;expectedHash:string|null;approved:true;document:WorkbenchDocument},signal:AbortSignal):Promise<WorkbenchReceipt>
+ status?(context:WorkbenchContext,operationId:string,signal:AbortSignal):Promise<WorkbenchOperation>
+}
+export function createWorkbenchProvider(fetcher:typeof fetch):WorkbenchProvider {
+ function route(context:WorkbenchContext){if(!/^[a-f0-9]{16}$/.test(context.projectId))throw Error('无效工程');return '/api/art-spec/'+context.projectId+'/workbench'}
+ async function request(path:string,signal:AbortSignal,input?:unknown){
+  const response=await fetcher(path,{method:input?'POST':'GET',credentials:'same-origin',redirect:'error',headers:input?{'content-type':'application/json'}:{},body:input?JSON.stringify(input):undefined,signal})
+  const raw=await response.text();if(raw.length>1024*1024)throw Error('工作台响应超限')
+  if(!response.ok){
+   let code='';try{const body=JSON.parse(raw);if(typeof body?.code==='string'&&/^[A-Z][A-Z0-9_]{1,79}$/.test(body.code))code=body.code}catch{}
+   const rejectedCodes=['ART_INPUT_INVALID','ART_PROJECT_INVALID','ART_PROJECT_NOT_REGISTERED','ART_CONFIG_STALE','ART_CONFIG_BUSY','ART_REFERENCE_INVALID','ART_REFERENCE_STALE','ART_WRITE_REJECTED','ART_WORKBENCH_2D_NORM_REQUIRED','ART_WORKBENCH_NORM_MIGRATION_REQUIRED','ART_WORKBENCH_JOBS_UNAVAILABLE','ART_WORKBENCH_JOB_BINDING_MISMATCH','ART_WORKBENCH_SPEC_BINDING_INVALID','ART_WORKBENCH_DUPLICATE_ID','ART_WORKBENCH_SPEC_REQUIRED','ART_WORKBENCH_VERSION_INVALID','ART_WORKBENCH_SPEC_STALE','ART_WORKBENCH_LINKED_NEED_IMMUTABLE']
+   const rejected=rejectedCodes.includes(code)
+   throw new WorkbenchRequestError(rejected?'rejected':'unknown','工作台请求'+(rejected?'被拒绝':'结果需核对')+'（'+response.status+(code?' · '+code:'')+'）。原输入保留，未自动重发。')
+  }
+  return JSON.parse(raw)
+ }
+ function receipt(value:unknown,context:WorkbenchContext):WorkbenchReceipt{
+  const result=value as WorkbenchReceipt
+  if(!result||result.projectId!==context.projectId||result.projectPath!==context.projectPath||!result.capabilities||result.capabilities.generation!==false||result.capabilities.imageConditioning!==false||typeof result.capabilities.referenceUpload!=='boolean'||typeof result.capabilities.existingJobLink!=='boolean')throw Error('工作台回执不匹配')
+  if(result.document){if(!result.hash||!/^[a-f0-9]{64}$/.test(result.hash))throw Error('工作台哈希无效');validateWorkbenchDocument(result.document,context.projectId,context.projectPath)}else if(result.hash!==null)throw Error('工作台回执无效')
+  if(result.operation&&(!/^art-save-[a-f0-9]{32}$/.test(result.operation.operationId)||!/^[a-f0-9]{64}$/.test(result.operation.bindingHash)||result.operation.state!=='completed'))throw Error('工作台操作回执无效')
+  return result
+ }
+ return {
+  read:async(context,signal)=>receipt(await request(route(context),signal),context),
+  save:async(context,input,signal)=>receipt(await request(route(context),signal,input),context),
+  status:async(context,operationId,signal)=>{
+   if(!/^art-save-[a-f0-9]{32}$/.test(operationId))throw Error('无效工作台操作')
+   const result=await request(route(context)+'/operations/'+operationId,signal) as WorkbenchOperation
+   if(!result||result.projectId!==context.projectId||result.projectPath!==context.projectPath||result.operationId!==operationId||!['pending','completed','rejected'].includes(result.state))throw Error('工作台操作状态不匹配')
+   if(result.state==='completed')result.receipt=receipt(result.receipt,context)
+   return result
+  },
+ }
+}
