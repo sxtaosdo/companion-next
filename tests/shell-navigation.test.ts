@@ -16,10 +16,11 @@ describe('approved shell reuse',()=>{
   expect(tabs.map(tab=>tab.to)).toEqual(['/knowledge/qa?project=one','/knowledge/qa?project=two'])
   expect(visitShellTab(tabs,r.currentRoute.value)).toHaveLength(2)
  })
+ it('keeps internal art task tabs in one shell tab while preserving the latest exact destination',async()=>{const r=router();await r.push('/art-resources?project=one&type=icon');let tabs=visitShellTab([],r.currentRoute.value);await r.push('/art-resources?project=one&type=ui');tabs=visitShellTab(tabs,r.currentRoute.value);expect(tabs).toHaveLength(1);expect(tabs[0]!.to).toBe('/art-resources?project=one&type=ui')})
  it('switches, closes current and preserves another project query without triggering actions',async()=>{
   const r=router();await r.push('/projects?project=one');const w=mount(ShellRouteTabs,{global:{plugins:[r,ElementPlus]}})
   await r.push('/art-resources?project=two&type=icon');await flushPromises()
-  expect(w.findAll('[role=tab]')).toHaveLength(2)
+  expect(w.findAll('[role=tab]')).toHaveLength(2);expect(w.findAll('[role=tab][aria-selected=true]')).toHaveLength(1)
   await w.findAll('[role=tab]')[0]!.trigger('click');await flushPromises();expect(r.currentRoute.value.fullPath).toBe('/projects?project=one')
   await w.findAll('.close-tab')[0]!.trigger('click');await flushPromises();expect(r.currentRoute.value.fullPath).toBe('/art-resources?project=two&type=icon');expect(w.findAll('[role=tab]')).toHaveLength(1);w.unmount()
  })
