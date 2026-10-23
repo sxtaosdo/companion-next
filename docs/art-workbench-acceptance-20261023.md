@@ -50,3 +50,5 @@
 2026-10-23：前端1.3.193、后端0.3.154同32180/PID40784恢复OPEN，15安装目标及6静态HTTP hash核验，10工程和5规范保持。P1060经现有页面先预览再点击“战斗取证”；operation web-profiler-1792756061360-12678304-84f0-472b-b1b8-9d3bbecc6a3f，两个UI请求均200，无直接Creator调用。窗口5dcbca7c-a9a4-44d0-8868-8291b2b51722保留846帧、0丢帧，P95=18.2ms；战斗12.34%、空闲82.74%、未知4.92%，状态insufficient/UNCONFIRMED。角色自然通关草原后等待选区，不能把此混合窗口当持续战斗性能通过；源/编译/页面身份仍unknown。完整证据task/p1060-samewindow-20261023/actual-window-summary.json与battle-ui-capture.json，原完整文件在P1060/temp/creator-ai-bridge/profiler/capture-1792756086186.json。
 
 启动脚本复用服务验证成功；本次单次冷启动最初返回readiness-unconfirmed，随后只读核验同一启动PID40784正常OPEN，没有第二次启动。冷启动确认预算问题继续修复，不称启动包装冷启动已完整通过。
+
+冷启动确认预算后续纠正：官方CLI内部8秒就绪观察早于wrapper原65秒进程上限返回，旧额外10秒观察导致约18秒就停止确认。现改为一次start与后续只读观察共用原65秒，单次读取最多10秒、不加整体超时、不二次启动；37项虚拟时钟/真实协议隔离测试通过且主协调独立重跑37项。源码脚本已在原启动入口生效；不为验证此修复再次重启当前健康服务，最终冷启动现场验证留待下一次必要启动。证据task/startup-wrapper-cold-20261023/delivery.json。

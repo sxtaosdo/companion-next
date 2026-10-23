@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { startCompanion, openNext, startupEnvironment, discoverBounded, waitForOwnedBrowser, StartupError, BASE, NEXT, APPROVED_STARTUP_CONFIG, validateStartupConfiguration, loadStartupConfiguration } from '../scripts/start-companion.mjs';
+import { startCompanion, openNext, startupEnvironment, discoverBounded, waitForOwnedBrowser, StartupError, BASE, NEXT, DAEMON_ENTRY, APPROVED_STARTUP_CONFIG, validateStartupConfiguration, loadStartupConfiguration } from '../scripts/start-companion.mjs';
+const ready=pid=>({schemaVersion:'companion-daemon-inflight-v1',phase:'OPEN',generation:1,identity:{pid,startupEpoch:'11111111-1111-4111-8111-111111111111',entryPath:DAEMON_ENTRY,entrySha256:'a'.repeat(64)}});
 test('rejects nonlocal or partial overrides before any startup and does not mutate environment', () => {
   assert.throws(() => startupEnvironment({ CREATOR_AI_DAEMON_URL: 'http://localhost:7470', CREATOR_AI_DAEMON_TOKEN: 'test' }), /UNEXPECTED_DAEMON_URL/);
   assert.throws(() => startupEnvironment({ CREATOR_AI_DAEMON_TOKEN: 'test' }), /INCOMPLETE/);
@@ -13,7 +14,7 @@ test('rejects nonlocal or partial overrides before any startup and does not muta
 test('cold and already running paths each use only official start, then bounded status; no-browser never creates a ticket',async()=>{
   for(const runningBefore of [false,true]){
     let starts=0,spawns=0;const requests=[];let running=runningBefore;
-    const result=await startCompanion({noBrowser:true},{start:async()=>{starts++;if(!running){spawns++;running=true}},discover:async()=>({baseUrl:BASE,request:async(method,path,_body,signal)=>{requests.push([method,path]);assert(signal instanceof AbortSignal);return {phase:running?'OPEN':'CLOSED',identity:{pid:123}}}}),createBrowser:()=>assert.fail('browser')});
+    const result=await startCompanion({noBrowser:true},{start:async()=>{starts++;if(!running){spawns++;running=true}},discover:async()=>({baseUrl:BASE,request:async(method,path,_body,signal)=>{requests.push([method,path]);assert(signal instanceof AbortSignal);return {...ready(123),phase:running?'OPEN':'CLOSED'}}}),createBrowser:()=>assert.fail('browser')});
     assert.equal(result.url,NEXT);assert.equal(starts,1);assert.equal(spawns,runningBefore?0:1);assert.deepEqual(requests,[['GET','/v1/daemon/inflight']]);
   }
 });
@@ -35,7 +36,7 @@ test('foreign tickets and failed authentication close only the owned browser and
 });
 
 test('observes a late official start once without issuing another start',async()=>{
-  let starts=0;const result=await startCompanion({noBrowser:true},{start:async()=>{starts++;throw new StartupError('OFFICIAL_START_UNCONFIRMED')},discover:async()=>({baseUrl:BASE,request:async()=>({phase:'OPEN',identity:{pid:456}})})});assert.equal(starts,1);assert.equal(result.pid,456);assert.equal(result.lateReady,true);
+  let starts=0;const result=await startCompanion({noBrowser:true},{start:async()=>{starts++;throw new StartupError('OFFICIAL_START_UNCONFIRMED')},discover:async()=>({baseUrl:BASE,request:async()=>ready(456)})});assert.equal(starts,1);assert.equal(result.pid,456);assert.equal(result.lateReady,true);
 });
 test('discovery is bounded and a closed owned browser does not keep the command waiting',async()=>{
   await assert.rejects(discoverBounded(()=>new Promise(()=>{}),2),/DISCOVERY_UNCONFIRMED/);
@@ -80,10 +81,10 @@ test('tracked example matches the bounded allowlist and does not become an autom
 });
 
 test('readiness retries only the snapshot generation race without repeating startup or issuing a ticket',async()=>{
- let starts=0,reads=0;const result=await startCompanion({noBrowser:true},{start:async()=>{starts++},discover:async()=>({baseUrl:BASE,request:async(method,path)=>{assert.equal(method,'GET');assert.equal(path,'/v1/daemon/inflight');if(++reads<3)throw Object.assign(Error('race'),{status:409,code:'DAEMON_GENERATION_CHANGED'});return {phase:'OPEN',identity:{pid:456}}}}),createBrowser:()=>assert.fail('browser')});assert.equal(starts,1);assert.equal(reads,3);assert.equal(result.pid,456);
+ let starts=0,reads=0;const result=await startCompanion({noBrowser:true},{start:async()=>{starts++},discover:async()=>({baseUrl:BASE,request:async(method,path)=>{assert.equal(method,'GET');assert.equal(path,'/v1/daemon/inflight');if(++reads<3)throw Object.assign(Error('race'),{status:409,code:'DAEMON_GENERATION_CHANGED'});return ready(456)}}),createBrowser:()=>assert.fail('browser')});assert.equal(starts,1);assert.equal(reads,3);assert.equal(result.pid,456);
 });
 test('permission refusal is not retried as readiness and persistent generation races are bounded',async()=>{
- for(const code of ['FORBIDDEN','DAEMON_GENERATION_CHANGED']){let starts=0,reads=0;await assert.rejects(startCompanion({noBrowser:true},{start:async()=>{starts++},discover:async()=>({baseUrl:BASE,request:async()=>{reads++;throw Object.assign(Error(code),{status:code==='FORBIDDEN'?403:409,code})}}),createBrowser:()=>assert.fail('browser')}),new RegExp(code));assert.equal(starts,1);assert.equal(reads,code==='FORBIDDEN'?1:5);}
+ for(const code of ['FORBIDDEN','DAEMON_GENERATION_CHANGED']){let starts=0,reads=0,now=0;await assert.rejects(startCompanion({noBrowser:true},{start:async()=>{starts++},discover:async()=>({baseUrl:BASE,request:async()=>{reads++;throw Object.assign(Error(code),{status:code==='FORBIDDEN'?403:409,code})}}),readiness:{now:()=>now,delay:async ms=>{now+=ms},timeoutMs:40,pollMs:10},createBrowser:()=>assert.fail('browser')}),new RegExp(code==='FORBIDDEN'?'DAEMON_AUTH_REJECTED':'DAEMON_READINESS_UNCONFIRMED'));assert.equal(starts,1);assert.equal(reads,code==='FORBIDDEN'?1:4);}
 });
 
 const { ensureAccountProvider } = await import('../scripts/start-companion.mjs');

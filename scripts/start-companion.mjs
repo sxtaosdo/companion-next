@@ -4,11 +4,14 @@ import { createRequire } from 'node:module';
 import { dirname, resolve, join, win32 } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+export const STARTUP_BUDGET_MS = 65_000;
+export const READ_BUDGET_MS = 10_000;
 export const BASE = 'http://127.0.0.1:32180';
 export const NEXT = BASE + '/next/index.html#/overview';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const host = resolve(root, '../cocos-mcp/mcp');
-export class StartupError extends Error { constructor(code) { super(code); this.code = code; } }
+export const DAEMON_ENTRY = join(host, 'dist/companion/companion-daemon.js');
+export class StartupError extends Error { constructor(code, { stage, reason, exitCode, officialReason, officialExitCode } = {}) { super(code); this.code = code; if (stage) this.stage = stage; if (reason) this.reason = reason; if (Number.isSafeInteger(exitCode)) this.exitCode = exitCode; if (officialReason) this.officialReason = officialReason; if (Number.isSafeInteger(officialExitCode)) this.officialExitCode = officialExitCode; } }
 export const LOCAL_STARTUP_CONFIG = join(root, 'companion-start.local.json');
 // This allowlist is the Owner-approved machine binding, not a generation default.
 export const APPROVED_STARTUP_CONFIG = Object.freeze({
@@ -94,13 +97,34 @@ export function ensureAccountProvider(run = execFile) {
       });
   });
 }
-function officialStart(env) {
+export function officialStart(env, run = execFile) {
   return new Promise((done, reject) => {
-    execFile(process.execPath, [join(host, 'dist/companion/creator-ai.js'), 'daemon', 'start'],
-      { cwd: host, env, windowsHide: true, timeout: 65_000, maxBuffer: 1024 * 1024 },
-      error => error ? reject(new StartupError('OFFICIAL_START_UNCONFIRMED')) : done());
+    run(process.execPath, [join(host, 'dist/companion/creator-ai.js'), 'daemon', 'start', '--json'],
+      { cwd: host, env, windowsHide: true, timeout: STARTUP_BUDGET_MS, maxBuffer: 1024 * 1024 },
+      (error, stdout) => {
+        // Decode the existing CLI protocol in memory; never retain or print output, URLs, tokens or stderr.
+        let value;
+        try { value = JSON.parse(stdout); } catch { /* A partial/missing response is not proof that a detached daemon failed. */ }
+        const envelope = value?.schemaVersion === 'cocos-tool-result-v1';
+        if (!error && envelope && value.status === 'PASSED' && value.tool === 'daemon_start') {
+          const pid = value.data?.started === true ? value.data?.pid : undefined;
+          if (pid !== undefined && (!Number.isSafeInteger(pid) || pid <= 0)) { reject(new StartupError('OFFICIAL_START_UNCONFIRMED', { stage: 'official-start', reason: 'cli-protocol' })); return; }
+          done({ confirmed: true, ...(pid === undefined ? {} : { pid }) }); return;
+        }
+        const exitCode = Number.isSafeInteger(error?.code) ? error.code : undefined;
+        const details = { stage: 'official-start', ...(exitCode === undefined ? {} : { exitCode }) };
+        if (['ENOENT', 'EACCES', 'EPERM'].includes(error?.code)) { reject(new StartupError('OFFICIAL_START_FAILED', { ...details, reason: 'executable-unavailable' })); return; }
+        const message = envelope && value.status === 'FAILED' && typeof value.error?.message === 'string' ? value.error.message : '';
+        if (/DAEMON_PORT_OCCUPIED\b/.test(message)) { reject(new StartupError('OFFICIAL_START_PORT_OCCUPIED', { ...details, reason: 'port-occupied' })); return; }
+        if (/daemon exited immediately/i.test(message)) { reject(new StartupError('OFFICIAL_START_FAILED', { ...details, reason: 'child-exited' })); return; }
+        const reason = error?.killed || error?.signal || error?.code === 'ETIMEDOUT' ? 'cli-timeout'
+          : /did not become ready within 8 seconds/.test(message) ? 'cli-readiness-deadline'
+            : envelope && value.status === 'FAILED' ? 'cli-error' : 'cli-protocol';
+        reject(new StartupError('OFFICIAL_START_UNCONFIRMED', { ...details, reason }));
+      });
   });
 }
+
 export async function openNext(client, createBrowser) {
   if (client.baseUrl !== BASE) throw new StartupError('UNEXPECTED_DAEMON_URL');
   let browser;
@@ -135,32 +159,101 @@ export async function waitForOwnedBrowser(browser) {
   try { if (browser.isConnected()) await new Promise(done => browser.once('disconnected', done)); }
   finally { process.removeListener('SIGINT', finish); process.removeListener('SIGTERM', finish); }
 }
+function validateReadySnapshot(status, expectedPid) {
+  const identity = status?.identity;
+  const sameEntry = typeof identity?.entryPath === 'string'
+    && (process.platform === 'win32' ? win32.normalize(identity.entryPath).toLowerCase() === win32.normalize(DAEMON_ENTRY).toLowerCase() : resolve(identity.entryPath) === DAEMON_ENTRY);
+  if (status?.schemaVersion !== 'companion-daemon-inflight-v1' || !Number.isSafeInteger(status.generation) || status.generation < 0
+    || !Number.isSafeInteger(identity?.pid) || identity.pid <= 0 || !sameEntry
+    || typeof identity.startupEpoch !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(identity.startupEpoch)
+    || typeof identity.entrySha256 !== 'string' || !/^[a-f0-9]{64}$/.test(identity.entrySha256)) throw new StartupError('DAEMON_IDENTITY_UNVERIFIED', { stage: 'health', reason: 'invalid-snapshot' });
+  if (expectedPid !== undefined && identity.pid !== expectedPid) throw new StartupError('DAEMON_START_IDENTITY_CHANGED', { stage: 'health', reason: 'pid-mismatch' });
+  if (status.phase !== 'OPEN') throw new StartupError('DAEMON_NOT_READY', { stage: 'health', reason: 'admission-not-open' });
+}
+function transientRead(error, stage) {
+  if (error?.status === 409 && error?.code === 'DAEMON_GENERATION_CHANGED') return 'snapshot-generation-changed';
+  if (error?.status === 408 || error?.status === 429 || error?.status >= 500) return 'health-temporarily-unavailable';
+  const code = error?.cause?.code ?? error?.code;
+  if (stage === 'discovery' && code === 'ENOENT') return 'locator-not-yet-present';
+  if (['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_SOCKET'].includes(code)) return 'connection-not-yet-ready';
+  return null;
+}
+/** One official start, then only existing authenticated discovery/health reads under a shared deadline. */
+export async function waitForDaemonReadiness(discover, { timeoutMs = 10_000, pollMs = 100, now = Date.now, delay = ms => new Promise(done => setTimeout(done, ms)), expectedPid, once = false } = {}) {
+  if (!Number.isFinite(timeoutMs) || timeoutMs < 1 || timeoutMs > STARTUP_BUDGET_MS || !Number.isFinite(pollMs) || pollMs < 1 || pollMs > 1000) throw new StartupError('READINESS_OPTIONS_INVALID');
+  const deadline = now() + timeoutMs;
+  let lastStage = 'discovery', lastReason = 'not-observed';
+  while (now() < deadline) {
+    let timer, stage = 'discovery';
+    const remaining = Math.max(1, Math.min(READ_BUDGET_MS, deadline - now())), controller = new AbortController();
+    try {
+      const work = Promise.resolve().then(async () => {
+        const client = await discover();
+        if (controller.signal.aborted) throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage, reason: 'deadline' });
+        if (client?.baseUrl !== BASE) throw new StartupError('UNEXPECTED_DAEMON_URL', { stage, reason: 'unexpected-locator' });
+        stage = 'health';
+        // Reuse the installed authenticated request contract and keep the whole read cancellable.
+        // Readiness identity is not a maintenance/drain proof and does not clear historical unknowns.
+        const status = await client.request('GET', '/v1/daemon/inflight', undefined, controller.signal);
+        if (controller.signal.aborted) throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage, reason: 'deadline' });
+        validateReadySnapshot(status, expectedPid);
+        return { client, status };
+      });
+      return await Promise.race([work, new Promise((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage, reason: 'deadline' })); }, remaining); })]);
+    } catch (error) {
+      if (error instanceof StartupError) throw error;
+      if (error?.status === 401 || error?.status === 403) throw new StartupError('DAEMON_AUTH_REJECTED', { stage, reason: 'authenticated-read-rejected' });
+      const reason = transientRead(error, stage);
+      if (!reason) throw new StartupError(stage === 'discovery' ? 'DAEMON_DISCOVERY_UNCONFIRMED' : 'DAEMON_IDENTITY_UNVERIFIED', { stage, reason: stage === 'discovery' ? 'locator-unreadable-or-invalid' : 'unrecognized-health-response' });
+      lastStage = stage; lastReason = reason;
+      if (once) break;
+    } finally { clearTimeout(timer); }
+    if (now() < deadline) await delay(Math.min(pollMs, Math.max(1, deadline - now())));
+  }
+  throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage: lastStage, reason: lastReason });
+}
 export async function startCompanion({ noBrowser = false } = {}, deps) {
   await deps.ensureAuth?.();
-  let lateReady = false;
-  try { await deps.start(); }
+  // One budget owns both the official CLI call and subsequent read-only observation.
+  // The CLI's detached child can outlive its internal 8s readiness deadline.
+  const now = deps.readiness?.now ?? Date.now;
+  const budgetMs = deps.readiness?.timeoutMs ?? STARTUP_BUDGET_MS;
+  if (!Number.isFinite(budgetMs) || budgetMs < 1 || budgetMs > STARTUP_BUDGET_MS) throw new StartupError('READINESS_OPTIONS_INVALID');
+  const deadline = now() + budgetMs;
+  let startFailure, startReceipt;
+  try { startReceipt = await deps.start(); }
   catch (error) {
-    if (!(error instanceof StartupError) || error.code !== 'OFFICIAL_START_UNCONFIRMED') throw error;
-    // Observe only: the single official start may have completed after its own wait.
-    lateReady = true;
+    if (!(error instanceof StartupError) || !['OFFICIAL_START_UNCONFIRMED', 'OFFICIAL_START_FAILED', 'OFFICIAL_START_PORT_OCCUPIED'].includes(error.code)) throw error;
+    startFailure = error;
   }
-  const client = await discoverBounded(deps.discover);
-  if (client.baseUrl !== BASE) throw new StartupError('UNEXPECTED_DAEMON_URL');
-  // Page polling can change the read-only snapshot generation after startup.
-  // Re-observe only that specific race; never start again or replay a mutation.
-  const deadline = Date.now() + 10_000;
-  let status;
-  for (let attempt = 0; attempt < 5; attempt++) {
-    try { status = await client.request('GET', '/v1/daemon/inflight', undefined, AbortSignal.timeout(Math.max(1, deadline - Date.now()))); break; }
-    catch (error) {
-      if (error?.status !== 409 || error?.code !== 'DAEMON_GENERATION_CHANGED' || attempt === 4 || Date.now() >= deadline) throw error;
-      await new Promise(done => setTimeout(done, Math.min(100, Math.max(1, deadline - Date.now()))));
-    }
+  let observed;
+  try {
+    const remaining = deadline - now();
+    if (remaining <= 0) throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage: 'official-start', reason: 'startup-budget-exhausted' });
+    observed = await waitForDaemonReadiness(deps.discover, { ...deps.readiness, timeoutMs: remaining,
+      expectedPid: startReceipt?.pid, once: !!startFailure && startFailure.code !== 'OFFICIAL_START_UNCONFIRMED' });
+  } catch (error) {
+    if (startFailure && startFailure.code !== 'OFFICIAL_START_UNCONFIRMED') throw startFailure;
+    if (startFailure && error instanceof StartupError) throw new StartupError(error.code, {
+      stage: error.stage, reason: error.reason,
+      officialReason: ['cli-readiness-deadline', 'cli-timeout', 'cli-error', 'cli-protocol'].includes(startFailure.reason) ? startFailure.reason : 'cli-unconfirmed',
+      officialExitCode: startFailure.exitCode,
+    });
+    throw error;
   }
-  if (status?.phase !== 'OPEN' || !Number.isSafeInteger(status?.identity?.pid) || status.identity.pid <= 0) throw new StartupError('DAEMON_NOT_READY');
-  if (noBrowser) return { url: NEXT, pid: status.identity.pid, lateReady };
-  return { url: NEXT, pid: status.identity.pid, lateReady, ...await openNext(client, deps.createBrowser) };
+  const { client, status } = observed, lateReady = !!startFailure;
+  const receipt = { url: NEXT, pid: status.identity.pid, lateReady,
+    ...(startFailure ? { officialReason: ['cli-readiness-deadline', 'cli-timeout', 'cli-error', 'cli-protocol'].includes(startFailure.reason) ? startFailure.reason : 'cli-unconfirmed' } : {}) };
+  if (noBrowser) return receipt;
+  return { ...receipt, ...await openNext(client, deps.createBrowser) };
 }
+export function startupFailureSummary(error) {
+  const failure = error instanceof StartupError ? error : new StartupError('LOCAL_START_UNCONFIRMED');
+  const state = /UNCONFIRMED|UNVERIFIED|IDENTITY_CHANGED/.test(failure.code) ? 'readiness unconfirmed' : 'startup failed';
+  const details = [failure.stage && 'stage=' + failure.stage, failure.reason && 'reason=' + failure.reason, Number.isSafeInteger(failure.exitCode) && 'cliExit=' + failure.exitCode, failure.officialReason && 'officialReason=' + failure.officialReason, Number.isSafeInteger(failure.officialExitCode) && 'officialExit=' + failure.officialExitCode].filter(Boolean).join(', ');
+  return `Companion Next ${state} [${failure.code}]${details ? ' (' + details + ')' : ''}. No restart or retry was issued; an unconfirmed daemon may still be starting.`;
+}
+
 export async function main(args = process.argv.slice(2)) {
   if (args.includes('--help')) { console.log('npm start [-- --no-browser]\nStarts/reuses the installed Companion and opens only Companion Next. Closing the new browser window does not stop the daemon.'); return; }
   if (args.some(arg => arg !== '--no-browser')) throw new StartupError('UNKNOWN_OPTION');
@@ -179,7 +272,7 @@ export async function main(args = process.argv.slice(2)) {
       return chromium.launch({ executablePath, headless: false, env: browserEnv });
     },
   });
-  if (result.lateReady) console.log('Official CLI did not confirm startup; the authenticated daemon is now OPEN. No second start was issued.');
+  if (result.lateReady) console.log('Official CLI did not confirm startup (' + result.officialReason + '); the authenticated daemon is now OPEN. No second start was issued.');
   console.log('Companion Next ready (PID ' + result.pid + '): ' + result.url);
   if (result.browser) {
     console.log('Opened a separate Edge window. Close that window to finish this command; the Companion service remains running.');
@@ -190,7 +283,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   main().catch(error => {
     // Do not echo CLI output, credentials, auth tickets or Playwright request diagnostics.
     if (error instanceof StartupError && error.code.startsWith('LOCAL_CONFIG_')) console.error('Check companion-start.local.json against companion-start.example.json; only the approved fixed offline or e2e generation bindings are accepted.');
-    console.error('Companion Next startup failed [' + (error instanceof StartupError ? error.code : 'LOCAL_START_FAILED') + ']. No restart or retry was issued; a timed-out daemon may still be starting.');
+    console.error(startupFailureSummary(error));
     process.exitCode = 1;
   });
 }
