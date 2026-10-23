@@ -1,12 +1,17 @@
-import { validateWorkbenchDocument, type WorkbenchDocument, type WorkbenchReceipt, type WorkbenchOperation } from '../domain/art-workbench'
+import { validateWorkbenchDocument, workbenchEndpoint, type WorkbenchDocument, type WorkbenchReceipt, type WorkbenchOperation, type WorkbenchTaskReceipt } from '../domain/art-workbench'
+import { isAiJobId } from '../domain/ai-jobs-read'
 export class WorkbenchRequestError extends Error { constructor(readonly outcome:'rejected'|'unknown',message:string){super(message)} }
 export interface WorkbenchContext { projectId:string;projectPath:string;source:object }
 export interface WorkbenchProvider {
+ readonly endpoint?:string
  read(context:WorkbenchContext,signal:AbortSignal):Promise<WorkbenchReceipt>
  save(context:WorkbenchContext,input:{operationId:string;expectedHash:string|null;approved:true;document:WorkbenchDocument},signal:AbortSignal):Promise<WorkbenchReceipt>
  status?(context:WorkbenchContext,operationId:string,signal:AbortSignal):Promise<WorkbenchOperation>
+ createTask?(context:WorkbenchContext,input:{operationId:string;expectedHash:string;needId:string;preparedOnly:true;referenceMode:'evidence-only';approved:true},signal:AbortSignal):Promise<WorkbenchTaskReceipt>
+ taskStatus?(context:WorkbenchContext,operationId:string,signal:AbortSignal):Promise<WorkbenchTaskReceipt>
+ reconcileTask?(context:WorkbenchContext,operationId:string,signal:AbortSignal):Promise<WorkbenchTaskReceipt>
 }
-export function createWorkbenchProvider(fetcher:typeof fetch):WorkbenchProvider {
+export function createWorkbenchProvider(fetcher:typeof fetch,origin?:string):WorkbenchProvider {
  function route(context:WorkbenchContext){if(!/^[a-f0-9]{16}$/.test(context.projectId))throw Error('无效工程');return '/api/art-spec/'+context.projectId+'/workbench'}
  async function request(path:string,signal:AbortSignal,input?:unknown){
   const response=await fetcher(path,{method:input?'POST':'GET',credentials:'same-origin',redirect:'error',headers:input?{'content-type':'application/json'}:{},body:input?JSON.stringify(input):undefined,signal})
@@ -24,9 +29,19 @@ export function createWorkbenchProvider(fetcher:typeof fetch):WorkbenchProvider 
   if(!result||result.projectId!==context.projectId||result.projectPath!==context.projectPath||!result.capabilities||result.capabilities.generation!==false||result.capabilities.imageConditioning!==false||typeof result.capabilities.referenceUpload!=='boolean'||typeof result.capabilities.existingJobLink!=='boolean')throw Error('工作台回执不匹配')
   if(result.document){if(!result.hash||!/^[a-f0-9]{64}$/.test(result.hash))throw Error('工作台哈希无效');validateWorkbenchDocument(result.document,context.projectId,context.projectPath)}else if(result.hash!==null)throw Error('工作台回执无效')
   if(result.operation&&(!/^art-save-[a-f0-9]{32}$/.test(result.operation.operationId)||!/^[a-f0-9]{64}$/.test(result.operation.bindingHash)||result.operation.state!=='completed'))throw Error('工作台操作回执无效')
+  const tasks=result.capabilities.preparedTasks;if(tasks&&(tasks.maxBatch!==1||tasks.imageConditioning!==false||!Array.isArray(tasks.categories)||tasks.categories.length!==1||tasks.categories[0]!=='icon'))throw Error('准备任务能力回执无效')
   return result
  }
+ function task(value:unknown,context:WorkbenchContext,operationId:string):WorkbenchTaskReceipt{
+  const result=value as WorkbenchTaskReceipt
+  if(!result||result.projectId!==context.projectId||result.projectPath!==context.projectPath||result.operationId!==operationId||!['created','already-linked','rejected','unknown'].includes(result.state)||(result.needId!==null&&(typeof result.needId!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/.test(result.needId)))||(result.runId!==null&&!isAiJobId(result.runId))||(result.snapshotHash!==null&&!/^[a-f0-9]{64}$/.test(result.snapshotHash))||(result.code!==undefined&&!/^[A-Z][A-Z0-9_]{1,79}$/.test(result.code)))throw Error('准备任务回执无效')
+  if(result.state==='created'||result.state==='already-linked'){if(!isAiJobId(result.jobId)||result.jobId!==result.runId||!result.needId||result.state==='created'&&!result.snapshotHash)throw Error('准备任务身份未确认');result.workbench=receipt(result.workbench,context);if(!result.workbench.document?.needs.some(need=>need.id===result.needId&&need.jobId===result.jobId))throw Error('准备任务尚未关联到需求')}
+  if(result.observation&&(!isAiJobId(result.observation.jobId)||result.observation.verified!==true||typeof result.observation.state!=='string'||result.observation.state.length>80))throw Error('准备任务观察无效')
+  return result
+ }
+ function taskRoute(context:WorkbenchContext,operationId:string){if(!/^art-save-[a-f0-9]{32}$/.test(operationId))throw Error('无效准备任务操作');return route(context)+'/tasks/operations/'+operationId}
  return {
+  ...(origin?{endpoint:workbenchEndpoint(origin)}:{}),
   read:async(context,signal)=>receipt(await request(route(context),signal),context),
   save:async(context,input,signal)=>receipt(await request(route(context),signal,input),context),
   status:async(context,operationId,signal)=>{
@@ -36,5 +51,8 @@ export function createWorkbenchProvider(fetcher:typeof fetch):WorkbenchProvider 
    if(result.state==='completed')result.receipt=receipt(result.receipt,context)
    return result
   },
+  createTask:async(context,input,signal)=>task(await request(route(context)+'/tasks',signal,input),context,input.operationId),
+  taskStatus:async(context,operationId,signal)=>task(await request(taskRoute(context,operationId),signal),context,operationId),
+  reconcileTask:async(context,operationId,signal)=>task(await request(taskRoute(context,operationId)+'/reconcile',signal,{approved:true}),context,operationId),
  }
 }

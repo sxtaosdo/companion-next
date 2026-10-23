@@ -17,7 +17,7 @@ const stages=['项目规范','资源规划','生成素材','视觉审核','导�
 const current=ref({step:0,reached:2})
 function selectView(value:View){current.value={step:value==='norm'?0:value==='specs'?1:2,reached:2};void router.replace({path:'/art-resources',query:{...route.query,manage:value}})}
 async function openSpecification(){selectView('norm');await nextTick();specificationEditor.value?.openEditor()}
-function chooseStage(index:number){if(index<3)selectView(views[index]!);else manager.value?.chooseStep(index)}
+function chooseStage(index:number){if(index===2&&manager.value?.taskActive){manager.value.chooseStep(index);return}if(index<3)selectView(views[index]!);else manager.value?.chooseStep(index)}
 watch(view,value=>current.value={step:value==='norm'?0:value==='specs'?1:2,reached:2},{immediate:true})
 const referenceService=ref<{label:string;text:string;tone:'info'|'success'|'warning';busy:boolean}|null>(null)
 const referenceVisited=ref(route.query.references==='1'),referencesOpen=ref(route.query.references==='1')

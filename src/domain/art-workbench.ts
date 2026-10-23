@@ -2,11 +2,12 @@ import { ART_CATEGORIES, type ArtCategory } from './project-art-spec'
 import { isAiJobId } from './ai-jobs-read'
 import { decodeAiReferenceUploadReceipt, type AiReferenceUploadReceipt, type PreparedLocalReference } from './ai-reference-upload'
 import { AI_REFERENCE_UPLOAD_FENCE_KEY } from '../stores/ai-reference-upload'
+import { artCanonical,artPath } from './project-art-pending'
 export interface WorkbenchReference { relativePath:string; sha256:string; name:string }
 export interface WorkbenchSpec { id:string; name:string; category:ArtCategory; version:number; sizePolicy:'fixed'|'per-asset'; width:number; height:number; destination:string; exportDirectory:string; imageOutput:'transparent-png'; style:string; references:WorkbenchReference[] }
 export interface WorkbenchNeed { id:string; name:string; version:number; content:string; specId:string; specVersion:number; spec:WorkbenchSpec; size?:{width:number;height:number}; references:WorkbenchReference[]; jobId?:string }
 export interface WorkbenchDocument { schemaVersion:'art-workbench-v1'; projectId:string; projectPath:string; version:number; norm:{hash:string;version:number}; projectReferences:WorkbenchReference[]; specs:WorkbenchSpec[]; needs:WorkbenchNeed[] }
-export interface WorkbenchReceipt { projectId:string; projectPath:string; hash:string|null; document:WorkbenchDocument|null; capabilities:{generation:false;imageConditioning:false;referenceUpload:boolean;existingJobLink:boolean}; operation?:{operationId:string;bindingHash:string;state:'completed'} }
+export interface WorkbenchReceipt { projectId:string; projectPath:string; hash:string|null; document:WorkbenchDocument|null; capabilities:{generation:false;imageConditioning:false;referenceUpload:boolean;existingJobLink:boolean;preparedTasks?:{categories:readonly ['icon'];maxBatch:1;imageConditioning:false}}; operation?:{operationId:string;bindingHash:string;state:'completed'} }
 export interface WorkbenchOperation { projectId:string;projectPath:string;operationId:string;state:'pending'|'completed'|'rejected';receipt?:WorkbenchReceipt }
 export const workbenchLabels:Record<ArtCategory,string>={ip:'人物 IP',equipment:'装备',skill:'技能',ui:'UI',icon:'图标'}
 const sha=/^[a-f0-9]{64}$/
@@ -43,4 +44,90 @@ export function rememberWorkbenchReferenceUpload(storage:WorkbenchReferenceStora
 export function releaseRejectedWorkbenchReferenceUpload(storage:WorkbenchReferenceStorage,record:WorkbenchReferenceUpload){
  const id=workbenchReferenceScopeKey(record)+record.originalSha256,rows=readWorkbenchReferenceUploads(storage).filter(row=>workbenchReferenceScopeKey(row)+row.originalSha256!==id||row.receipt!==null)
  const raw=JSON.stringify(rows);storage.setItem(WORKBENCH_REFERENCE_LEDGER_KEY,raw);assert(storage.getItem(WORKBENCH_REFERENCE_LEDGER_KEY)===raw)
+}
+
+/** Workbench schema adapter for the existing art pending-write protocol. No credentials or image bytes. */
+export interface PendingWorkbenchWrite {
+ schemaVersion:'art-workbench-pending-v1';endpoint:string;projectId:string;projectPath:string
+ input:{operationId:string;expectedHash:string|null;approved:true;document:WorkbenchDocument}
+ bindingHash:string;baseVersion:number;base:WorkbenchDocument|null;draft:WorkbenchDocument
+}
+export interface WorkbenchPendingStorage extends WorkbenchReferenceStorage {removeItem(key:string):void;readonly length?:number;key?(index:number):string|null}
+export function workbenchEndpoint(endpoint:string){const url=new URL(endpoint);if(url.protocol!=='http:'||url.hostname!=='127.0.0.1'||url.username||url.password||url.pathname!=='/'||url.search||url.hash)throw Error('无效工作台来源');return url.origin}
+export function workbenchPendingKey(endpoint:string,projectId:string,projectPath:string){return 'art-workbench-pending-v1:'+encodeURIComponent(workbenchEndpoint(endpoint))+':'+projectId+':'+encodeURIComponent(artPath(projectPath))}
+export function readPendingWorkbenchWrite(storage:WorkbenchPendingStorage,endpoint:string,projectId:string,projectPath:string):PendingWorkbenchWrite|null{
+ const raw=storage.getItem(workbenchPendingKey(endpoint,projectId,projectPath));if(raw===null)return null;assert(raw.length<=1024*1024);const record=JSON.parse(raw) as PendingWorkbenchWrite
+ assert(record&&record.schemaVersion==='art-workbench-pending-v1'&&record.endpoint===workbenchEndpoint(endpoint)&&record.projectId===projectId&&artPath(record.projectPath)===artPath(projectPath)&&/^art-save-[a-f0-9]{32}$/.test(record.input?.operationId)&&record.input.approved===true&&(record.input.expectedHash===null||sha.test(record.input.expectedHash))&&sha.test(record.bindingHash)&&Number.isSafeInteger(record.baseVersion)&&record.baseVersion>=0)
+ validateWorkbenchDocument(record.input.document,projectId,record.projectPath);validateWorkbenchDocument(record.draft,projectId,record.projectPath)
+ if(record.base){validateWorkbenchDocument(record.base,projectId,record.projectPath);assert(record.base.version===record.baseVersion&&record.input.expectedHash!==null)}else assert(record.baseVersion===0&&record.input.expectedHash===null)
+ return record
+}
+export async function workbenchPendingBindingHash(record:Pick<PendingWorkbenchWrite,'endpoint'|'projectId'|'projectPath'|'input'|'baseVersion'|'base'>){
+ const data=artCanonical({endpoint:record.endpoint,projectId:record.projectId,projectPath:artPath(record.projectPath),input:record.input,baseVersion:record.baseVersion,base:record.base})
+ return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(data))),value=>value.toString(16).padStart(2,'0')).join('')
+}
+export function persistPendingWorkbenchWrite(storage:WorkbenchPendingStorage,record:PendingWorkbenchWrite){
+ const key=workbenchPendingKey(record.endpoint,record.projectId,record.projectPath),current=readPendingWorkbenchWrite(storage,record.endpoint,record.projectId,record.projectPath)
+ assert(!current||current.input.operationId===record.input.operationId&&current.bindingHash===record.bindingHash)
+ const raw=JSON.stringify(record);assert(raw.length<=1024*1024);storage.setItem(key,raw);assert(storage.getItem(key)===raw);readPendingWorkbenchWrite(storage,record.endpoint,record.projectId,record.projectPath)
+}
+export function clearPendingWorkbenchWrite(storage:WorkbenchPendingStorage,record:PendingWorkbenchWrite){
+ const current=readPendingWorkbenchWrite(storage,record.endpoint,record.projectId,record.projectPath);assert(current&&current.input.operationId===record.input.operationId&&current.bindingHash===record.bindingHash)
+ const key=workbenchPendingKey(record.endpoint,record.projectId,record.projectPath);storage.removeItem(key);assert(storage.getItem(key)===null)
+}
+
+export interface WorkbenchTaskReceipt {projectId:string;projectPath:string;operationId:string;needId:string|null;runId:string|null;state:'created'|'already-linked'|'rejected'|'unknown';code?:string;snapshotHash:string|null;jobId?:string;workbench?:WorkbenchReceipt;observation?:{jobId:string;state:string;verified:true}}
+export interface WorkbenchTaskEntry {needId:string;name:string;operationId:string;state:'not-started'|'submitting'|WorkbenchTaskReceipt['state'];expectedHash?:string;before?:WorkbenchDocument;jobId?:string;runId?:string|null;snapshotHash?:string|null;code?:string}
+export interface WorkbenchTaskLedger {schemaVersion:'art-workbench-tasks-v1';endpoint:string;projectId:string;projectPath:string;entries:WorkbenchTaskEntry[]}
+export function workbenchTasksKey(endpoint:string,projectId:string,projectPath:string){return 'art-workbench-tasks-v1:'+encodeURIComponent(workbenchEndpoint(endpoint))+':'+projectId+':'+encodeURIComponent(artPath(projectPath))}
+function validateWorkbenchTaskLedger(ledger:WorkbenchTaskLedger,endpoint:string,projectId:string,projectPath:string):WorkbenchTaskLedger{
+ assert(ledger?.schemaVersion==='art-workbench-tasks-v1'&&ledger.endpoint===workbenchEndpoint(endpoint)&&ledger.projectId===projectId&&artPath(ledger.projectPath)===artPath(projectPath)&&Array.isArray(ledger.entries)&&ledger.entries.length<=100)
+ const ops=new Set<string>();for(const entry of ledger.entries){assert(/^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$/.test(entry.needId)&&/^art-save-[a-f0-9]{32}$/.test(entry.operationId)&&!ops.has(entry.operationId)&&['not-started','submitting','created','already-linked','rejected','unknown'].includes(entry.state));text(entry.name,128);ops.add(entry.operationId);if(entry.expectedHash!==undefined)assert(sha.test(entry.expectedHash));if(entry.before)validateWorkbenchDocument(entry.before,projectId,projectPath);if(entry.state==='submitting'||entry.state==='unknown')assert(entry.before&&entry.expectedHash);if(entry.jobId!==undefined)assert(isAiJobId(entry.jobId));if(entry.runId!==undefined&&entry.runId!==null)assert(isAiJobId(entry.runId));if(entry.snapshotHash!==undefined&&entry.snapshotHash!==null)assert(sha.test(entry.snapshotHash));if(entry.code!==undefined)assert(/^[A-Z][A-Z0-9_]{1,79}$/.test(entry.code))}
+ return ledger
+}
+function mergeWorkbenchTaskEntry(previous:WorkbenchTaskEntry,next:WorkbenchTaskEntry):WorkbenchTaskEntry{
+ assert(previous.operationId===next.operationId&&previous.needId===next.needId)
+ if(previous.expectedHash&&next.expectedHash)assert(previous.expectedHash===next.expectedHash)
+ if(previous.before&&next.before)assert(artCanonical(previous.before)===artCanonical(next.before))
+ const terminal=(row:WorkbenchTaskEntry)=>['created','already-linked','rejected'].includes(row.state)
+ if(terminal(previous)){if(terminal(next))assert(previous.state===next.state&&previous.jobId===next.jobId);return copyWorkbench(previous)}
+ if(terminal(next))return copyWorkbench(next)
+ if(previous.state==='unknown'&&next.state==='submitting')return copyWorkbench(previous)
+ if(previous.state==='not-started')return copyWorkbench(next)
+ if(next.state==='not-started')return copyWorkbench(previous)
+ return {...copyWorkbench(previous),...copyWorkbench(next),state:previous.state==='unknown'||next.state==='unknown'?'unknown':'submitting',before:copyWorkbench(previous.before??next.before),expectedHash:previous.expectedHash??next.expectedHash,runId:next.runId??previous.runId,snapshotHash:next.snapshotHash??previous.snapshotHash}
+}
+export function readWorkbenchTaskLedger(storage:WorkbenchPendingStorage,endpoint:string,projectId:string,projectPath:string):WorkbenchTaskLedger|null{
+ const key=workbenchTasksKey(endpoint,projectId,projectPath),raw=storage.getItem(key)
+ let ledger:WorkbenchTaskLedger|null=null
+ if(raw!==null){assert(raw.length<=1024*1024);ledger=validateWorkbenchTaskLedger(JSON.parse(raw),endpoint,projectId,projectPath)}
+ const entries=new Map<string,WorkbenchTaskEntry>(ledger?.entries.map(row=>[row.operationId,row])??[])
+ // Independent operation anchors survive a last-writer-wins race on the existing summary key.
+ if(storage.key&&typeof storage.length==='number'){
+  const prefix=key+':operation:',keys:string[]=[]
+  for(let index=0;index<storage.length;index++){const item=storage.key(index);if(item?.startsWith(prefix))keys.push(item)}
+  assert(keys.length<=100)
+  for(const anchorKey of keys){const value=storage.getItem(anchorKey);if(value===null)continue;assert(value.length<=1024*1024);const anchor=validateWorkbenchTaskLedger(JSON.parse(value),endpoint,projectId,projectPath);assert(anchor.entries.length===1);const entry=anchor.entries[0]!;assert(anchorKey===prefix+entry.operationId&&entry.state!=='not-started'&&entry.before&&entry.expectedHash);const previous=entries.get(entry.operationId);entries.set(entry.operationId,previous?mergeWorkbenchTaskEntry(previous,entry):entry)}
+ }
+ if(!ledger&&!entries.size)return null
+ ledger={schemaVersion:'art-workbench-tasks-v1',endpoint:workbenchEndpoint(endpoint),projectId,projectPath,entries:[...entries.values()]}
+ return validateWorkbenchTaskLedger(ledger,endpoint,projectId,projectPath)
+}
+export function persistWorkbenchTaskLedger(storage:WorkbenchPendingStorage,ledger:WorkbenchTaskLedger){
+ // Validate before every mutation, including fallback UNKNOWN writes after a storage fault.
+ const candidate=validateWorkbenchTaskLedger(JSON.parse(JSON.stringify(ledger)),ledger.endpoint,ledger.projectId,ledger.projectPath)
+ assert(storage.key&&typeof storage.length==='number')
+ const current=readWorkbenchTaskLedger(storage,ledger.endpoint,ledger.projectId,ledger.projectPath),proposed=new Map<string,WorkbenchTaskEntry>(candidate.entries.map(row=>[row.operationId,row]))
+ for(const existing of current?.entries??[]){const next=proposed.get(existing.operationId)
+  if(existing.state==='unknown'||existing.state==='submitting'){assert(next);assert(!(existing.state==='unknown'&&next.state==='submitting'))}
+  if(next)proposed.set(existing.operationId,mergeWorkbenchTaskEntry(existing,next));else proposed.set(existing.operationId,copyWorkbench(existing))
+ }
+ const merged={...candidate,entries:[...proposed.values()]};validateWorkbenchTaskLedger(merged,ledger.endpoint,ledger.projectId,ledger.projectPath)
+ const raw=JSON.stringify(merged);assert(raw.length<=1024*1024);const key=workbenchTasksKey(ledger.endpoint,ledger.projectId,ledger.projectPath)
+ storage.setItem(key,raw);assert(storage.getItem(key)===raw)
+ for(const entry of merged.entries){if(!entry.before||!entry.expectedHash)continue
+  const anchor={...merged,entries:[entry]},value=JSON.stringify(anchor),anchorKey=key+':operation:'+entry.operationId
+  if(storage.getItem(anchorKey)!==value){storage.setItem(anchorKey,value);assert(storage.getItem(anchorKey)===value)}
+ }
+ readWorkbenchTaskLedger(storage,ledger.endpoint,ledger.projectId,ledger.projectPath)
 }

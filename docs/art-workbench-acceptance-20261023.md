@@ -21,3 +21,14 @@
 本批关联的是已有真实任务，没有从需求表新建或批量执行生成。参考图实际入模、风格一致性及人物/UI生成未实现，不以上传或历史任务绑定冒充。整页刷新后的未知保存恢复未验证；同页/跨工程保输入有测试。启动包装误报另保留。
 
 原始证据与备份：`C:/Users/33272/Documents/Codex/2026-10-17/task/art-workbench-delivery-20261023/` 内delivery.json、ui-{spec,reference,need,binding,readback}.json、data-readback.json、before-data、before-installed。SQLite在线备份integrity_check=ok。恢复只在正常停止本宿主后按deployment-plan核验并还原原目标，旧index最后写入，保留后续用户数据；不删历史或新hash资产。
+
+
+## 第二批：准备任务与整页恢复（2026-10-23，现场验收待完成）
+
+- 项目规范仍为唯一权威来源。已保存图标需求通过原 Studio inspect/enqueue 准备真实任务，冻结规范、规格、单项输入和引用证据；不调用 run-next/resume，不把任务创建等同图片生成。
+- 单项和顺序批次逐项记录 created/rejected/unknown/not-started；遇未知停止后续，查询原操作并显式恢复关联，不自动重发。人物、UI及参考图入模能力仍未接通。
+- 保存恢复记录跨整页刷新保留原 operationId 和草稿。独立审查发现并修复瞬时存储失败丢快照、旧页面覆盖未知操作两项缺陷；复审及真实浏览器证据以本批任务目录最终记录为准，不以单测冒充现场。
+- 宿主相关10文件79项回归与TypeScript通过；取证采集器2.2.26显式同窗能力有隔离证据和上限，不代表P1060实战P95达标。现有取证按钮尚无战斗步骤入口。
+- 现场更新前备份、预检通过后才正常停止本应用。保护用户登录、10工程、5份规范与城市游戏，不清历史，不新后台，不重启Windows。
+
+证据目录：`C:/Users/33272/Documents/Codex/2026-10-17/task/art-workbench-phase2-20261023/`。源版本与实际运行版本须分别核实；本节不预先声明已部署或新GPU生成成功。
