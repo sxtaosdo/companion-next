@@ -65,3 +65,37 @@ describe('authoritative art creation through state and actual fetch adapter',()=
  })
 
 it('accepts exact padding boundaries while leaving the legacy v2 binding immutable',()=>{for(const value of ['0','40']){const s=buildArtTaskSubmission({...brief,paddingPercent:value},spec(),'a'.repeat(64),[],jobs(),runId);expect(s.input.artAssets![0]!.overrides.paddingPercent).toBe(Number(value))}expect(()=>buildAiTaskSubmission({...brief,paddingPercent:'9'},resourceView(id),jobs(),runId)).toThrow();const legacy=buildAiTaskSubmission(brief,resourceView(id),jobs(),runId);expect(legacy.input.resourceBinding).toEqual({version:1,hash:resourceView(id).hash,presetId:'default'});expect(legacy.input.artAssets).toBeUndefined()})
+
+
+describe('asset-level output dimension planning',()=>{
+ it('requires dimensions only at icon planning and keeps project defaults unchanged',async()=>{
+  const t=setup(),saved=receipt(),c=saved.config as ProjectArtSpec;delete c.overrides.width;delete c.overrides.height;c.overrides.exportDirectory='art/final';t.setSaved(saved)
+  await t.state.readContext();for(const[k,v]of Object.entries(brief))t.state.edit(k as keyof typeof brief,v)
+  expect(t.state.inheritedWidth).toBeUndefined();expect(t.state.inheritedHeight).toBeUndefined();expect(t.state.canPrepare).toBe(false);expect(t.state.prepare()).toBe(false)
+  t.state.edit('width','128');t.state.edit('height','96');expect(t.state.canPrepare).toBe(true);expect(t.state.prepare()).toBe(true)
+  const submitted=t.state.prepared!;expect(submitted.input.artAssets![0]!.overrides).toMatchObject({width:128,height:96,exportDirectory:'art/final/icons'});expect((submitted.savedConfig as ProjectArtSpec).overrides).not.toHaveProperty('width');expect((submitted.savedConfig as ProjectArtSpec).overrides.exportDirectory).toBe('art/final')
+  expect(t.state.output).toMatchObject({width:128,height:96,destination:'assets/art',exportDirectory:'art/final/icons'});expect(t.transport).not.toHaveBeenCalled()
+ })
+ it('inherits category dimensions and returns to inheritance when a task override is cleared',async()=>{
+  const t=setup(),saved=receipt(),c=saved.config as ProjectArtSpec;c.categories.icon={width:144,height:120};t.setSaved(saved);await ready(t)
+  expect(t.state.inheritedWidth).toBe(144);expect(t.state.inheritedHeight).toBe(120);t.state.edit('width','160');expect(t.state.confirmed).toBe(false);expect(t.state.prepared).toBeNull();expect(t.state.output?.width).toBe(160);t.state.edit('width','');expect(t.state.output?.width).toBe(144);expect(t.state.prepare()).toBe(true);expect(t.state.prepared!.input.artAssets![0]!.overrides.width).toBeUndefined();expect(t.transport).not.toHaveBeenCalled()
+ })
+ it.each([['0','96'],['4097','96'],['2.5','96'],['bad','96'],['4096','4096']])('rejects invalid dimensions %s × %s',async(width,height)=>{
+  const t=setup();await ready(t);t.state.edit('width',width);t.state.edit('height',height);expect(t.state.canPrepare).toBe(false);expect(t.state.prepare()).toBe(false);expect(t.transport).not.toHaveBeenCalled()
+ })
+ it('respects locked dimensions and a locked export root',async()=>{
+  const t=setup(),saved=receipt(),c=saved.config as ProjectArtSpec,pin={path:'P0001/ip/canon_interface.md',revision:'c'.repeat(40)};delete c.overrides.width;delete c.overrides.exportDirectory;c.inheritance={mode:'canon',usage:'runtime',sources:[pin]};saved.authorities=[{source:pin,status:'Accepted',kind:'canon-interface',projectIds:[id],allowedUsages:['runtime'],categories:['icon'],locked:{width:128,exportDirectory:'art/final'},defaults:{},requiresImageReference:false}];t.setSaved(saved);await ready(t)
+  expect(t.state.widthLocked).toBe(true);t.state.edit('width','64');expect(t.state.brief.width).toBe('');expect(t.state.output?.width).toBe(128);expect(t.state.output?.exportDirectory).toBe('art/final');expect(t.state.prepared!.input.artAssets![0]!.overrides.exportDirectory).toBeUndefined()
+ })
+ it('does not append icons to an already specific output directory',()=>{
+  for(const directory of ['art/final/icons','art/final/custom']){const c=spec();c.overrides.exportDirectory=directory;const s=buildArtTaskSubmission(brief,c,'a'.repeat(64),[],jobs(),runId);expect(s.input.artAssets![0]!.overrides.exportDirectory).toBeUndefined()}
+  expect(()=>buildAiTaskSubmission({...brief,width:'128'},resourceView(id),jobs(),runId)).toThrow();expect(()=>buildAiTaskSubmission({...brief,height:'128'},resourceView(id),jobs(),runId)).toThrow()
+ })
+ it('isolates both dimension overrides by project path and source identity',async()=>{
+  const t=setup();await ready(t);t.state.edit('width','192');t.state.edit('height','160');const other={...project,id:'fedcba9876543210',path:'/other'};t.state.setContext(other,source,t.reader,t.history,t.writer,false,t.art);expect([t.state.brief.width,t.state.brief.height]).toEqual(['','']);t.state.setContext(project,source,t.reader,t.history,t.writer,false,t.art);expect([t.state.brief.width,t.state.brief.height]).toEqual(['192','160']);t.state.setContext(project,{},t.reader,t.history,t.writer,false,t.art);expect([t.state.brief.width,t.state.brief.height]).toEqual(['','']);expect(t.transport).not.toHaveBeenCalled()
+ })
+ it('shows blank required planning dimensions without fake zero and enables review after valid input',async()=>{
+  const t=setup(),saved=receipt(),c=saved.config as ProjectArtSpec;delete c.overrides.width;delete c.overrides.height;t.setSaved(saved);projectArtSpecProvider.value=t.art;const wrapper=mount(AiTaskCreationPanel,{props:{project,source,resourceReader:t.reader,jobsReader:t.history,provider:t.writer},global:{plugins:[createPinia(),ElementPlus]}})
+  try{await wrapper.get('.task-buttons button').trigger('click');await flushPromises();expect(wrapper.text()).toContain('待填写 × 待填写');const width=wrapper.get('input[aria-label="本次图标成品宽"]'),height=wrapper.get('input[aria-label="本次图标成品高"]');expect((width.element as HTMLInputElement).value).toBe('');expect(wrapper.get('button[type=submit]').attributes('disabled')).toBeDefined();await width.setValue('128');await height.setValue('96');await flushPromises();expect(wrapper.get('button[type=submit]').attributes('disabled')).toBeUndefined();expect(t.transport).not.toHaveBeenCalled()}finally{wrapper.unmount()}
+ })
+})

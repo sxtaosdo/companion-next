@@ -25,7 +25,8 @@ export interface ProjectArtSpec {
   schemaVersion: 'project-art-spec-v1'
   projectId: string
   version: number
-  project: { name: string; content: string; engine: 'cocos-creator'; designResolution: { width: number; height: number } }
+  project: { name: string; content: string; engine: 'cocos-creator'; visualMode?: '2d' | '3d'; designResolution: { width: number; height: number } }
+  imageOutput?: 'transparent-png'
   inheritance: { mode: 'none'; reason?: string } | { mode: 'canon'; sources: ArtSourcePin[]; usage?: CanonArtUsage }
   overrides: ArtValues
   categories: Partial<Record<ArtCategory, ArtValues>>
@@ -88,19 +89,21 @@ function values(value: unknown, field: string): ArtValues {
 }
 /** Reuses the stored contract for the first wizard step without validating future fields. */
 export function validateArtProjectSettings(value: unknown): ProjectArtSpec['project'] {
-  const project = object(value, 'project'); keys(project, ['name', 'content', 'engine', 'designResolution'], 'project')
+  const project = object(value, 'project'); keys(project, ['name', 'content', 'engine', 'visualMode', 'designResolution'], 'project')
   if (project.engine !== 'cocos-creator') fail('UNSUPPORTED_ENGINE', 'project.engine')
+  if (project.visualMode !== undefined && project.visualMode !== '2d' && project.visualMode !== '3d') fail('INVALID_CONFIG', 'project.visualMode')
   const design = object(project.designResolution, 'project.designResolution'); keys(design, ['width', 'height'], 'project.designResolution')
-  return { name: text(project.name, 'project.name', 128), content: text(project.content, 'project.content'), engine: 'cocos-creator', designResolution: { width: integer(design.width, 'project.designResolution.width', 8192), height: integer(design.height, 'project.designResolution.height', 8192) } }
+  return { name: text(project.name, 'project.name', 128), content: text(project.content, 'project.content'), engine: 'cocos-creator', ...(project.visualMode === undefined ? {} : { visualMode: project.visualMode as '2d' | '3d' }), designResolution: { width: integer(design.width, 'project.designResolution.width', 8192), height: integer(design.height, 'project.designResolution.height', 8192) } }
 }
 export function parseProjectArtSpec(value: unknown, expectedProjectId: string): ParsedArtSpec {
   if (!/^[a-f0-9]{16}$/.test(expectedProjectId)) fail('PROJECT_MISMATCH', 'projectId')
   const raw = object(value, 'config')
   if (raw.projectId !== expectedProjectId) fail('PROJECT_MISMATCH', 'projectId')
   if (raw.schemaVersion === 'project-resource-config-v2') return { kind: 'legacy-v2', config: decodeAiResourceConfigV2(raw, expectedProjectId), referencesAsModelInput: false }
-  keys(raw, ['schemaVersion', 'projectId', 'version', 'project', 'inheritance', 'overrides', 'categories'], 'config')
+  keys(raw, ['schemaVersion', 'projectId', 'version', 'project', 'inheritance', 'overrides', 'categories', 'imageOutput'], 'config')
   if (raw.schemaVersion !== 'project-art-spec-v1') fail('UNSUPPORTED_SCHEMA', 'schemaVersion')
   if (raw.projectId !== expectedProjectId) fail('PROJECT_MISMATCH', 'projectId')
+  if (raw.imageOutput !== undefined && raw.imageOutput !== 'transparent-png') fail('INVALID_CONFIG', 'imageOutput')
   const project = validateArtProjectSettings(raw.project)
   const inheritance = object(raw.inheritance, 'inheritance')
   let inherited: ProjectArtSpec['inheritance']
@@ -119,10 +122,16 @@ export function parseProjectArtSpec(value: unknown, expectedProjectId: string): 
   const categories = object(raw.categories, 'categories'); keys(categories, ART_CATEGORIES, 'categories')
   const checked: ProjectArtSpec['categories'] = {}
   for (const category of ART_CATEGORIES) if (Object.hasOwn(categories, category)) checked[category] = values(categories[category], `categories.${category}`)
+  const overrides = values(raw.overrides, 'overrides')
+  if (raw.imageOutput === 'transparent-png') {
+    if (overrides.transparent === false) fail('IMAGE_OUTPUT_POLICY_CONFLICT', 'overrides.transparent')
+    for (const category of ART_CATEGORIES) if (checked[category]?.transparent === false) fail('IMAGE_OUTPUT_POLICY_CONFLICT', `categories.${category}.transparent`)
+  }
   return { kind: 'project', spec: {
     schemaVersion: 'project-art-spec-v1', projectId: expectedProjectId, version: integer(raw.version, 'version', Number.MAX_SAFE_INTEGER),
     project,
-    inheritance: inherited, overrides: values(raw.overrides, 'overrides'), categories: checked,
+    ...(raw.imageOutput === undefined ? {} : { imageOutput: 'transparent-png' as const }),
+    inheritance: inherited, overrides, categories: checked,
   } }
 }
 export interface ArtAssetInput { assetId: string; category: ArtCategory; prompt: string; overrides: ArtValues; references: string[] }
@@ -168,12 +177,14 @@ export function resolveArtGenerationInput(spec: ProjectArtSpec, asset: ArtAssetI
   const resolved: ArtValues = { ...defaults, ...locked }
   for (const [layerName, layer] of [['project', checked.overrides], ['category', checked.categories[asset.category] ?? {}], ['asset', values(asset.overrides, 'asset.overrides')]] as const) {
     for (const [key, item] of Object.entries(layer)) {
+      if (checked.imageOutput === 'transparent-png' && key === 'transparent' && item === false) fail('IMAGE_OUTPUT_POLICY_CONFLICT', `${layerName}.transparent`)
       if (Object.hasOwn(locked, key) && locked[key as keyof ArtValues] !== item) fail('LOCKED_OVERRIDE', key)
       Object.assign(resolved, { [key]: item })
       if (!Object.hasOwn(locked, key)) provenance[key] = layerName
     }
   }
   for (const key of [...required[asset.category], 'width', 'height', 'transparent', 'destination', 'exportDirectory'] as const) if (resolved[key] === undefined) fail('REQUIRED_FIELD', key)
+  if (checked.imageOutput === 'transparent-png' && resolved.transparent !== true) fail('IMAGE_OUTPUT_POLICY_CONFLICT', 'transparent')
   if (resolved.transparent === false && resolved.backgroundColor === undefined) fail('REQUIRED_FIELD', 'backgroundColor')
   if (resolved.width! * resolved.height! > 16_000_000) fail('INVALID_CONFIG', 'dimensions')
   const blockers: string[] = []
@@ -215,6 +226,7 @@ export function validateProjectArtBindings(spec: ProjectArtSpec, authorities: re
         Object.assign(target, { [key]: value })
       }
     }
+    if (parsed.spec.imageOutput === 'transparent-png' && locked.transparent === false) fail('IMAGE_OUTPUT_POLICY_CONFLICT', 'authority.locked.transparent')
     for (const layer of [spec.overrides, spec.categories[category] ?? {}]) for (const [key, value] of Object.entries(layer)) {
       if (Object.hasOwn(locked, key) && locked[key as keyof ArtValues] !== value) fail('LOCKED_OVERRIDE', key)
     }

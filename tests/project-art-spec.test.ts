@@ -171,3 +171,36 @@ describe('optional independent-project explanation contract',()=>{
  it.each([null,42,false,' ',' leading','trailing ','bad\u0001text'])('does not treat malformed explanation %j as an optional omission',reason=>{const c=spec();Object.assign(c,{inheritance:{mode:'none',reason}});rejects('INVALID_CONFIG',()=>parseProjectArtSpec(c,projectId))})
  it('retains strict Canon use and required generation values without an independent explanation',()=>{const c=spec();c.inheritance={mode:'none'};delete c.overrides.width;rejects('REQUIRED_FIELD',()=>resolve(c));const pinned=inherited();if(pinned.inheritance.mode==='canon')delete pinned.inheritance.usage;rejects('SOURCE_USAGE_OUT_OF_SCOPE',()=>resolve(pinned,asset(),[authority()]))})
 })
+
+describe('compatible visual metadata and transparent PNG policy', () => {
+  it.each([undefined, '2d', '3d'] as const)('round-trips visual mode %s and optional output policy exactly', visualMode => {
+    const c = spec(); if (visualMode) c.project.visualMode = visualMode
+    expect(parseProjectArtSpec(c, projectId)).toEqual({ kind: 'project', spec: c })
+    c.imageOutput = 'transparent-png'
+    expect(parseProjectArtSpec(c, projectId)).toEqual({ kind: 'project', spec: c })
+    expect(resolve(c).values.transparent).toBe(true)
+  })
+  it('rejects unrecognized metadata without weakening existing opaque compatibility', () => {
+    const old = spec(); old.overrides.transparent = false; old.overrides.backgroundColor = '#abcdef'
+    expect(resolve(old).values.transparent).toBe(false)
+    Object.assign(old.project, {visualMode:'4d'}); rejects('INVALID_CONFIG', () => parseProjectArtSpec(old,projectId))
+    delete old.project.visualMode; Object.assign(old,{imageOutput:'opaque-jpeg'}); rejects('INVALID_CONFIG', () => parseProjectArtSpec(old,projectId))
+  })
+  it('rejects opaque project, category and individual asset layers under declared transparent output', () => {
+    const c = spec(); c.imageOutput = 'transparent-png'; c.overrides.transparent = false
+    rejects('IMAGE_OUTPUT_POLICY_CONFLICT', () => parseProjectArtSpec(c,projectId))
+    c.overrides.transparent = true
+    for (const category of ART_CATEGORIES) { c.categories = {[category]:{transparent:false}}; rejects('IMAGE_OUTPUT_POLICY_CONFLICT',()=>parseProjectArtSpec(c,projectId)) }
+    c.categories = {}; const input=asset(); input.overrides.transparent=false
+    rejects('IMAGE_OUTPUT_POLICY_CONFLICT',()=>resolve(c,input))
+    c.overrides.backgroundColor='#abcdef'; expect(resolve(c).values.backgroundColor).toBe('#abcdef')
+  })
+  it('retains Canon locks and refuses an incompatible inherited transparent policy', () => {
+    const c=inherited(); c.imageOutput='transparent-png';const a=authority();a.locked.transparent=false
+    rejects('IMAGE_OUTPUT_POLICY_CONFLICT',()=>validateProjectArtBindings(c,[a]))
+    rejects('LOCKED_OVERRIDE',()=>resolve(c,asset(),[a]))
+    a.locked.transparent=true;const input=asset();input.overrides.transparent=false
+    rejects('IMAGE_OUTPUT_POLICY_CONFLICT',()=>resolve(c,input,[a]))
+    c.overrides.renderingLanguage='Different';rejects('LOCKED_OVERRIDE',()=>validateProjectArtBindings(c,[a]))
+  })
+})

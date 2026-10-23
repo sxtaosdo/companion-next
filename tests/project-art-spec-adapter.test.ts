@@ -36,3 +36,9 @@ describe('project art authenticated same-origin transport',()=>{
   fetcher.mockResolvedValueOnce(new Response('x'.repeat(512*1024+1)));await expect(provider.read(context,new AbortController().signal)).rejects.toThrow()
  })
 })
+
+describe('explicit global association read metadata',()=>{
+ const pin={path:'P0001/art/style.md',revision:'a'.repeat(40)}
+ it.each([{state:'unlinked',code:'NO_PROJECT_ASSOCIATION',sources:[]},{state:'not-applicable',code:'EXPLICIT_NOT_APPLICABLE',sources:[pin]}])('preserves trusted resolution without turning absence into exclusion',async inheritanceResolution=>{const p=createProjectArtSpecProvider(vi.fn<typeof fetch>(async()=>json({...receipt,inheritanceResolution})),'http://127.0.0.1:32180');expect((await p.read(context,new AbortController().signal)).inheritanceResolution).toEqual(inheritanceResolution)})
+ it.each([{state:'not-applicable',code:'EXPLICIT_NOT_APPLICABLE',sources:[]},{state:'unlinked',code:'NO_PROJECT_ASSOCIATION',sources:[pin]},{state:'available',code:'REVIEWED_SOURCES_AVAILABLE',sources:[pin]},{state:'unlinked',code:'NO_PROJECT_ASSOCIATION',sources:[],unexpected:'private'},{state:'not-applicable',code:'EXPLICIT_NOT_APPLICABLE',sources:[{...pin,path:'P0001/../private.md'}]}])('rejects malformed/unproven applicability',async inheritanceResolution=>{const p=createProjectArtSpecProvider(vi.fn<typeof fetch>(async()=>json({...receipt,inheritanceResolution})),'http://127.0.0.1:32180');await expect(p.read(context,new AbortController().signal)).rejects.toThrow()})
+})

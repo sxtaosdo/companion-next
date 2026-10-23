@@ -93,3 +93,8 @@ describe('single-flight I/O lease and response budgets', () => {
     for (const response of [large, html, redirect]) await expect(createAiJobActionsProvider({ fetch: async () => response }).execute(id, submission())).rejects.toMatchObject({ outcome: 'unknown' })
   })
 })
+
+describe('proven pre-persistence image rejection',()=>{
+ it.each([['IMAGE_TRANSPARENCY_REQUIRED','image-transparency-required','真实透明像素'],['IMAGE_CONTENT_EMPTY','image-content-empty','没有可见内容']])('keeps %s definite and does not retry',async(backendCode,code,message)=>{const fetch=vi.fn<AiJobActionsFetch>(async()=>json({code:backendCode,error:backendCode,retryable:false},400)),p=createAiJobActionsProvider({fetch});await expect(p.execute(id,submission('export-variant'))).rejects.toMatchObject({code,outcome:'rejected',status:400,message:expect.stringContaining(message!)});expect(fetch).toHaveBeenCalledOnce();await p.waitForIdle()})
+ it('does not misclassify the same text with the wrong HTTP status as safe rejection',async()=>{const fetch=vi.fn<AiJobActionsFetch>(async()=>json({code:'IMAGE_TRANSPARENCY_REQUIRED',error:'IMAGE_TRANSPARENCY_REQUIRED',retryable:false},503)),p=createAiJobActionsProvider({fetch});await expect(p.execute(id,submission('export-variant'))).rejects.toMatchObject({outcome:'unknown'});expect(fetch).toHaveBeenCalledOnce()})
+})

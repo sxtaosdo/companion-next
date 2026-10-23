@@ -7,7 +7,7 @@ import type { AiResourceReadProvider, AiResourceView } from '../domain/ai-resour
 import { decodeAiResourceView, isAiProjectId } from '../domain/ai-resource-read'
 import { decodeAiJobsView } from '../domain/ai-jobs-read'
 import type { AiJobsReadProvider, AiJobsView, AiJobSnapshot } from '../domain/ai-jobs-read'
-import { AiTaskCreationError, artTaskAssetInput, artTaskCompiledPrompt, aiTaskPromptSuffix, aiTaskCanonicalJson, aiTaskGapAllowsWrite, aiTaskHistoryBlocked, aiTaskInputHash, buildAiTaskSubmission, buildArtTaskSubmission, decodeAiTaskInspection, newAiTaskRunId, savedAiTaskConfig, validateAiTaskCreatedJob } from '../domain/ai-task-creation'
+import { AiTaskCreationError, artTaskPlanningInput, artTaskInheritedPlanning, artTaskCompiledPrompt, aiTaskPromptSuffix, aiTaskCanonicalJson, aiTaskGapAllowsWrite, aiTaskHistoryBlocked, aiTaskInputHash, buildAiTaskSubmission, buildArtTaskSubmission, decodeAiTaskInspection, newAiTaskRunId, savedAiTaskConfig, validateAiTaskCreatedJob } from '../domain/ai-task-creation'
 import type { AiTaskBrief, AiTaskCreationProvider, AiTaskCreationSubmission, AiTaskInspection } from '../domain/ai-task-creation'
 import { AiWriteCoordinationError, aiWriteCoordinator, getAiWriteFenceStorage, hasPendingAiWrites, putAiWriteFence, readAiWriteFences, removeAiWriteFence } from '../domain/ai-write-coordination'
 import type { AiWriteCoordinator, AiWriteFence, AiWriteFenceStorage } from '../domain/ai-write-coordination'
@@ -25,14 +25,14 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   const project = shallowRef<AiTaskProject | null>(null), resource = shallowRef<AiResourceView | null>(null), history = shallowRef<AiJobsView | null>(null)
   const art = shallowRef<ProjectArtSpecReceipt | null>(null)
   const artConfig = computed(() => { if(!art.value?.config || !project.value)return null; const parsed=parseProjectArtSpec(art.value.config,project.value.id);return parsed.kind==='project'?parsed.spec:null })
-  const brief = reactive<AiTaskBrief>({ name: '', assetId: '', purpose: '', prompt: '', sourceId: '', paddingPercent: '' })
+  const brief = reactive<AiTaskBrief>({ name: '', assetId: '', purpose: '', prompt: '', sourceId: '', paddingPercent: '', width:'',height:'' })
   const briefCache = new WeakMap<object,Map<string,AiTaskBrief>>()
   let briefContext:{source:object;key:string}|null=null
   function bindBrief(next:AiTaskProject|null,source:object|null){
     const key=validProject(next)?JSON.stringify([next.id,next.path]):''
     if(briefContext?.source===source && briefContext.key===key)return
     if(briefContext){let cache=briefCache.get(briefContext.source);if(!cache){cache=new Map();briefCache.set(briefContext.source,cache)}cache.set(briefContext.key,copy(brief))}
-    Object.assign(brief,source&&key?briefCache.get(source)?.get(key)??{name:'',assetId:'',purpose:'',prompt:'',sourceId:'',paddingPercent:''}:{name:'',assetId:'',purpose:'',prompt:'',sourceId:'',paddingPercent:''})
+    Object.assign(brief,source&&key?briefCache.get(source)?.get(key)??{name:'',assetId:'',purpose:'',prompt:'',sourceId:'',paddingPercent:'',width:'',height:''}:{name:'',assetId:'',purpose:'',prompt:'',sourceId:'',paddingPercent:'',width:'',height:''})
     briefContext=source&&key?{source,key}:null
   }
   const active = ref(true), contextVersion = ref(0), pendingRunIds = ref<string[]>([]), recovered = ref(false)
@@ -44,16 +44,21 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   const coordinator = options.coordinator ?? aiWriteCoordinator, lane = useProjectOperationLaneStore()
   const storage = () => options.storage ?? getAiWriteFenceStorage()
   const config = computed(() => { try { return resource.value && project.value ? savedAiTaskConfig(resource.value, project.value.id) : null } catch { return null } })
-  const resolvedInput = computed(() => {if(!artConfig.value||!art.value)return null;try{return resolveArtGenerationInput(artConfig.value,artTaskAssetInput(brief,true),art.value.authorities,{categories:['icon'],imageReferenceInput:false})}catch{return null}})
-  const inheritedInput = computed(() => {if(!artConfig.value||!art.value)return null;try{return resolveArtGenerationInput(artConfig.value,artTaskAssetInput({...brief,paddingPercent:''},true),art.value.authorities,{categories:['icon'],imageReferenceInput:false})}catch{return null}})
-  const inheritedPadding = computed(() => artConfig.value ? inheritedInput.value?.values.paddingPercent : config.value?.composition.paddingPercent)
-  const paddingLocked = computed(() => inheritedInput.value?.lockedFields.includes('paddingPercent') ?? false)
+  const resolvedInput = computed(() => {if(!artConfig.value||!art.value)return null;try{return resolveArtGenerationInput(artConfig.value,artTaskPlanningInput(brief,artConfig.value,art.value.authorities,true),art.value.authorities,{categories:['icon'],imageReferenceInput:false})}catch{return null}})
+  const inheritedPlanning = computed(() => {if(!artConfig.value||!art.value)return null;try{return artTaskInheritedPlanning(artConfig.value,art.value.authorities)}catch{return null}})
+  const inheritedPadding = computed(() => artConfig.value ? inheritedPlanning.value?.values.paddingPercent : config.value?.composition.paddingPercent)
+  const paddingLocked = computed(() => inheritedPlanning.value?.lockedFields.includes('paddingPercent') ?? false)
+  const inheritedWidth = computed(() => artConfig.value ? inheritedPlanning.value?.values.width : config.value?.iconSize.width)
+  const inheritedHeight = computed(() => artConfig.value ? inheritedPlanning.value?.values.height : config.value?.iconSize.height)
+  const widthLocked = computed(() => inheritedPlanning.value?.lockedFields.includes('width') ?? false)
+  const heightLocked = computed(() => inheritedPlanning.value?.lockedFields.includes('height') ?? false)
+  const dimensionsReady = computed(() => !artConfig.value || !!resolvedInput.value)
   const compiledPromptLength = computed(() => artConfig.value ? resolvedInput.value ? artTaskCompiledPrompt(resolvedInput.value).length : '待核对' : config.value ? brief.prompt.trim().length+aiTaskPromptSuffix(config.value).length : 0)
   const output = computed(() => artConfig.value ? resolvedInput.value?.values??null : config.value?{width:config.value.iconSize.width,height:config.value.iconSize.height,destination:config.value.destination.directory}:null)
   const targetPath = computed(() => output.value && brief.assetId.trim() ? `${output.value.destination}/${brief.assetId.trim()}.png` : '')
   const supportsDrain = (bound: Binding) => typeof bound.resourceReader.waitForIdle === 'function' && typeof bound.jobsReader.waitForIdle === 'function' && typeof bound.provider.waitForIdle === 'function' && (!bound.artReader || typeof bound.artReader.waitForIdle === 'function')
   const drainAvailable = computed(() => { contextVersion.value; return !!binding && supportsDrain(binding) })
-  const canPrepare = computed(() => active.value && !!project.value && !!binding && !!(config.value || artConfig.value) && !!history.value && drainAvailable.value && !aiTaskHistoryBlocked(history.value) && !dirty.value && !busy.value && !pending.value && !storageBlocked.value && !lane.locked && phase.value !== 'unknown' && !retainedRunId.value)
+  const canPrepare = computed(() => active.value && !!project.value && !!binding && !!(config.value || artConfig.value) && !!history.value && drainAvailable.value && !aiTaskHistoryBlocked(history.value) && !dirty.value && !busy.value && !pending.value && !storageBlocked.value && !lane.locked && phase.value !== 'unknown' && !retainedRunId.value && dimensionsReady.value)
   const canSubmit = computed(() => active.value && !!prepared.value && drainAvailable.value && confirmed.value && approval === prepared.value && !busy.value && !dirty.value && !pending.value && !storageBlocked.value && !lane.locked && phase.value === 'prepared')
   const recoveryContextMatches = () => !!recovery && !!binding && equal(recovery.binding.project, binding.project) && recovery.binding.source === binding.source && recovery.binding.resourceReader === binding.resourceReader && recovery.binding.jobsReader === binding.jobsReader && recovery.binding.provider === binding.provider && recovery.binding.artReader === binding.artReader
   const canRecover = computed(() => { contextVersion.value; return active.value && phase.value === 'unknown' && !!activeFence && !!recovery && drainAvailable.value && !busy.value && !lane.locked && recoveryContextMatches() })
@@ -87,7 +92,7 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   }
   function edit(field: keyof AiTaskBrief, value: string) {
     if (!active.value || busy.value || phase.value === 'unknown' || retainedRunId.value) return
-    if(field==='paddingPercent' && (!artConfig.value || paddingLocked.value))return
+    if(['paddingPercent','width','height'].includes(field) && (!artConfig.value || (field==='paddingPercent'?paddingLocked.value:field==='width'?widthLocked.value:heightLocked.value)))return
     brief[field] = value
     if (field === 'name') brief.assetId = value.trim()
     clearApproval(); prepared.value = null; inspection.value = null; phase.value = history.value && (config.value || artConfig.value) ? 'ready' : 'idle'; error.value = ''
@@ -243,6 +248,6 @@ export function createAiTaskCreationState(options: { storage?: AiWriteFenceStora
   }
   function storageChanged() { refreshFenceState(); if (busy.value) invalidate(); else clearApproval() }
   function leave() { invalidate(); binding = null; contextVersion.value++ }
-  return { active, project, resource, history, brief, config, artConfig, art, output, resolvedInput, inheritedPadding, paddingLocked, compiledPromptLength, targetPath, phase, error, confirmed, busy, dirty, pending, pendingRunIds, recovered, storageBlocked, prepared, inspection, snapshot, retainedRunId,
+  return { inheritedWidth,inheritedHeight,widthLocked,heightLocked,dimensionsReady,active, project, resource, history, brief, config, artConfig, art, output, resolvedInput, inheritedPadding, paddingLocked, compiledPromptLength, targetPath, phase, error, confirmed, busy, dirty, pending, pendingRunIds, recovered, storageBlocked, prepared, inspection, snapshot, retainedRunId,
     drainAvailable, canPrepare, canSubmit, canRecover, recoverOriginal, setActive, setContext, edit, returnToBrief, readContext, prepare, confirm, submit, newBrief, storageChanged, leave }
 }

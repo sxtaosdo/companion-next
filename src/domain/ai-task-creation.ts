@@ -1,11 +1,11 @@
-import { parseProjectArtSpec, resolveArtGenerationInput, type ProjectArtSpec, type ArtAuthority, type ArtAssetInput } from './project-art-spec'
+import { parseProjectArtSpec, resolveArtGenerationInput, type ProjectArtSpec, type ArtAuthority, type ArtAssetInput, validateProjectArtBindings, type ArtValues } from './project-art-spec'
 import { decodeAiResourceConfigV2, decodeAiResourceView, isAiProjectId } from './ai-resource-read'
 import type { AiResourceConfigV2, AiResourceView } from './ai-resource-read'
 import { decodeAiJobSnapshot, decodeAiJobsView, isAiJobId } from './ai-jobs-read'
 import type { AiJobSnapshot, AiJobsView } from './ai-jobs-read'
 
 /** The original UI creates one asset. The deployed protocol allows two, but this form does not. */
-export interface AiTaskBrief { name: string; assetId: string; purpose: string; prompt: string; sourceId: string; paddingPercent?: string }
+export interface AiTaskBrief { name: string; assetId: string; purpose: string; prompt: string; sourceId: string; paddingPercent?: string; width?: string; height?: string }
 export interface AiTaskRequest {
   schemaVersion: 'local-icon-requests-v1'; projectId: string; runId: string; sourceRevision: string; visualSpec: string
   assets: [{ assetId: string; relativePath: string; prompt: string; purpose: string; required: true }]
@@ -76,7 +76,7 @@ export function savedAiTaskConfig(value: AiResourceView, projectId: string): AiR
   return view.config
 }
 export function buildAiTaskSubmission(brief: AiTaskBrief, resource: AiResourceView, history: AiJobsView, runId = newAiTaskRunId()): AiLegacyTaskCreationSubmission {
-  if (brief.paddingPercent?.trim()) throw fail()
+  if (brief.paddingPercent?.trim() || brief.width?.trim() || brief.height?.trim()) throw fail()
   const config = savedAiTaskConfig(resource, resource.projectId), jobs = decodeAiJobsView(history, resource.projectId)
   if (!asset.test(brief.name.trim()) || !asset.test(brief.assetId.trim()) || reserved.test(brief.assetId.trim()) || aiTaskHistoryBlocked(jobs) || jobs.jobs.some(job => job.jobId === runId)) throw fail()
   const selected = brief.sourceId ? jobs.adoptionSources?.find(source => source.sourceId === brief.sourceId) : undefined
@@ -143,14 +143,32 @@ export async function decodeAiTaskCreationResponse(value: unknown, submission: A
 export function artTaskAssetInput(brief:AiTaskBrief, preview=false):ArtAssetInput & {category:'icon'} {
   const fallback=preview?'preview':''
   const padding=brief.paddingPercent?.trim()
+  const dimensions:ArtValues={}
+  for(const field of ['width','height'] as const){const value=brief[field]?.trim();if(value){if(!/^\d+$/.test(value)||Number(value)<1||Number(value)>4096)throw fail();dimensions[field]=Number(value)}}
   if(padding && (!/^\d+$/.test(padding)||Number(padding)>40))throw fail()
-  return {assetId:brief.assetId.trim()||fallback,category:'icon',prompt:brief.prompt.trim()||fallback,overrides:{subject:brief.prompt.trim()||fallback,purpose:brief.purpose.trim()||fallback,...(padding?{paddingPercent:Number(padding)}:{})},references:[]}
+  return {assetId:brief.assetId.trim()||fallback,category:'icon',prompt:brief.prompt.trim()||fallback,overrides:{subject:brief.prompt.trim()||fallback,purpose:brief.purpose.trim()||fallback,...dimensions,...(padding?{paddingPercent:Number(padding)}:{})},references:[]}
+}
+/** Read only inherited planning fields even when a new project has not chosen output dimensions yet. */
+export function artTaskInheritedPlanning(config:ProjectArtSpec,authorities:readonly ArtAuthority[]):{values:ArtValues;lockedFields:string[]}{
+  const parsed=parseProjectArtSpec(config,config.projectId);if(parsed.kind!=='project')throw fail()
+  const spec=parsed.spec;validateProjectArtBindings(spec,authorities)
+  const inherited=spec.inheritance
+  const selected=inherited.mode==='canon'?inherited.sources.map(pin=>authorities.find(a=>a.source.path===pin.path&&a.source.revision===pin.revision)!).filter(a=>a.categories.includes('icon')):[]
+  const defaults:ArtValues={},locked:ArtValues={}
+  for(const item of selected){Object.assign(defaults,item.defaults);Object.assign(locked,item.locked)}
+  return {values:{...defaults,...locked,...spec.overrides,...spec.categories.icon},lockedFields:Object.keys(locked)}
+}
+/** Root export directories acquire the supported icon subdirectory at task planning, never in stored project defaults. */
+export function artTaskPlanningInput(brief:AiTaskBrief,config:ProjectArtSpec,authorities:readonly ArtAuthority[],preview=false):ArtAssetInput & {category:'icon'}{
+  const input=artTaskAssetInput(brief,preview),inherited=artTaskInheritedPlanning(config,authorities)
+  if(inherited.values.exportDirectory==='art/final'&&!inherited.lockedFields.includes('exportDirectory'))input.overrides.exportDirectory='art/final/icons'
+  return input
 }
 /** New single-authority path. Authorities are read from the host; never sent as an authority claim. */
 export function buildArtTaskSubmission(brief: AiTaskBrief, config: ProjectArtSpec, hash: string, authorities: readonly ArtAuthority[], history: AiJobsView, runId = newAiTaskRunId()): AiTaskCreationSubmission {
   const jobs=decodeAiJobsView(history,config.projectId), selected=brief.sourceId ? jobs.adoptionSources?.find(s=>s.sourceId===brief.sourceId) : undefined
   if (!asset.test(brief.name.trim()) || aiTaskHistoryBlocked(jobs) || jobs.jobs.some(j=>j.jobId===runId) || brief.sourceId && !selected || !selected && jobs.mode==='offline_import_only') throw fail()
-  const {prompt:assetPrompt,...metadata}=artTaskAssetInput(brief)
+  const {prompt:assetPrompt,...metadata}=artTaskPlanningInput(brief,config,authorities)
   const resolved=resolveArtGenerationInput(config,{...metadata,prompt:assetPrompt},authorities,{categories:['icon'],imageReferenceInput:false})
   if (!resolved.readyForGeneration) throw fail('image-reference-unsupported')
   return validateArtTaskSubmission(config.projectId,{operation:selected?'adopt':'enqueue',savedConfig:config,authorities:[...authorities],profileId:jobs.profile.id,sourceSha256:selected?.fileSha256??null,input:{request:{schemaVersion:'local-icon-requests-v1',projectId:config.projectId,runId,sourceRevision:jobs.sourceRevision,visualSpec:config.project.content,assets:[{assetId:metadata.assetId,relativePath:resolved.values.destination+'/'+metadata.assetId+'.png',prompt:brief.prompt.trim(),purpose:brief.purpose.trim(),required:true}]},artBinding:{version:config.version,hash},artAssets:[metadata],approved:true,...(selected?{sourceId:selected.sourceId}:{})}})

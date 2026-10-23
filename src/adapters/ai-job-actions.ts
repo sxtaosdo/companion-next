@@ -42,6 +42,8 @@ function serverFailure(raw: unknown, status: number): AiJobActionError {
   const data = raw as Record<string, unknown>
   if (Reflect.ownKeys(data).length !== 3 || !Object.hasOwn(data, 'code') || !Object.hasOwn(data, 'error') || !Object.hasOwn(data, 'retryable')
     || typeof data.code !== 'string' || data.error !== data.code || data.retryable !== false) return fail('unconfirmed', 'unknown', status)
+  if(status===400&&data.code==='IMAGE_TRANSPARENCY_REQUIRED')return fail('image-transparency-required','rejected',status)
+  if(status===400&&data.code==='IMAGE_CONTENT_EMPTY')return fail('image-content-empty','rejected',status)
   if (status === 409 && ['STALE_JOB', 'TASK_STATE_BLOCKED'].includes(data.code)) return fail('stale', 'conflict', status)
   if (status === 400 && data.code === 'INVALID_INPUT' || status === 404 && data.code === 'PROJECT_NOT_FOUND'
     || status === 429 && data.code === 'ICON_WORKER_BUSY' || status === 503 && ['ICON_ADAPTER_DISABLED', 'ICON_CONFIG_INVALID'].includes(data.code)

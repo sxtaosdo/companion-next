@@ -28,8 +28,10 @@ export interface AiJobActionsProvider {
   waitForIdle(): Promise<void>
 }
 export type AiJobActionOutcome = 'not-sent' | 'rejected' | 'conflict' | 'unknown'
-export type AiJobActionCode = 'invalid-input' | 'busy' | 'aborted' | 'timeout' | 'unauthorized' | 'forbidden' | 'stale' | 'rejected' | 'unconfirmed' | 'invalid-shape' | 'response-too-large' | 'network-error'
+export type AiJobActionCode = 'image-transparency-required' | 'image-content-empty' | 'invalid-input' | 'busy' | 'aborted' | 'timeout' | 'unauthorized' | 'forbidden' | 'stale' | 'rejected' | 'unconfirmed' | 'invalid-shape' | 'response-too-large' | 'network-error'
 const messages: Record<AiJobActionCode, string> = {
+  'image-transparency-required':'候选图片没有真实透明像素，未导出；请先取得符合透明要求的图片。',
+  'image-content-empty':'候选图片完全透明，没有可见内容，未导出。',
   'invalid-input': '本次原任务操作参数或状态不符合已核合同，未发送请求。', busy: '已有原任务操作或请求清理尚未结束，未重复发送。',
   aborted: '已停止等待原任务操作；后台可能已经执行，请刷新同一个原任务。', timeout: '原任务操作等待超时；结果未知，不能重复提交。',
   unauthorized: 'Companion 会话无效（401），操作被拒绝。', forbidden: 'Companion 拒绝本次操作（403），请核对已有同源会话。',

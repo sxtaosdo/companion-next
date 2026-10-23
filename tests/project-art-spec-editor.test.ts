@@ -135,3 +135,46 @@ describe('optional explanation exact write and recovery binding',()=>{
   store.draft!.project.content='Second local edit';store.touch();store.confirmed=true;let completed!:ProjectArtSpecReceipt;host.save=vi.fn(async(binding,input)=>{completed={...receipt({...input.config,version:3},'c'.repeat(64)),operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed'}};throw new ProjectArtSpecWriteError('unknown')});await store.save();expect(store.phase).toBe('unknown');const frozen=pendingArtWrite(context,host)!;host.status=vi.fn(async()=>({schemaVersion:'project-art-write-v1' as const,projectId:context.projectId,projectPath:context.projectPath,operationId:frozen.input.operationId,bindingHash:frozen.bindingHash,state:'completed' as const,receipt:completed}));await store.recover();expect(store.phase).toBe('saved');expect(store.base!.inheritance).toEqual(saved.inheritance);expect(host.save).toHaveBeenCalledOnce();
  })
 })
+
+describe('new art output policy and compatible project drafts', () => {
+  it('starts only missing new files with real safe directories and transparent policy, without asset sizes or categories',async()=>{
+    const store=useProjectArtSpecStore(),host=provider();host.read=vi.fn(async()=>receipt(null,null));host.save=vi.fn(async(binding,input)=>({...receipt({...input.config,version:1},'b'.repeat(64)),operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed' as const}}));store.bind(context,host);await store.read();store.startDraft('New project')
+    expect(store.draft).toMatchObject({imageOutput:'transparent-png',overrides:{destination:'assets/art',exportDirectory:'art/final',transparent:true},categories:{}})
+    expect(store.draft!.overrides).not.toHaveProperty('width');expect(store.draft!.overrides).not.toHaveProperty('height');expect(store.draft!.project).not.toHaveProperty('visualMode')
+    store.draft!.project.content='Independent project';store.draft!.project.visualMode='3d';store.draft!.project.designResolution={width:750,height:1334};store.touch();store.confirmed=true
+    expect(store.errors).toEqual([]);await store.save();expect(store.phase).toBe('saved');expect(store.base!.project.visualMode).toBe('3d');expect(store.base!.imageOutput).toBe('transparent-png')
+    host.read=vi.fn(async()=>receipt(store.base));await store.read();expect(store.draft!.imageOutput).toBe('transparent-png')
+  })
+  it('retains old opaque legacy values and never silently upgrades their image policy',async()=>{
+    const store=useProjectArtSpecStore(),host=provider(),legacy={...resourceView(context.projectId).config!,background:{format:'png' as const,transparent:false,color:'#123456'}}
+    host.read=vi.fn(async()=>({...receipt(),config:legacy}));store.bind(context,host);await store.read();store.startDraft('Existing legacy')
+    expect(store.draft).not.toHaveProperty('imageOutput');expect(store.draft!.overrides).toMatchObject({transparent:false,backgroundColor:'#123456',destination:legacy.destination.directory,exportDirectory:'art/final/icons'})
+    expect(store.draft!.project).not.toHaveProperty('visualMode')
+  })
+  it('keeps new metadata through ambiguous save recovery and project-isolated drafts',async()=>{
+    const {store,host}=await setup();store.draft!.project.visualMode='2d';store.draft!.imageOutput='transparent-png';store.touch();store.confirmed=true
+    let completed!:ProjectArtSpecReceipt;host.save=vi.fn(async(binding,input)=>{completed={...receipt({...input.config,version:2},'b'.repeat(64)),operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed'}};throw new ProjectArtSpecWriteError('unknown')})
+    await store.save();expect(store.phase).toBe('unknown');const frozen=pendingArtWrite(context,host)!
+    host.status=vi.fn(async()=>({schemaVersion:'project-art-write-v1' as const,projectId:context.projectId,projectPath:context.projectPath,operationId:frozen.input.operationId,bindingHash:frozen.bindingHash,state:'completed' as const,receipt:completed}));await store.recover()
+    expect(store.phase).toBe('saved');expect(store.base).toMatchObject({imageOutput:'transparent-png',project:{visualMode:'2d'}})
+    store.draft!.project.content='Retained';store.touch();store.bind({...context,projectId:'ffffffffffffffff',projectPath:'/different'},host);expect(store.draft).toBeNull();store.bind(context,host);store.restoreRetained();expect(store.draft).toMatchObject({imageOutput:'transparent-png',project:{visualMode:'2d',content:'Retained'}})
+    expect(host.save).toHaveBeenCalledOnce()
+  })
+  it('blocks opaque changes under the new policy before writing',async()=>{
+    const {store,host}=await setup();store.draft!.imageOutput='transparent-png';store.setValue('icon','transparent',false);store.confirmed=true
+    expect(store.errors.join(' ')).toContain('IMAGE_OUTPUT_POLICY_CONFLICT');await store.save();expect(host.save).not.toHaveBeenCalled()
+  })
+})
+
+describe('trusted inheritance resolution freshness',()=>{
+  it('does not infer applicability on old hosts and clears metadata on project change/read failure',async()=>{
+    const {store,host}=await setup();expect(store.inheritanceResolution).toBeNull()
+    store.draft=null;host.read=vi.fn(async()=>({...receipt(),inheritanceResolution:{state:'not-applicable' as const,code:'EXPLICIT_NOT_APPLICABLE' as const,sources:[]}}));await store.read();expect(store.inheritanceResolution?.state).toBe('not-applicable')
+    host.read=vi.fn(async()=>{throw Error('offline')});await store.read();expect(store.inheritanceResolution).toBeNull()
+    store.bind({...context,projectPath:'/other'},host);expect(store.inheritanceResolution).toBeNull()
+  })
+  it('uses the saved receipt rather than stale prior applicability',async()=>{
+    const {store,host}=await setup();host.save=vi.fn(async(binding,input)=>({...receipt({...input.config,version:2},'b'.repeat(64)),inheritanceResolution:{state:'available' as const,code:'REVIEWED_SOURCES_AVAILABLE' as const,sources:[{path:'P0001/art/source.md',revision:'a'.repeat(40)}]},operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed' as const}}))
+    await store.save();expect(store.phase).toBe('saved');expect(store.inheritanceResolution?.state).toBe('available')
+  })
+})

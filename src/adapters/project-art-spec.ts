@@ -12,6 +12,14 @@ export function createProjectArtSpecProvider(fetcher: typeof fetch, origin: stri
     if (!value || value.projectId !== context.projectId || artPath(value.projectPath) !== artPath(context.projectPath) || !Array.isArray(value.authorities) || value.authorities.length > 8) throw Error('Invalid art receipt')
     if (value.config === null) { if (value.hash !== null) throw Error('Invalid missing receipt') }
     else { if (!value.hash || !/^[a-f0-9]{64}$/.test(value.hash)) throw Error('Invalid art hash'); const parsed = parseProjectArtSpec(value.config, context.projectId); if (parsed.kind === 'project' && !(parsed.spec.inheritance.mode === 'canon' && parsed.spec.inheritance.usage === undefined)) validateProjectArtBindings(parsed.spec, value.authorities) }
+    if(value.inheritanceResolution !== undefined) {
+      const info=value.inheritanceResolution
+      if(!info||typeof info!=='object'||!Array.isArray(info.sources)||info.sources.length>8||Object.keys(info).some(key=>!['state','code','sources'].includes(key))||!info.sources.every(pin=>pin&&typeof pin.path==='string'&&/^P0001\/[A-Za-z0-9_./-]+\.md$/.test(pin.path)&&!pin.path.split('/').includes('..')&&typeof pin.revision==='string'&&/^[a-f0-9]{40}$/.test(pin.revision)))throw Error('Invalid inheritance resolution')
+      if(info.state==='unlinked'){if(info.code!=='NO_PROJECT_ASSOCIATION'||info.sources.length||value.authorities.length)throw Error('Invalid unlinked resolution')}
+      else if(info.state==='available'){if(info.code!=='REVIEWED_SOURCES_AVAILABLE'||!info.sources.length||!info.sources.every(pin=>value.authorities.some(authority=>authority.source.path===pin.path&&authority.source.revision===pin.revision&&authority.status==='Accepted'&&authority.projectIds.includes(context.projectId))))throw Error('Invalid available resolution')}
+      else if(info.state==='not-applicable'){if(info.code!=='EXPLICIT_NOT_APPLICABLE'||!info.sources.length||value.authorities.length)throw Error('Invalid explicit applicability')}
+      else throw Error('Invalid inheritance state')
+    }
     if(value.generationCapabilities !== undefined && (value.generationCapabilities.imageReferenceInput !== false || !Array.isArray(value.generationCapabilities.categories) || value.generationCapabilities.categories.length !== 1 || value.generationCapabilities.categories[0] !== 'icon')) throw Error('Invalid generation capabilities')
     return value
   }
