@@ -7,7 +7,7 @@ import { Close,ArrowDown } from '@element-plus/icons-vue'
 import { visitShellTab } from '../domain/shell-navigation'
 import type { ShellTab } from '../domain/shell-navigation'
 const route=useRoute(),router=useRouter(),tabs=ref<ShellTab[]>([]),pending=ref(false)
-watch(()=>route.fullPath,()=>{tabs.value=visitShellTab(tabs.value,route)},{immediate:true})
+watch(()=>route.fullPath,()=>{if(route.path!=='/'&&route.matched.length)tabs.value=visitShellTab(tabs.value,route)},{immediate:true})
 async function navigate(to:string){if(pending.value||to===route.fullPath)return;pending.value=true;try{await router.push(to)}finally{pending.value=false}}
 async function close(key:string){
  if(pending.value)return
