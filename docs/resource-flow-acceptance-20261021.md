@@ -212,3 +212,16 @@ results.json是16条记录、15个不同stage；保留重复读取及初次失�
 ## 2026-10-23 单一后台单图接线
 
 现用32180增加固定e2e生成配置，范围仅16ad921aa0fb06d6；其他登记工程继续offline_import_only。端点127.0.0.1:8188，专用lease与工程、任务库不相互包含。Next启动20项、宿主适配41项、宿主类型及独立审查通过。既有模型启动器保留AMD和全部节点加载参数、禁弹窗过滤；Companion子进程将8090和8188收窄至loopback。此处仅记录源码与隔离验证，尚未提交新GPU任务，不代表生成或导入通过。
+
+
+### 2026-10-23 同一32180真实新图与导入实证
+
+- 实际运行：前端1.3.190保持；宿主0.3.151 / cb2d2e80d849-00356fbd4db7，PID45244 / OPEN；10工程及原无验证码、固定周会话配置保持。先备份、SQLite在线一致性备份与零活动预检，再正常停止20668、替换6文件、原npm入口仅启动一次；包装仍提前报LOCAL_START_FAILED，已核实同次启动随后监听，未重复启动或清历史。
+- 本机模型启动器和ComfyUI均由32180模型服务页面操作，8090/8188实际只监听127.0.0.1；原AMD参数和amd_batchnorm_fix.py真实加载，15节点与模型枚举通过，空队列后提交唯一新图。非e2e工程保留offline限制。
+- 新任务 `STUDIO-RUN-icon-mvklx7yu-93d3c165`，prompt `875c92ba-485b-445a-88c5-9f49e4e6e554`：1024×1024、8steps、1candidate；真实success约98秒，非旧图采用。RGBA母图SHA `081eca41016da411a0357ea401f53d4dbbc486961503195951a28b3a23adce6c`，透明895093、不透明14638、半透明138845像素。
+- 通过32180原任务界面显示候选并核对SHA，保存选择r4；导出96×96 PNG SHA `f361acafb8bd9922470fc4cf7548a42a91c3424cb57f8432459f1cc9c4b3f03a`，收据SHA `791bc90ed66a75bbab0ac9ac3278b236f2c242a053c9549093f53549ed386a63`。页面重开后按原协议复核同一导出，返回created=false；未覆盖、未新增GPU请求。
+- e2e工程由后台工程页启动，Creator3.8.8 PID27792。仅通过后台UI导入；原操作 `icon-import-4c5a1ea27671438c672362530b8c0cde`，effectApplied=true、leaseState=RELEASED、active=false；身份、asset_import、AssetDB回读及SpriteFrame解析通过。任务r7保留母图selected，变体为imported_pending_verification，不伪造productionVerified。
+- 实际文件 `e2e-project/assets/generated/acceptance/acceptance-crystal-20261023-96x96-f361acafb8bd.png` 及Meta回读，UUID `de3b9c72-abc3-4f12-8e44-10ec7fb3d1e4`，SpriteFrame `@f9941`；96×96 Alpha 0–255、透明7662/不透明101像素。后台“预览此变体”实际显示96×96并核对文件/收据SHA，页面错误0。本地截图不上传。四份既有规范文件哈希保持，ant-cook未写。
+- 仍未覆盖：参考图入模及P0001视觉一致性；该图场景绑定、游戏运行可见、正式Preview与Build。UI执行/导入初始响应仍可能给旧任务快照并显示待核对，须刷新原任务；没有自动重复写。启动包装提前报错与导出回执仅页内保存为现有交互缺口，未冒充解决。
+- P1060独立切片v0.1.0.125 /380e089：74/74隔离回归与game类型通过，后台UI启动Creator并启动Preview回执通过；UI缺Playtest/编译回执入口、未返编译产物身份，因此实际复活运行及正式Preview身份仍未验，未用CLI绕过。
+- 完整机器证据：`C:/Users/33272/Documents/Codex/2026-10-17/task/resource-single-20261023/delivery.json`；P1060证据同任务根下`p1060-respawn-20261023/verification.json`。ComfyUI队列最终为空，未强杀服务、未重启Windows或改驱动。
