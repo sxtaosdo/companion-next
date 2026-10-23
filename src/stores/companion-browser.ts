@@ -72,7 +72,7 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  }
  async function refreshProjects(background=false){
   const active=provider.value;if(!active||projectLoading.value)return
-  const read=begin('projects');backgroundProjectRead.value=background&&connected.value;projectLoading.value=true;projectError.value=''
+  const read=begin('projects');backgroundProjectRead.value=background&&connected.value;projectLoading.value=true;if(!observedAt.value)projectError.value=''
   try{const result=await active.loadProjects(read.signal);if(!read.current())return
    // Retain identical snapshots so live reads do not rebuild unchanged cards or filters.
    if(JSON.stringify(projects.value)!==JSON.stringify(result.projects))projects.value=result.projects
@@ -80,7 +80,7 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
    // Normal workspace keeps explicit Dashboard observations across Bridge polling.
    if(active.dashboardDiscoveryEnabled!==false&&JSON.stringify(dashboard.value)!==JSON.stringify(result.dashboard))dashboard.value=result.dashboard
    if(JSON.stringify(warnings.value)!==JSON.stringify(result.warnings))warnings.value=result.warnings
-   connected.value=true;observedAt.value=new Date().toISOString()
+   projectError.value='';connected.value=true;observedAt.value=new Date().toISOString()
    projectSnapshotRevision.value++
    if(networkRecovering){networkRecovering=false;networkRecoveryAttempts=0;scheduleProjectPoll(liveEpoch);if(eventStopped)liveState.value='failed';else openLiveStream(liveEpoch)}
    if(callProjectId.value&&!projects.value.some(project=>project.id===callProjectId.value)){cancel('calls');callLoading.value=false;callProjectId.value='';resetCalls()}
@@ -89,10 +89,10 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
    const transient=cause instanceof CompanionBrowserError&&(cause.code==='network-error'||cause.code==='timeout')
    const recoverable=background&&transient&&liveEnabled.value&&liveVisible.value&&livePageActive.value&&active===boundReadProvider
    if(recoverable&&networkRecoveryAttempts<3){
-    networkRecoveryAttempts++;clearLiveWork();clearData();networkRecovering=true;liveState.value='retrying';liveError.value=message(cause);projectError.value=message(cause);scheduleNetworkRecovery(liveEpoch)
+    networkRecoveryAttempts++;clearLiveWork();connected.value=false;networkRecovering=true;liveState.value='retrying';liveError.value=message(cause);projectError.value=message(cause);scheduleNetworkRecovery(liveEpoch)
    }else{
     const exhausted=recoverable&&networkRecoveryAttempts>=3
-    epoch++;cancelReads();clearData();projectError.value=message(cause)
+    epoch++;cancelReads();connected.value=false;projectError.value=message(cause)
     if(exhausted){liveState.value='failed';liveError.value=message(cause)}
    }
   }finally{if(read.current()){projectLoading.value=false;backgroundProjectRead.value=false}}

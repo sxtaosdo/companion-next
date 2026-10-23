@@ -130,6 +130,8 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
   const sourceIds = new WeakMap<object, number>()
   let nextSourceId = 1, nextReceiptId = 1, operation: Operation | null = null
   let dispatching = false, operationGeneration = 0, snapshotGeneration = 0
+  const waitingForRead = ref(false)
+  const readWaitGeneration = ref(0)
   let readGeneration = browser.projectLoading ? 1 : 0
   const barriers = shallowRef<readonly ReadBarrier[]>([])
   // A receipt records the result boundary before publishing it to synchronous observers.
@@ -172,7 +174,8 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
   function hasBarrier(project: ManagedProject) {
     return barriers.value.some(barrier => barrier.readProvider === activeReadProvider() && barrier.projectKey === projectKey(project))
   }
-  function blockingReason(projectId: string, action: CreatorAction): string {
+  function blockingReason(projectId: string, action: CreatorAction, allowBackgroundRead = false): string {
+    if (waitingForRead.value) return '正在等待当前工程读取完成，请勿重复操作。'
     if (dispatching) return '上一次工程请求正在确认发送，请等待完成后重试。'
     if (transportPending.value) return settlementFailed.value ? cleanupMessage : '上一次工程请求仍在等待或清理，请等待传输结束。'
     if (lane.locked) return `工程操作“${lane.description}”仍在等待或清理，请等待完成后重新确认。`
@@ -180,7 +183,7 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
     if (!browser.connected || !activeReadProvider()) return '请先连接并读取已登记工程。'
     const provider = activeOperationProvider()
     if (!provider || typeof provider.run !== 'function' || typeof provider.waitForIdle !== 'function') return '当前来源未提供工程操作能力。'
-    if (browser.projectLoading) return '正在读取真实工程快照，请读取完成后重新确认。'
+    if (browser.projectLoading && !(allowBackgroundRead && browser.backgroundProjectRead)) return '正在读取真实工程快照，请读取完成后重新确认。'
     const project = currentProject(projectId)
     if (!project) return '该目标不在当前已登记工程中，请先刷新工程。'
     try { normalizeCreatorOperation({ projectId, action }) } catch { return '已登记工程标识无效，未发送请求。' }
@@ -207,7 +210,7 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
     return pending.value || transportPending.value || dispatching || dialogOpen.value || prepared.value !== null
       || barriers.value.some(barrier => barrier.readProvider === toRaw(readProvider))
   }
-  function canPrepare(projectId: string, action: CreatorAction) { return blockingReason(projectId, action) === '' }
+  function canPrepare(projectId: string, action: CreatorAction) { return blockingReason(projectId, action, true) === '' }
   function makeBinding(project: ManagedProject): Binding | null {
     const readProvider = activeReadProvider(), operationProvider = activeOperationProvider()
     if (!readProvider || !operationProvider) return null
@@ -334,7 +337,7 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
   }
   function prepare(projectId: string, action: CreatorAction): PreparedCreatorOperation | null {
     revoke()
-    const reason = blockingReason(projectId, action)
+    const reason = blockingReason(projectId, action, true)
     if (reason) { error.value = reason; if (!pending.value) phase.value = 'invalidated'; return null }
     const preview = createApproval(projectId, action)
     prepared.value = preview; visibleReceiptId.value = null
@@ -351,8 +354,36 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
     if (action !== 'start' && action !== 'focus') {
       error.value = '直接操作仅支持启动或聚焦；其他操作需要单独确认。'; return false
     }
-    const reason = blockingReason(projectId, action)
+    const reason = blockingReason(projectId, action, true)
     if (reason) { error.value = reason; if (!pending.value) phase.value = 'invalidated'; return false }
+    if (browser.projectLoading) {
+      // The click may be prepared while polling, but cannot authorize a write
+      // from that old snapshot. Wait, then require the same source and target
+      // identity/runtime before creating a fresh one-use approval.
+      const project = currentProject(projectId)!, before = makeBinding(project)!, request = ++readWaitGeneration.value, expectedRead = readGeneration
+      waitingForRead.value = true
+      await new Promise<void>(resolve => {
+        const finish = () => {
+          if (!browser.projectLoading || request !== readWaitGeneration.value || before.sourceGeneration !== sourceGeneration.value
+            || before.readProvider !== activeReadProvider() || before.operationProvider !== activeOperationProvider()) {
+            stop(); resolve()
+          }
+        }
+        const stop = watch(() => [browser.projectLoading, browser.provider, sourceGeneration.value,
+          creatorOperationsProvider.value, readWaitGeneration.value], finish, { flush: 'sync' })
+        // A synchronous UI observer may cancel/switch source while waiting is published.
+        finish()
+      })
+      waitingForRead.value = false
+      const current = currentProject(projectId)
+      if (request !== readWaitGeneration.value || !current || !bindingIsCurrent(before, projectId, false)
+        || before.runtimeKey !== runtimeKey(currentRuntime(projectId))
+        || browser.projectSnapshotRevision !== before.snapshotRevision + 1 || readGeneration !== expectedRead || browser.projectLoading) {
+        phase.value = 'invalidated'; error.value = contextMessage; return false
+      }
+      const freshReason = blockingReason(projectId, action)
+      if (freshReason) { phase.value = 'invalidated'; error.value = freshReason; return false }
+    }
     const preview = createApproval(projectId, action), binding = approvals.get(preview)!.binding
     const sending = dispatch(preview, true)
     const record = lastReceipt.value, receiptId = record && receiptBindings.get(record.id) === binding ? record.id : null
@@ -486,10 +517,12 @@ export const useCreatorOperationsStore = defineStore('creator-operations', () =>
       && qualifiesRegistrationRead(boundary, projectObservation.value, true)
   }
   function closeDialog() {
+    readWaitGeneration.value++
     revoke(); cancelWaiting(); dialogOpen.value = false; visibleReceiptId.value = null
     if (!transportPending.value) { phase.value = 'idle'; error.value = '' }
   }
   function leave() {
+    readWaitGeneration.value++
     revoke(); detachOperation(); dialogOpen.value = false; visibleReceiptId.value = null
     if (!transportPending.value) { phase.value = 'idle'; error.value = '' }
   }

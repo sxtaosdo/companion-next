@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { safeCompanionReturnTo } from './domain/companion-session-recovery'
 import type { LocationQueryValue, RouteLocationNormalizedLoaded } from 'vue-router'
-import { ArrowDown, ArrowLeft, Refresh, Close, Menu, SwitchButton } from '@element-plus/icons-vue'
+import { ArrowDown, ArrowLeft, Refresh, Close, Menu } from '@element-plus/icons-vue'
 import { useWorkspaceStore } from './stores/workspace'
 import { liveProvider } from './integration'
 import { companionBrowserProvider } from './companion-browser-integration'
@@ -15,6 +15,9 @@ import InfoTip from './components/InfoTip.vue'
 import CompanionSessionRecovery from './components/CompanionSessionRecovery.vue'
 import {useProductVersionStore} from './stores/product-version'
 import {productVersionReadProvider} from './product-version-integration'
+import CompanionUserMenu from './components/CompanionUserMenu.vue'
+import ShellBreadcrumb from './components/ShellBreadcrumb.vue'
+import ShellRouteTabs from './components/ShellRouteTabs.vue'
 import ArtWorkspaceView from './views/ArtWorkspaceView.vue'
 import { knowledgeNavigation, knowledgePageFor } from './domain/knowledge-navigation'
 const backendVersionInformation=useProductVersionStore()
@@ -73,11 +76,8 @@ const nav = [
 ]
 const knowledgeExpanded = ref(false)
 const knowledgeActive = computed(() => Boolean(knowledgePageFor(route)))
-const knowledgeCacheEpoch = ref(0)
-// Cache only this knowledge visit. The independent model page keeps its own lifecycle.
-watch(knowledgeActive, (active, previous) => {
-  if (!active && previous) knowledgeCacheEpoch.value++
-}, { flush: 'sync' })
+const knowledgeCached = computed(() => route.path === '/knowledge' || route.path.startsWith('/knowledge/'))
+const knowledgeCacheKey = computed(() => route.path + (route.query.tab === 'models' ? '?tab=models' : ''))
 watch(() => route.fullPath, () => {
   if (knowledgeActive.value) knowledgeExpanded.value = true
 }, { immediate: true })
@@ -167,9 +167,10 @@ const dateLabel = computed(() => {
     </aside>
     <div class="main-shell">
       <header class="topbar">
-        <div class="topbar-left"><el-button class="mobile-menu" :icon="Menu" text aria-label="打开导航" @click="menuOpen = !menuOpen"/><button v-if="route.path === '/projects' || compactOverview" class="page-back compact-page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><div class="breadcrumb"><strong>{{ pageTitle }}</strong></div><InfoTip v-if="(route.path === '/projects' || compactOverview) && pageInfo" :label="`${pageTitle}说明`" :text="pageInfo"/></div>
-        <div class="topbar-right"><el-tooltip v-if="companionBrowserProvider" content="&#x9000;&#x51fa;&#x767b;&#x5f55;"><el-button :icon="SwitchButton" text circle aria-label="&#x9000;&#x51fa;&#x767b;&#x5f55;" :loading="loggingOut" @click="logoutBrowserSession"/></el-tooltip><RouterLink to="/changelog" class="frontend-version" aria-label="查看前端版本与更新记录">前端 v{{ frontendIdentity.version }}</RouterLink><RouterLink to="/help" class="utility-link" @click="menuOpen = false">帮助</RouterLink><RouterLink to="/about" class="utility-link" @click="menuOpen = false">关于</RouterLink><el-tag v-if="showRegisteredChrome" :type="registered.currentSource ? 'success' : 'info'" round>{{ registered.currentSource ? '真实工程' : '未连接' }}</el-tag><el-tag v-else-if="showProjectContext && store.mode === 'disconnected'" type="info" effect="plain" round>未连接</el-tag><el-tag v-else-if="showProjectContext && store.isDemo" class="demo-tag" effect="light" round>示例模式</el-tag><el-tag v-else-if="showProjectContext" :type="store.connection === 'connected' ? 'success' : 'warning'" round>{{ store.sourceLabel }}</el-tag></div>
+        <div class="topbar-left"><el-button class="mobile-menu" :icon="Menu" text aria-label="打开导航" @click="menuOpen = !menuOpen"/><button v-if="route.path === '/projects' || compactOverview" class="page-back compact-page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><ShellBreadcrumb/><InfoTip v-if="(route.path === '/projects' || compactOverview) && pageInfo" :label="`${pageTitle}说明`" :text="pageInfo"/></div>
+        <div class="topbar-right"><CompanionUserMenu v-if="companionBrowserProvider" :busy="loggingOut" @logout="logoutBrowserSession"/><RouterLink to="/changelog" class="frontend-version" aria-label="查看前端版本与更新记录">前端 v{{ frontendIdentity.version }}</RouterLink><RouterLink to="/help" class="utility-link" @click="menuOpen = false">帮助</RouterLink><RouterLink to="/about" class="utility-link" @click="menuOpen = false">关于</RouterLink><el-tag v-if="showRegisteredChrome" :type="registered.currentSource ? 'success' : 'info'" round>{{ registered.currentSource ? '真实工程' : '未连接' }}</el-tag><el-tag v-else-if="showProjectContext && store.mode === 'disconnected'" type="info" effect="plain" round>未连接</el-tag><el-tag v-else-if="showProjectContext && store.isDemo" class="demo-tag" effect="light" round>示例模式</el-tag><el-tag v-else-if="showProjectContext" :type="store.connection === 'connected' ? 'success' : 'warning'" round>{{ store.sourceLabel }}</el-tag></div>
       </header>
+      <ShellRouteTabs/>
       <main class="main-content" :class="{ 'projects-main': route.path === '/projects' || compactOverview }">
         <div v-if="route.path !== '/projects' && !compactOverview" class="page-heading"><div class="page-title"><button class="page-back" type="button" :aria-label="returnLabel" :title="returnDisabled && !returning ? '已在工程页面' : returnLabel" :disabled="returnDisabled" @click="returnWithinApp"><el-icon aria-hidden="true"><ArrowLeft/></el-icon></button><h1>{{ pageTitle }}</h1><InfoTip v-if="pageInfo" :label="`${pageTitle}说明`" :text="pageInfo" /></div><div v-if="showRegisteredContext" class="page-heading-actions"><el-button v-if="legacyWorkspace" @click="store.openDemo">查看示例工作台</el-button><el-select v-if="registered.projects.length" :model-value="registered.project?.id ?? ''" class="project-select" aria-label="当前登记工程" placeholder="请选择工程" @update:model-value="selectRegisteredProject"><el-option v-for="project in registered.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-button v-if="companionBrowserProvider" :loading="registered.directory.projectLoading && !registered.directory.backgroundProjectRead" :disabled="registered.directory.projectLoading" @click="registered.directory.connect(companionBrowserProvider)">{{ registered.currentSource ? '重新连接工程' : '连接工程服务' }}</el-button><el-button v-if="registered.directory.provider" :icon="Refresh" text aria-label="刷新登记工程" :disabled="registered.directory.projectLoading" @click="registered.directory.refreshProjects()"/><el-button v-if="registered.directory.provider" :icon="Close" text aria-label="断开工程服务" @click="registered.directory.disconnect()"/></div><div v-else-if="showProjectContext" class="page-heading-actions"><el-select v-if="store.snapshot.projects.length" :model-value="store.selectedProjectId" class="project-select" aria-label="当前项目" @update:model-value="store.selectProject"><el-option v-for="project in store.snapshot.projects" :key="project.id" :label="project.name" :value="project.id"/></el-select><el-dropdown trigger="click"><el-button>数据源<el-icon class="button-trail"><ArrowDown/></el-icon></el-button><template #dropdown><el-dropdown-menu><el-dropdown-item @click="store.openDemo">查看示例资料</el-dropdown-item><el-dropdown-item v-if="liveProvider" @click="store.connect(liveProvider)">连接只读数据源</el-dropdown-item><el-dropdown-item :disabled="store.mode === 'disconnected'" divided @click="store.disconnect">断开并清空视图</el-dropdown-item></el-dropdown-menu></template></el-dropdown></div></div>
         <div v-if="showProjectContext && store.mode !== 'disconnected'" class="source-banner" :class="{ 'source-live': !store.isDemo }" role="status"><span class="source-dot"></span><div><strong>{{ store.isDemo ? '正在浏览示例资料' : store.sourceLabel }}</strong><span>{{ store.isDemo ? '演示数据 · 无真实服务连接' : `${store.snapshot.source.label} · ${dateLabel}` }}</span></div><InfoTip v-if="store.isDemo" label="示例数据说明" text="项目、资源与状态均为演示。未探测真实服务，未执行任何工程写入。"/><el-button :icon="Refresh" text aria-label="刷新数据源" :loading="store.loading" @click="store.refresh"/><el-button :icon="Close" text aria-label="断开数据源" @click="store.disconnect"/></div>
@@ -182,10 +183,10 @@ const dateLabel = computed(() => {
           <ArtWorkspaceView v-if="artWorkspaceVisited" v-show="route.path==='/art-resources'"/>
         </KeepAlive>
         <RouterView v-slot="{ Component }">
-          <KeepAlive :key="knowledgeCacheEpoch">
-            <component :is="Component" v-if="knowledgeActive" :key="route.path" />
+          <KeepAlive :max="4">
+            <component :is="Component" v-if="knowledgeCached" :key="knowledgeCacheKey" />
           </KeepAlive>
-          <component :is="Component" v-if="!knowledgeActive && route.path!=='/art-resources'" />
+          <component :is="Component" v-if="!knowledgeCached && route.path!=='/art-resources'" />
         </RouterView>
       </main>
     </div>

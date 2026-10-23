@@ -34,7 +34,7 @@ describe('knowledge secondary navigation and visit lifetime',()=>{
     expect(router.currentRoute.value.meta.workspaceIndependent).toBe(true)
     expect(fetch).not.toHaveBeenCalled()
   })
-  it('retains completed read and conditions across subpages without repeated requests and clears them on leaving the visit',async()=>{
+  it('retains completed read and conditions across subpages without repeated requests and retains them across approved route tabs',async()=>{
     const p=knowledgeFixture();registerKnowledgeReadProvider(p)
     const {router,read}=await setup('/knowledge?legacy=kept')
     await read.connect(p);read.selectKnowledgeBase('kb-a','Selected A');read.query='kept keyword';await read.run('search');await flushPromises()
@@ -46,8 +46,8 @@ describe('knowledge secondary navigation and visit lifetime',()=>{
     expect(read.kbId).toBe('kb-a');expect(read.query).toBe('kept keyword');expect(read.selectedBaseLabel).toContain('Selected A')
     expect(read.result).toBe(result);expect(p.search).toHaveBeenCalledTimes(1);expect(p.status).toHaveBeenCalledTimes(1)
     expect(p.listKnowledgeBases).not.toHaveBeenCalled();expect(p.listAgents).not.toHaveBeenCalled()
-    await router.push('/help');await flushPromises();expect(read.result).toBeNull()
-    await router.push('/knowledge');await flushPromises();expect(read.result).toBeNull()
+    await router.push('/help');await flushPromises();expect(read.result).toBe(result)
+    await router.push('/knowledge');await flushPromises();expect(read.result).toBe(result)
   })
   it('keeps the legacy models root separate and ignores unknown old query tabs on read',async()=>{
     const {router}=await setup('/knowledge?tab=models&filter=local#status')

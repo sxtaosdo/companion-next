@@ -299,7 +299,7 @@ describe('help, about and visible frontend identity', () => {
     await setup('/projects')
     expect(wrapper!.find('.page-heading').exists()).toBe(false)
     expect(wrapper!.find('.projects-main').exists()).toBe(true)
-    expect(wrapper!.find('.topbar .breadcrumb').text()).toBe('工程')
+    expect(wrapper!.find('.topbar .breadcrumb .el-breadcrumb__inner').text()).toBe('工程')
     expect(wrapper!.find('.topbar .page-back').exists()).toBe(true)
     expect(wrapper!.find('.page-heading p').exists()).toBe(false)
     expect(wrapper!.find('.page-heading .eyebrow').exists()).toBe(false)

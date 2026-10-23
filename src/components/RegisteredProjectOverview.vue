@@ -12,16 +12,22 @@ import { recentProjects } from '../domain/recent-projects'
 import { useOverviewRecentProjects } from '../composables/use-overview-recent-projects'
 const selection = useRegisteredProjectStore(), directory = selection.directory, workspace = useWorkspaceStore()
 const recent = useOverviewRecentProjects(), operations = useCreatorOperationsStore()
-const cards = computed(() => recentProjects(selection.projects, recent.data.value))
+const retainedSource = computed(() => !!directory.observedAt && !!directory.provider && directory.provider === companionBrowserProvider.value)
+const evidenceStale = computed(() => retainedSource.value && (!directory.connected || !!directory.projectError))
+// Selection remains fail-closed; this is display-only retained evidence. Keep its
+// established order when a failed read clears the optional recent-time reader.
+const cards = computed<ReturnType<typeof recentProjects>>(previous => !retainedSource.value ? []
+  : evidenceStale.value && previous?.length ? previous : recentProjects(directory.projects, recent.data.value))
 const legacyWorkspace = computed(() => allowsLegacyWorkspace(import.meta.env.MODE, Boolean(companionBrowserProvider.value)))
 function activeOperation(project: ManagedProject) { return [...operations.receipts].reverse().find(record => record.project.id === project.id && operations.isReceiptCurrent(record.id) && (record.phase === 'sending' || record.snapshotRevision === directory.projectSnapshotRevision)) }
 function projectStatus(project: ManagedProject) { return directory.statuses.find(item => item.projectId === project.id) }
 function bridge(project: ManagedProject) {
+  if (evidenceStale.value) return { label: '状态过期 · 待核对', detail: '保留上次工程信息，当前连接和运行状态尚未核对', version: undefined, error: '' }
   const runtime = projectStatus(project)
   if (directory.provider?.runtimeProbesEnabled === false) return { label: '未检查', detail: '运行状态未探测', version: undefined, error: '' }
   const warning = directory.warnings.find(item => item.startsWith('运行状态未取得有效数据：['))
   const code = warning?.split('[')[1]?.split(']')[0]
-  const label = warning ? ['unauthorized','forbidden'].includes(code ?? '') ? '鉴权失败' : code === 'timeout' ? '超时' : '异常' : runtime ? runtimeStateLabel(runtime.state) : directory.projectLoading ? '检查中' : '未知'
+  const label = warning ? ['unauthorized','forbidden'].includes(code ?? '') ? '鉴权失败' : code === 'timeout' ? '超时' : '异常' : runtime ? runtimeStateLabel(runtime.state) : directory.projectLoading && !directory.observedAt ? '检查中' : '未知'
   return { label, detail: warning ? '本次运行状态未核验' : '', version: runtime?.creatorVersion, error: runtime?.lastError || '' }
 }
 function selectProject(event: MouseEvent, id: string) {
@@ -32,7 +38,7 @@ function summary(text: string) { return text.length > 110 ? text.slice(0,110) + 
 </script>
 <template>
   <section class="registered-overview" aria-label="工程看板">
-    <header class="overview-card-header"><h1>看板</h1><span>{{ selection.currentSource ? `${selection.projects.length} 个工程` : '工程数量未读取' }}</span><RouterLink to="/projects" class="all-projects">全部工程</RouterLink>
+    <header class="overview-card-header"><h1>看板</h1><span>{{ retainedSource ? `${directory.projects.length} 个工程${evidenceStale?'（待核对）':''}` : '工程数量未读取' }}</span><RouterLink to="/projects" class="all-projects">全部工程</RouterLink>
       <div class="overview-connect-actions"><el-button v-if="companionBrowserProvider" size="small" :loading="directory.projectLoading && !directory.backgroundProjectRead" :disabled="directory.projectLoading" @click="directory.connect(companionBrowserProvider)">{{ selection.currentSource ? '重新连接工程' : '连接工程服务' }}</el-button><el-button v-if="directory.provider" size="small" :icon="Refresh" text aria-label="刷新登记工程" :disabled="directory.projectLoading" @click="directory.refreshProjects()"/><el-button v-if="directory.provider" size="small" :icon="Close" text aria-label="断开工程服务" @click="directory.disconnect()"/></div>
     </header>
     <div class="overview-live"><span>工程更新：<time v-if="directory.observedAt" :datetime="directory.observedAt">{{ directory.observedAt }}</time><span v-else>未检查</span></span><button type="button" class="realtime-toggle" :disabled="!directory.livePreferred && !recent.canRealtime.value" @click="recent.toggleRealtime">{{ directory.livePreferred ? '暂停工程实时' : '恢复工程实时' }}</button><el-button v-if="legacyWorkspace" size="small" @click="workspace.openDemo">查看示例工作台</el-button></div>
@@ -42,7 +48,7 @@ function summary(text: string) { return text.length > 110 ? text.slice(0,110) + 
       <article v-for="item in cards" :key="item.project.id" class="registered-project-card panel" :data-project-id="item.project.id">
         <RouterLink :to="{ path: '/projects', query: { project: item.project.id } }" class="project-title" :aria-label="`查看工程 ${item.project.name}`" :title="`查看工程 ${item.project.name}`" @click.capture="selectProject($event, item.project.id)"><h2>{{ item.project.name }}</h2><el-tooltip content="查看工程" placement="top"><el-icon class="project-open-icon" aria-hidden="true"><ArrowRight/></el-icon></el-tooltip></RouterLink>
         <p class="project-path">{{ item.project.path }}</p>
-        <RouterLink class="project-bridge" @click.capture="selectProject($event, item.project.id)" :to="{ path: '/projects', query: { project: item.project.id } }"><strong>Creator Bridge</strong><ProjectStatusTag v-if="activeOperation(item.project) || (projectStatus(item.project) && !bridge(item.project).detail)" :status="projectStatus(item.project)" :operation="activeOperation(item.project)" :stop-acknowledged="operations.isExpectedStopDisconnect(item.project.id)" :passive="directory.provider?.runtimeProbesEnabled === false"/><el-tag v-else size="small" :type="bridge(item.project).detail ? 'warning' : 'info'">{{ bridge(item.project).label }}</el-tag><span v-if="bridge(item.project).version">Creator {{ bridge(item.project).version }}</span><span v-else>版本未返回</span></RouterLink>
+        <RouterLink class="project-bridge" @click.capture="selectProject($event, item.project.id)" :to="{ path: '/projects', query: { project: item.project.id } }"><strong>Creator Bridge</strong><ProjectStatusTag v-if="!evidenceStale && (activeOperation(item.project) || (projectStatus(item.project) && !bridge(item.project).detail))" :status="projectStatus(item.project)" :operation="activeOperation(item.project)" :stop-acknowledged="operations.isExpectedStopDisconnect(item.project.id)" :passive="directory.provider?.runtimeProbesEnabled === false"/><el-tag v-else size="small" :type="bridge(item.project).detail ? 'warning' : 'info'">{{ bridge(item.project).label }}</el-tag><span v-if="bridge(item.project).version">Creator {{ bridge(item.project).version }}</span><span v-else>版本未返回</span></RouterLink>
         <p v-if="item.project.requiredCreatorVersion" class="project-note">要求 Creator {{ item.project.requiredCreatorVersion }}</p>
         <p v-if="bridge(item.project).detail" class="project-note">{{ bridge(item.project).detail }}</p>
         <p v-if="bridge(item.project).error" class="overview-problem" :title="bridge(item.project).error">{{ summary(bridge(item.project).error) }}</p>

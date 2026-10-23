@@ -79,15 +79,20 @@ The approved provider address is loopback port 18001 (user-approved change from 
 网页登录会话首次成功时固定七天，Cookie剩余Max-Age与服务端绝对期限一致，请求不会续期。磁盘缓存使刷新与服务重启不丢失；退出删除专用记录，停用/密码版本/角色变化使会话撤销。测试只用隔离身份与临时目录；真实密码仍由用户在原32180页面输入。旧的本机一次性授权入口保持兼容，不能把它的进程级Cookie当作七天网页登录会话。
 
 
-## 2026-10-23 原工程布局调查与待批准的最小方案
+## 2026-10-23 原工程布局调查与待批准的最小方案（上游复核修订）
 
-本轮直接读取 Downloads 留存的五个源码包，而非只读当前 App：`companion-next-source.zip`（0.1.0）、`companion-next-source (1).zip`（0.1.1）、`companion-next-source (2).zip`（0.1.7）、`companion-next-source (3).zip`（0.1.12）、`companion-next-1.3.173-complete-source.zip`（1.3.173）。完整包 SHA256 b4dc893ddaab276ef8fd95c2eb35d82a4f1597affe8b6b6f03e1659d0ad2b477 与原导入清单一致。五包 package 都名为 companion-next，依赖 Vue/ElementPlus/Pinia/vue-router，repository/homepage/author/license 未注明，归档未含可确认模板来源的 LICENSE。README/来源记录仍不能建立第三方上游 URL 和版本。Cool-admin 的来源只证明独立运营后台，不能替代 Next 来源。逐包元数据与布局行证据：task/login-week-20261022/original-layout-investigation.json。
+本地包仍是来源证据边界：直接读取 Downloads 的 `companion-next-source.zip`（0.1.0）、`companion-next-source (1).zip`（0.1.1）、`companion-next-source (2).zip`（0.1.7）、`companion-next-source (3).zip`（0.1.12）、`companion-next-1.3.173-complete-source.zip`（1.3.173）。完整包 SHA256 b4dc893ddaab276ef8fd95c2eb35d82a4f1597affe8b6b6f03e1659d0ad2b477 与原导入清单一致。五包没有足以确认第三方上游的 repository/homepage/license 元数据；它们不含这些组件不等于已知参考框架没有功能。
 
-| 项目 | 原功能证据与当前差异 | 可复用能力与最小方案（待批准，不实施） | 验证点 |
+2026-10-23已直接核对明确参考源 [Cool-admin Vue 8.x](https://github.com/cool-team-official/cool-admin-vue/tree/8.x) 的真实源码及其 [MIT许可](https://github.com/cool-team-official/cool-admin-vue/blob/8.x/LICENSE)。主布局 `src/modules/base/pages/main/index.vue` 引入 topbar/process/views，插件 `src/plugins/dev-tools/config.ts` 注册工具。该仓库是已知参考技术体系及独立运营后台来源，仍未证明 Companion Next 整套由它派生。后续复用须保留许可/归属及实际来源版本，不能把参考集成写成找回 Next 原 Git 历史。
+
+| 项目 | 上游真实能力与现有差异 | 最小适配方案（待批准，不实施） | 不直接照搬的依赖/验证点 |
 | --- | --- | --- | --- |
-| 用户信息/登录态 | 五包 App 与组件清单未找到用户名/头像模块；当前 src/App.vue:171 只有退出登录。提供方专用 person 返回 id/username/status/expiresAt，但现前端 /api/ui/session 只收到 authenticated，不应从配置名单猜当前用户。 | 复用现会话只读身份，最小追加已认证用户名摘要；顶栏用已有 ElementPlus 下拉呈现真实用户名及退出。头像无已证实来源，先不加上传/个人资料；原本机一次性授权明确显示“本机授权”，不可冒用账号名。不能称为恢复一个已找到的原模块。 | 账号登录、本机授权、失效/未知分别显示；不暴露令牌/密码，不因刷新重新登录或重发写操作。 |
-| 右下独立悬浮按钮 | 留存五包未找到能核实其名称/用途的 App 挂载或对应组件，不能认作标签切换，也不能断言历史模板从未有。 | 目前无可核实源码可直接恢复。需要当时真正模板的仓库URL/版本或原工程目录/压缩包；取得后仅复用其确切组件，不猜造第四功能。 | 先确定名称、用途和来源，再检查是否被隐藏、入口与键盘/窄屏交互。 |
-| 顶部路由导航 | 0.1.0 包 companion-next/src/App.vue:30、0.1.1/0.1.7:33、0.1.12:35 均为文字“项目工作区 / route.meta.title”；1.3.173:98及当前App:170只显示当前页标题。未发现多路由页签证据。 | 可复用路由 meta 和现成 ElementPlus Breadcrumb 恢复清楚层级，保留既有返回按钮/导航。严格复原时先恢复原两级文字；新增可点击层级需明确路由映射确认。路由页签不是已证实遗漏，不能混入。 | 当前路由/工程query保留，深链接/返回/知识库子页层级正确，手机不溢出。 |
+| 用户信息 | [topbar.vue](https://github.com/cool-team-official/cool-admin-vue/blob/8.x/src/modules/base/pages/main/components/topbar.vue) 显示 nickName/headImg/email、个人中心及退出；[user.ts](https://github.com/cool-team-official/cool-admin-vue/blob/8.x/src/modules/base/store/user.ts) 含账号token与刷新逻辑。Next当前只有退出；专用会话 person 现仅返回 id/username/status/expiresAt，前端 /api/ui/session 只有authenticated。 | 复用顶栏下拉布局及ElementPlus；只接现有安全Cookie会话的已验证用户名摘要，退出复用当前注销。昵称/头像/邮箱若要显示，需提供方同一已认证身份最小白名单字段，不把全用户对象返回前端。无头像时用默认呈现，原CLI入口明确“本机授权”。 | 不复制token/refreshToken浏览器存储、router.clear或账号切换。个人中心尚无Next对应页面，不能做假入口或顺带新增修改密码/资料。验证账号、本机授权、失效/未知身份及七天/退出不被破坏。 |
+| 右下悬浮工具 | [dev-tools/index.vue](https://github.com/cool-team-official/cool-admin-vue/blob/8.x/src/plugins/dev-tools/components/index.vue) 入口固定右20/下20、v-if=isDev且hidden-sm-and-down；内容是Eps、代理请求、字典、账号、文档。正式构建及小屏隐藏是其原行为，不是足以断言的漏迁移。 | 推荐保留原开发环境/桌面限制。本批不在正式32180强制启用整套。若确认开发场景需要，先只复用抽屉/按钮外观和适用文档入口，逐项确认真实能力后接线，不能做空工具壳。 | Eps依赖virtual:eps和生成service；代理会切请求环境；字典依赖dict API/菜单/权限；账号工具保存token/refreshToken并切换账号，与Cookie边界冲突，不迁入。文档虽较独立也应只链接本项目已用依赖。不得为了恢复按钮开放代理/权限或引入全套Cool服务。 |
+| 顶部面包屑 | [route-nav.vue](https://github.com/cool-team-official/cool-admin-vue/blob/8.x/src/modules/base/pages/main/components/route-nav.vue) 是ElementPlus面包屑，按menu.group找层级，小屏只留末级；源码没有配置点击跳转。Next早期包有“项目工作区/当前页”文字，当前仅页名。 | 复用面包屑外观与小屏规则，用Next现有静态路由/meta和侧栏分组生成层级，不接运营菜单/权限服务，默认保留只展示语义。 | 不把可点击层级冒充原生能力。验证深链接、知识库子路由、资源旧链接重定向及project查询保持，小屏末级不溢出。 |
+| 路由页签 | [process.vue](https://github.com/cool-team-official/cool-admin-vue/blob/8.x/src/modules/base/pages/main/components/process.vue) 支持切换、关闭当前/其他/全部、返回/刷新/首页；依赖process/app store、useCool、ContextMenu及mitt。上游按path合并标签，[views.vue](https://github.com/cool-team-official/cool-admin-vue/blob/8.x/src/modules/base/pages/main/components/views.vue) 由process/meta.keepAlive算缓存，刷新会增加整层KeepAlive key。Next已有美术专用KeepAlive/v-show及知识库独立缓存，不能替换。 | 可复用页签外观和操作语义，薄适配到现有Router，保留完整fullPath及工程上下文；保留Next现缓存/草稿，不导入上游user/store/router体系。推荐作为第二小批，先通过页面切换、关闭、草稿和任务保护再开放。 | 不能直接复制整层key刷新或只按path合并不同工程。关闭标签不等于取消后台任务；未保存/进行中有原有确认或保留策略。刷新只调用适用的当前页现有刷新入口，不全局reload/重发写操作；资源内部三tab仍为页内任务切换。验证query/工程隔离、展开/滚动、后台轮询暂停/恢复、草稿与未知任务不丢失。 |
+
+推荐批准范围：第一批先统一静默轮询、真实用户菜单和只展示面包屑；第二批再接路由页签并验证现有缓存/草稿。右下工具遵守上游仅开发模式显示，不盲目在正式后台打开；其中账号/代理/Eps/字典能力不混入第一批。可复用的是源码布局与已适用交互，需最小适配的是会话字段、路由树和任务/缓存生命周期；没有用现成能力的部分必须说明其真实接口缺口。当前仅文档方案，无布局、认证、路由或轮询实现/部署变更。
 
 Companion“检查中”只读结论：`src/components/OverviewServiceSummary.vue:30` 以 directory.projectLoading 直接显示检查中；`src/stores/companion-browser.ts` 的 refreshProjects(true) 后台轮询同时设 projectLoading 与 backgroundProjectRead（约三秒一次），而卡片未使用后者区分静默刷新。读的是同源 /api/projects 等工程API可达性，不是独立MCP或Creator启动证明。`src/composables/use-overview-service-status.ts` 另以十五秒更新知识/模型服务，两者不可混为一个依赖绿灯。需要保留检测以识别断连/失效/接口错误；待批准最小修正是已有成功且未过期时保持已连接，后台刷新仅更新观察时间；首次读或真正状态变化再显示加载/失败/待核对。不得用旧绿灯掩盖失败或过期，也不改变真实依赖含义。当前未改布局或状态组件。
 
@@ -99,3 +104,14 @@ Companion“检查中”只读结论：`src/components/OverviewServiceSummary.vu
 三秒轮询在store scheduleProjectPoll（约180行）每次先clearTimeout，完成当前读取才安排下一次，并有projectLoading并发保护；setLivePageActive/setLiveVisibility/clearLiveWork及视图119卸载处理暂停和清理，begin/epoch/version拒绝旧响应。当前只读代码未证实重复计时器/并发请求覆盖，也未进行用户当前页的运行时计数，不能宣称已全面排除。网络失败分支会clearData，短暂错误即可清空旧卡片，恢复后重新挂载；默认展开跟随运行状态，显式选择已有优先保护。
 
 最小建议与看板统一：首次读取显示加载；成功快照有效时后台静默更新，只改实际变化字段，保持稳定ID/排序/显式展开/滚动。后台读失败保留旧内容并标过期/待核对，不冒充当前已就绪或清成无工程。区分后台读busy与业务操作busy；避免所有按钮视觉反复闪禁，点击操作时仍等待/冻结最新读取并按原身份、generation及确认门禁核验，不为稳定UI放宽写入保护。真实启动/停止进度继续及时显示。保留单一计时器与旧响应保护，不增加定时器。验收应录制正常轮询、慢响应、超时恢复、真实状态变更、切页/隐藏再返回，断言无document reload、无无谓卡片重挂/重复定时器、顺序/展开/滚动保持、操作不误重放。此处仅方案，未改任何布局/状态代码或执行Creator操作。
+
+
+### 2026-10-23 已批准的工作区导航与静默读取实施
+
+用户已批准上述最小方案。顶栏布局参考 Cool-admin Vue 8.x 的 topbar.vue、route-nav.vue 与 process.vue；新增适配组件保留 MIT 出处，许可证沿用 src/login/COOL-ADMIN-LICENSE.txt。仅复用布局和显示语义，不引入其 Token 存储、EPS、账号权限或另一后台。面包屑只展示层级；路由标签按完整内部路由保留工程 query，不将不同工程合并为同一目的页。右下 Dev Tools 保持原开发模式边界，正式后台不新增空工具入口。
+
+用户身份只取现有受保护 /api/ui/session 的服务端核实用户名；本机一次性授权明确标为本机授权，旧宿主不提供身份时明确显示身份未提供，不推测账户。七天到期、注销、账号停用与权限校验仍使用现有机制。
+
+后台轮询保留成功快照和稳定 DOM，读取失败标待核对并禁止旧快照直接授权写入。可在后台读取期间表达操作意图，但实际派发必须等待新读完成并重新校验来源、工程、运行身份和 revision，不将旧确认当新确认。离页清理读取计时器和请求；知识库保留输入及已完成结果，离页暂停在途操作并撤销临时确认，不重发。美术工作区既有 iframe 留在 DOM，避免路由切换重载素材选择。
+
+验收记录见 [工作区导航与静默刷新验收](ui-shell-acceptance-20261023.md)。构建通过、模拟行为与实际 32180 页面验证必须分别记录。

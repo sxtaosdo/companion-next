@@ -17,8 +17,8 @@ function serviceCard(key: 'knowledge' | 'model') {
   const code = warning ? warning.slice(prefix.length).split(']')[0] ?? '' : errorCode.value
   const failed = !!warning || !!error.value || (!!services.value && !value)
   // A retained successful snapshot is evidence, not current readiness during a
-  // new request, failed read, pause or operation barrier.
-  const state = loading.value ? status('检查中', 'primary', true)
+  // failed read, pause or operation barrier. Routine background reads retain it.
+  const state = loading.value && !observedAt.value ? status('检查中', 'primary', true)
     : failed ? status(failureLabel(code), 'danger')
     : stale.value && value ? status('状态过期 · 待核对', 'warning')
     : !value ? status('未读取', 'info')
@@ -27,7 +27,7 @@ function serviceCard(key: 'knowledge' | 'model') {
     detail: failed ? warning || error.value || '本次未取得有效服务响应，进入管理页核对连接' : blockedReason.value || (value?.running ? key === 'model' ? '仅启动器可达' : '服务可达 · 检索需核对' : !value ? '尚未取得状态' : '本次探测未达'), time: observedAt.value }
 }
 const cards = computed(() => {
-  const apiState = directory.projectLoading ? status('检查中', 'primary', true)
+  const apiState = directory.projectLoading && !directory.observedAt ? status('检查中', 'primary', true)
     : directory.projectError ? status(/（40[13]）/.test(directory.projectError) ? '鉴权失败' : directory.projectError.includes('只读查询超时') ? '超时' : '读取异常', 'danger')
     : blockedReason.value || (!connected.value && directory.observedAt) ? status(directory.observedAt ? '状态过期 · 待核对' : '状态未知 · 待核对', 'warning')
     : connected.value ? status('已连接', 'success') : directory.provider ? status('未读取', 'info') : status('未连接', 'info')

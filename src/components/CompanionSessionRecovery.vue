@@ -28,6 +28,7 @@ function restored(event: MessageEvent) {
   if (!open.value || source !== companionBrowserProvider.value || routeIdentity !== route.fullPath
     || !isSessionRestoredMessage(event, window.location.origin, frame.value?.contentWindow ?? null)) return
   close()
+  window.dispatchEvent(new Event('companion:identity-refresh'))
   ElMessage.success('会话已恢复，请手动重试刚才的操作。')
 }
 function guideLoaded() {
@@ -50,7 +51,7 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <el-dialog v-model="open" title="需要重新登录" width="min(640px, calc(100vw - 32px))" :close-on-click-modal="false" destroy-on-close>
-    <p class="session-recovery-note">当前页面和输入已保留。请在下方使用账号、密码和图片验证码登录；刚才的操作不会自动重发。</p>
+    <p class="session-recovery-note">当前页面和输入已保留。请在下方使用账号和密码登录；刚才的操作不会自动重发。</p>
     <p v-if="frameError" role="alert">登录页加载失败，请重试加载。</p>
     <iframe v-if="open && !frameError" :key="frameRevision" ref="frame" class="session-recovery-frame" :src="`/login?embedded=1&returnTo=${encodeURIComponent(returnTo)}`" title="Companion 账号登录" @load="guideLoaded" @error="frameError = true"/>
     <template #footer>

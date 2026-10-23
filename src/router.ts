@@ -31,10 +31,12 @@ export const routes: RouteRecordRaw[] = [
   { path: '/migration', component: MigrationView, meta: { title: '旧功能保留', description: '保留旧能力，逐项核对迁移完成情况。', workspaceIndependent: true } },
   { path: '/:pathMatch(.*)*', redirect: '/overview' },
 ]
+const shellScroll = new Map<string, {left:number;top:number}>()
 export const router = createRouter({
   history: createWebHashHistory(), routes,
   scrollBehavior(to, from, saved) {
     if (saved) return saved
+    if (shellScroll.has(to.fullPath)) return shellScroll.get(to.fullPath)!
     if (to.hash === '#service-status') return { el: '#service-status', top: 16 }
     if (knowledgePageFor(to)) return knowledgeScrollFor(to) ?? { left: 0, top: 0 }
     if (knowledgePageFor(from)) return { left: 0, top: 0 }
@@ -42,5 +44,6 @@ export const router = createRouter({
   },
 })
 router.beforeEach((_to, from) => {
+  shellScroll.set(from.fullPath, {left:window.scrollX,top:window.scrollY})
   if (knowledgePageFor(from)) rememberKnowledgeScroll(from, { left: window.scrollX, top: window.scrollY })
 })
