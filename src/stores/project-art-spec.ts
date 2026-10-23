@@ -35,9 +35,9 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
   const errors = computed(() => {
     if (!draft.value || !context.value) return []
     try {
-      if (base.value?.inheritance.mode === 'canon') {
+      if (base.value && base.value.inheritance.mode !== 'none') {
         const current = draft.value.inheritance
-        if (current.mode !== 'canon' || base.value.inheritance.usage !== undefined && current.usage !== base.value.inheritance.usage || base.value.inheritance.sources.some(pin => !current.sources.some(item => item.path === pin.path && item.revision === pin.revision))) return ['INHERITANCE_CHANGE_REQUIRES_REVIEW']
+        if (current.mode === 'none' || current.mode !== base.value.inheritance.mode || base.value.inheritance.usage !== undefined && current.usage !== base.value.inheritance.usage || base.value.inheritance.sources.some(pin => !current.sources.some(item => item.path === pin.path && item.revision === pin.revision))) return ['INHERITANCE_CHANGE_REQUIRES_REVIEW']
       }
       parseProjectArtSpec(draft.value, context.value.projectId); validateProjectArtBindings(draft.value, authorities.value); return [] }
     catch (error) { return [error instanceof ArtSpecError ? `${error.code} · ${error.field}` : '美术规范字段无效'] }
@@ -91,6 +91,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
       project: { name, content: '', engine: 'cocos-creator', designResolution: legacyConfig ? { ...legacyConfig.designResolution } : { width: 0, height: 0 } },
       ...(legacyConfig ? {} : { imageOutput: 'transparent-png' as const }),
       inheritance: { mode: 'none', reason: '' }, overrides: legacyConfig ? { width: legacyConfig.iconSize.width, height: legacyConfig.iconSize.height, transparent: legacyConfig.background.transparent, backgroundColor: legacyConfig.background.color, destination: legacyConfig.destination.directory, exportDirectory: legacyConfig.destination.exportDirectory, paddingPercent: legacyConfig.composition.paddingPercent } : { destination: 'assets/art', exportDirectory: 'art/final', transparent: true }, categories: {} }
+    if (!legacyConfig) { const styles = authorities.value.filter(a => a.kind === 'art-style' && a.allowedUsages.includes('project-art')); if (styles.length) draft.value.inheritance = { mode: 'style', usage: 'project-art', sources: styles.map(a => ({ ...a.source })) } }
     phase.value = 'editing'; message.value = '未保存草稿；请填写项目设定，保存前需读取工程原文件。'
   }
   function setValue(layer: 'project' | ArtCategory, key: keyof ArtValues, value: string | number | boolean) {

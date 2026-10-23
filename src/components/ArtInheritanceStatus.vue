@@ -13,9 +13,9 @@ const state=computed(()=>{
  if(info.state==='not-applicable')return {label:'明确不适用',tone:'info' as const,icon:Minus,detail:'已核实的来源记录明确排除此工程；不由空列表推断。'}
  if(info.state==='unlinked')return {label:'尚未关联',tone:'info' as const,icon:Minus,detail:'当前工程尚未建立 P0001 来源关联，不表示 P0001 不适用。'}
  const inheritance=props.inheritance
- const matched=inheritance.mode==='canon'&&inheritance.sources.length>0&&inheritance.sources.every(pin=>info.sources.some(s=>s.path===pin.path&&s.revision===pin.revision)&&props.authorities.some(a=>a.source.path===pin.path&&a.source.revision===pin.revision&&a.status==='Accepted'))
+ const matched=inheritance.mode!=='none'&&inheritance.sources.length>0&&inheritance.sources.every(pin=>info.sources.some(s=>s.path===pin.path&&s.revision===pin.revision)&&props.authorities.some(a=>a.source.path===pin.path&&a.source.revision===pin.revision&&a.status==='Accepted'))
  if(matched)return {label:props.saved?'已继承':'待保存继承',tone:props.saved?'success' as const:'primary' as const,icon:props.saved?CircleCheck:QuestionFilled,detail:'使用下列固定版本的来源，项目不能覆盖锁定要求。'}
- if(inheritance.mode==='canon')return {label:'来源待核对',tone:'warning' as const,icon:QuestionFilled,detail:'保存的来源与当前核实结果不一致，不能按已继承处理。'}
+ if(inheritance.mode!=='none')return {label:'来源待核对',tone:'warning' as const,icon:QuestionFilled,detail:'保存的来源与当前核实结果不一致，不能按已继承处理。'}
  return {label:'有可选来源',tone:'info' as const,icon:Minus,detail:'已核实下列来源可关联；尚未选择继承，不自动套用。'}
 })
 </script>

@@ -79,7 +79,7 @@ export function useArtSpecificationContext() {
   const specificationSource = computed(() => {
     if (primaryBound.value) {
       if (art.dirty) return { text: '有未保存修改', title: '草稿仍保留；公共状态以已保存规范为准。' }
-      if (art.base?.inheritance.mode === 'canon') return { text: `v${art.base.version} · P0001`, title: art.base.inheritance.sources.map(pin => `${pin.path} @ ${pin.revision}`).join('；') }
+      if (art.base && art.base.inheritance.mode !== 'none') return { text: `v${art.base.version} · P0001`, title: art.base.inheritance.sources.map(pin => `${pin.path} @ ${pin.revision}`).join('；') }
       if (art.base) return { text: `v${art.base.version} · 项目自定义`, title: '独立项目美术设定；未声明继承 P0001。' }
       if (art.legacyVersion !== null) return { text: `旧图标 v${art.legacyVersion}`, title: '旧图标配置不是项目美术规范。' }
     }

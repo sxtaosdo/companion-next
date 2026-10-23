@@ -14,6 +14,14 @@ function provider(): ProjectArtSpecProvider { return { label: 'test host', endpo
 async function setup() { const store = useProjectArtSpecStore(), host = provider(); store.bind(context, host); await store.read(); store.draft!.project.content = 'Changed content'; store.touch(); store.confirmed = true; return { store, host } }
 beforeEach(() => { vi.stubGlobal('crypto',webcrypto); const data=new Map<string,string>();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value)},removeItem:(key:string)=>{data.delete(key)},clear:()=>data.clear()}}); setActivePinia(createPinia()) })
 describe('project art editor real-provider boundary', () => {
+  it('preselects reviewed style only for a new draft and preserves a saved independent spec',async()=>{
+    const store=useProjectArtSpecStore(),host=provider(),pin={path:'P0001/art/master-style-reference.md',revision:'a'.repeat(40)};
+    const authorities=[{source:pin,status:'Accepted' as const,kind:'art-style' as const,projectIds:[context.projectId],allowedUsages:['project-art' as const],categories:['icon' as const],locked:{palette:'青绿/橙/白'},defaults:{},requiresImageReference:true}];
+    host.read=vi.fn(async()=>({...receipt(null,null),authorities}));store.bind(context,host);await store.read();store.startDraft('Project');
+    expect(store.draft!.inheritance).toEqual({mode:'style',usage:'project-art',sources:[pin]});expect(store.draft!.overrides).not.toHaveProperty('palette');
+    store.bind({...context,source:{}},host);host.read=vi.fn(async()=>({...receipt(),authorities}));await store.read();
+    expect(store.base!.inheritance).toEqual(config().inheritance);expect(store.draft!.inheritance).toEqual(config().inheritance);
+  })
   it('never accepts a completed save or recovered receipt with a removed explicit usage',async()=>{
     const {store,host}=await setup(),pin={path:'P0001/ip/canon_interface.md',revision:'a'.repeat(40)}
     store.authorities=[{source:pin,status:'Accepted',kind:'canon-interface',projectIds:[context.projectId],allowedUsages:['runtime'],categories:['icon'],locked:{},defaults:{},requiresImageReference:false}]
