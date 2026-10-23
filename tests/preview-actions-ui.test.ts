@@ -47,3 +47,6 @@ describe('last successful Preview diagnostic context',()=>{
   const api=fixture(),{store}=await setup(api);await store.run(id,'profiler');expect(store.lastPreviewProjectId).toBe('');api.run=vi.fn(async()=>{throw new PreviewActionError('network-error')});await store.run(id,'probe');expect(store.lastPreviewProjectId).toBe('')
  })
 })
+
+
+it('names the existing P1060 evidence action as isolated natural battle without adding a page',async()=>{const api=fixture(),{browser}=await setup(api),target='c16c713714956b4e';browser.projects=[{id:target,name:'P1060',path:'D:/code/shidai3/P1000/P1060'}];browser.statuses=[{projectId:target,state:'ready',capabilityProfile:'read-only',instanceId:'one'}];await wrapper!.setProps({projectId:target});await flushPromises();const capture=button('战斗取证');expect(capture).toBeDefined();expect(capture.attributes('title')).toContain('独立测试存档');await capture.trigger('click');await flushPromises();expect(api.run).toHaveBeenCalledExactlyOnceWith({projectId:target,action:'profiler'},expect.any(AbortSignal))})

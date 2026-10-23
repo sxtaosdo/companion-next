@@ -1,4 +1,4 @@
-import { PREVIEW_ACTION_LIMITS, PreviewActionError, normalizePreviewRequest } from '../domain/preview-actions'
+import { P1060_PERFORMANCE_SCENARIO, PREVIEW_ACTION_LIMITS, PreviewActionError, normalizePreviewRequest } from '../domain/preview-actions'
 import type { PreviewCode, PreviewOutcome, PreviewReply, PreviewActionsProvider } from '../domain/preview-actions'
 import { sanitizeCompanionDisplayText } from './companion-browser'
 export type PreviewActionPath = `/api/projects/${string}/preview/${'start'|'probe'|'status'|'reload'}` | `/api/projects/${string}/profiler/capture`
@@ -91,7 +91,7 @@ export function createPreviewActionsProvider(options:{fetch:PreviewActionFetch;t
           invoked = true
           try {
             const path:PreviewActionPath=request.action==='profiler'?`/api/projects/${request.projectId}/profiler/capture`:`/api/projects/${request.projectId}/preview/${request.action}`
-            const body=request.action==='start'?{target:'browser'}:request.action==='profiler'?{operationId:`web-profiler-${Date.now()}-${crypto.randomUUID()}`}:{ }
+            const body=request.action==='start'?{target:'browser'}:request.action==='profiler'?{operationId:`web-profiler-${Date.now()}-${crypto.randomUUID()}`,...(request.projectId===P1060_PERFORMANCE_SCENARIO.projectId?{scenarioId:P1060_PERFORMANCE_SCENARIO.id}:{})}:{ }
             return Promise.resolve(transport(path, {
               method:'POST',mode:'same-origin',credentials:'same-origin',redirect:'error',cache:'no-store',
               headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify(body),

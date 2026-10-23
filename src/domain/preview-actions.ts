@@ -1,3 +1,4 @@
+export const P1060_PERFORMANCE_SCENARIO = Object.freeze({projectId:'c16c713714956b4e',id:'p1060-natural-battle-v1'})
 export const PREVIEW_ACTIONS = ['start','probe','status','reload','profiler'] as const
 export type PreviewAction = typeof PREVIEW_ACTIONS[number]
 export const previewActionLabel = (action:PreviewAction) => ({start:'预览',probe:'探测',status:'状态',reload:'刷新',profiler:'Profiler 采集'})[action]

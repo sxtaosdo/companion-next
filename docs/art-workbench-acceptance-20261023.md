@@ -23,7 +23,7 @@
 原始证据与备份：`C:/Users/33272/Documents/Codex/2026-10-17/task/art-workbench-delivery-20261023/` 内delivery.json、ui-{spec,reference,need,binding,readback}.json、data-readback.json、before-data、before-installed。SQLite在线备份integrity_check=ok。恢复只在正常停止本宿主后按deployment-plan核验并还原原目标，旧index最后写入，保留后续用户数据；不删历史或新hash资产。
 
 
-## 第二批：准备任务与整页恢复（2026-10-23，现场验收待完成）
+## 第二批：准备任务与整页恢复（2026-10-23，现场验收完成）
 
 - 项目规范仍为唯一权威来源。已保存图标需求通过原 Studio inspect/enqueue 准备真实任务，冻结规范、规格、单项输入和引用证据；不调用 run-next/resume，不把任务创建等同图片生成。
 - 单项和顺序批次逐项记录 created/rejected/unknown/not-started；遇未知停止后续，查询原操作并显式恢复关联，不自动重发。人物、UI及参考图入模能力仍未接通。
@@ -32,3 +32,21 @@
 - 现场更新前备份、预检通过后才正常停止本应用。保护用户登录、10工程、5份规范与城市游戏，不清历史，不新后台，不重启Windows。
 
 证据目录：`C:/Users/33272/Documents/Codex/2026-10-17/task/art-workbench-phase2-20261023/`。源版本与实际运行版本须分别核实；本节不预先声明已部署或新GPU生成成功。
+
+### 第二批现场回执（更新首批未完成项）
+
+前端实际1.3.192/e4bd2402+working；宿主0.3.153/6b6b6db08d3f+working-13aa985c6d48，PID23612/OPEN。同一32180，10工程、5份正式规范hash保持，原用户会话不注销。
+
+在e2e真实页面新建需求acceptance-prepared-20261023，并仅提交一次准备请求，得到任务STUDIO-RUN-workbench-5435056f8e11469d9bd74e864e42fdc2-7abb3488，状态queued。冻结摘要2a32b3eef6a34c95b0028085b2a982fd7d8aee278e22d5c40d187e23284df977；工作台v6/hash764fb34a5a2ae9bd2c40ac628a206a11e4c1000a730d9a20032fb461ad42f23a。刷新重读确认任务关联保持，未执行GPU、未产生新图或prompt ID。
+
+实际构建页面的未知保存整页恢复使用明确网络夹具：1次POST、刷新后保留草稿及原operationId、1次原操作查询恢复；真实项目写入0。此证据验证界面恢复，不能冒充真实故障任务已经恢复。187项前端、79项宿主、14份collector功能脚本、4组独立存储故障探查通过；15个安装目标hash及6个静态HTTP产物核验。
+
+启动误报另已修复并现场复用验证：npm start -- --no-browser返回0，仍PID23612，无第二启动或窗口；33项隔离回归和独立复审通过。冷启动故障分支由隔离测试覆盖，本次现场只证明已运行服务复用。
+
+完整回执delivery.json/live-need.json/live-prepare.json/live-readback.json/browser-reload-fixture.json及备份位于上述phase2目录；启动回执在task/startup-wrapper-20261023/live-reuse.json。场景绑定、Qwen Edit参考入模已获后续实现批准，当前正在独立实施，尚无真实绑定/推理通过证据。P1060战斗入口后续接线不属于本批已完成验收。
+
+### 后续采样交付与实际边界
+
+2026-10-23：前端1.3.193、后端0.3.154同32180/PID40784恢复OPEN，15安装目标及6静态HTTP hash核验，10工程和5规范保持。P1060经现有页面先预览再点击“战斗取证”；operation web-profiler-1792756061360-12678304-84f0-472b-b1b8-9d3bbecc6a3f，两个UI请求均200，无直接Creator调用。窗口5dcbca7c-a9a4-44d0-8868-8291b2b51722保留846帧、0丢帧，P95=18.2ms；战斗12.34%、空闲82.74%、未知4.92%，状态insufficient/UNCONFIRMED。角色自然通关草原后等待选区，不能把此混合窗口当持续战斗性能通过；源/编译/页面身份仍unknown。完整证据task/p1060-samewindow-20261023/actual-window-summary.json与battle-ui-capture.json，原完整文件在P1060/temp/creator-ai-bridge/profiler/capture-1792756086186.json。
+
+启动脚本复用服务验证成功；本次单次冷启动最初返回readiness-unconfirmed，随后只读核验同一启动PID40784正常OPEN，没有第二次启动。冷启动确认预算问题继续修复，不称启动包装冷启动已完整通过。
