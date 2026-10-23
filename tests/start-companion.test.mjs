@@ -70,7 +70,7 @@ test('offline binding strips all inherited icon capabilities including case vari
  const original={...parent};const child=startupEnvironment(parent,APPROVED_STARTUP_CONFIG);
  assert.deepEqual(Object.fromEntries(Object.entries(child).filter(([key])=>key.toUpperCase().startsWith('CREATOR_AI_ICONS_'))),APPROVED_STARTUP_CONFIG);
  assert.equal(child.PATH,parent.PATH);assert.equal(child.CREATOR_AI_OWNER_CACHE,parent.CREATOR_AI_OWNER_CACHE);assert.deepEqual(parent,original);
- assert.throws(()=>startupEnvironment(parent,{...APPROVED_STARTUP_CONFIG,CREATOR_AI_ICONS_MODE:'generation'}),/LOCAL_CONFIG_MODE_INVALID/);
+ assert.throws(()=>startupEnvironment(parent,{...APPROVED_STARTUP_CONFIG,CREATOR_AI_ICONS_MODE:'generation'}),/LOCAL_CONFIG_KEYS_INVALID/);
 });
 
 test('tracked example matches the bounded allowlist and does not become an automatic fallback',()=>{
@@ -97,11 +97,53 @@ test('unconfirmed auth dependency prevents Companion startup and browser creatio
 
 
 test('approved existing mother-image source persists without allowing arbitrary manifest paths or generation',()=>{
- const binding=loadStartupConfiguration();
+ const binding=APPROVED_STARTUP_CONFIG; // Test offline policy independently from the current machine-selected profile.
  assert.equal(binding.CREATOR_AI_ICONS_ADOPTION_MANIFEST,'D:/CompanionData/art-generation-acceptance-20261021/records/adoption-catalog.json');
  const child=startupEnvironment({CREATOR_AI_ICONS_ADOPTION_MANIFEST:'D:/unapproved.json',CREATOR_AI_ICONS_ENDPOINT:'http://127.0.0.1:8188'},binding);
  assert.equal(child.CREATOR_AI_ICONS_ADOPTION_MANIFEST,binding.CREATOR_AI_ICONS_ADOPTION_MANIFEST);
  assert.equal(child.CREATOR_AI_ICONS_MODE,'offline_import_only');assert.equal(child.CREATOR_AI_ICONS_ENDPOINT,undefined);
  assert.throws(()=>validateStartupConfiguration({...binding,CREATOR_AI_ICONS_ADOPTION_MANIFEST:'D:/other.json'}),/LOCAL_CONFIG_BINDING_NOT_APPROVED/);
  const missing={...binding};delete missing.CREATOR_AI_ICONS_ADOPTION_MANIFEST;assert.throws(()=>validateStartupConfiguration(missing),/LOCAL_CONFIG_KEYS_INVALID/);
+});
+
+
+const { APPROVED_E2E_GENERATION_CONFIG } = await import('../scripts/start-companion.mjs');
+test('e2e generation accepts only the complete explicit approved profile',()=>{
+ const profile={...APPROVED_E2E_GENERATION_CONFIG};
+ assert.deepEqual(validateStartupConfiguration(profile),profile);
+ assert.equal(profile.CREATOR_AI_ICONS_GENERATION_PROJECT_IDS,'16ad921aa0fb06d6');
+ for(const drift of [
+  {CREATOR_AI_ICONS_ENDPOINT:'http://0.0.0.0:8188'},
+  {CREATOR_AI_ICONS_ENDPOINT:'https://paid.example'},
+  {CREATOR_AI_ICONS_LEASE:'D:/other'},
+  {CREATOR_AI_ICONS_GENERATION_PROJECT_IDS:'04c4cde24ee76d83'},
+  {CREATOR_AI_ICONS_GENERATION_PROJECT_IDS:'16ad921aa0fb06d6,04c4cde24ee76d83'},
+  {CREATOR_AI_ICONS_MODE:'offline_import_only'},
+ ])assert.throws(()=>validateStartupConfiguration({...profile,...drift}),StartupError);
+ for(const key of ['CREATOR_AI_ICONS_LEASE','CREATOR_AI_ICONS_ENDPOINT','CREATOR_AI_ICONS_GENERATION_PROJECT_IDS']){
+  const missing={...profile};delete missing[key];assert.throws(()=>validateStartupConfiguration(missing),StartupError);
+ }
+ const getter={...profile};Object.defineProperty(getter,'CREATOR_AI_ICONS_MODE',{get:()=>assert.fail('getter must not run'),enumerable:true});
+ assert.throws(()=>validateStartupConfiguration(getter),StartupError);
+});
+test('generation startup strips inherited scope and always restricts the existing model launcher to loopback',()=>{
+ const parent={CREATOR_AI_ICONS_GENERATION_PROJECT_IDS:'04c4cde24ee76d83',CREATOR_AI_ICONS_ENDPOINT:'http://remote',CREATOR_AI_LOCAL_MODEL_LOOPBACK_ONLY:'0',creator_ai_local_model_loopback_only:'0'};
+ const before={...parent},child=startupEnvironment(parent,APPROVED_E2E_GENERATION_CONFIG);
+ assert.equal(child.CREATOR_AI_ICONS_GENERATION_PROJECT_IDS,'16ad921aa0fb06d6');
+ assert.equal(child.CREATOR_AI_ICONS_ENDPOINT,'http://127.0.0.1:8188');
+ assert.equal(child.CREATOR_AI_LOCAL_MODEL_LOOPBACK_ONLY,'1');assert.equal(child.creator_ai_local_model_loopback_only,undefined);assert.deepEqual(parent,before);
+ const offline=startupEnvironment(parent,APPROVED_STARTUP_CONFIG);
+ assert.equal(offline.CREATOR_AI_ICONS_GENERATION_PROJECT_IDS,undefined);assert.equal(offline.CREATOR_AI_ICONS_ENDPOINT,undefined);
+ assert.equal(offline.CREATOR_AI_LOCAL_MODEL_LOOPBACK_ONLY,'1');
+});
+test('generation machine-local loader keeps repeated-key and extra-key rejection',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'companion-e2e-config-')),file=join(dir,'config.json');
+ try{
+  const raw=JSON.stringify(APPROVED_E2E_GENERATION_CONFIG);writeFileSync(file,raw);
+  assert.deepEqual(loadStartupConfiguration(file),APPROVED_E2E_GENERATION_CONFIG);
+  writeFileSync(file,raw.replace('{','{"CREATOR_AI_ICONS_GENERATION_PROJECT_IDS":"04c4cde24ee76d83",'));
+  assert.throws(()=>loadStartupConfiguration(file),/LOCAL_CONFIG_KEYS_INVALID/);
+  writeFileSync(file,JSON.stringify({...APPROVED_E2E_GENERATION_CONFIG,CREATOR_AI_ICONS_FUTURE_FEATURE:'1'}));
+  assert.throws(()=>loadStartupConfiguration(file),/LOCAL_CONFIG_KEYS_INVALID/);
+ }finally{rmSync(dir,{recursive:true});}
 });

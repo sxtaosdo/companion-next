@@ -20,8 +20,19 @@ export const APPROVED_STARTUP_CONFIG = Object.freeze({
   CREATOR_AI_ICONS_MODE: 'offline_import_only',
   CREATOR_AI_ICONS_ADOPTION_MANIFEST: 'D:/CompanionData/art-generation-acceptance-20261021/records/adoption-catalog.json',
 });
+// A separate, exact profile for the single Owner-approved local e2e acceptance.
+// All other registered projects remain offline in the host adapter.
+export const APPROVED_E2E_GENERATION_CONFIG = Object.freeze({
+  ...APPROVED_STARTUP_CONFIG,
+  CREATOR_AI_ICONS_MODE: 'generation',
+  CREATOR_AI_ICONS_ENDPOINT: 'http://127.0.0.1:8188',
+  CREATOR_AI_ICONS_LEASE: 'D:/CompanionData/art-generation-acceptance-20261021/generation-lease-20261023',
+  CREATOR_AI_ICONS_GENERATION_PROJECT_IDS: '16ad921aa0fb06d6',
+});
 export function validateStartupConfiguration(value) {
-  const expected = Object.keys(APPROVED_STARTUP_CONFIG);
+  const mode = value && typeof value === 'object' ? Object.getOwnPropertyDescriptor(value, 'CREATOR_AI_ICONS_MODE') : undefined;
+  const approved = mode && 'value' in mode && mode.value === 'generation' ? APPROVED_E2E_GENERATION_CONFIG : APPROVED_STARTUP_CONFIG;
+  const expected = Object.keys(approved);
   if (!value || typeof value !== 'object' || Array.isArray(value)
     || Object.getPrototypeOf(value) !== Object.prototype
     || Reflect.ownKeys(value).length !== expected.length
@@ -29,8 +40,8 @@ export function validateStartupConfiguration(value) {
   for (const key of expected) {
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
     if (!descriptor || !('value' in descriptor) || typeof descriptor.value !== 'string') throw new StartupError('LOCAL_CONFIG_VALUE_INVALID');
-    if (key !== 'CREATOR_AI_ICONS_MODE' && (!/^[A-Za-z]:[\\/]/.test(descriptor.value) || !win32.isAbsolute(descriptor.value))) throw new StartupError('LOCAL_CONFIG_PATH_INVALID');
-    if (descriptor.value !== APPROVED_STARTUP_CONFIG[key]) throw new StartupError(key === 'CREATOR_AI_ICONS_MODE' ? 'LOCAL_CONFIG_MODE_INVALID' : 'LOCAL_CONFIG_BINDING_NOT_APPROVED');
+    if (!['CREATOR_AI_ICONS_MODE', 'CREATOR_AI_ICONS_ENDPOINT', 'CREATOR_AI_ICONS_GENERATION_PROJECT_IDS'].includes(key) && (!/^[A-Za-z]:[\\/]/.test(descriptor.value) || !win32.isAbsolute(descriptor.value))) throw new StartupError('LOCAL_CONFIG_PATH_INVALID');
+    if (descriptor.value !== approved[key]) throw new StartupError(key === 'CREATOR_AI_ICONS_MODE' ? 'LOCAL_CONFIG_MODE_INVALID' : 'LOCAL_CONFIG_BINDING_NOT_APPROVED');
   }
   return Object.freeze({ ...value });
 }
@@ -53,10 +64,12 @@ export function startupEnvironment(env = process.env, configuration) {
   if (Boolean(env.CREATOR_AI_DAEMON_URL) !== Boolean(env.CREATOR_AI_DAEMON_TOKEN)) throw new StartupError('INCOMPLETE_DAEMON_OVERRIDE');
   const binding = validateStartupConfiguration(configuration ?? loadStartupConfiguration());
   const value = { ...env };
-  // Remove every inherited icon setting before applying the exact approved offline binding.
+  // Remove every inherited icon setting before applying the selected exact approved binding.
   // Windows environment names are case-insensitive; unknown future icon settings also fail closed.
-  for (const key of Object.keys(value)) if (key.toUpperCase().startsWith('CREATOR_AI_ICONS_')) delete value[key];
+  for (const key of Object.keys(value)) if (key.toUpperCase().startsWith('CREATOR_AI_ICONS_') || key.toUpperCase() === 'CREATOR_AI_LOCAL_MODEL_LOOPBACK_ONLY') delete value[key];
   Object.assign(value, binding);
+  // The existing model launcher may only bind loopback when started by Companion.
+  value.CREATOR_AI_LOCAL_MODEL_LOOPBACK_ONLY = '1';
   // These are the existing host bindings, scoped to this child process only.
   value.CREATOR_AI_OWNER_PYTHON ??= 'C:/Users/33272/miniconda3/python.exe';
   value.CREATOR_AI_OWNER_BRIDGE_ROOT ??= root;
@@ -152,7 +165,7 @@ export async function main(args = process.argv.slice(2)) {
   if (args.includes('--help')) { console.log('npm start [-- --no-browser]\nStarts/reuses the installed Companion and opens only Companion Next. Closing the new browser window does not stop the daemon.'); return; }
   if (args.some(arg => arg !== '--no-browser')) throw new StartupError('UNKNOWN_OPTION');
   const env = startupEnvironment();
-  console.log('Project-local offline resource configuration loaded. New daemon processes use it; an already running daemon keeps its configuration until an approved maintenance restart.');
+  console.log('Project-local resource configuration loaded. New daemon processes use it; an already running daemon keeps its configuration until an approved maintenance restart.');
   delete process.env.DEBUG; delete process.env.PWDEBUG;
   const { CompanionApiClient } = await import(pathToFileURL(join(host, 'dist/companion-api-client.js')).href);
   const result = await startCompanion({ noBrowser: args.includes('--no-browser') }, {
@@ -176,7 +189,7 @@ export async function main(args = process.argv.slice(2)) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   main().catch(error => {
     // Do not echo CLI output, credentials, auth tickets or Playwright request diagnostics.
-    if (error instanceof StartupError && error.code.startsWith('LOCAL_CONFIG_')) console.error('Check companion-start.local.json against companion-start.example.json; only the approved fixed offline bindings are accepted.');
+    if (error instanceof StartupError && error.code.startsWith('LOCAL_CONFIG_')) console.error('Check companion-start.local.json against companion-start.example.json; only the approved fixed offline or e2e generation bindings are accepted.');
     console.error('Companion Next startup failed [' + (error instanceof StartupError ? error.code : 'LOCAL_START_FAILED') + ']. No restart or retry was issued; a timed-out daemon may still be starting.');
     process.exitCode = 1;
   });
