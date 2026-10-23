@@ -90,3 +90,12 @@ The approved provider address is loopback port 18001 (user-approved change from 
 | 顶部路由导航 | 0.1.0 包 companion-next/src/App.vue:30、0.1.1/0.1.7:33、0.1.12:35 均为文字“项目工作区 / route.meta.title”；1.3.173:98及当前App:170只显示当前页标题。未发现多路由页签证据。 | 可复用路由 meta 和现成 ElementPlus Breadcrumb 恢复清楚层级，保留既有返回按钮/导航。严格复原时先恢复原两级文字；新增可点击层级需明确路由映射确认。路由页签不是已证实遗漏，不能混入。 | 当前路由/工程query保留，深链接/返回/知识库子页层级正确，手机不溢出。 |
 
 Companion“检查中”只读结论：`src/components/OverviewServiceSummary.vue:30` 以 directory.projectLoading 直接显示检查中；`src/stores/companion-browser.ts` 的 refreshProjects(true) 后台轮询同时设 projectLoading 与 backgroundProjectRead（约三秒一次），而卡片未使用后者区分静默刷新。读的是同源 /api/projects 等工程API可达性，不是独立MCP或Creator启动证明。`src/composables/use-overview-service-status.ts` 另以十五秒更新知识/模型服务，两者不可混为一个依赖绿灯。需要保留检测以识别断连/失效/接口错误；待批准最小修正是已有成功且未过期时保持已连接，后台刷新仅更新观察时间；首次读或真正状态变化再显示加载/失败/待核对。不得用旧绿灯掩盖失败或过期，也不改变真实依赖含义。当前未改布局或状态组件。
+
+
+### 工程页持续刷新：只读根因与合并方案（待批准）
+
+当前工程入口为 `src/router.ts` → `src/views/CompanionBrowserView.vue`。未发现该页/store调用 location.reload；不能把每次轮询叫整页刷新。`src/stores/companion-browser.ts:75–98` 的 refreshProjects(true) 设置 projectLoading/backgroundProjectRead；相同 projects/statuses 已JSON去重，卡片 `:key=project.id`，显式展开在视图92–93按工程ID保存。因此正常无变化轮询不应整列表重挂或随机排序。仍存在确定的可见更新：每次成功都改 observedAt 并增加 projectSnapshotRevision；`src/stores/creator-operations.ts:183` 对所有 projectLoading 阻断 canPrepare，视图124、146等按钮随后台读反复禁用。视图96–102另有100/1000ms的调用耗时显示计时器，不是网络轮询。
+
+三秒轮询在store scheduleProjectPoll（约180行）每次先clearTimeout，完成当前读取才安排下一次，并有projectLoading并发保护；setLivePageActive/setLiveVisibility/clearLiveWork及视图119卸载处理暂停和清理，begin/epoch/version拒绝旧响应。当前只读代码未证实重复计时器/并发请求覆盖，也未进行用户当前页的运行时计数，不能宣称已全面排除。网络失败分支会clearData，短暂错误即可清空旧卡片，恢复后重新挂载；默认展开跟随运行状态，显式选择已有优先保护。
+
+最小建议与看板统一：首次读取显示加载；成功快照有效时后台静默更新，只改实际变化字段，保持稳定ID/排序/显式展开/滚动。后台读失败保留旧内容并标过期/待核对，不冒充当前已就绪或清成无工程。区分后台读busy与业务操作busy；避免所有按钮视觉反复闪禁，点击操作时仍等待/冻结最新读取并按原身份、generation及确认门禁核验，不为稳定UI放宽写入保护。真实启动/停止进度继续及时显示。保留单一计时器与旧响应保护，不增加定时器。验收应录制正常轮询、慢响应、超时恢复、真实状态变更、切页/隐藏再返回，断言无document reload、无无谓卡片重挂/重复定时器、顺序/展开/滚动保持、操作不误重放。此处仅方案，未改任何布局/状态代码或执行Creator操作。
