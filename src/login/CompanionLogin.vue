@@ -1,6 +1,6 @@
 <!-- Adapted from Cool-admin Vue 8.x modules/base/pages/login/index.vue, MIT.
 Source: https://github.com/cool-team-official/cool-admin-vue/tree/8.x
-Reuses layout, mandatory fields, Enter submission and failed-login captcha refresh.
+Reuses layout, mandatory fields and Enter submission; captcha remains only for legacy host compatibility.
 Companion uses its own same-origin authentication adapter and HttpOnly Cookie, never Cool token storage.
 See COOL-ADMIN-LICENSE.txt. -->
 <script setup lang="ts">
@@ -10,12 +10,13 @@ import { finishLogin, loginError, LoginFailure, readCaptcha, readLoginConfig, su
 const phase = ref<'checking' | 'ready' | 'blocked' | 'complete'>('checking')
 const saving = ref(false)
 const captchaLoading = ref(false)
+const captchaRequired = ref(true)
 const captchaImage = ref('')
 const error = ref('')
 const form = reactive({ username: '', password: '', captchaId: '', verifyCode: '' })
 let active = true, revision = 0
 async function refreshCaptcha() {
-  if (!active || saving.value || captchaLoading.value || phase.value !== 'ready') return
+  if (!active || !captchaRequired.value || saving.value || captchaLoading.value || phase.value !== 'ready') return
   const current = ++revision
   captchaLoading.value = true
   form.captchaId = ''; form.verifyCode = ''; captchaImage.value = ''
@@ -34,7 +35,8 @@ async function initialize() {
     if (!config.configured || !config.available) {
       phase.value = 'blocked'; error.value = loginError(new LoginFailure(!config.configured ? 'AUTH_NOT_CONFIGURED' : 'AUTH_PROVIDER_UNAVAILABLE')); return
     }
-    phase.value = 'ready'; await refreshCaptcha()
+    captchaRequired.value = config.captchaRequired !== false
+    phase.value = 'ready'; if (captchaRequired.value) await refreshCaptcha()
   } catch (failure) { if (active) { phase.value = 'blocked'; error.value = loginError(failure) } }
 }
 async function toLogin() {
@@ -42,12 +44,12 @@ async function toLogin() {
   error.value = ''
   if (!form.username.trim()) { error.value = '用户名不能为空。'; return }
   if (!form.password) { error.value = '密码不能为空。'; return }
-  if (!form.verifyCode.trim()) { error.value = '图片验证码不能为空。'; return }
-  if (!form.captchaId) { error.value = '请先刷新图片验证码。'; return }
+  if (captchaRequired.value && !form.verifyCode.trim()) { error.value = '图片验证码不能为空。'; return }
+  if (captchaRequired.value && !form.captchaId) { error.value = '请先刷新图片验证码。'; return }
   saving.value = true
   let refresh = false
   try {
-    await submitLogin(window.fetch.bind(window), form)
+    await submitLogin(window.fetch.bind(window), captchaRequired.value ? form : { username: form.username, password: form.password })
     form.password = ''
     if (!active) return
     await verifyLoginSession(window.fetch.bind(window))
@@ -62,7 +64,7 @@ async function toLogin() {
   } finally {
     form.password = ''
     saving.value = false
-    if (active && refresh) await refreshCaptcha()
+    if (active && refresh && captchaRequired.value) await refreshCaptcha()
   }
 }
 onMounted(initialize)
@@ -80,8 +82,9 @@ onBeforeUnmount(() => { active = false; revision++; form.password = ''; form.ver
       <el-form v-if="phase === 'ready'" class="form" label-position="top" :disabled="saving" @submit.prevent="toLogin">
         <el-form-item label="用户名"><el-input v-model="form.username" aria-label="用户名" placeholder="请输入用户名" maxlength="128" autocomplete="username" :disabled="saving"/></el-form-item>
         <el-form-item label="密码"><el-input v-model="form.password" aria-label="密码" type="password" placeholder="请输入密码" show-password autocomplete="off" :disabled="saving"/></el-form-item>
-        <el-form-item label="验证码"><div class="captcha-row"><el-input v-model="form.verifyCode" aria-label="验证码" placeholder="图片验证码" maxlength="8" autocomplete="off" :disabled="saving || captchaLoading" @keyup.enter="toLogin"/><PicCaptcha :image="captchaImage" :loading="captchaLoading" :disabled="saving" @refresh="refreshCaptcha"/></div></el-form-item>
-        <div class="op"><el-button native-type="submit" type="primary" :loading="saving" :disabled="saving || captchaLoading || !form.captchaId">登录</el-button></div>
+        <el-form-item v-if="captchaRequired" label="验证码"><div class="captcha-row"><el-input v-model="form.verifyCode" aria-label="验证码" placeholder="图片验证码" maxlength="8" autocomplete="off" :disabled="saving || captchaLoading" @keyup.enter="toLogin"/><PicCaptcha :image="captchaImage" :loading="captchaLoading" :disabled="saving" @refresh="refreshCaptcha"/></div></el-form-item>
+        <p v-if="!captchaRequired" class="session-note">登录后保持 7 天，主动退出即失效。</p>
+        <div class="op"><el-button native-type="submit" type="primary" :loading="saving" :disabled="saving || captchaLoading || (captchaRequired && !form.captchaId)">登录</el-button></div>
       </el-form>
     </section>
   </main>
@@ -100,6 +103,7 @@ h1 { font-size:30px; margin:0; letter-spacing:1px; }
 .captcha-row { display:flex; gap:10px; width:100%; align-items:center; }
 .op { display:flex; margin-top:24px; }
 .op .el-button { width:100%; height:44px; font-size:16px; }
+.session-note { color:#637187; font-size:12px; margin:8px 0 0; }
 .login-error { color:#a52d3a; line-height:1.6; margin:0 0 16px; }
 @media(max-width:480px) { .page-login { padding:20px 16px; align-items:flex-start; } .desc { margin-bottom:16px; } }
 </style>

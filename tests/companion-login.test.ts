@@ -21,6 +21,12 @@ describe('same-origin Cookie login contract', () => {
     const fetcher = vi.fn().mockResolvedValue(response({ code }, status as number))
     await expect(submitLogin(fetcher, form)).rejects.toHaveProperty('code', code); expect(fetcher).toHaveBeenCalledTimes(1)
   })
+  it('accepts the explicit password-only capability and sends no captcha fields', async () => {
+    expect(await readLoginConfig(vi.fn().mockResolvedValue(response({available:true,configured:true,captchaRequired:false})))).toEqual({available:true,configured:true,captchaRequired:false})
+    const fetcher=vi.fn().mockResolvedValue(response({authenticated:true}));await submitLogin(fetcher,{username:'fixture-user',password:'fixture-password'})
+    expect(JSON.parse(fetcher.mock.calls[0][1].body)).toEqual({username:'fixture-user',password:'fixture-password'})
+    await expect(submitLogin(vi.fn().mockResolvedValue(response({code:'AUTH_RATE_LIMITED'},429)),{username:'fixture-user',password:'fixture-password'})).rejects.toHaveProperty('code','AUTH_RATE_LIMITED')
+  })
   it('never accepts a token or JWT response as a browser session', async () => {
     for (const data of [{ token: 'fixture-only' }, { authenticated: true, access_token: 'fixture-only' }, { authenticated: false }]) await expect(submitLogin(vi.fn().mockResolvedValue(response(data)), form)).rejects.toHaveProperty('code', 'AUTH_INVALID_RESPONSE')
   })

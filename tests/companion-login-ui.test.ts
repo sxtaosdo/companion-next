@@ -7,11 +7,11 @@ const wrappers: Array<ReturnType<typeof mount>> = []
 const png = 'data:image/png;base64,aGVsbG8='
 const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
 afterEach(() => { wrappers.splice(0).forEach(w => w.unmount()); vi.unstubAllGlobals(); vi.restoreAllMocks() })
-async function page(options: { configured?: boolean; available?: boolean; loginStatus?: number; loginCode?: string; session?: boolean; captchaFails?: boolean } = {}) {
+async function page(options: { configured?: boolean; available?: boolean; loginStatus?: number; loginCode?: string; session?: boolean; captchaFails?: boolean; captchaRequired?: boolean } = {}) {
   let captcha = 0
-  const fetcher = vi.fn(async (input: RequestInfo | URL) => {
+  const fetcher = vi.fn(async (input: RequestInfo | URL, _init?: RequestInit) => {
     const url = String(input)
-    if (url === '/api/auth/config') return response({ available: options.available ?? true, configured: options.configured ?? true })
+    if (url === '/api/auth/config') return response({ available: options.available ?? true, configured: options.configured ?? true, ...(options.captchaRequired === false ? { captchaRequired: false } : {}) })
     if (url === '/api/auth/captcha') return options.captchaFails ? response({ code: 'AUTH_PROVIDER_UNAVAILABLE' }, 503) : response({ captchaId: 'captcha-' + ++captcha, image: png })
     if (url === '/api/auth/login') return options.loginStatus ? response({ code: options.loginCode }, options.loginStatus) : response({ authenticated: true })
     if (url === '/api/ui/session') return options.session === false ? response({ code: 'UI_SESSION_REQUIRED' }, 401) : response({ authenticated: true })
@@ -60,7 +60,7 @@ describe('reused login form with Companion session adapter', () => {
     expect(wrapper.get<HTMLInputElement>('input[aria-label="密码"]').element.value).toBe('')
     expect(fetcher.mock.calls.filter(call => call[0] === '/api/auth/login')).toHaveLength(1)
   })
-  it.each([[401, 'AUTH_INVALID_CREDENTIALS', '用户名、密码或验证码不正确'], [403, 'AUTH_ACCOUNT_NOT_ALLOWED', '此账号不允许登录'], [503, 'AUTH_NOT_CONFIGURED', '尚未配置允许登录的账号']])('shows exact rejection and clears password for %s', async (status, code, text) => {
+  it.each([[401, 'AUTH_INVALID_CREDENTIALS', '用户名或密码不正确'], [403, 'AUTH_ACCOUNT_NOT_ALLOWED', '此账号不允许登录'], [503, 'AUTH_NOT_CONFIGURED', '尚未配置允许登录的账号']])('shows exact rejection and clears password for %s', async (status, code, text) => {
     const { wrapper, fetcher, complete } = await page({ loginStatus: status as number, loginCode: code })
     await fill(wrapper); await wrapper.get('form').trigger('submit'); await flushPromises()
     expect(wrapper.text()).toContain(text); expect(complete).not.toHaveBeenCalled()
@@ -72,4 +72,29 @@ describe('reused login form with Companion session adapter', () => {
     expect(wrapper.text()).toContain('认证服务暂不可用')
     await wrapper.get('form').trigger('submit'); expect(fetcher.mock.calls.filter(call => call[0] === '/api/auth/login')).toHaveLength(0)
   })
+  it('approved password-only mode never requests a captcha and sends only two fields', async () => {
+    const { wrapper, fetcher, complete } = await page({ captchaRequired: false })
+    expect(wrapper.find('input[aria-label="验证码"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('7 天')
+    await wrapper.get('input[aria-label="用户名"]').setValue('fixture-user')
+    await wrapper.get('input[aria-label="密码"]').setValue('fixture-password')
+    await wrapper.get('form').trigger('submit'); await flushPromises()
+    expect(fetcher.mock.calls.map(call => call[0])).toEqual(['/api/auth/config','/api/auth/login','/api/ui/session'])
+    expect(complete).toHaveBeenCalledTimes(1)
+    const request = fetcher.mock.calls.find(call => call[0] === '/api/auth/login')!
+    expect(JSON.parse((request[1] as RequestInit).body as string)).toEqual({username:'fixture-user',password:'fixture-password'})
+  })
+  it('password-only rejection preserves username, clears password and never retries automatically', async () => {
+    const { wrapper, fetcher, complete } = await page({ captchaRequired:false,loginStatus:401,loginCode:'AUTH_INVALID_CREDENTIALS' })
+    await wrapper.get('input[aria-label="用户名"]').setValue('fixture-user')
+    await wrapper.get('input[aria-label="密码"]').setValue('fixture-password')
+    await wrapper.get('form').trigger('submit');await flushPromises()
+    expect(wrapper.get<HTMLInputElement>('input[aria-label="用户名"]').element.value).toBe('fixture-user')
+    expect(wrapper.get<HTMLInputElement>('input[aria-label="密码"]').element.value).toBe('')
+    expect(wrapper.text()).toContain('用户名或密码不正确')
+    expect(complete).not.toHaveBeenCalled()
+    expect(fetcher.mock.calls.filter(call => call[0] === '/api/auth/login')).toHaveLength(1)
+    expect(fetcher.mock.calls.filter(call => call[0] === '/api/auth/captcha')).toHaveLength(0)
+  })
+
 })

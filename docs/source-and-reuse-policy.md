@@ -70,3 +70,10 @@ The approved provider address is loopback port 18001 (user-approved change from 
 
 
 现场复核：1.3.183静态产物已更新原 `cocos-mcp/mcp/dist/companion/web/next`；源码 `516ab9af`，真实构建 `516ab9af+working`（保留既有登录验收文档修改）。`deployed183.json`记录30项真实HTTP/页面只读检查通过：7路由呈现、6静态文件哈希、版本、同PID28744/epoch/OPEN和原8工程均一致。后端仍0.3.144，未重启、未注销。备份 `status-ui-20261022/before183-static` 已校验120文件；回退仅恢复该备份index，旧哈希资源与登录目录保留。此处不声称真实生成、服务启停或Creator业务闭环已验。
+
+
+## 2026-10-23 Companion 固定七天网页登录（已批准）
+
+仅 Companion 入口取消验证码，保留用户名/密码校验和精确账号许可。复用现认证提供方的 verifyPassword、用户状态/密码版本/角色与 CoolCacheStore；新增最小的 Companion 专用 login/session/logout 接线，使用独立缓存命名空间，不更改运营后台原 login/captcha/JWT/refresh/SSO 缓存。提供方路由仅既有本机监听、精确Host，拒绝带Origin的浏览器直调；不签发新账号、静态凭据或扩大网络访问。
+
+网页登录会话首次成功时固定七天，Cookie剩余Max-Age与服务端绝对期限一致，请求不会续期。磁盘缓存使刷新与服务重启不丢失；退出删除专用记录，停用/密码版本/角色变化使会话撤销。测试只用隔离身份与临时目录；真实密码仍由用户在原32180页面输入。旧的本机一次性授权入口保持兼容，不能把它的进程级Cookie当作七天网页登录会话。
