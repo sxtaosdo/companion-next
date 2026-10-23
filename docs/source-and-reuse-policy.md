@@ -77,3 +77,16 @@ The approved provider address is loopback port 18001 (user-approved change from 
 仅 Companion 入口取消验证码，保留用户名/密码校验和精确账号许可。复用现认证提供方的 verifyPassword、用户状态/密码版本/角色与 CoolCacheStore；新增最小的 Companion 专用 login/session/logout 接线，使用独立缓存命名空间，不更改运营后台原 login/captcha/JWT/refresh/SSO 缓存。提供方路由仅既有本机监听、精确Host，拒绝带Origin的浏览器直调；不签发新账号、静态凭据或扩大网络访问。
 
 网页登录会话首次成功时固定七天，Cookie剩余Max-Age与服务端绝对期限一致，请求不会续期。磁盘缓存使刷新与服务重启不丢失；退出删除专用记录，停用/密码版本/角色变化使会话撤销。测试只用隔离身份与临时目录；真实密码仍由用户在原32180页面输入。旧的本机一次性授权入口保持兼容，不能把它的进程级Cookie当作七天网页登录会话。
+
+
+## 2026-10-23 原工程布局调查与待批准的最小方案
+
+本轮直接读取 Downloads 留存的五个源码包，而非只读当前 App：`companion-next-source.zip`（0.1.0）、`companion-next-source (1).zip`（0.1.1）、`companion-next-source (2).zip`（0.1.7）、`companion-next-source (3).zip`（0.1.12）、`companion-next-1.3.173-complete-source.zip`（1.3.173）。完整包 SHA256 b4dc893ddaab276ef8fd95c2eb35d82a4f1597affe8b6b6f03e1659d0ad2b477 与原导入清单一致。五包 package 都名为 companion-next，依赖 Vue/ElementPlus/Pinia/vue-router，repository/homepage/author/license 未注明，归档未含可确认模板来源的 LICENSE。README/来源记录仍不能建立第三方上游 URL 和版本。Cool-admin 的来源只证明独立运营后台，不能替代 Next 来源。逐包元数据与布局行证据：task/login-week-20261022/original-layout-investigation.json。
+
+| 项目 | 原功能证据与当前差异 | 可复用能力与最小方案（待批准，不实施） | 验证点 |
+| --- | --- | --- | --- |
+| 用户信息/登录态 | 五包 App 与组件清单未找到用户名/头像模块；当前 src/App.vue:171 只有退出登录。提供方专用 person 返回 id/username/status/expiresAt，但现前端 /api/ui/session 只收到 authenticated，不应从配置名单猜当前用户。 | 复用现会话只读身份，最小追加已认证用户名摘要；顶栏用已有 ElementPlus 下拉呈现真实用户名及退出。头像无已证实来源，先不加上传/个人资料；原本机一次性授权明确显示“本机授权”，不可冒用账号名。不能称为恢复一个已找到的原模块。 | 账号登录、本机授权、失效/未知分别显示；不暴露令牌/密码，不因刷新重新登录或重发写操作。 |
+| 右下独立悬浮按钮 | 留存五包未找到能核实其名称/用途的 App 挂载或对应组件，不能认作标签切换，也不能断言历史模板从未有。 | 目前无可核实源码可直接恢复。需要当时真正模板的仓库URL/版本或原工程目录/压缩包；取得后仅复用其确切组件，不猜造第四功能。 | 先确定名称、用途和来源，再检查是否被隐藏、入口与键盘/窄屏交互。 |
+| 顶部路由导航 | 0.1.0 包 companion-next/src/App.vue:30、0.1.1/0.1.7:33、0.1.12:35 均为文字“项目工作区 / route.meta.title”；1.3.173:98及当前App:170只显示当前页标题。未发现多路由页签证据。 | 可复用路由 meta 和现成 ElementPlus Breadcrumb 恢复清楚层级，保留既有返回按钮/导航。严格复原时先恢复原两级文字；新增可点击层级需明确路由映射确认。路由页签不是已证实遗漏，不能混入。 | 当前路由/工程query保留，深链接/返回/知识库子页层级正确，手机不溢出。 |
+
+Companion“检查中”只读结论：`src/components/OverviewServiceSummary.vue:30` 以 directory.projectLoading 直接显示检查中；`src/stores/companion-browser.ts` 的 refreshProjects(true) 后台轮询同时设 projectLoading 与 backgroundProjectRead（约三秒一次），而卡片未使用后者区分静默刷新。读的是同源 /api/projects 等工程API可达性，不是独立MCP或Creator启动证明。`src/composables/use-overview-service-status.ts` 另以十五秒更新知识/模型服务，两者不可混为一个依赖绿灯。需要保留检测以识别断连/失效/接口错误；待批准最小修正是已有成功且未过期时保持已连接，后台刷新仅更新观察时间；首次读或真正状态变化再显示加载/失败/待核对。不得用旧绿灯掩盖失败或过期，也不改变真实依赖含义。当前未改布局或状态组件。
