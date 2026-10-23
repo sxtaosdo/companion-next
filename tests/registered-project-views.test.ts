@@ -1,3 +1,4 @@
+import {watch} from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { createPinia } from 'pinia'
@@ -38,10 +39,12 @@ async function setup(path = '/overview', options: { source?: CompanionBrowserPro
   return { pinia, api, directory, router, workspace, lane, lease, selection: useRegisteredProjectStore(pinia), reader: useAiResourceReadStore(pinia), operations: useCreatorOperationsStore(pinia) }
 }
 function button(label: string) { const target = wrapper!.findAll('button').find(item => item.text().includes(label)); if (!target) throw Error(label); return target }
+// The approved shell performs one protected read-only identity query; all business fetches remain forbidden below.
 function currentProjectIdentity() { const bar = wrapper!.getComponent({ name: 'ArtStatusBar' }); const tip = bar.findAllComponents({ name: 'InfoTip' }).find(item => item.props('label') === '当前工程详情'); if (!tip) throw Error('Missing current project details'); return String(tip.props('text')) }
 beforeEach(() => { localStorage.clear(); vi.stubGlobal('fetch', vi.fn()) })
 afterEach(() => { wrapper?.unmount(); wrapper = undefined; history?.destroy(); history = undefined; companionProjectEntryProvider.value = null; companionBrowserProvider.value = null; aiResourceReadProvider.value = null; document.body.innerHTML = ''; vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.restoreAllMocks() })
 describe('registered project overview and resource context', () => {
+  it('does not transiently unbind the same verified project on route return; changed paths still invalidate',async()=>{const {selection,directory}=await setup(`/art-resources?project=${id}`);const observations:unknown[]=[];const stop=watch(()=>selection.project,value=>observations.push(value),{flush:'sync'});selection.restoreRouteProject(id);expect(observations).toEqual([]);directory.projects=directory.projects.map(p=>p.id===id?{...p,path:'/changed/project-a'}:p);expect(selection.project).toBeNull();expect(selection.invalidated).toBe(true);selection.restoreRouteProject(id);expect(selection.project?.path).toBe('/changed/project-a');stop()})
   it('opens overview by default and places it first, while preserving direct routes', async () => {
     const { router } = await setup('/')
     expect(router.currentRoute.value.path).toBe('/overview')
@@ -69,7 +72,7 @@ describe('registered project overview and resource context', () => {
     finish(result()); await flushPromises()
     expect(selection.project).toBeNull(); expect(wrapper!.findAll('.registered-project-card')).toHaveLength(2)
     directory.projects = [projects[1]!, projects[0]!]; await flushPromises(); expect(selection.project).toBeNull()
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('preserves beta context entering the global overview while old explicit links and resource routes still select exactly', async () => {
     const { selection, router } = await setup(`/resources?project=${other}`)
@@ -95,7 +98,7 @@ describe('registered project overview and resource context', () => {
     expect(detail.find('a.hero-link').attributes('href')).toBe(`/resources?project=${id}`)
     await detail.find('a.hero-link').trigger('click'); await flushPromises()
     expect(router.currentRoute.value.query.project).toBe(id)
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('retains B through AI, engineering, knowledge and models navigation before returning to resources or overview', async () => {
     const { selection, router } = await setup(`/overview?project=${other}`)
@@ -111,7 +114,7 @@ describe('registered project overview and resource context', () => {
     expect(router.currentRoute.value.query.project).toBe(other)
     await go('/overview')
     expect(router.currentRoute.value.query.project).toBe(other)
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('ignores outgoing page queries but restores exact project intent through browser back and forward', async () => {
     const { selection, router } = await setup(`/overview?project=${other}`)
@@ -124,7 +127,7 @@ describe('registered project overview and resource context', () => {
     await router.push(`/resources?project=${id}&step=1`); await flushPromises(); expect(selection.project?.id).toBe(id)
     router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/help')); await flushPromises(); expect(selection.project?.id).toBe(id)
     router.back(); await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/art-resources')); await flushPromises(); expect(selection.project?.id).toBe(other)
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it.each(['not-registered', '', 'x'.repeat(129)])('preserves explicit invalid overview intent across engineering and help without defaulting: %s', async intent => {
     const { selection, router } = await setup(`/overview?project=${encodeURIComponent(intent)}`)
@@ -135,7 +138,7 @@ describe('registered project overview and resource context', () => {
     await target.trigger('click'); await flushPromises()
     expect(router.currentRoute.value.query.project).toBe(intent)
     expect(selection.project).toBeNull()
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('preserves pending explicit B intent when leaving before registration arrives', async () => {
     let finish!: (value: ProjectRead) => void
@@ -149,7 +152,7 @@ describe('registered project overview and resource context', () => {
     expect(router.currentRoute.value.query.project).toBe(other)
     finish(result()); await flushPromises()
     expect(selection.project?.id).toBe(other)
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('does not substitute a default for an explicit unknown or empty overview project', async () => {
     const { selection, router } = await setup('/overview?project=not-registered')
@@ -161,7 +164,7 @@ describe('registered project overview and resource context', () => {
     const { selection } = await setup(path)
     expect(selection.project).toBeNull()
     expect(wrapper!.find('[data-testid="registered-project-overview"]').exists()).toBe(false)
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('does not invent a selection when registrations arrive in a global overview', async () => {
     const api = source(); api.loadProjects = vi.fn(async () => ({ ...result(), projects: [] }))
@@ -174,7 +177,7 @@ describe('registered project overview and resource context', () => {
     directory.projects = [projects[0]!]; await flushPromises()
     directory.projects = [projects[1]!, projects[0]!]; await flushPromises()
     expect(selection.project).toBeNull()
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('honors a later explicit choice instead of the pending default when the entry read arrives', async () => {
     let finish!: (value: ProjectRead) => void
@@ -184,7 +187,7 @@ describe('registered project overview and resource context', () => {
     finish(result()); await flushPromises()
     expect(selection.project?.id).toBe(other)
     expect(router.currentRoute.value.query.project).toBe(other)
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('lists every real registration and opens a selected overview without starting Creator or showing discovered/sample projects', async () => {
     const { router, selection, operations } = await setup('/overview', { demo: true })
@@ -195,7 +198,7 @@ describe('registered project overview and resource context', () => {
     await wrapper!.get(`[data-project-id="${other}"] .project-title`).trigger('click'); await flushPromises()
     expect(router.currentRoute.value.query.project).toBe(other); expect(selection.project?.path).toBe('/real/project-b')
     expect(router.currentRoute.value.path).toBe('/projects')
-    expect(wrapper!.text()).not.toContain('已停止'); expect(actions.filter(name => name !== 'isExpectedStopDisconnect')).toEqual([]); expect(fetch).not.toHaveBeenCalled(); stop()
+    expect(wrapper!.text()).not.toContain('已停止'); expect(actions.filter(name => name !== 'isExpectedStopDisconnect')).toEqual([]); expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true); stop()
   })
   it.each(['ctrlKey', 'metaKey', 'altKey', 'shiftKey', 'non-primary', 'prevented'] as const)('does not change the original tab selection for a %s card click', async kind => {
     const { selection, router } = await setup(`/overview?project=${id}`)
@@ -225,7 +228,7 @@ describe('registered project overview and resource context', () => {
     expect(wrapper!.findAll('button').some(item=>item.text().includes('查看示例工作台'))).toBe(false); expect(useWorkspaceStore(pinia).mode).toBe('disconnected')
     const api = source(); registerCompanionBrowserProvider(api); await useCompanionBrowserStore(pinia).connect(api); await flushPromises()
     expect(wrapper!.findAll('.resource-row')).toHaveLength(0); expect(useWorkspaceStore(pinia).mode).toBe('disconnected')
-    expect(wrapper!.text()).not.toContain('查看示例工作台'); expect(fetch).not.toHaveBeenCalled()
+    expect(wrapper!.text()).not.toContain('查看示例工作台'); expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('does not offer samples in a dedicated build when the host reader is unavailable', async () => {
     vi.stubEnv('MODE', 'companion-workspace')
@@ -233,7 +236,7 @@ describe('registered project overview and resource context', () => {
     await router.push('/overview'); await router.isReady()
     wrapper = mount(App, { global: { plugins: [pinia, router, ElementPlus] } }); await flushPromises()
     expect(wrapper!.text()).toContain('当前宿主未接入 Companion 工程读取接口')
-    expect(wrapper!.text()).not.toContain('查看示例'); expect(useWorkspaceStore(pinia).project).toBeUndefined(); expect(fetch).not.toHaveBeenCalled()
+    expect(wrapper!.text()).not.toContain('查看示例'); expect(useWorkspaceStore(pinia).project).toBeUndefined(); expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('preserves selected real identity into resources and across step changes without sample resources or fabricated counts', async () => {
     const { router, workspace } = await setup(`/overview?project=${id}`, { demo: true })
@@ -245,7 +248,7 @@ describe('registered project overview and resource context', () => {
     const steps=wrapper!.findAll('.resource-steps button');expect(steps).toHaveLength(6)
     for(let index=1;index<6;index++){expect(steps[index]!.attributes('disabled')).toBeDefined();await steps[index]!.trigger('click');expect(wrapper!.find('.resource-steps button.active').text()).toContain('项目规范')}
     expect(router.currentRoute.value.query.project).toBe(id)
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('restores the exact real project but never lets a deep-link step skip prerequisites', async () => {
     const { selection, router } = await setup(`/resources?project=${other}&step=4`)
@@ -269,7 +272,7 @@ describe('registered project overview and resource context', () => {
     expect(selection.project).toBeNull(); expect(directory.projectLoading).toBe(true)
     finish(result()); await flushPromises()
     expect(selection.project?.id).toBe(other); expect(api.loadProjects).toHaveBeenCalledTimes(1)
-    expect(config.readConfig).not.toHaveBeenCalled(); expect(config.previewReference).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
+    expect(config.readConfig).not.toHaveBeenCalled(); expect(config.previewReference).not.toHaveBeenCalled(); expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('waits for the real entry snapshot when a new deep-link ID is absent from an older connected cache', async () => {
     let finish!: (value: ProjectRead) => void
@@ -328,7 +331,7 @@ describe('registered project overview and resource context', () => {
     await wrapper!.get('button[aria-label="刷新登记工程"]').trigger('click'); await flushPromises()
     expect(selection.project).toBeNull(); expect(wrapper!.findAll('.registered-project-card')).toHaveLength(2)
     expect(wrapper!.find('[data-testid="registered-project-overview"]').exists()).toBe(false)
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('rejects same-ID source replacement without silently reopening the prior selection', async () => {
     const { directory, selection } = await setup(`/overview?project=${id}`)
@@ -358,7 +361,7 @@ describe('real saved config remains separate from local drafts', () => {
     expect(api.readConfig).toHaveBeenCalledWith(id, expect.any(AbortSignal))
     expect(wrapper!.text()).toContain('已保存 · 配置有效'); expect(wrapper!.text()).toContain('明亮卡通'); expect(reader.resource?.config).not.toBeNull()
     expect(workspace.project).toBeUndefined(); expect(workspace.spec).toBeUndefined(); expect(api.previewReference).not.toHaveBeenCalled()
-    expect(storageWrite).not.toHaveBeenCalled(); expect(fetch).not.toHaveBeenCalled()
+    expect(storageWrite).not.toHaveBeenCalled(); expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it('does not turn missing config or a suggested draft into saved content', async () => {
     const api = configApi(), value = resourceView()
@@ -383,7 +386,7 @@ describe('real saved config remains separate from local drafts', () => {
     if (change === 'reader') aiResourceReadProvider.value = configApi()
     await flushPromises(); expect(signal?.aborted).toBe(true)
     finish(resourceView()); await flushPromises(); expect(reader.resource).toBeNull(); expect(reader.loading).toBe(false)
-    expect(api.readConfig).toHaveBeenCalledTimes(1); expect(fetch).not.toHaveBeenCalled()
+    expect(api.readConfig).toHaveBeenCalledTimes(1); expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
 })
 
@@ -400,7 +403,7 @@ describe('global dashboard cards', () => {
     expect(wrapper!.find('.overview-project-details').exists()).toBe(false)
     expect(wrapper!.get('.all-projects').attributes('href')).toBe('/projects')
     if (!count) expect(wrapper!.text()).toContain('尚无已登记工程')
-    expect(fetch).not.toHaveBeenCalled()
+    expect(vi.mocked(fetch).mock.calls.every(([url]) => url === '/api/ui/session')).toBe(true)
   })
   it.each(['empty','failed'] as const)('does not fall back to old Dashboard timestamps after a current %s recent read', async kind => {
     const api = source(); api.loadDashboardProjects = vi.fn(async () => { if (kind === 'failed') throw Error('read failed'); return [] })

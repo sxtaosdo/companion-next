@@ -21,7 +21,10 @@ export const useRegisteredProjectStore = defineStore('registered-project', () =>
   let defaultFirst = false
   function restoreRouteProject(value: unknown, selectFirst = false) {
     defaultFirst = selectFirst && value === undefined
-    requestedId.value = typeof value === 'string' && value.length <= 128 ? value : ''
+    const nextId = typeof value === 'string' && value.length <= 128 ? value : ''
+    // Returning to the same verified project must not transiently unbind draft owners.
+    if (!invalidated.value && nextId === requestedId.value && boundSource.value === companionBrowserProvider.value && project.value) return
+    requestedId.value = nextId
     boundSource.value = companionBrowserProvider.value
     boundPath.value = null
     invalidated.value = false
