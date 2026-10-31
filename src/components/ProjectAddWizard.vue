@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { sortProjectsByRecentOpen } from '../domain/recent-projects'
 import { computed,onBeforeUnmount,ref,watch } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import AgentRegistrationPanel from './AgentRegistrationPanel.vue'
@@ -8,7 +9,7 @@ import { useProjectSetupAddStore } from '../stores/project-setup-add'
 import { useProjectOperationLaneStore } from '../stores/project-operation-lane'
 import { useProjectScaffoldStore } from '../stores/project-scaffold'
 import { projectSetupProvider } from '../project-setup-integration'
-import { projectDisplayPathKey,projectDisplayRank } from '../domain/companion-project-display'
+import { projectDisplayPathKey } from '../domain/companion-project-display'
 import type { DashboardProject } from '../domain/companion-browser'
 import { runtimeStateLabel } from '../domain/companion-browser'
 import { setupStageLabel,validateProjectPath,ProjectSetupError,buildSetupCompletionPrompt } from '../domain/project-setup'
@@ -17,7 +18,7 @@ const open=ref(false),step=ref(1),mode=ref<'custom'|'dashboard'|'create'|'initia
 const labels={custom:'自定义项目目录',dashboard:'来自 Cocos Dashboard',create:'创建 Cocos 项目',initialize:'初始化空目录'}
 function registered(item:DashboardProject){return browser.projects.find(p=>projectDisplayPathKey(p.path)===projectDisplayPathKey(item.path))}
 function dashboardStatus(item:DashboardProject){const project=registered(item),runtime=browser.statuses.find(s=>s.projectId===project?.id);if(!item.exists)return '路径不存在';if(item.running&&!project)return `Dashboard 已启动${item.pid?` · PID ${item.pid}`:''}`;if(!project)return '未接入';if(runtime?.state==='ready')return '已接入 · 已就绪';return runtime?.state?`已接入 · ${runtimeStateLabel(runtime.state)}`:'已接入'}
-const dashboardItems=computed(()=>[...browser.dashboard].sort((a,b)=>{const x=projectDisplayRank(a.running?'dashboard-running':browser.statuses.find(s=>s.projectId===registered(a)?.id)?.state,a.lastOpenedAt),y=projectDisplayRank(b.running?'dashboard-running':browser.statuses.find(s=>s.projectId===registered(b)?.id)?.state,b.lastOpenedAt);return y[0]-x[0]||y[1]-x[1]||a.path.localeCompare(b.path)}))
+const dashboardItems=computed(()=>sortProjectsByRecentOpen(browser.dashboard,item=>registered(item)?.id??projectDisplayPathKey(item.path)))
 const createTarget=computed(()=>parent.value.replace(/[\\/]+$/u,'')+(parent.value.startsWith('/')?'/':'\\')+name.value)
 const phases={idle:'尚未开始',reading:'正在读取工具范围',prepared:'确认工程',submitting:'正在提交启动',tracking:'正在启动',paused:'已停止等待',complete:'接入完成',failed:'启动失败',unknown:'结果待核对',error:'请核对'}
 const errorText:Record<string,string>={'invalid-path':'请填写有效的工程绝对路径。','add-unavailable':'当前来源未提供严格启动与工具范围接口，未提交任务。','scope-read-failed':'工具范围读取失败，未启动工程。','setup-unknown':'启动结果未知，请核对原任务，不要重复提交。','setup-failed':'原启动任务失败，可能已有部分修改。','poll-budget':'等待已达上限，可继续读取原任务。','status-or-scope-unconfirmed':'原任务或工具范围结果未确认，只能继续核对原任务，不会重发启动或配置。','transport-unsettled':'请求尚未确认结束，操作仍受保护。','source-changed':'来源已变化，原操作仍受保护。','waiting-stopped':'已停止等待，未取消后台任务。'}

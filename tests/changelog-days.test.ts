@@ -52,7 +52,7 @@ describe('daily changelog mapping',()=>{
     expect(days).toHaveLength(1);expect(days[0]!.versions).toEqual(['v','w']);expect(days[0]!.origins).toHaveLength(3)
     expect(days[0]!.changes).toEqual(['同文','同文']);expect(days[0]!.origins[2]).toMatchObject({firstChange:3,lastChange:2})
   })
-  it('keeps all real frontend records and all 114 legacy versions / 201 legacy changes',()=>{
+  it('keeps every real frontend and legacy record as the changelog grows',()=>{
     for(const entries of [frontendChanges,CHANGELOG_ENTRIES]){
       const before=JSON.stringify(entries),days=groupChangelogByDay(entries)
       expect(new Set(days.map(day=>day.date)).size).toBe(days.length)
@@ -65,8 +65,6 @@ describe('daily changelog mapping',()=>{
       }
       expect(JSON.stringify(entries)).toBe(before)
     }
-    expect(CHANGELOG_ENTRIES).toHaveLength(114)
-    expect(groupChangelogByDay(CHANGELOG_ENTRIES).flatMap(day=>day.changes)).toHaveLength(201)
   })
 })
 describe('daily changelog UI',()=>{
@@ -84,7 +82,7 @@ describe('daily changelog UI',()=>{
       const overlap=days.find(day=>day.date==='2026-10-12')!
       expect(new Set(overlap.origins.map(origin=>origin.product))).toEqual(new Set(['Companion Next','Creator AI Companion']))
       expect(days.flatMap(day=>day.origins)).toHaveLength(frontendChanges.length+CHANGELOG_ENTRIES.length)
-      expect(days.flatMap(day=>day.changes)).toHaveLength(frontendChanges.reduce((n,entry)=>n+entry.changes.length,0)+201)
+      expect(days.flatMap(day=>day.changes)).toHaveLength([...frontendChanges,...CHANGELOG_ENTRIES].reduce((n,entry)=>n+entry.changes.length,0))
       expect(wrapper.text()).not.toContain('不表示新版已完成相同能力')
       expect(fetch).not.toHaveBeenCalled()
     }finally{wrapper.unmount();vi.unstubAllGlobals()}

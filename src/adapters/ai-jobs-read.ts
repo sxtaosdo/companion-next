@@ -2,7 +2,7 @@ import { verifyAiResourceSnapshotIntegrity } from '../domain/ai-resource-snapsho
 import { AI_JOBS_BACKEND_ERRORS, AI_JOBS_READ_LIMITS, AiJobsReadError, decodeAiJobCandidate, decodeAiJobsView, decodeAiJobStatus, decodeAiJobSnapshot, isAiJobId, isAiCandidateId, verifyAiJobPreview, verifyAiVariantPreview } from '../domain/ai-jobs-read'
 import { isAiProjectId } from '../domain/ai-resource-read'
 import type { AiJobsReadProvider, AiJobsReadEndpoint, AiJobsReadCode, AiJobsBackendCode } from '../domain/ai-jobs-read'
-export type AiJobsReadPath = `/api/icons/${string}/jobs` | `/api/icons/${string}/status` | `/api/icons/${string}/candidate` | `/api/icons/${string}/variant-preview`
+export type AiJobsReadPath = `/api/icons/${string}/jobs` | `/api/icons/${string}/status` | `/api/icons/${string}/candidate` | `/api/icons/${string}/variant-preview` | `/api/icons/${string}/variant-import-status`
 export type AiJobsReadFetch = (input: AiJobsReadPath, init: RequestInit) => Promise<Response>
 function fail(code: AiJobsReadCode, endpoint: AiJobsReadEndpoint, status?: number) { return new AiJobsReadError(code, endpoint, status) }
 type Track = <T>(promise: Promise<T>) => Promise<T>
@@ -123,6 +123,18 @@ export function createAiJobsReadProvider(options: { fetch: AiJobsReadFetch; time
       try { checked = decodeAiJobSnapshot(job, projectId) } catch { throw fail('invalid-query', 'variant-preview') }
       if (!checked.variantImport?.artifact) throw fail('invalid-query', 'variant-preview')
       return read(projectId, 'variant-preview', { jobId: checked.jobId, operationId: checked.variantImport.operationId }, value => verifyAiVariantPreview(value, checked), signal)
+    },
+    async queryVariantImport(projectId, jobId, operationId, signal) {
+      const endpoint = 'variant-import-status'
+      if (!isAiProjectId(projectId) || !isAiJobId(jobId) || !/^icon-import-[a-f0-9]{32}$/.test(operationId)) throw fail('invalid-query', endpoint)
+      return read(projectId, endpoint, { jobId, operationId }, value => {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) throw fail('invalid-shape', endpoint)
+        const raw = value as Record<string, unknown>, query = raw.query as Record<string, unknown> | null
+        if (raw.schemaVersion !== 'companion-icons-v1' || raw.operationId !== operationId || !query || typeof query !== 'object' || Array.isArray(query) || query.operationId !== operationId
+          || !['blocked','import_unknown','imported_pending_verification'].includes(query.state as string) || ![true,false,'UNKNOWN'].includes(query.effectApplied as never)
+          || !(query.leaseState === undefined || ['RELEASED','RETAINED','UNKNOWN'].includes(query.leaseState as string)) || !Array.isArray(query.receipts) || query.receipts.length > 20) throw fail('invalid-shape', endpoint)
+        return { operationId, state: query.state as 'blocked'|'import_unknown'|'imported_pending_verification', effectApplied: query.effectApplied as boolean|'UNKNOWN', leaseState: (query.leaseState ?? null) as 'RELEASED'|'RETAINED'|'UNKNOWN'|null }
+      }, signal)
     },
   } satisfies AiJobsReadProvider)
 }

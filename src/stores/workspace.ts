@@ -1,3 +1,4 @@
+import { sortProjectsByRecentOpen } from '../domain/recent-projects'
 import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 import { emptySnapshot } from '../domain/contracts'
@@ -15,6 +16,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
   let provider: ReadOnlyCompanionProvider | null = null
   let controller: AbortController | null = null
   let requestVersion = 0
+  const orderedProjects = computed(() => sortProjectsByRecentOpen(snapshot.value.projects))
   const project = computed(() => snapshot.value.projects.find((p) => p.id === selectedProjectId.value))
   const resources = computed(() => snapshot.value.resources.filter((r) => r.projectId === selectedProjectId.value))
   const spec = computed(() => localDraft.value?.spec ?? project.value?.spec)
@@ -77,5 +79,5 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     const draft = await navigator.locks.request(draftKey(sourceMode, projectId), save)
     if (selectedProjectId.value === projectId && mode.value === sourceMode) localDraft.value = draft
   }
-  return { mode, connection, snapshot, selectedProjectId, error, loading, localDraft, project, resources, spec, isDemo, resourceInventoryKnown, sourceLabel, selectProject, connect, disconnect, refresh, openDemo, saveLocalSpec, reloadLocalDraft }
+  return { mode, connection, snapshot, orderedProjects, selectedProjectId, error, loading, localDraft, project, resources, spec, isDemo, resourceInventoryKnown, sourceLabel, selectProject, connect, disconnect, refresh, openDemo, saveLocalSpec, reloadLocalDraft }
 })

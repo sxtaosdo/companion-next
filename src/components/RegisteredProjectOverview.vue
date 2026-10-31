@@ -17,7 +17,7 @@ const evidenceStale = computed(() => retainedSource.value && (!directory.connect
 // Selection remains fail-closed; this is display-only retained evidence. Keep its
 // established order when a failed read clears the optional recent-time reader.
 const cards = computed<ReturnType<typeof recentProjects>>(previous => !retainedSource.value ? []
-  : evidenceStale.value && previous?.length ? previous : recentProjects(directory.projects, recent.data.value))
+  : evidenceStale.value && previous?.length ? previous : recentProjects(directory.projects, [...directory.projectOpenings, ...recent.data.value]))
 const legacyWorkspace = computed(() => allowsLegacyWorkspace(import.meta.env.MODE, Boolean(companionBrowserProvider.value)))
 function activeOperation(project: ManagedProject) { return [...operations.receipts].reverse().find(record => record.project.id === project.id && operations.isReceiptCurrent(record.id) && (record.phase === 'sending' || record.snapshotRevision === directory.projectSnapshotRevision)) }
 function projectStatus(project: ManagedProject) { return directory.statuses.find(item => item.projectId === project.id) }

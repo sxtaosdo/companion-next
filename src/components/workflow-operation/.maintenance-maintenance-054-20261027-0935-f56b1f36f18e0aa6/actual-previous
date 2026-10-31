@@ -1,0 +1,92 @@
+/** Frontend projection only. Goal and plan content remain GSD/OpenSpec authority. */
+export type WorkflowOperationState='draft'|'planning'|'review'|'ready'|'starting'|'queued'|'running'|'pause-requested'|'paused'|'resuming'|'completed'|'failed'|'unknown'|'accepted'|'abandoned'
+export interface SourceBinding<K extends 'gsd'|'openspec'> {source:K;ref:string;digest:string;version:string|null}
+export type WorkflowCapability='restricted-readonly-model-output'|'task-directory-workspace-write'
+export type WorkflowExecutionScope='technical-sample'|'task-directory'|'unverified'
+export interface WorkflowTaskWorkspace {relativePath:string;baselineDigest:string;policyDigest:string}
+export interface WorkflowRun {capability?:WorkflowCapability|'unverified';scope?:WorkflowExecutionScope;taskWorkspace?:WorkflowTaskWorkspace;id:string;operationId:string;planDigest:string;goalDigest:string;state:WorkflowOperationState;executionId:string|null;lastObservedAt:string|null;reason?:string;logRefs:string[];evidenceRefs:string[];acceptance:null|{planDigest:string;goalDigest:string;evidenceDigests:string[];acceptedAt:string;reviewNote?:string;scope?:'technical-sample'|'task-directory'}}
+export interface IndependentChannel {state:'independent-unverified';channelId:string;newGoalId:string;originalOperationId:string;activity:'unverified';outcome:'not-accepted';resourceGuard:'quarantined';directoryRelativePath:string;at:string}
+export interface IndependentContinuation {state:'continued-unverified';channelId:string;priorGoalId:string;newGoalId:string;activity:'unverified';resourceGuard:'quarantined';at:string}
+export interface ContinueChannelInput {operationId:string;expectedAnchorRevision:number;expectedChildRevision:number;priorGoalId:string;priorChannelId:string;confirmation:'CONTINUE_KEEP_OLD_UNVERIFIED';protocol:'CONTINUATION_INTENT_V2';title:string;description:string;projectId:string}
+export interface IndependentChannelInput {operationId:string;expectedRevision:number;originalOperationId:string;confirmation:'OPEN_INDEPENDENT_KEEP_OLD_UNVERIFIED';title:string;description:string;projectId:string}
+export interface IndependentChannelResult {channel:IndependentChannel;record:WorkflowOperationRecord}
+export interface FinishedDisposition {state:'ended-unaccepted';dispositionId:string;originalOperationId:string;executionId:string;directoryRelativePath:string;resourceGuard:'quarantined';at:string}
+export interface FinishUnacceptedInput {operationId:string;expectedRevision:number;originalOperationId:string;confirmation:'END_UNACCEPTED_KEEP_EVIDENCE'}
+export interface WorkflowTracking {state:'detached-by-user';outcome:'unknown';resourceGuard:'quarantined';dispositionId:string;originalOperationId:string;at:string;directoryRelativePath:string;lateObservationCount:number}
+export interface StopTrackingInput {operationId:string;expectedRevision:number;originalOperationId:string;confirmation:'STOP_TRACKING_KEEP_UNKNOWN'}
+export interface WorkflowOperationRecord {independentContinuation?:IndependentContinuation;independentChannel?:IndependentChannel;finishedDisposition?:FinishedDisposition;tracking?:WorkflowTracking;capability?:WorkflowCapability;schemaVersion:'workflow-operation-v1';id:string;revision:number;projectId?:string;goal:SourceBinding<'gsd'>;plan:SourceBinding<'openspec'>|null;state:WorkflowOperationState;review:null|{planDigest:string;goalDigest:string;reviewedAt:string;readiness?:ReviewReadiness};activeRunId:string|null;runs:WorkflowRun[];presentation?:{title:string;description?:string;planText?:string}}
+export interface ExecutionRead {record:WorkflowOperationRecord;logs?:{ref:string;digest:string;summary?:string;at?:string}[];evidence?:{ref:string;digest:string;kind:string;state:string;summary?:string}[]}
+export interface PreparationRead {operationId:string;state:'pending'|'settled'|'unknown';scope:'technical-sample';evidence:{workflowId:string;operationId:string;phase:'plan'|'start'|'resume';goalDigest:string;planDigest:string|null;status:'ready';evidenceRef:string;roles:{id:string;configDigest:string;mode:'read'|'prompt'|'native';evidenceRef:string}[];kb:{status:'hit'|'zero-hit';requestId:string;responseId:string;queryDigest:string;documents:{id:string;version:string|null;digest:string}[]};knowledgeUse:'retrieved-and-linked-not-model-adoption'}}
+export type WorkflowApprovalState='pending'|'responding'|'resolved'|'expired'|'disconnected'|'unknown'
+export interface WorkflowApproval {id:string;version:number;approvalDigest:string;state:WorkflowApprovalState;kind:'command'|'fileChange';summary:string;display:{command?:string;relativePaths?:string[]};expiresAt:string;threadId:string;turnId:string;itemId:string;connectionId:string;canRespond:boolean}
+export interface ApprovalRead {workflowId:string;capability:'disabled'|'restricted-single-use-approval';enabled:boolean;scope:'technical-sample'|'task-directory';observedAt:string;approvals:WorkflowApproval[]}
+export interface ApprovalDecision {operationId:string;approvalId:string;expectedVersion:number;approvalDigest:string;decision:'accept'|'decline'}
+export interface ReviewReadiness {id:string;ref:string;digest:string;version:'1';ownerScope:string;workflowId:string;goalDigest:string;goalVersion:string|null;planDigest:string;selectedTaskId:string;expiresAt:string;actor:{kind:'authenticated-principal'|'isolated-control-harness';principalDigest:string}}
+export interface ReadinessTask {id:string;text:string;digest:string;artifactDigest:string;requiredDependencies:string[]|null}
+export interface ReadinessSource {id:string;label:string;taskId:string|null;digest:string;expiresAt:string|null;resolves:string[];remaining:string[];status:'verified'|'blocked';reason:string|null}
+export interface ReadinessCatalogue {schemaVersion:'workflow-readiness-catalogue-v1';workflowId:string;goalDigest:string;goalVersion:string|null;planDigest:string|null;availability:'configured'|'unconfigured';tasks:ReadinessTask[];sources:ReadinessSource[];current:ReviewReadiness|null;currentStatus:'missing'|'fresh'|'stale'}
+export interface ReviewCommand extends CommandEnvelope {selectedTaskId:string;sourceIds:string[];note:string}
+export interface CommandEnvelope {operationId:string;expectedRevision:number;planDigest?:string}
+export interface OperationRead {operationId:string;workflowId:string|null;state:'pending'|'settled'|'unknown'|'not-observed';record?:WorkflowOperationRecord}
+export interface RecoveryPreflight {schemaVersion:'workflow-recovery-preflight-v1';workflowId:string;revision:number;originalOperationId:string|null;scope:'local-records-only';observedAt:string;canAbandon:false;canRequestVerification:boolean;checks:{id:string;status:'recorded'|'missing'|'unverified';message:string}[];readError:string|null;sourceDigests:{executor:string;events:string}|null}
+export interface LostBarrierPreview {anchorId:string;priorGoalId:string;anchorRevision:number;childRevision:number;recordSetDigest:string}
+export interface LostBarrier {operationId:string;workflowId:string;priorGoalId:string;priorChannelId:string;fromRevision:number;childRevision:number;recordSetDigest:string;outcome:'unknown';requestId:'lost';replay:'prohibited';resourceGuard:'quarantined';digest:string}
+export interface LostBarrierInput {operationId:string;expectedAnchorRevision:number;expectedChildRevision:number;priorGoalId:string;priorChannelId:string;expectedRecordSetDigest:string;confirmation:'RECORD_UNKNOWN_DO_NOT_REPLAY'}
+export interface ContinuationIntent {operationId:string;anchorId:string;priorGoalId:string;priorChannelId:string;projectId:string;expectedAnchorRevision:number;expectedChildRevision:number;state:'pending'|'unknown'|'rejected'|'settled';at:string;code?:string}
+export interface WorkflowOperationProvider {
+ listContinuationIntents?(id:string):Promise<ContinuationIntent[]>;
+ readLostBarrierPreview?(id:string,childId:string):Promise<LostBarrierPreview>;
+ recordLostBarrier?(id:string,input:LostBarrierInput):Promise<{barrier:LostBarrier;record:WorkflowOperationRecord}>;
+ readLostBarrier?(id:string,operationId:string):Promise<{state:'recorded'|'not-observed';barrier:LostBarrier|null}>;
+ stopTracking?(id:string,input:StopTrackingInput):Promise<WorkflowOperationRecord>;
+ finishUnaccepted?(id:string,input:FinishUnacceptedInput):Promise<WorkflowOperationRecord>;
+ createIndependentChannelGoal?(id:string,input:IndependentChannelInput):Promise<IndependentChannelResult>;
+ advanceIndependentChannel?(id:string,input:ContinueChannelInput):Promise<{continuation:IndependentContinuation;record:WorkflowOperationRecord}>;
+ readRecoveryPreflight?(id:string):Promise<RecoveryPreflight>;
+ abandonBeforeTurn?(id:string,input:{operationId:string;expectedRevision:number}):Promise<WorkflowOperationRecord>;
+ list():Promise<WorkflowOperationRecord[]>;
+ createGoal(input:{title:string;description:string;projectId?:string;operationId:string}):Promise<WorkflowOperationRecord>;
+ getGoal(id:string):Promise<WorkflowOperationRecord>;
+ generatePlan(id:string,command:CommandEnvelope):Promise<WorkflowOperationRecord>;
+ reviewPlan(id:string,command:ReviewCommand):Promise<WorkflowOperationRecord>;
+ start(id:string,command:CommandEnvelope):Promise<WorkflowOperationRecord>;
+ readExecution(id:string):Promise<ExecutionRead>;
+ readReadiness?(id:string):Promise<ReadinessCatalogue>;
+ readPreparation?(id:string):Promise<PreparationRead[]>;
+ readApprovals?(id:string):Promise<ApprovalRead>;
+ decideApproval?(id:string,decision:ApprovalDecision):Promise<WorkflowOperationRecord>;
+ requestPause(id:string,command:CommandEnvelope):Promise<WorkflowOperationRecord>;
+ resume(id:string,command:CommandEnvelope):Promise<WorkflowOperationRecord>;
+ accept(id:string,command:CommandEnvelope&{evidenceDigests:string[];note:string}):Promise<WorkflowOperationRecord>;
+ getOperation(operationId:string,workflowId?:string):Promise<OperationRead>;
+}
+export const operationLabels:Record<WorkflowOperationState,string>={draft:'目标已保存',planning:'计划生成中',review:'计划待审阅',ready:'已审阅，待启动',starting:'启动已受理，待确认',queued:'执行已排队',running:'执行中','pause-requested':'已请求安全边界暂停',paused:'已暂停',resuming:'恢复已受理，待确认',completed:'执行结束，待验收',failed:'失败',unknown:'结果未知，待核对',abandoned:'已放弃（未派发回合）',accepted:'已验收（按执行范围）'}
+export function activeRun(record:WorkflowOperationRecord){return record.runs.find(run=>run.id===record.activeRunId)}
+export function displayedState(record:WorkflowOperationRecord):WorkflowOperationState {
+ if(record.state==='accepted'&&!['technical-sample','task-directory'].includes(verifiedAcceptanceScope(record)))return 'unknown'
+ if(['running','queued'].includes(record.state)&&!activeRun(record)?.executionId)return 'unknown'
+ return record.state
+}
+
+/** Top-level capability is configuration only; a formal run needs its own task binding. */
+export function taskDirectoryRun(record:WorkflowOperationRecord):WorkflowRun|undefined {
+ const run=activeRun(record),workspace=run?.taskWorkspace
+ return run?.capability==='task-directory-workspace-write'&&run.scope==='task-directory'&&workspace
+  &&workspace.relativePath===`.companion/tasks/${record.id}`&&/^[a-zA-Z0-9_-]+$/.test(record.id)
+  &&/^[a-f0-9]{64}$/i.test(workspace.baselineDigest)&&/^[a-f0-9]{64}$/i.test(workspace.policyDigest)?run:undefined
+}
+export function verifiedAcceptanceScope(record:WorkflowOperationRecord):WorkflowExecutionScope {
+ const run=activeRun(record)
+ if(!run?.acceptance||!run.executionId||run.acceptance.goalDigest!==run.goalDigest||run.acceptance.planDigest!==run.planDigest||record.goal.digest!==run.goalDigest||record.plan?.digest!==run.planDigest)return 'unverified'
+ if(run.acceptance.scope==='technical-sample'&&run.capability==='restricted-readonly-model-output')return 'technical-sample'
+ if(run?.acceptance?.scope==='task-directory'&&taskDirectoryRun(record))return 'task-directory'
+ return 'unverified'
+}
+export function workflowOperationLabel(record:WorkflowOperationRecord):string {
+ const state=displayedState(record)
+ return state!=='accepted'?operationLabels[state]:verifiedAcceptanceScope(record)==='task-directory'?'任务目录已验收（非游戏验收）':'技术样例已验收（非业务/游戏验收）'
+}
+export function reviewMatches(record:WorkflowOperationRecord){return !!record.plan&&record.review?.planDigest===record.plan.digest&&record.review?.goalDigest===record.goal.digest}
+export function canStart(record:WorkflowOperationRecord){return record.state==='ready'&&reviewMatches(record)}
+/** Only an explicit rejected receipt proves non-execution. Generic failures remain unknown. */
+export class WorkflowCommandError extends Error {constructor(readonly outcome:'rejected'|'unknown',readonly reason:string,readonly code?:string,readonly httpStatus?:number){super(reason);this.name='WorkflowCommandError'}}

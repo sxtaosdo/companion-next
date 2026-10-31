@@ -1,3 +1,5 @@
+Execution and acceptance: [single checklist](docs/execution-checklist.md). Test/build and host-start use separate enforced runtime gates.
+
 2026-10-21 启动入口及开机验收收尾：Next入口代码已提交f0bac11 / 1.3.173.193；熟悉的cocos-mcp根目录和web目录均使用 `npm run start:next`，本仓用 `npm start`。用户已亲自从新入口打开，随后仅只读核实，Companion仍PID21872/OPEN，无重复启动、重启或终止服务，没有操作用户当前标签。旧仓两个package仅新增本任务别名，保留未提交，不混入并行发布；旧start与22条原并行修改保持。
 
 原知识服务8081开机后未运行，按已批准的原 `D:/services/weknora/Start-PilotAccess.ps1` 恢复一次，PID29848/health200。启动原guard验证schema30/dirty0、quick_check ok、10触发表空及历史知识状态hash一致；未执行Owner登录、凭据创建、迁移/索引/模型启动。之后独立Edge只读状态验收24项通过：看板独立卡、知识三页导航/无工程污染/共享已读短状态一致、6静态HTTP SHA仍匹配5ae52d0/.191，0pageerror/0写请求。没有执行问答、Agent、同步或关键词/文档业务；不据此提升其业务验收结论。
@@ -95,7 +97,7 @@
 
 2026-10-17接续：新96变体已在独立工程完成场景保存/跨会话重开、真实Preview/Profiler/WebMobile/Smoke；证据521fcf8、说明c80b890/.18，两张750×1334钱袋图已查看，运行诊断为空，累计554.154/1800秒且测试进程/端口全关。原工具scene_validate弃用warn误判false及可选等待跳过均保留。随后原任务历史/status与96PNG真实读取200，源796a233保持、currentHead=c80b890，82项定向回归/strict类型通过，未发现需改业务代码的确切缺陷。当前页面实际版本1.3.173、部署源仍3074d37/.25；用户要求的[新开发者后台](http://127.0.0.1:32180/next/index.html)已通过正式入口打开，认证Edge核页面200/六资源SHA/0页面错误，用户窗口保留。模型与Creator未为接续回归或开页启动；[本片记录](docs/history-read-regression-20261017.md)区分源码、部署、实际读取与整体缺口，下列旧“未做运行验收”是原时间事实。
 
-**当前版本：`v1.3.173.266`**
+**当前版本：`v1.3.173.267`**
 
 2026-10-17 新尺寸变体入口本机交付：尺寸回执旁“导入当前工程”已实现并部署3074d37/1.3.173.25（页面产品仍1.3.173），新隔离任务一次96×96导入、PNG/meta与UUID/SpriteFrame及真实预览通过，母图未导入。3883项完整回归、类型/构建和六HTTP SHA通过；自有进程/端口关闭，累计412.673/1800秒，无云上传。新资源未做场景/Preview/Build，productionVerified固定false。[唯一计划与证据](docs/variant-ui-import-20261017.md)。下列05:40记录保留原时间。
 

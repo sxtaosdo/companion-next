@@ -1,0 +1,170 @@
+/* Direct declarations from user-approved workflow prototype; scoped to workflow presentation. */
+.workflow-prototype,.workflow-prototype-evidence{--ink:#253345;--muted:#66758b;--line:#dce3ec;--paper:#f4f6f9;--blue:#315fb2;--soft:#edf3ff;--green:#267a53;--red:#b34645;--amber:#9a691b;--white:#fff;font:14px/1.55 "Microsoft YaHei",system-ui,sans-serif;color:var(--ink);background:var(--paper)}
+.workflow-prototype *,.workflow-prototype-evidence *{box-sizing:border-box}
+.workflow-prototype button,.workflow-prototype input,.workflow-prototype select,.workflow-prototype-evidence button,.workflow-prototype-evidence input,.workflow-prototype-evidence select{font:inherit}
+.workflow-prototype button,.workflow-prototype select,.workflow-prototype-evidence button,.workflow-prototype-evidence select{cursor:pointer}
+.workflow-prototype button,.workflow-prototype a,.workflow-prototype input,.workflow-prototype select,.workflow-prototype summary,.workflow-prototype-evidence button,.workflow-prototype-evidence a,.workflow-prototype-evidence input,.workflow-prototype-evidence select,.workflow-prototype-evidence summary{outline-offset:3px}
+.workflow-prototype button:focus-visible,.workflow-prototype a:focus-visible,.workflow-prototype input:focus-visible,.workflow-prototype select:focus-visible,.workflow-prototype summary:focus-visible,.workflow-prototype-evidence button:focus-visible,.workflow-prototype-evidence a:focus-visible,.workflow-prototype-evidence input:focus-visible,.workflow-prototype-evidence select:focus-visible,.workflow-prototype-evidence summary:focus-visible{outline:3px solid #82a9ed}
+.workflow-prototype button,.workflow-prototype-evidence button{border:1px solid var(--line);background:white;color:var(--ink);border-radius:5px;padding:6px 12px}
+.workflow-prototype button:hover,.workflow-prototype-evidence button:hover{border-color:#99b3d8;background:#f7faff}
+.workflow-prototype button.primary,.workflow-prototype-evidence button.primary{background:var(--blue);border-color:var(--blue);color:white}
+.workflow-prototype a,.workflow-prototype-evidence a{color:var(--blue)}
+.workflow-prototype h1,.workflow-prototype h2,.workflow-prototype h3,.workflow-prototype p,.workflow-prototype-evidence h1,.workflow-prototype-evidence h2,.workflow-prototype-evidence h3,.workflow-prototype-evidence p{margin:0}
+.workflow-prototype h1,.workflow-prototype-evidence h1{font-size:20px;letter-spacing:.02em}
+.workflow-prototype h2,.workflow-prototype-evidence h2{font-size:16px}
+.workflow-prototype h3,.workflow-prototype-evidence h3{font-size:14px}
+.workflow-prototype small,.workflow-prototype .muted,.workflow-prototype-evidence small,.workflow-prototype-evidence .muted{color:var(--muted)}
+.workflow-prototype.page{max-width:1330px;margin:0 auto;padding:23px 24px 36px}
+.workflow-prototype .heading,.workflow-prototype-evidence .heading{display:flex;justify-content:space-between;align-items:start;gap:16px;margin-bottom:16px}
+.workflow-prototype .heading p,.workflow-prototype-evidence .heading p{font-size:13px;color:var(--muted);margin-top:5px}
+.workflow-prototype .badge,.workflow-prototype-evidence .badge{display:inline-flex;gap:5px;align-items:center;padding:2px 7px;border-radius:4px;font-size:12px;white-space:nowrap;border:1px solid transparent}
+.workflow-prototype .neutral,.workflow-prototype-evidence .neutral{background:#edf0f5;color:#59697e}
+.workflow-prototype .pass,.workflow-prototype-evidence .pass{background:#e9f4ee;color:var(--green)}
+.workflow-prototype .unknown,.workflow-prototype-evidence .unknown{background:#fff2da;color:var(--amber)}
+.workflow-prototype .rejected,.workflow-prototype-evidence .rejected{background:#fbeceb;color:var(--red)}
+.workflow-prototype .panel,.workflow-prototype-evidence .panel{border:1px solid var(--line);background:white;border-radius:7px}
+.workflow-prototype .section-head,.workflow-prototype-evidence .section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.workflow-prototype .section-head small,.workflow-prototype-evidence .section-head small{font-size:12px}
+.workflow-prototype .choice-section,.workflow-prototype-evidence .choice-section{padding:15px 16px;margin-bottom:14px}
+.workflow-prototype .choices,.workflow-prototype-evidence .choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.workflow-prototype .choice,.workflow-prototype-evidence .choice{display:flex;flex-direction:column;text-align:left;gap:6px;padding:11px;position:relative;min-height:121px}
+.workflow-prototype .choice[aria-pressed=true],.workflow-prototype-evidence .choice[aria-pressed=true]{border-color:var(--blue);background:var(--soft);box-shadow:inset 0 0 0 1px var(--blue)}
+.workflow-prototype .choice strong,.workflow-prototype-evidence .choice strong{font-size:13px}
+.workflow-prototype .choice small,.workflow-prototype-evidence .choice small{line-height:1.5}
+.workflow-prototype .choice .badge,.workflow-prototype-evidence .choice .badge{align-self:start}
+.workflow-prototype .route-select,.workflow-prototype-evidence .route-select{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:11px;font-size:12px}
+.workflow-prototype .route-select select,.workflow-prototype-evidence .route-select select{border:1px solid var(--line);border-radius:4px;background:white;padding:5px;max-width:100%;color:var(--ink)}
+.workflow-prototype .selected-route,.workflow-prototype-evidence .selected-route{border-top:1px solid var(--line);padding-top:10px;margin-top:11px;font-size:12px}
+.workflow-prototype .selected-route b,.workflow-prototype-evidence .selected-route b{color:var(--blue)}
+.workflow-prototype .comparison,.workflow-prototype-evidence .comparison{margin-top:13px;overflow:auto}
+.workflow-prototype .comparison table,.workflow-prototype-evidence .comparison table{min-width:840px}
+.workflow-prototype .comparison caption,.workflow-prototype-evidence .comparison caption{text-align:left;font-weight:600;margin:0 0 8px}
+.workflow-prototype .comparison td,.workflow-prototype-evidence .comparison td{vertical-align:top;white-space:normal;min-width:165px}
+.workflow-prototype .comparison th:first-child,.workflow-prototype-evidence .comparison th:first-child{min-width:90px}
+.workflow-prototype .projectbar,.workflow-prototype-evidence .projectbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.workflow-prototype .projectbar label,.workflow-prototype-evidence .projectbar label{display:flex;align-items:center;gap:8px;font-weight:600}
+.workflow-prototype .projectbar select,.workflow-prototype-evidence .projectbar select{border:1px solid var(--line);border-radius:4px;background:white;padding:6px 9px;max-width:100%}
+.workflow-prototype .demo-note,.workflow-prototype-evidence .demo-note{font-size:12px;color:var(--muted)}
+.workflow-prototype .tabs,.workflow-prototype-evidence .tabs{display:flex;gap:4px;padding:0 16px;border-bottom:1px solid var(--line);overflow-x:auto}
+.workflow-prototype .tabs button,.workflow-prototype-evidence .tabs button{border:0;border-radius:0;background:none;white-space:nowrap;padding:12px 14px;border-bottom:2px solid transparent;color:var(--muted)}
+.workflow-prototype .tabs button[aria-selected=true],.workflow-prototype-evidence .tabs button[aria-selected=true]{border-bottom-color:var(--blue);color:var(--blue);font-weight:600}
+.workflow-prototype .content,.workflow-prototype-evidence .content{padding:18px 16px;min-height:290px}
+.workflow-prototype .summary-line,.workflow-prototype-evidence .summary-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.workflow-prototype .summary-line .muted,.workflow-prototype-evidence .summary-line .muted{font-size:12px}
+.workflow-prototype .grid2,.workflow-prototype-evidence .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.workflow-prototype .info-card,.workflow-prototype-evidence .info-card{padding:14px;border:1px solid var(--line);border-radius:5px}
+.workflow-prototype .info-card h3,.workflow-prototype-evidence .info-card h3{margin-bottom:8px}
+.workflow-prototype .info-card p,.workflow-prototype-evidence .info-card p{font-size:13px;margin:7px 0}
+.workflow-prototype .info-card dl,.workflow-prototype-evidence .info-card dl{margin:0;display:grid;grid-template-columns:98px minmax(0,1fr);gap:7px;font-size:12px}
+.workflow-prototype .info-card dt,.workflow-prototype-evidence .info-card dt{color:var(--muted)}
+.workflow-prototype .info-card dd,.workflow-prototype-evidence .info-card dd{margin:0;overflow-wrap:anywhere}
+.workflow-prototype .callout,.workflow-prototype-evidence .callout{padding:10px 12px;background:#f6f8fb;border-left:3px solid #9cacc3;color:#536278;font-size:12px;margin-top:12px}
+.workflow-prototype .filter,.workflow-prototype-evidence .filter{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.workflow-prototype .filter input,.workflow-prototype .filter select,.workflow-prototype-evidence .filter input,.workflow-prototype-evidence .filter select{border:1px solid var(--line);border-radius:4px;background:white;padding:6px 9px;min-height:34px}
+.workflow-prototype .filter input,.workflow-prototype-evidence .filter input{width:240px;max-width:100%}
+.workflow-prototype .filter label,.workflow-prototype-evidence .filter label{font-size:12px}
+.workflow-prototype .table-wrap,.workflow-prototype-evidence .table-wrap{overflow:auto}
+.workflow-prototype table,.workflow-prototype-evidence table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}
+.workflow-prototype th,.workflow-prototype-evidence th{font-weight:500;color:var(--muted);background:#f8f9fc;font-size:12px}
+.workflow-prototype th,.workflow-prototype td,.workflow-prototype-evidence th,.workflow-prototype-evidence td{padding:11px 10px;border-bottom:1px solid #e7ecf2}
+.workflow-prototype td code,.workflow-prototype-evidence td code{font-size:11px;color:var(--muted)}
+.workflow-prototype td input,.workflow-prototype-evidence td input{width:17px;height:17px;accent-color:var(--blue)}
+.workflow-prototype .table-wrap table,.workflow-prototype-evidence .table-wrap table{min-width:600px}
+.workflow-prototype .text-button,.workflow-prototype-evidence .text-button{border:0;background:none;padding:3px 0;color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+.workflow-prototype .empty,.workflow-prototype-evidence .empty{padding:30px;text-align:center;color:var(--muted)}
+.workflow-prototype .accept-grid,.workflow-prototype-evidence .accept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.workflow-prototype .accept-card,.workflow-prototype-evidence .accept-card{border:1px solid var(--line);border-top:3px solid #9eacc0;border-radius:5px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.workflow-prototype .accept-card h3,.workflow-prototype-evidence .accept-card h3{font-size:14px}
+.workflow-prototype .accept-card p,.workflow-prototype-evidence .accept-card p{color:var(--muted);font-size:12px;min-height:38px}
+.workflow-prototype .accept-card button,.workflow-prototype-evidence .accept-card button{margin-top:auto;align-self:start}
+.workflow-prototype .source-line,.workflow-prototype-evidence .source-line{font-size:12px;margin-top:14px;display:flex;gap:14px;flex-wrap:wrap}
+.workflow-prototype .real-snapshot,.workflow-prototype-evidence .real-snapshot{margin-top:16px;border-left:4px solid #667f9c;padding:13px 15px;background:#f9fbfe}
+.workflow-prototype .real-snapshot h2,.workflow-prototype-evidence .real-snapshot h2{font-size:13px;margin-bottom:7px}
+.workflow-prototype .real-snapshot p,.workflow-prototype-evidence .real-snapshot p{font-size:12px;line-height:1.8}
+.workflow-prototype .real-snapshot strong,.workflow-prototype-evidence .real-snapshot strong{font-weight:600}
+.workflow-prototype .sources,.workflow-prototype-evidence .sources{padding:15px 16px;margin-top:14px}
+.workflow-prototype .sources summary,.workflow-prototype-evidence .sources summary{cursor:pointer;font-size:13px;font-weight:600}
+.workflow-prototype .sources ul,.workflow-prototype-evidence .sources ul{margin:12px 0 0;padding-left:19px;font-size:12px}
+.workflow-prototype .sources li,.workflow-prototype-evidence .sources li{margin:8px 0;overflow-wrap:anywhere}
+.workflow-prototype .footer,.workflow-prototype-evidence .footer{font-size:11px;color:var(--muted);padding:15px 0 0;display:flex;justify-content:space-between;gap:12px}
+.workflow-prototype-evidence{padding:0;border:1px solid var(--line);border-radius:8px;width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 36px);box-shadow:0 20px 80px #20365533;color:var(--ink)}
+.workflow-prototype-evidence-overlay{background:#1a294858}
+.workflow-prototype-evidence .drawer-head{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:15px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.workflow-prototype-evidence .drawer-body{padding:18px;overflow-wrap:anywhere}
+.workflow-prototype-evidence .drawer-body p{font-size:13px;margin:9px 0}
+.workflow-prototype-evidence .drawer-body dl{font-size:12px;display:grid;grid-template-columns:110px 1fr;gap:10px}
+.workflow-prototype-evidence .drawer-body dt{color:var(--muted)}
+.workflow-prototype-evidence .drawer-body dd{margin:0}
+.workflow-prototype-evidence .drawer-body code{font-size:11px}
+.workflow-prototype-evidence .drawer-foot{padding:12px 18px;border-top:1px solid var(--line);font-size:12px;background:#f9fafc}
+.workflow-prototype-evidence .drawer-head button{font-size:18px;padding:2px 9px}
+.workflow-prototype button:disabled,.workflow-prototype-evidence button:disabled{cursor:not-allowed;opacity:.55}
+.workflow-prototype input[type=checkbox],.workflow-prototype-evidence input[type=checkbox]{cursor:pointer}
+@media(max-width:1100px){.workflow-prototype .choices,.workflow-prototype-evidence .choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+.workflow-prototype.page{padding:18px}
+.workflow-prototype .accept-grid,.workflow-prototype-evidence .accept-grid{grid-template-columns:1fr}
+.workflow-prototype .accept-card p,.workflow-prototype-evidence .accept-card p{min-height:0}}
+@media(max-width:700px){.workflow-prototype.page{padding:16px 12px 24px}
+.workflow-prototype .heading,.workflow-prototype-evidence .heading{display:block}
+.workflow-prototype .heading .badge,.workflow-prototype-evidence .heading .badge{margin-top:9px}
+.workflow-prototype .choices,.workflow-prototype-evidence .choices{grid-template-columns:1fr}
+.workflow-prototype .choice,.workflow-prototype-evidence .choice{min-height:0}
+.workflow-prototype .grid2,.workflow-prototype-evidence .grid2{grid-template-columns:1fr}
+.workflow-prototype .projectbar,.workflow-prototype-evidence .projectbar{padding:12px}
+.workflow-prototype .projectbar label,.workflow-prototype-evidence .projectbar label{display:block;max-width:100%}
+.workflow-prototype .projectbar select,.workflow-prototype-evidence .projectbar select{display:block;margin-top:6px;width:100%}
+.workflow-prototype .tabs,.workflow-prototype-evidence .tabs{padding:0 5px}
+.workflow-prototype .tabs button,.workflow-prototype-evidence .tabs button{padding:11px 10px}
+.workflow-prototype .content,.workflow-prototype-evidence .content{padding:15px 12px}
+.workflow-prototype .heading h1,.workflow-prototype-evidence .heading h1{font-size:19px}
+.workflow-prototype .filter input,.workflow-prototype-evidence .filter input{width:100%}
+.workflow-prototype .filter,.workflow-prototype-evidence .filter{align-items:stretch}
+.workflow-prototype .footer,.workflow-prototype-evidence .footer{display:block}
+.workflow-prototype .footer span,.workflow-prototype-evidence .footer span{display:block;margin-bottom:5px}
+.workflow-prototype .real-snapshot,.workflow-prototype-evidence .real-snapshot{padding:12px}
+.workflow-prototype-evidence .drawer-body dl{grid-template-columns:90px 1fr}}
+.workflow-prototype .page-actions,.workflow-prototype-evidence .page-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.workflow-prototype .comparison,.workflow-prototype-evidence .comparison{margin-top:16px}
+.workflow-prototype [hidden],.workflow-prototype-evidence [hidden]{display:none!important}
+.workflow-prototype .lifecycle-summary,.workflow-prototype-evidence .lifecycle-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:15px}
+.workflow-prototype .lifecycle-summary>div,.workflow-prototype-evidence .lifecycle-summary>div{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:5px;padding:11px}
+.workflow-prototype .lifecycle-summary strong,.workflow-prototype-evidence .lifecycle-summary strong{font-size:22px;font-weight:600}
+.workflow-prototype .card-actions,.workflow-prototype .drill-actions,.workflow-prototype-evidence .card-actions,.workflow-prototype-evidence .drill-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+@media(max-width:700px){.workflow-prototype .lifecycle-summary,.workflow-prototype-evidence .lifecycle-summary{grid-template-columns:repeat(2,1fr)}
+.workflow-prototype .lifecycle-summary>div,.workflow-prototype-evidence .lifecycle-summary>div{padding:8px;gap:6px}}
+/* Required live-data and Vue/Element Plus adapters; no alternate design tokens. */
+.workflow-prototype-evidence{background:white}
+.workflow-prototype .workflow-muted{color:var(--muted);font-size:12px}
+.workflow-prototype .workflow-live-goals,.workflow-prototype .workflow-operation-integration,.workflow-prototype .workflow-planning-source{margin-top:16px}
+.workflow-prototype .workflow-execution-counts{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin-top:12px}
+.workflow-prototype .workflow-task-detail h2{margin-top:14px}
+.workflow-prototype .workflow-task-mark{padding:10px 12px;background:#f6f8fb;font-size:12px}
+.workflow-prototype .workflow-goals,.workflow-prototype .workflow-delivery{min-width:0}
+.workflow-prototype .workflow-delivery.is-selected{border-color:var(--blue)}
+.workflow-prototype .workflow-milestone-evidence{margin-top:12px}
+.workflow-prototype .workflow-milestone-evidence section{padding:10px 0;border-top:1px solid var(--line)}
+.workflow-prototype .workflow-source-groups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.workflow-prototype .workflow-source{padding:11px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+.workflow-prototype .workflow-source small{color:var(--muted)}
+.workflow-prototype .workflow-source p{margin:0}
+.workflow-prototype .workflow-sources{margin-top:14px}
+.workflow-prototype .workflow-source-marks{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px}
+.workflow-prototype .workflow-evidence-list{display:grid;gap:8px;margin-top:12px}
+.workflow-prototype .workflow-evidence-button,.workflow-prototype-evidence .workflow-evidence-button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 10px;border:1px solid var(--line);border-radius:5px;background:white;color:var(--ink);cursor:pointer}
+.workflow-prototype .workflow-evidence-button>span:first-child,.workflow-prototype-evidence .workflow-evidence-button>span:first-child{flex:1;min-width:0}
+.workflow-prototype .workflow-evidence-button small,.workflow-prototype-evidence .workflow-evidence-button small{display:block;color:var(--muted);font-size:12px}
+.workflow-prototype .workflow-header-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.workflow-prototype .projectbar>.workflow-project-registration{margin-top:0}
+.workflow-prototype .projectbar>.workflow-project-registration:has(form){flex-basis:100%}
+.workflow-prototype-evidence .el-dialog__header,.workflow-prototype-evidence .el-dialog__body,.workflow-prototype-evidence .el-dialog__footer{padding:0;margin:0}
+.workflow-prototype-evidence .drawer-foot{text-align:left}
+.workflow-prototype-evidence .workflow-evidence-detail dl{margin:0;display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;font-size:12px}
+.workflow-prototype-evidence .workflow-evidence-detail dt{color:var(--muted)}
+.workflow-prototype-evidence .workflow-evidence-detail dd{margin:0;white-space:pre-wrap}
+.workflow-prototype-evidence .workflow-muted{color:var(--muted);font-size:12px}
+.workflow-prototype-evidence .workflow-evidence-list{display:grid;gap:8px;margin-top:12px}
+.workflow-prototype-evidence button{font:inherit;border:1px solid var(--line);background:white;color:var(--ink);border-radius:5px;padding:6px 12px;cursor:pointer}
+.workflow-prototype-evidence .drawer-head button{font-size:18px;padding:2px 9px}
+@media(max-width:700px){.workflow-prototype .workflow-source-groups{grid-template-columns:1fr}.workflow-prototype-evidence .workflow-evidence-detail dl{grid-template-columns:90px minmax(0,1fr)}}
+
+.workflow-prototype,.workflow-prototype-evidence{box-sizing:border-box}

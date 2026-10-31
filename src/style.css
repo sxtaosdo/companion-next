@@ -131,3 +131,6 @@
 .topbar{height:48px;padding:0 20px}.topbar-left,.topbar-right{gap:10px;min-width:0}.main-content{padding:16px 20px 20px}.sidebar{padding-top:18px}.companion-browser-page{gap:12px}.companion-browser-page>.panel{padding:14px}.source-banner{margin-bottom:12px}.section-heading{margin-top:16px;margin-bottom:10px}
 @media(min-width:1500px){.main-content{padding:18px 24px 24px}}
 @media(max-width:760px){.topbar{min-height:48px;height:auto;padding:6px 12px;gap:8px}.topbar-left{gap:6px}.topbar-right{gap:6px}.main-content{padding:12px}.frontend-version{display:none}.companion-browser-page>.panel{padding:12px}}
+
+/* Keep every utility action reachable on narrow screens without reducing text size. */
+@media(max-width:400px){.topbar-right{flex-wrap:wrap;justify-content:flex-end;row-gap:4px}}

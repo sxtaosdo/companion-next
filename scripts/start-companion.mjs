@@ -3,14 +3,15 @@ import { existsSync, lstatSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, resolve, join, win32 } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import {DEPENDENCIES} from '../../cocos-mcp/mcp/src/companion/dependency-contract.mjs';
 
 export const STARTUP_BUDGET_MS = 65_000;
 export const READ_BUDGET_MS = 10_000;
-export const BASE = 'http://127.0.0.1:32180';
+export const BASE = DEPENDENCIES.daemon.origin;
 export const NEXT = BASE + '/next/index.html#/overview';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const host = resolve(root, '../cocos-mcp/mcp');
-export const DAEMON_ENTRY = join(host, 'dist/companion/companion-daemon.js');
+export const DAEMON_ENTRY = join(host, DEPENDENCIES.daemon.entry);
 export class StartupError extends Error { constructor(code, { stage, reason, exitCode, officialReason, officialExitCode } = {}) { super(code); this.code = code; if (stage) this.stage = stage; if (reason) this.reason = reason; if (Number.isSafeInteger(exitCode)) this.exitCode = exitCode; if (officialReason) this.officialReason = officialReason; if (Number.isSafeInteger(officialExitCode)) this.officialExitCode = officialExitCode; } }
 export const LOCAL_STARTUP_CONFIG = join(root, 'companion-start.local.json');
 // This allowlist is the Owner-approved machine binding, not a generation default.
@@ -32,9 +33,11 @@ export const APPROVED_E2E_GENERATION_CONFIG = Object.freeze({
   CREATOR_AI_ICONS_LEASE: 'D:/CompanionData/art-generation-acceptance-20261021/generation-lease-20261023',
   CREATOR_AI_ICONS_GENERATION_PROJECT_IDS: '16ad921aa0fb06d6',
 });
+// Narrow Owner-approved ant toolbar scope; host validates three exact needs and references.
+export const APPROVED_ANT_TOOLBAR_GENERATION_CONFIG = Object.freeze({...APPROVED_E2E_GENERATION_CONFIG,CREATOR_AI_ICONS_GENERATION_PROJECT_IDS:'04c4cde24ee76d83'});
 export function validateStartupConfiguration(value) {
   const mode = value && typeof value === 'object' ? Object.getOwnPropertyDescriptor(value, 'CREATOR_AI_ICONS_MODE') : undefined;
-  const approved = mode && 'value' in mode && mode.value === 'generation' ? APPROVED_E2E_GENERATION_CONFIG : APPROVED_STARTUP_CONFIG;
+  const approved = mode && 'value' in mode && mode.value === 'generation' ? (Object.getOwnPropertyDescriptor(value,'CREATOR_AI_ICONS_GENERATION_PROJECT_IDS')?.value==='04c4cde24ee76d83'?APPROVED_ANT_TOOLBAR_GENERATION_CONFIG:APPROVED_E2E_GENERATION_CONFIG) : APPROVED_STARTUP_CONFIG;
   const expected = Object.keys(approved);
   if (!value || typeof value !== 'object' || Array.isArray(value)
     || Object.getPrototypeOf(value) !== Object.prototype
@@ -87,12 +90,12 @@ export function startupEnvironment(env = process.env, configuration) {
 }
 export function ensureAccountProvider(run = execFile) {
   return new Promise((done, reject) => {
-    run('D:/code/shidai3/P8000/dual-game-build/node_modules/node/bin/node.exe',
-      [resolve(root, '../game-ops-admin/server/local-launcher.cjs'), '--backend-only'],
-      { cwd: resolve(root, '../game-ops-admin/server'), windowsHide: true, timeout: 125_000, maxBuffer: 32 * 1024 },
+    run(DEPENDENCIES.account.node,
+      [DEPENDENCIES.account.entry, ...DEPENDENCIES.account.args],
+      { cwd: DEPENDENCIES.account.cwd, windowsHide: true, timeout: 125_000, maxBuffer: 32 * 1024 },
       (error, stdout) => {
         if (error) { reject(new StartupError('ACCOUNT_PROVIDER_UNCONFIRMED')); return; }
-        try { const value = JSON.parse(stdout); if (value.ready !== true || value.port !== 18001 || !Number.isSafeInteger(value.pid) || value.pid <= 0) throw Error(); done(value); }
+        try { const value = JSON.parse(stdout); if (value.ready !== true || value.port !== DEPENDENCIES.account.port || !Number.isSafeInteger(value.pid) || value.pid <= 0) throw Error(); done(value); }
         catch { reject(new StartupError('ACCOUNT_PROVIDER_UNCONFIRMED')); }
       });
   });
@@ -183,18 +186,39 @@ export async function waitForDaemonReadiness(discover, { timeoutMs = 10_000, pol
   if (!Number.isFinite(timeoutMs) || timeoutMs < 1 || timeoutMs > STARTUP_BUDGET_MS || !Number.isFinite(pollMs) || pollMs < 1 || pollMs > 1000) throw new StartupError('READINESS_OPTIONS_INVALID');
   const deadline = now() + timeoutMs;
   let lastStage = 'discovery', lastReason = 'not-observed';
+  let authRediscoveryUsed = false;
   while (now() < deadline) {
     let timer, stage = 'discovery';
     const remaining = Math.max(1, Math.min(READ_BUDGET_MS, deadline - now())), controller = new AbortController();
     try {
       const work = Promise.resolve().then(async () => {
-        const client = await discover();
+        let client = await discover();
         if (controller.signal.aborted) throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage, reason: 'deadline' });
         if (client?.baseUrl !== BASE) throw new StartupError('UNEXPECTED_DAEMON_URL', { stage, reason: 'unexpected-locator' });
         stage = 'health';
         // Reuse the installed authenticated request contract and keep the whole read cancellable.
         // Readiness identity is not a maintenance/drain proof and does not clear historical unknowns.
-        const status = await client.request('GET', '/v1/daemon/inflight', undefined, controller.signal);
+        let status;
+        try { status = await client.request('GET', '/v1/daemon/inflight', undefined, controller.signal); }
+        catch (error) {
+          // The installed daemon listens before publishing its new locator. An old
+          // locator can therefore authenticate against a new listener once. Reuse
+          // secure discovery, but never replay a refusal with unchanged credentials.
+          if (![401, 403].includes(error?.status) || authRediscoveryUsed || once
+            || typeof client.apiToken !== 'string' || !client.apiToken) throw error;
+          if (controller.signal.aborted || now() >= deadline) throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage, reason: 'deadline' });
+          authRediscoveryUsed = true;
+          stage = 'discovery';
+          let refreshed;
+          try { refreshed = await discover(); }
+          catch { throw new StartupError('DAEMON_AUTH_REJECTED', { stage, reason: 'credential-refresh-unconfirmed' }); }
+          if (controller.signal.aborted || now() >= deadline) throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage, reason: 'deadline' });
+          if (refreshed?.baseUrl !== BASE) throw new StartupError('UNEXPECTED_DAEMON_URL', { stage, reason: 'unexpected-locator' });
+          stage = 'health';
+          if (typeof refreshed.apiToken !== 'string' || !refreshed.apiToken || refreshed.apiToken === client.apiToken) throw error;
+          client = refreshed;
+          status = await client.request('GET', '/v1/daemon/inflight', undefined, controller.signal);
+        }
         if (controller.signal.aborted) throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage, reason: 'deadline' });
         validateReadySnapshot(status, expectedPid);
         return { client, status };
@@ -212,7 +236,8 @@ export async function waitForDaemonReadiness(discover, { timeoutMs = 10_000, pol
   }
   throw new StartupError('DAEMON_READINESS_UNCONFIRMED', { stage: lastStage, reason: lastReason });
 }
-export async function startCompanion({ noBrowser = false } = {}, deps) {
+export async function startCompanion({ noBrowser = false, feature = 'management' } = {}, deps) {
+  if(!['management','workflow'].includes(feature))throw new StartupError('UNKNOWN_FEATURE');
   await deps.ensureAuth?.();
   // One budget owns both the official CLI call and subsequent read-only observation.
   // The CLI's detached child can outlive its internal 8s readiness deadline.
@@ -244,6 +269,12 @@ export async function startCompanion({ noBrowser = false } = {}, deps) {
   const { client, status } = observed, lateReady = !!startFailure;
   const receipt = { url: NEXT, pid: status.identity.pid, lateReady,
     ...(startFailure ? { officialReason: ['cli-readiness-deadline', 'cli-timeout', 'cli-error', 'cli-protocol'].includes(startFailure.reason) ? startFailure.reason : 'cli-unconfirmed' } : {}) };
+  if(feature==='workflow'){
+    if(typeof deps.checkWorkflow!=='function')throw new StartupError('WORKFLOW_DEPENDENCY_UNVERIFIED');
+    // Explicit workflow readiness is read-only. It never grants permission to
+    // start knowledge/model services or upgrades an executable trust binding.
+    try{await deps.checkWorkflow();}catch(error){throw new StartupError('WORKFLOW_DEPENDENCY_NOT_READY',{stage:'workflow-preflight',reason:/^[A-Z_]+$/.test(error?.code??'')?error.code:'DEPENDENCY_UNCONFIRMED'});}
+  }
   if (noBrowser) return receipt;
   return { ...receipt, ...await openNext(client, deps.createBrowser) };
 }
@@ -255,13 +286,14 @@ export function startupFailureSummary(error) {
 }
 
 export async function main(args = process.argv.slice(2)) {
-  if (args.includes('--help')) { console.log('npm start [-- --no-browser]\nStarts/reuses the installed Companion and opens only Companion Next. Closing the new browser window does not stop the daemon.'); return; }
-  if (args.some(arg => arg !== '--no-browser')) throw new StartupError('UNKNOWN_OPTION');
+  if (args.includes('--help')) { console.log('npm start [-- --no-browser] [--workflow]\nStarts/reuses account and Companion. --workflow also verifies the controlled executable and knowledge health; it does not start knowledge or model services. Closing the new browser window does not stop the daemon.'); return; }
+  if (args.some(arg => !['--no-browser','--workflow'].includes(arg))) throw new StartupError('UNKNOWN_OPTION');
   const env = startupEnvironment();
   console.log('Project-local resource configuration loaded. New daemon processes use it; an already running daemon keeps its configuration until an approved maintenance restart.');
   delete process.env.DEBUG; delete process.env.PWDEBUG;
   const { CompanionApiClient } = await import(pathToFileURL(join(host, 'dist/companion-api-client.js')).href);
-  const result = await startCompanion({ noBrowser: args.includes('--no-browser') }, {
+  const result = await startCompanion({ noBrowser: args.includes('--no-browser'),feature:args.includes('--workflow')?'workflow':'management' }, {
+    checkWorkflow:async()=>{const {createSubmissionPreflight}=await import(pathToFileURL(join(host,'src/companion/workflow-operations/integration/submission-preflight.mjs')).href);await createSubmissionPreflight()();},
     ensureAuth: () => ensureAccountProvider(), start: () => officialStart(env), discover: () => CompanionApiClient.discover(),
     createBrowser: async () => {
       const { chromium } = createRequire(join(host, 'package.json'))('playwright');

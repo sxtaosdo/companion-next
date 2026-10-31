@@ -58,6 +58,8 @@ function readFences(storage: AiEditorFenceStorage): AiReferencePendingFence[] {
     return { project: { ...raw.project }, originalSha256: original.sha256, mimeType: original.mimeType, width: original.width, height: original.height, receipt }
   })
 }
+/** Read-only reuse of the existing strict recovery decoder; never clears a fence. */
+export function readAiReferenceUploadFences(storage: AiEditorFenceStorage): readonly AiReferencePendingFence[] { return readFences(storage) }
 interface Binding {
   project: AiEditorProject
   source: object

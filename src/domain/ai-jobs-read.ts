@@ -1,3 +1,4 @@
+import {ANT_TOOLBAR_PROJECT,ANT_TOOLBAR_SPEC,antToolbarScope,antToolbarReference} from './ant-toolbar-scope'
 /** Original Companion v148 icon-adapter schema; the four icon modules are unchanged in v150. */
 import { isAiProjectId } from './ai-resource-read'
 import { decodeAiJobResourceSnapshot } from './ai-resource-snapshot'
@@ -16,7 +17,7 @@ export interface AiJobVariantImport extends AiJobImport {
   active: boolean
   artifact?: { kind: 'variant'; candidateId: string; width: number; height: number; fileSha256: string; receiptSha256: string; destinationUrl: string }
 }
-export interface AiJobBudget { maxAssets: 2; candidatesPerAsset: 1; submissionAttempts: 1 }
+export interface AiJobBudget { maxAssets: 1|2; candidatesPerAsset: 1; submissionAttempts: 1 }
 export interface AiVariantDispatchObservation {
   schemaVersion: 'variant-dispatch-observation-v1'; state: 'not-started'; effectApplied: false
   originalReceipt: null; leaseDisposition: 'not-claimed'; reason: 'KNOWN_LEGACY_PREPARE_REJECTED_BEFORE_READ_WRITE'
@@ -24,9 +25,15 @@ export interface AiVariantDispatchObservation {
     motherSha256: string; configHash: string; width: number; height: number; fileSha256: string; receiptSha256: string; destinationUrl: string }
   taskSha256: string; observedAt: string
 }
+export interface AiJobReferenceProfile {
+  schemaVersion:'qwen-reference-manifest-v1';profileId:'qwen-image-edit-2511-reference-v1';projectId:string;runId:string;assetId:string
+  scope:{specId:string;specVersion:number;needId:string;normHash:string}
+  references:Array<{referenceId:string;relativePath:string;sha256:string;mimeType:'image/png'|'image/jpeg';width:number;height:number;role:'style'|'subject'|'composition';order:number}>
+  profileSha256:string;promptSha256:string;artifactSha256:string
+}
 export interface AiJobSnapshot {
   projectId: string; jobId: string; revision: number; state: AiJobState; sourceRevision: string; requestHash: string
-  profile: string; budget: AiJobBudget; createdAt: string; assets: Array<{ assetId: string; relativePath: string }>
+  profile: string; referenceProfile?:AiJobReferenceProfile; budget: AiJobBudget; createdAt: string; assets: Array<{ assetId: string; relativePath: string }>
   candidates: AiJobCandidate[]; selectedIds: string[]; import: AiJobImport | null; workerResident: false; productionVerified: false
   mode?: AiJobMode; origin?: 'generated' | 'adopted'; errorCode?: string | null
   resourceSnapshot?: AiJobResourceSnapshot
@@ -43,6 +50,7 @@ export interface AiJobsView {
 export interface AiJobPreview { candidateId: string; mimeType: 'image/png'; base64: string; sha256: string; width: 1024; height: 1024 }
 export interface AiPngPreview { candidateId: string; mimeType: 'image/png'; base64: string; sha256: string; width: number; height: number }
 export interface AiVariantPreview extends AiPngPreview { operationId: string; receiptSha256: string }
+export interface AiVariantImportObservation { operationId: string; state: 'blocked' | 'import_unknown' | 'imported_pending_verification'; effectApplied: boolean | 'UNKNOWN'; leaseState: 'RELEASED' | 'RETAINED' | 'UNKNOWN' | null }
 export interface AiJobsReadProvider {
   readonly label: string
   /** Optional for standalone reads; mutation pipelines require tracked I/O drainage. */
@@ -51,8 +59,9 @@ export interface AiJobsReadProvider {
   readStatus(projectId: string, jobId: string, signal?: AbortSignal): Promise<AiJobSnapshot>
   previewCandidate(projectId: string, jobId: string, candidate: AiJobCandidate, signal?: AbortSignal): Promise<AiJobPreview>
   previewVariant?(projectId: string, job: AiJobSnapshot, signal?: AbortSignal): Promise<AiVariantPreview>
+  queryVariantImport?(projectId: string, jobId: string, operationId: string, signal?: AbortSignal): Promise<AiVariantImportObservation>
 }
-export type AiJobsReadEndpoint = 'jobs' | 'status' | 'candidate' | 'variant-preview'
+export type AiJobsReadEndpoint = 'jobs' | 'status' | 'candidate' | 'variant-preview' | 'variant-import-status'
 export type AiJobsReadCode = 'unauthorized' | 'forbidden' | 'timeout' | 'aborted' | 'invalid-shape' | 'response-too-large' | 'http-error' | 'network-error' | 'invalid-query' | 'busy' | 'verification-unavailable'
 const messages: Record<AiJobsReadCode, string> = {
   unauthorized: '需要已有的 Companion 会话（401）。', forbidden: 'Companion 拒绝任务读取（403），请核对已有会话与同源部署。',
@@ -94,7 +103,22 @@ function text(value: unknown, max: number): string { if (typeof value !== 'strin
 function pattern(value: unknown, expression: RegExp, max = 200): string { const result = text(value, max); if (!expression.test(result)) throw invalid(); return result }
 function rows(value: unknown, max: number, min = 0): unknown[] { if (!Array.isArray(value) || value.length > max || value.length < min) throw invalid(); return value }
 function member<T extends string>(value: unknown, options: readonly T[]): T { if (typeof value !== 'string' || !options.includes(value as T)) throw invalid(); return value as T }
-function budget(value: unknown): AiJobBudget { const raw = record(value); if (raw.maxAssets !== 2 || raw.candidatesPerAsset !== 1 || raw.submissionAttempts !== 1) throw invalid(); return { maxAssets: 2, candidatesPerAsset: 1, submissionAttempts: 1 } }
+function budget(value: unknown,qwen=false): AiJobBudget { const raw = record(value); if (raw.maxAssets !== (qwen?1:2) || raw.candidatesPerAsset !== 1 || raw.submissionAttempts !== 1) throw invalid(); return { maxAssets:qwen?1:2, candidatesPerAsset: 1, submissionAttempts: 1 } }
+const qwenProfile='qwen-image-edit-2511-reference-v1',qwenProject='16ad921aa0fb06d6'
+function decodeReferenceProfile(value:unknown,projectId:string,jobId:string,assetId:string):AiJobReferenceProfile {
+  const raw=record(value),scope=record(raw.scope)
+  const exact=(item:Record<string,unknown>,keys:string[])=>Object.keys(item).length===keys.length&&keys.every(key=>Object.hasOwn(item,key))
+  if(!exact(raw,['schemaVersion','profileId','projectId','runId','assetId','scope','references','profileSha256','promptSha256','artifactSha256'])||!exact(scope,['specId','specVersion','needId','normHash'])||!(projectId===qwenProject||antToolbarScope(projectId,'ant',assetId))||raw.schemaVersion!=='qwen-reference-manifest-v1'||raw.profileId!==qwenProfile||raw.projectId!==projectId||raw.runId!==jobId||raw.assetId!==assetId||scope.needId!==assetId||!Number.isSafeInteger(scope.specVersion)||Number(scope.specVersion)<1)throw invalid()
+  const refs=rows(raw.references,3,1).map((value,index)=>{const r=record(value)
+    if(!exact(r,['referenceId','relativePath','sha256','mimeType','width','height','role','order'])||r.order!==index||!Number.isInteger(r.width)||!Number.isInteger(r.height)||Number(r.width)<1||Number(r.height)<1||Number(r.width)>4096||Number(r.height)>4096||Number(r.width)*Number(r.height)>16_000_000)throw invalid()
+    const relativePath=pattern(r.relativePath,/^(?:art\/reference|assets)\/(?:[A-Za-z0-9_-][A-Za-z0-9._-]*\/)*[A-Za-z0-9_-][A-Za-z0-9._-]*\.(?:png|jpe?g)$/i,240)
+    if(relativePath.split('/').some(p=>p==='.'||p==='..'||p.endsWith('.')||/^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(p)))throw invalid()
+    return {referenceId:pattern(r.referenceId,/^reference-[a-f0-9]{24}$/),relativePath,sha256:pattern(r.sha256,sha,64),mimeType:member(r.mimeType,['image/png','image/jpeg'] as const),width:r.width as number,height:r.height as number,role:member(r.role,['style','subject','composition'] as const),order:index}
+  })
+  if(new Set(refs.map(r=>r.referenceId)).size!==refs.length||new Set(refs.map(r=>r.relativePath+':'+r.sha256)).size!==refs.length)throw invalid()
+  if(projectId===ANT_TOOLBAR_PROJECT&&(scope.specId!==ANT_TOOLBAR_SPEC||refs.length!==1||!antToolbarReference(assetId,refs[0]!)||refs[0]!.mimeType!=='image/png'||refs[0]!.width!==160||refs[0]!.height!==160||refs[0]!.role!=='subject'))throw invalid()
+  return {schemaVersion:'qwen-reference-manifest-v1',profileId:qwenProfile,projectId,runId:jobId,assetId,scope:{specId:pattern(scope.specId,/^[a-z][a-z0-9-]{0,59}$/),specVersion:scope.specVersion as number,needId:assetId,normHash:pattern(scope.normHash,sha,64)},references:refs,profileSha256:pattern(raw.profileSha256,sha,64),promptSha256:pattern(raw.promptSha256,sha,64),artifactSha256:pattern(raw.artifactSha256,sha,64)}
+}
 export function decodeAiJobCandidate(value: unknown): AiJobCandidate {
   const raw = record(value)
   if (raw.width !== 1024 || raw.height !== 1024 || raw.hasAlpha !== true) throw invalid()
@@ -160,8 +184,12 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
   const assetIds = assets.map(asset => asset.assetId), candidateIds = candidates.map(candidate => candidate.candidateId)
   if (new Set(assetIds).size !== assetIds.length || new Set(candidateIds).size !== candidateIds.length || new Set(selectedIds).size !== selectedIds.length
     || candidates.some(candidate => !assetIds.includes(candidate.assetId)) || selectedIds.some(id => !candidateIds.includes(id))) throw invalid()
+  const qwen=raw.profile===qwenProfile
+  const referenceProfile=raw.referenceProfile===undefined?undefined:decodeReferenceProfile(raw.referenceProfile,projectId,raw.jobId,assets[0]!.assetId)
+  if(qwen?(!referenceProfile||assets.length!==1||candidates.length>1||selectedIds.length>1):referenceProfile!==undefined)throw invalid()
   let resourceSnapshot: AiJobResourceSnapshot | undefined
-  try { if (raw.resourceSnapshot !== undefined) resourceSnapshot = decodeAiJobResourceSnapshot(raw.resourceSnapshot, projectId, raw as {jobId:unknown;sourceRevision:unknown;requestHash:unknown;assets:unknown}) } catch { throw invalid() }
+  try { if (raw.resourceSnapshot !== undefined) resourceSnapshot = decodeAiJobResourceSnapshot(raw.resourceSnapshot, projectId, {...raw,referenceProfile} as {jobId:unknown;sourceRevision:unknown;requestHash:unknown;assets:unknown;profile?:unknown;referenceProfile?:AiJobReferenceProfile}) } catch { throw invalid() }
+  if(qwen&&projectId===ANT_TOOLBAR_PROJECT&&(!resourceSnapshot||resourceSnapshot.state!=='sealed'||!('kind' in resourceSnapshot)||!antToolbarScope(projectId,resourceSnapshot.config.resourceDomainId,assets[0]!.assetId)))throw invalid()
   const variantDispatchObservation = raw.variantDispatchObservation === undefined ? undefined : decodeVariantDispatchObservation(raw.variantDispatchObservation, raw, candidates, selectedIds, resourceSnapshot)
   const importReceipt = decodeImport(raw.import)
   const variantImport = raw.variantImport === undefined ? undefined : decodeVariantImport(raw.variantImport, candidates, selectedIds)
@@ -178,7 +206,7 @@ export function decodeAiJobSnapshot(value: unknown, projectId: string, jobId?: s
       || importReceipt?.state !== 'imported_pending_verification' || importReceipt.effectApplied !== true || selectedIds.length !== 1)) throw invalid()
   } catch { throw invalid() }
   return { projectId, jobId: raw.jobId, revision: raw.revision, state: member(raw.state, AI_JOB_STATES), sourceRevision: pattern(raw.sourceRevision, revision, 40),
-    requestHash: pattern(raw.requestHash, sha, 64), profile: text(raw.profile, 80), budget: budget(raw.budget), createdAt: text(raw.createdAt, 60), assets, candidates,
+    requestHash: pattern(raw.requestHash, sha, 64), profile: text(raw.profile, 80), ...(referenceProfile?{referenceProfile}:{}), budget: budget(raw.budget,qwen), createdAt: text(raw.createdAt, 60), assets, candidates,
     selectedIds, import: importReceipt, workerResident: false, productionVerified: false,
     ...(raw.mode !== undefined ? { mode: member(raw.mode, ['generation', 'offline_import_only'] as const) } : {}),
     ...(raw.origin !== undefined ? { origin: member(raw.origin, ['generated', 'adopted'] as const) } : {}),
@@ -189,9 +217,9 @@ export function decodeAiJobsView(value: unknown, projectId: string): AiJobsView 
   const raw = record(value), profile = record(raw.profile)
   if (raw.schemaVersion !== 'companion-icons-v1' || raw.projectId !== projectId || !isAiProjectId(projectId) || raw.schedulerEnabled !== false || raw.workerResident !== false) throw invalid()
   const jobs = rows(raw.jobs, AI_JOBS_READ_LIMITS.maxJobs).map(value => decodeAiJobSnapshot(value, projectId))
-  if (new Set(jobs.map(job => job.jobId)).size !== jobs.length) throw invalid()
+  if (new Set(jobs.map(job => job.jobId)).size !== jobs.length || profile.id===qwenProfile&&projectId!==qwenProject&&projectId!==ANT_TOOLBAR_PROJECT) throw invalid()
   return { schemaVersion: 'companion-icons-v1', projectId, sourceRevision: pattern(raw.sourceRevision, revision, 40), jobs,
-    profile: { id: text(profile.id, 80), ...budget(profile) }, schedulerEnabled: false, workerResident: false,
+    profile: { id: text(profile.id, 80), ...budget(profile,profile.id===qwenProfile) }, schedulerEnabled: false, workerResident: false,
     ...(raw.mode !== undefined ? { mode: member(raw.mode, ['generation', 'offline_import_only'] as const) } : {}),
     ...(raw.adoptionSources !== undefined ? { adoptionSources: rows(raw.adoptionSources, 20).map(value => { const source = record(value); return { sourceId: pattern(source.sourceId, /^[a-z][a-z0-9-]{0,79}$/), fileSha256: pattern(source.fileSha256, sha, 64) } }) } : {}) }
 }

@@ -37,13 +37,14 @@ async function boundedJson(response: Response, signal: AbortSignal, error: () =>
 }
 // Only failures proven to occur before dispatch/persistence are classified as rejected.
 // ICON_SCHEMA_INVALID / ICON_OUTCOME_UNCONFIRMED and image-write faults can follow effects and remain UNKNOWN.
-function serverFailure(raw: unknown, status: number): AiJobActionError {
+function serverFailure(raw: unknown, status: number, operation: AiJobAction): AiJobActionError {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return fail('unconfirmed', 'unknown', status)
   const data = raw as Record<string, unknown>
   if (Reflect.ownKeys(data).length !== 3 || !Object.hasOwn(data, 'code') || !Object.hasOwn(data, 'error') || !Object.hasOwn(data, 'retryable')
     || typeof data.code !== 'string' || data.error !== data.code || data.retryable !== false) return fail('unconfirmed', 'unknown', status)
   if(status===400&&data.code==='IMAGE_TRANSPARENCY_REQUIRED')return fail('image-transparency-required','rejected',status)
   if(status===400&&data.code==='IMAGE_CONTENT_EMPTY')return fail('image-content-empty','rejected',status)
+  if(status===409&&operation==='import-variant'&&data.code==='ART_REVIEW_SOURCE_UNCONFIRMED')return fail('art-review-unconfirmed','rejected',status)
   if (status === 409 && ['STALE_JOB', 'TASK_STATE_BLOCKED'].includes(data.code)) return fail('stale', 'conflict', status)
   if (status === 400 && data.code === 'INVALID_INPUT' || status === 404 && data.code === 'PROJECT_NOT_FOUND'
     || status === 429 && data.code === 'ICON_WORKER_BUSY' || status === 503 && ['ICON_ADAPTER_DISABLED', 'ICON_CONFIG_INVALID'].includes(data.code)
@@ -87,7 +88,7 @@ export function createAiJobActionsProvider(options: { fetch: AiJobActionsFetch; 
         if (!/^application\/json(?:\s*;|\s*$)/i.test(response.headers.get('content-type') ?? '')) { discard(response, track); throw fail('invalid-shape') }
         const raw = await boundedJson(response, controller.signal, error, track)
         if (controller.signal.aborted) throw error()
-        if (!response.ok) throw serverFailure(raw, response.status)
+        if (!response.ok) throw serverFailure(raw, response.status, frozen.operation)
         if (response.status !== 200) throw fail('invalid-shape')
         return decodeAiJobActionResponse(raw, projectId, frozen)
       } catch (cause) {

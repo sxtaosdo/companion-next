@@ -50,6 +50,11 @@ describe('original size variant wire binding', () => {
     expect(s.input).toMatchObject({ width: 96, height: 96, expectedVariantSha256: 'e'.repeat(64) })
     expect(() => decodeAiJobActionResponse({ ...ack(), artifact: 'mother' }, project.id, s)).toThrow()
   })
+  it('retains only a validated original operation ID from the accepted import response', () => {
+    const operationId = `icon-import-${'1'.repeat(32)}`
+    expect(decodeAiJobActionResponse({ ...ack(), operationId }, project.id, submission())).toMatchObject({ kind:'dispatch', operationId })
+    expect(() => decodeAiJobActionResponse({ ...ack(), operationId:'untrusted' }, project.id, submission())).toThrow()
+  })
   it('rejects wrong project, mother/foreign destination, missing receipt and extra paths before transport', async () => {
     const fetch = vi.fn(), provider = createAiJobActionsProvider({ fetch }), s = submission()
     await expect(provider.execute('fedcba9876543210', s)).rejects.toMatchObject({ outcome: 'not-sent' })
@@ -65,9 +70,28 @@ describe('original size variant wire binding', () => {
       expect(fetch).toHaveBeenCalledTimes(1)
     }
   })
+  it('recognizes only the exact pre-dispatch review rejection for variant import', async () => {
+    const code='ART_REVIEW_SOURCE_UNCONFIRMED', body={code,error:code,retryable:false}
+    const provider=createAiJobActionsProvider({fetch:vi.fn(async()=>json(body,409))})
+    await expect(provider.execute(project.id,submission())).rejects.toMatchObject({outcome:'rejected',code:'art-review-unconfirmed'})
+    const exported:AiJobActionSubmission={operation:'export-variant',snapshot:job(),approved:true,input:{jobId:job().jobId,revision:3,candidateId,width:96,height:96,allowUpscale:false,expectedTargetSha256:null,approved:true}}
+    await expect(provider.execute(project.id,exported)).rejects.toMatchObject({outcome:'unknown'})
+    for(const [payload,status] of [[{...body,error:'OTHER'},409],[{...body,retryable:true},409],[{...body,code:'OTHER',error:'OTHER'},409],[body,500]] as const){const p=createAiJobActionsProvider({fetch:vi.fn(async()=>json(payload,status))});await expect(p.execute(project.id,submission())).rejects.toMatchObject({outcome:'unknown'})}
+  })
 })
 
 describe('size import protection and readback', () => {
+  it('releases only the exactly rejected import fence and explains the required visual review',async()=>{
+    const s=setup();await exportOnce(s);const code='ART_REVIEW_SOURCE_UNCONFIRMED',provider=createAiJobActionsProvider({fetch:vi.fn(async()=>json({code,error:code,retryable:false},409))});s.write.execute=provider.execute
+    s.store.prepare('import-variant');s.store.setConfirmed(true);expect(await s.store.execute()).toBe(false)
+    expect(readAiWriteFences(s.saved)).toEqual([]);expect(s.store.message).toContain('视觉审阅');expect(s.write.execute).toBe(provider.execute)
+  })
+  it('persists the accepted original operation ID inside the existing fence', async () => {
+    const s = setup(); await exportOnce(s); const operationId = `icon-import-${'1'.repeat(32)}`
+    s.write.execute = vi.fn(async () => ({ kind:'dispatch' as const, artifact:'variant' as const, dispatchAccepted:true as const, operationId, job:job() }))
+    expect(s.store.prepare('import-variant')).toBe(true); s.store.setConfirmed(true); await s.store.execute()
+    expect(readAiWriteFences(s.saved)[0]?.operationId).toBe(operationId); expect(s.write.execute).toHaveBeenCalledTimes(1)
+  })
   it('requires a real export receipt and freezes its size, target and distinct hashes', async () => {
     const s = setup(); expect(s.store.allowed('import-variant')).toBe(false); await exportOnce(s)
     expect(s.store.prepare('import-variant')).toBe(true); expect(s.store.confirmation?.submission.input).toEqual(submission().input)

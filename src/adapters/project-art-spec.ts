@@ -1,4 +1,5 @@
 import { parseProjectArtSpec, validateProjectArtBindings } from '../domain/project-art-spec'
+import {checkResourceDomainIdentity,resourceDomainRoute} from '../domain/art-resource-domains'
 import { artPath } from '../domain/project-art-pending'
 import { ProjectArtSpecWriteError, type ProjectArtOperation, type ProjectArtSpecContext, type ProjectArtSpecProvider, type ProjectArtSpecReceipt } from '../project-art-spec-integration'
 /** Exact same-origin authenticated routes; no credential, endpoint, or automatic retry UI. */
@@ -9,9 +10,10 @@ export function createProjectArtSpecProvider(fetcher: typeof fetch, origin: stri
   function tracked<T>(work: Promise<T>):Promise<T> { pending.add(work); void work.finally(()=>pending.delete(work)).catch(()=>undefined); return work }
   function receipt(raw: unknown, context: ProjectArtSpecContext): ProjectArtSpecReceipt {
     const value = raw as ProjectArtSpecReceipt
+    checkResourceDomainIdentity(value,context);if(context.resourceDomainId&&(!/^[a-f0-9]{64}$/.test(value.projectSettingsHash??'')||value.binding!==null))throw Error('资源域规范回执不匹配')
     if (!value || value.projectId !== context.projectId || artPath(value.projectPath) !== artPath(context.projectPath) || !Array.isArray(value.authorities) || value.authorities.length > 8) throw Error('Invalid art receipt')
     if (value.config === null) { if (value.hash !== null) throw Error('Invalid missing receipt') }
-    else { if (!value.hash || !/^[a-f0-9]{64}$/.test(value.hash)) throw Error('Invalid art hash'); const parsed = parseProjectArtSpec(value.config, context.projectId); if (parsed.kind === 'project' && !(parsed.spec.inheritance.mode === 'canon' && parsed.spec.inheritance.usage === undefined)) validateProjectArtBindings(parsed.spec, value.authorities) }
+    else { if (!value.hash || !/^[a-f0-9]{64}$/.test(value.hash)) throw Error('Invalid art hash'); const parsed = parseProjectArtSpec(value.config, context.projectId); if (parsed.kind === 'project' && !(parsed.spec.inheritance.mode === 'canon' && parsed.spec.inheritance.usage === undefined)) validateProjectArtBindings(parsed.spec, value.authorities);if(parsed.kind==='project') {checkResourceDomainIdentity(parsed.spec,context);if(context.resourceDomainId&&parsed.spec.projectSettingsHash!==value.projectSettingsHash)throw Error('资源域设置版本不匹配')} }
     if(value.inheritanceResolution !== undefined) {
       const info=value.inheritanceResolution
       if(!info||typeof info!=='object'||!Array.isArray(info.sources)||info.sources.length>8||Object.keys(info).some(key=>!['state','code','sources'].includes(key))||!info.sources.every(pin=>pin&&typeof pin.path==='string'&&/^P0001\/[A-Za-z0-9_./-]+\.md$/.test(pin.path)&&!pin.path.split('/').includes('..')&&typeof pin.revision==='string'&&/^[a-f0-9]{40}$/.test(pin.revision)))throw Error('Invalid inheritance resolution')
@@ -36,14 +38,14 @@ export function createProjectArtSpecProvider(fetcher: typeof fetch, origin: stri
     const bytes = new Uint8Array(size); let offset = 0; for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length }
     return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes))
   }
-  function route(context: ProjectArtSpecContext) { if (!/^[a-f0-9]{16}$/.test(context.projectId)) throw Error('Invalid project'); return '/api/art-spec/' + context.projectId }
+  function route(context: ProjectArtSpecContext) { if (!/^[a-f0-9]{16}$/.test(context.projectId)) throw Error('Invalid project'); return resourceDomainRoute(context.projectId,context.resourceDomainId) }
   return { label: '工程美术规范', endpoint: endpoint.origin, waitForIdle: async()=>{while(pending.size) await Promise.allSettled([...pending])},
     read: (context, signal) => tracked((async()=>receipt(await request(route(context), signal), context))()),
     save: (context, input, signal) => tracked((async()=>receipt(await request(route(context), signal, input), context))()),
     status: async (context, operationId, signal) => {
       if (!/^art-save-[a-f0-9]{32}$/.test(operationId)) throw Error('Invalid operation')
       const value = await request(route(context) + '/operations/' + operationId, signal) as ProjectArtOperation
-      if (!value || value.schemaVersion !== 'project-art-write-v1' || value.projectId !== context.projectId || artPath(value.projectPath) !== artPath(context.projectPath) || value.operationId !== operationId || !/^[a-f0-9]{64}$/.test(value.bindingHash) || !['pending', 'completed', 'rejected'].includes(value.state)) throw Error('Invalid art status')
+      if (!value || value.resourceDomainId!==context.resourceDomainId || value.schemaVersion !== 'project-art-write-v1' || value.projectId !== context.projectId || artPath(value.projectPath) !== artPath(context.projectPath) || value.operationId !== operationId || !/^[a-f0-9]{64}$/.test(value.bindingHash) || !['pending', 'completed', 'rejected'].includes(value.state)) throw Error('Invalid art status')
       if (value.state === 'completed') value.receipt = receipt(value.receipt, context)
       return value
     },

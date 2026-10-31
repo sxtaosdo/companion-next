@@ -108,3 +108,117 @@ test('a single health read is capped at ten seconds inside the shared 65s startu
   t.mock.timers.tick(1); await assertion;
   assert.equal(signal.aborted, true); assert.equal(starts, 1);
 });
+
+test('a new listener with an old locator permits one changed-credential identity read only', async () => {
+  let starts = 0, discoveries = 0;
+  const requests = [];
+  const result = await startCompanion({ noBrowser: true }, {
+    start: async () => { starts++; throw new StartupError('OFFICIAL_START_UNCONFIRMED', { reason: 'cli-readiness-deadline' }); },
+    discover: async () => {
+      const old = ++discoveries === 1;
+      return { baseUrl: BASE, apiToken: old ? 'old-test-token' : 'current-test-token', request: async (method, path, body, signal) => {
+        requests.push([method, path]); assert.equal(body, undefined); assert(signal instanceof AbortSignal);
+        if (old) throw Object.assign(Error('private old credential'), { status: 403 });
+        return status(42);
+      } };
+    },
+    createBrowser: () => assert.fail('no browser or ticket'),
+  });
+  assert.equal(starts, 1); assert.equal(discoveries, 2); assert.equal(result.pid, 42);
+  assert.deepEqual(requests, [['GET', '/v1/daemon/inflight'], ['GET', '/v1/daemon/inflight']]);
+});
+
+test('unchanged, missing and explicit fixed credentials never replay a rejected identity read', async () => {
+  for (const apiToken of ['fixed-test-token', undefined, '']) {
+    let discoveries = 0, reads = 0;
+    await assert.rejects(startCompanion({ noBrowser: true }, {
+      start: async () => {},
+      discover: async () => { discoveries++; return { baseUrl: BASE, apiToken, request: async () => { reads++; throw Object.assign(Error('private denial'), { status: 403 }); } }; },
+    }), failure => failure.code === 'DAEMON_AUTH_REJECTED');
+    assert.equal(reads, 1); assert(discoveries <= 2);
+  }
+});
+
+test('changed credentials cannot bypass a current rejection, foreign locator or launched PID mismatch', async () => {
+  for (const outcome of ['denied', 'foreign', 'pid-mismatch']) {
+    let discoveries = 0, reads = 0;
+    await assert.rejects(startCompanion({ noBrowser: true }, {
+      start: async () => ({ confirmed: true, pid: 42 }),
+      discover: async () => {
+        const old = ++discoveries === 1;
+        return { baseUrl: !old && outcome === 'foreign' ? 'http://127.0.0.1:32181' : BASE, apiToken: old ? 'old-test-token' : 'current-test-token', request: async () => {
+          reads++;
+          if (old || outcome === 'denied') throw Object.assign(Error('private denial'), { status: 403 });
+          return status(43);
+        } };
+      },
+    }), failure => failure.code === ({ denied: 'DAEMON_AUTH_REJECTED', foreign: 'UNEXPECTED_DAEMON_URL', 'pid-mismatch': 'DAEMON_START_IDENTITY_CHANGED' })[outcome]);
+    assert.equal(discoveries, 2); assert.equal(reads, outcome === 'foreign' ? 1 : 2);
+  }
+});
+
+test('a changed token permits the same bounded recovery for 401 and failed rediscovery stays terminal', async () => {
+  for (const unavailable of [false, true]) {
+    let discoveries = 0, reads = 0;
+    const pending = startCompanion({ noBrowser: true }, {
+      start: async () => {},
+      discover: async () => {
+        const old = ++discoveries === 1;
+        if (!old && unavailable) throw missing();
+        return { baseUrl: BASE, apiToken: old ? 'old-test-token' : 'current-test-token', request: async () => {
+          reads++; if (old) throw Object.assign(Error('private credential'), { status: 401 }); return status(42);
+        } };
+      },
+    });
+    if (unavailable) await assert.rejects(pending, failure => failure.code === 'DAEMON_AUTH_REJECTED' && failure.reason === 'credential-refresh-unconfirmed');
+    else assert.equal((await pending).pid, 42);
+    assert.equal(discoveries, 2); assert.equal(reads, unavailable ? 1 : 2);
+  }
+});
+
+test('auth rediscovery is allowed only once across transient generation observations', async () => {
+  let discoveries = 0, reads = 0;
+  await assert.rejects(startCompanion({ noBrowser: true }, {
+    start: async () => {},
+    discover: async () => ({ baseUrl: BASE, apiToken: 'test-token-' + ++discoveries, request: async () => {
+      reads++; if (reads === 2) throw race(); throw Object.assign(Error('denied'), { status: 403 });
+    } }),
+    readiness: { pollMs: 1 },
+  }), failure => failure.code === 'DAEMON_AUTH_REJECTED');
+  assert.equal(discoveries, 3); assert.equal(reads, 3);
+});
+
+test('credential rediscovery uses the existing health timer and cannot allocate another read budget', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let discoveries = 0, signal;
+  const pending = startCompanion({ noBrowser: true }, {
+    start: async () => {},
+    discover: async () => {
+      if (++discoveries === 2) return new Promise(() => {});
+      return { baseUrl: BASE, apiToken: 'old-test-token', request: async (_m, _p, _b, activeSignal) => {
+        signal = activeSignal; throw Object.assign(Error('denied'), { status: 403 });
+      } };
+    },
+  });
+  const assertion = assert.rejects(pending, failure => failure.code === 'DAEMON_READINESS_UNCONFIRMED' && failure.stage === 'discovery');
+  for (let i = 0; i < 12; i++) await Promise.resolve();
+  assert.equal(discoveries, 2); assert.equal(signal.aborted, false);
+  t.mock.timers.tick(10_000); await assertion;
+  assert.equal(signal.aborted, true); assert.equal(discoveries, 2);
+});
+
+test('credential rediscovery cannot issue health after the shared startup deadline', async () => {
+  let now = 0, discoveries = 0, reads = 0;
+  await assert.rejects(startCompanion({ noBrowser: true }, {
+    start: async () => { now = 64_000; },
+    discover: async () => {
+      const old = ++discoveries === 1;
+      if (!old) now = 65_000;
+      return { baseUrl: BASE, apiToken: old ? 'old-test-token' : 'current-test-token', request: async () => {
+        reads++; throw Object.assign(Error('denied'), { status: 403 });
+      } };
+    },
+    readiness: { now: () => now },
+  }), failure => failure.code === 'DAEMON_READINESS_UNCONFIRMED' && failure.reason === 'deadline');
+  assert.equal(discoveries, 2); assert.equal(reads, 1);
+});

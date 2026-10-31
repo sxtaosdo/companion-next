@@ -3,15 +3,17 @@ import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
 import { decodeAiJobSnapshot, verifyAiJobPreview } from '../domain/ai-jobs-read'
 import type { AiJobPreview, AiJobSnapshot, AiJobsReadProvider } from '../domain/ai-jobs-read'
+import { ANT_TOOLBAR_PROJECT } from '../domain/ant-toolbar-scope'
 import { isAiProjectId } from '../domain/ai-resource-read'
 import { AiJobActionError, aiJobActionAllowed, aiJobActionCanonical, aiJobActionIdentityMatches, aiVariantDestination, validateAiJobActionResult, validateAiJobActionSubmission } from '../domain/ai-job-actions'
 import type { AiJobAction, AiJobActionSubmission, AiJobActionsProvider, AiJobVariantReceipt } from '../domain/ai-job-actions'
-import { AiWriteCoordinationError, aiWriteCoordinator, getAiWriteFenceStorage, hasPendingAiWrites, putAiWriteFence, readAiWriteFences, removeAiWriteFence } from '../domain/ai-write-coordination'
+import { AiWriteCoordinationError, aiWriteCoordinator, getAiWriteFenceStorage, hasPendingAiWrites, putAiWriteFence, readAiWriteFences, removeAiWriteFence, recordAiWriteOperationId } from '../domain/ai-write-coordination'
 import type { AiWriteCoordinator, AiWriteFence, AiWriteFenceStorage } from '../domain/ai-write-coordination'
 import { useProjectOperationLaneStore } from './project-operation-lane'
 import type { AiJobsProject } from './ai-jobs-read'
 
 export interface AiJobActionReadback { snapshot: AiJobSnapshot; project: AiJobsProject; source: object; reader: AiJobsReadProvider }
+export interface AiVariantImportVerification { projectId: string; jobId: string; requestHash: string; sourceRevision: string; operationId: string; revision: number; artifact: NonNullable<NonNullable<AiJobSnapshot['variantImport']>['artifact']> }
 interface Binding { project: AiJobsProject; source: object; reader: AiJobsReadProvider; provider: AiJobActionsProvider | null; job: AiJobSnapshot; offlineOnly: boolean | undefined }
 export interface AiJobActionConfirmation { operation: AiJobAction; project: AiJobsProject; submission: AiJobActionSubmission; needsUpscale: boolean }
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
@@ -20,16 +22,20 @@ const projectMatches = (a: AiJobsProject, b: AiJobsProject) => aiJobActionCanoni
 const unknown = '本次操作结果未知，可能已经执行。保护记录会保留；只核对同一个原任务，不重复提交。'
 const dispatch = '原后台已接受派发；返回的是执行前快照，不代表生成或导入完成。'
 const pendingMessage = '此工程有尚未核对的写操作。请刷新原任务；未知尺寸导出不能靠任务状态解除，需在原工程核对。'
+function variantMatchesFence(artifact: NonNullable<NonNullable<AiJobSnapshot['variantImport']>['artifact']> | undefined, fence: AiWriteFence): boolean {
+  const saved = fence.variant
+  return !!artifact && !!saved && artifact.candidateId === saved.candidateId && artifact.width === saved.width && artifact.height === saved.height && artifact.fileSha256 === saved.fileSha256 && artifact.receiptSha256 === saved.receiptSha256 && artifact.destinationUrl === saved.destinationUrl
+}
 const contextChanged = '工程、来源、任务版本或提供者已变化，本次确认已撤销。'
 function validProject(project: AiJobsProject): boolean { return isAiProjectId(project.id) && typeof project.name === 'string' && project.name.length <= 512 && typeof project.path === 'string'
   && project.path.length > 0 && project.path.length <= 4096 && !/[\u0000-\u001f\u007f]/.test(project.name + project.path) }
 /** State is per mounted panel; persistent unknown fences and the cross-tab lock are shared. */
-export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage; coordinator?: AiWriteCoordinator } = {}) {
+export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage; coordinator?: AiWriteCoordinator; acceptVerifiedReadback?: (payload: AiJobActionReadback) => boolean } = {}) {
   const lane = useProjectOperationLaneStore(), coordinator = options.coordinator ?? aiWriteCoordinator
   const binding = shallowRef<Binding | null>(null), confirmation = shallowRef<AiJobActionConfirmation | null>(null)
   const confirmed = ref(false), upscaleConfirmed = ref(false), selectedIds = ref<string[]>([]), previewed = shallowRef<Record<string, string>>({})
   const busy = ref(false), refreshing = ref(false), phase = ref('idle'), message = ref(''), storageBlocked = ref(false), hasPending = ref(false)
-  const readback = shallowRef<AiJobActionReadback | null>(null), variantReceipt = shallowRef<AiJobVariantReceipt | null>(null)
+  const readback = shallowRef<AiJobActionReadback | null>(null), variantReceipt = shallowRef<AiJobVariantReceipt | null>(null), variantVerification = shallowRef<AiVariantImportVerification | null>(null)
   const observed = shallowRef<AiJobSnapshot | null>(null), readDrainBlocked = ref(false)
   const drainAvailable = computed(() => !!binding.value && typeof binding.value.reader.waitForIdle === 'function' && typeof binding.value.provider?.waitForIdle === 'function')
   let epoch = 0, previewEpoch = 0, scopeEpoch = 0, dispatchStarted = false, controller: AbortController | undefined, refreshController: AbortController | undefined
@@ -56,7 +62,7 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
     const previous = binding.value
     if (previous && next && projectMatches(previous.project, next.project) && previous.source === next.source && previous.reader === next.reader && previous.provider === next.provider
       && previous.offlineOnly === next.offlineOnly && aiJobActionCanonical(previous.job) === aiJobActionCanonical(next.job)) { updatePending(); return }
-    epoch++; previewEpoch++; clearApproval(); selectedIds.value = []; previewed.value = {}; observed.value = null; variantReceipt.value = null; readback.value = null
+    epoch++; previewEpoch++; clearApproval(); selectedIds.value = []; previewed.value = {}; observed.value = null; variantReceipt.value = null; variantVerification.value = null; readback.value = null
     refreshController?.abort(); refreshController = undefined; refreshing.value = false
     binding.value = next; readDrainBlocked.value = false; updatePending()
     if (!busy.value) { phase.value = next ? 'idle' : 'invalidated'; if (!storageBlocked.value) message.value = previous ? contextChanged : '' }
@@ -144,7 +150,7 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
       // Only this authenticated, fully scoped observation proves the old strict facade rejected before Creator dispatch.
       // It is not a fabricated import receipt or a claim that a server lease was released.
       const observation = snapshot.variantDispatchObservation, scope = observation?.binding
-      if (fence.operation === 'import-variant' && fence.variant && scope && snapshot.revision === fence.revision
+      if (fence.operation === 'import-variant' && !fence.operationId && fence.variant && scope && snapshot.revision === fence.revision
         && scope.projectId === fence.projectId && scope.jobId === fence.jobId && scope.revision === fence.revision
         && scope.requestHash === fence.requestHash && scope.sourceRevision === fence.sourceRevision
         && scope.candidateId === fence.variant.candidateId && scope.width === fence.variant.width && scope.height === fence.variant.height
@@ -159,6 +165,9 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
       if (fence.operation === 'import' && !(snapshot.state === 'imported_pending_verification' && snapshot.import?.state === 'imported_pending_verification' && snapshot.import.effectApplied === true && snapshot.import.leaseState === 'RELEASED')) continue
       if (fence.operation === 'import-variant') {
         const imported = snapshot.variantImport, artifact = imported?.artifact
+        if (snapshot.projectId === ANT_TOOLBAR_PROJECT && snapshot.assets.some(asset => asset.assetId === 'ant-bottom-slot-v01')
+          && (!variantVerification.value || variantVerification.value.operationId !== imported?.operationId || variantVerification.value.jobId !== snapshot.jobId || variantVerification.value.requestHash !== snapshot.requestHash || variantVerification.value.sourceRevision !== snapshot.sourceRevision || variantVerification.value.revision !== snapshot.revision || aiJobActionCanonical(variantVerification.value.artifact) !== aiJobActionCanonical(artifact))) continue
+        if (fence.operationId && fence.operationId !== imported?.operationId) continue
         if (!fence.variant || !imported || imported.active || imported.state !== 'imported_pending_verification' || imported.effectApplied !== true || imported.leaseState !== 'RELEASED' || !artifact
           || artifact.candidateId !== fence.variant.candidateId || artifact.width !== fence.variant.width || artifact.height !== fence.variant.height
           || artifact.fileSha256 !== fence.variant.fileSha256 || artifact.receiptSha256 !== fence.variant.receiptSha256 || artifact.destinationUrl !== fence.variant.destinationUrl) continue
@@ -218,6 +227,51 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
     } finally { if (epoch === token) { refreshing.value = false; refreshController = undefined } }
   }
   function refreshStatus(): Promise<boolean> { return refreshStatusInternal() }
+  async function inspectVariantImport(): Promise<boolean> {
+    const target = binding.value, token = epoch
+    if (!target || target.project.id !== ANT_TOOLBAR_PROJECT || !target.job.assets.some(asset => asset.assetId === 'ant-bottom-slot-v01') || !target.reader.queryVariantImport || !target.reader.waitForIdle || busy.value || refreshing.value || lane.locked) return false
+    const lease = lane.acquire('只读核对原尺寸导入'); if (!lease) return false
+    refreshing.value = true; variantVerification.value = null
+    const current = () => binding.value === target && epoch === token
+    const signal = new AbortController(); refreshController = signal
+    try {
+      const locked = await coordinator.run(async () => {
+        try {
+          const first = freeze(decodeAiJobSnapshot(await target.reader.readStatus(target.project.id, target.job.jobId, signal.signal), target.project.id, target.job.jobId))
+          await verifyAiResourceSnapshotIntegrity(first.resourceSnapshot)
+          if (!current() || first.historyOnly || !aiJobActionIdentityMatches(first, target.job) || first.revision < target.job.revision) throw Error('task changed')
+          const fences = readAiWriteFences(getStorage()).filter(f => f.operation === 'import-variant' && f.projectId === first.projectId && f.jobId === first.jobId)
+          if (fences.length > 1 || fences.some(f => f.requestHash !== first.requestHash || f.sourceRevision !== first.sourceRevision)) throw Error('unmatched requests')
+          const fence = fences[0], fromStatus = first.variantImport?.operationId, operationId = fence?.operationId ?? fromStatus
+          if (!operationId || fromStatus && fromStatus !== operationId) { message.value = '尚未取得一致的原导入操作 ID；保留保护，不重发。'; return false }
+          if (fence && !fence.operationId) {
+            if (!fromStatus || first.revision <= fence.revision || !variantMatchesFence(first.variantImport?.artifact, fence)) { message.value = '原任务尚未提供与保留范围一致的导入证据；保留保护，不猜测操作 ID。'; return false }
+            recordAiWriteOperationId(getStorage(), fence.key, operationId)
+          }
+          const observation = await target.reader.queryVariantImport!(target.project.id, target.job.jobId, operationId, signal.signal)
+          if (!current() || observation.operationId !== operationId) throw Error('operation changed')
+          if (observation.state !== 'imported_pending_verification' || observation.effectApplied !== true || observation.leaseState !== 'RELEASED') { message.value = '原导入仍未确认或租约未释放；保留原操作，不重发。'; return false }
+          const latest = freeze(decodeAiJobSnapshot(await target.reader.readStatus(target.project.id, target.job.jobId, signal.signal), target.project.id, target.job.jobId))
+          await verifyAiResourceSnapshotIntegrity(latest.resourceSnapshot)
+          await target.reader.waitForIdle!()
+          const imported = latest.variantImport, artifact = imported?.artifact
+          if (!current() || latest.historyOnly || !aiJobActionIdentityMatches(latest, target.job) || latest.revision < first.revision || !imported || imported.operationId !== operationId || imported.active || imported.state !== 'imported_pending_verification' || imported.effectApplied !== true || imported.leaseState !== 'RELEASED' || !artifact) { message.value = '导入器已返回结果，但原任务回读尚未确认同一导入；保留保护。'; return false }
+          if (fence && (latest.revision <= fence.revision || !variantMatchesFence(artifact, fence))) { message.value = '原任务回执与保留的导入范围不一致，保护记录保留。'; return false }
+          const verification: AiVariantImportVerification = { projectId: latest.projectId, jobId: latest.jobId, requestHash: latest.requestHash, sourceRevision: latest.sourceRevision, operationId, revision: latest.revision, artifact }
+          const payload: AiJobActionReadback = { snapshot: latest, project: target.project, source: target.source, reader: target.reader }
+          if (!options.acceptVerifiedReadback?.(payload) || !current()) { message.value = '原任务界面未能接收回读，保护记录保留；请重新核对。'; return false }
+          variantVerification.value = verification
+          reconcileLocked(target, latest); updatePending()
+          message.value = '已核对同一原导入与任务回执；场景绑定和运行验收仍需单独确认。'
+          return true
+        } catch { if (current()) message.value = '原导入核对未完成或身份不一致；保留原操作，不重发。'; return false }
+        finally { try { await target.reader.waitForIdle!() } catch { if (current()) { readDrainBlocked.value = true; message.value = '读取清理未确认，原操作保护继续保留。' }; await new Promise<never>(() => undefined) } }
+      })
+      if (!locked.acquired && current()) message.value = '另一个标签页正在处理原操作，保护记录保留。'
+      return locked.acquired && locked.value
+    } catch { if (current()) storageFailure(); return false }
+    finally { if (current()) { refreshing.value = false; refreshController = undefined }; lane.release(lease) }
+  }
   async function execute(): Promise<boolean> {
     if (!canExecute.value || !binding.value || !confirmation.value) return false
     const target = binding.value, approved = confirmation.value, provider = target.provider!, token = epoch, approvedScope = scopeEpoch
@@ -253,6 +307,7 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
           if (!current() || abort.signal.aborted || approvedScope !== scopeEpoch) { removeAiWriteFence(getStorage(), fence.key); return false }
           sent = true; dispatchStarted = true
           const result = validateAiJobActionResult(await provider.execute(target.project.id, base, abort.signal), target.project.id, base)
+          if (result.kind === 'dispatch' && base.operation === 'import-variant' && result.operationId) recordAiWriteOperationId(getStorage(), fence.key, result.operationId)
           if (result.kind === 'variant') {
             clearFenceAfterDrain = true
             if (current()) { variantReceipt.value = freeze(result.receipt); phase.value = 'variant'; message.value = '已核对本次尺寸 PNG 回执；这是 CPU 派生文件，未导入 Creator，也未完成运行验收。' }
@@ -290,7 +345,7 @@ export function createAiJobActionsState(options: { storage?: AiWriteFenceStorage
     } finally { busy.value = false; dispatchStarted = false; controller = undefined; lane.release(lease); updatePending() }
     return success
   }
-  return { job, confirmation, confirmed, upscaleConfirmed, selectedIds, previewed, busy, refreshing, phase, message, storageBlocked, hasPending, observed, readback, variantReceipt,
-    generationEnabled, drainAvailable, readDrainBlocked, canExecute, setContext, leave, recordPreview, setSelectedIds, allowed, prepare, setConfirmed, setUpscaleConfirmed, cancelConfirmation, revokePendingScope, cancelWait, refreshStatus, execute }
+  return { job, confirmation, confirmed, upscaleConfirmed, selectedIds, previewed, busy, refreshing, phase, message, storageBlocked, hasPending, observed, readback, variantReceipt, variantVerification,
+    generationEnabled, drainAvailable, readDrainBlocked, canExecute, setContext, leave, recordPreview, setSelectedIds, allowed, prepare, setConfirmed, setUpscaleConfirmed, cancelConfirmation, revokePendingScope, cancelWait, refreshStatus, inspectVariantImport, execute }
 }
 export const useAiJobActionsStore = defineStore('ai-job-actions', () => createAiJobActionsState())

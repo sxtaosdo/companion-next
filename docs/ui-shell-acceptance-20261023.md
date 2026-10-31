@@ -82,3 +82,20 @@
 - ant-cook与e2e的规范读取实际HTTP200并返回unlinked/NO_PROJECT_ASSOCIATION；前者尚无规范，后者已有规范。没有把空来源视为明确排除，没有自动关联P0001。明确不适用及已继承分支以可信metadata单元合同验证，不伪称现场已有该映射。
 - 证据 `art-four-steps-20261023/{live-state,live-render,live-new-draft-render,live-inheritance,http-hashes,front-tests,shell-tests,host-tests}.json`；备份before-installed、before-data与deployment-plan。SQLite在线备份integrity_check=ok，无迁移或清历史；恢复需正常停同一服务后按原哈希恢复精确文件，保留后续新改动。
 - 未实施新需求表/规格模板、UI人物或3D模型生成、参考图入模；未运行Creator/GPU或读取密码，未重启Windows/新增后台/上传截图。后续原型必须标示模拟，不写本次真实业务库。
+
+
+## 2026-10-23 ant-cook 通用风格关联与显示恢复后验收
+
+本批实际运行前端 **1.3.190**（构建 `7ba31b7b+working`），后端 **0.3.150**（源码 `2d8850847bc8ffe7ff6b7fa28c52d0353829a7e8`，构建 `2d8850847bc8-acf62be6ff47`）。同一 loopback32180 正常停止旧PID10476，确认退出与端口释放后安装12产物，通过原 `npm start -- --no-browser` 启动PID20668/OPEN。原包装器先返回LOCAL_START_FAILED，但首次启动的宿主随后就绪；没有重复启动。9工程与原认证18001保留，未重启Windows、注销用户或清历史。
+
+根因：宿主原先只映射旧cook与colony，且将通用绘制风格局限于ip/shared-concept。新增独立 `inheritance.mode=style / usage=project-art`，仅接受art-style权威；旧canon模式仍要求Canon Interface、原用途和依赖，宿主持久化禁止继承模式降级。ant-cook产品适用声明见 [共享宿主声明](../../cocos-mcp/mcp/docs/ant-cook-art-style-binding.md)，不修改P0001权威、不导入兔子等人物身份或Runtime替换权。新建草稿按真实风格来源初始化，旧规范/旧草稿不自动迁移。
+
+当前ant-cook工程 `04c4cde24ee76d83` 实际GET `/api/art-spec/04c4cde24ee76d83` 为200：`inheritanceResolution.state=available`、`code=REVIEWED_SOURCES_AVAILABLE`，仅关联`P0001/art/master-style-reference.md@d1bc46ef3696e8254377d7b655bd006ff3633c45`；类别五项，允许用途仅project-art。三份Accepted来源接口返回真实hash：Canon入口980cdfa67a89c6bf53a1f62d98e57dd54a3fd4052315fba946e900763db140ef；食堂运输接口39cf2ac08145a69feea3ae7f497df01ad2b431e7f13bcf59f2f8a532f3e42a7c；主风格378f370107e2b0d31af2764f9ad79654b9aab3ce0ef1c503198a2d355452f30f。六项风格值锁定，项目不能用任意色彩/写实/材质覆写。主色青绿/橙/白等关系来自权威文档，低成本运行时布光不被误解为必须实时GI。
+
+验证：新增纯style回归先复现8项失败；修复后Next定向120+5项、宿主34项通过，前后端完整类型与构建通过。宿主验证包含临时文件真实保存/重读、style与人物隔离、旧canon缺usage不能降级成style、来源/hash变化拒绝、无来源和旧映射兼容。未放宽来源完整性校验；旧测试夹具补齐真实Canon入口，未认证401与外域Origin403分别断言。6份实际HTTP静态hash匹配，4份既有规范/旧配置hash保持。
+
+显示异常期间暂停界面测试。用户确认显示恢复后，仅用同一32180隔离headless页面恢复轻量检查：实际190页面22项点击通过，无接口模拟、0写请求、0JS错误；覆盖四步左竖流程、必填门控、readonly项目/引擎、默认目录assets/art与art/final、真实来源默认选中、六项锁定/无无关人物入口、分类可跳过、返回保留内容、关闭重开保留草稿、关闭不误保存。实际渲染本地截图已查看，不上传。ant-cook最终仍config=null/hash=null，未执行真实保存。
+
+边界：临时目录持久化测试不是ant-cook保存验收；本轮不生成、不操作Creator。参考图实际入模仍未接通，requiresImageReference保持true，生成仍正确阻断；UI/人物/3D模型生产没有因此新增。规格表/需求表仍是独立模拟原型，不接生产。
+
+证据与回退：`C:/Users/33272/Documents/Codex/2026-10-17/task/p0001-style-binding-20261023/` 内含before-data（SQLite在线备份integrity_check=ok）、before-installed、deployment-plan/stop-receipt/installed-hashes、next-tests/host-tests、association-before/after/final、http-hashes、project-spec-preservation及live-new-draft-render。只在同一宿主正常停止后按清单核对hash恢复原对应文件；保留后续用户变更，旧hash静态资源保留，不迁移或删除项目、历史和会话。

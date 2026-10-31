@@ -1,3 +1,4 @@
+import {sameResourceDomain} from '../domain/art-resource-domains'
 import type { AiResourceConfigV2 } from '../domain/ai-resource-read'
 import { computed, ref, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
@@ -6,8 +7,8 @@ import { artBindingHash, artCanonical, artPath, artPendingRevision, pendingArtWr
 import { ProjectArtSpecWriteError, type ArtInheritanceResolution, type ProjectArtSpecContext, type ProjectArtSpecProvider, type ProjectArtSpecReceipt } from '../project-art-spec-integration'
 const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
 function canonical(value: unknown): string { if (value === null || typeof value !== 'object') return JSON.stringify(value); if (Array.isArray(value)) return '[' + value.map(canonical).join(',') + ']'; return '{' + Object.keys(value).sort().map(key => JSON.stringify(key) + ':' + canonical((value as Record<string, unknown>)[key])).join(',') + '}' }
-function same(a: ProjectArtSpecContext | null, b: ProjectArtSpecContext | null) { return !!a && !!b && a.projectId === b.projectId && a.projectPath === b.projectPath && a.source === b.source }
-export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () => {
+function same(a: ProjectArtSpecContext | null, b: ProjectArtSpecContext | null) { return !!a && !!b && a.projectId === b.projectId && a.projectPath === b.projectPath && a.source === b.source && sameResourceDomain(a,b) && a.readOnly===b.readOnly }
+function projectArtSpecSetup() {
   const context = shallowRef<ProjectArtSpecContext | null>(null), provider = shallowRef<ProjectArtSpecProvider | null>(null)
   const draft = ref<ProjectArtSpec | null>(null), base = ref<ProjectArtSpec | null>(null), hash = ref<string | null | undefined>(undefined)
   let legacyConfig: AiResourceConfigV2 | null = null
@@ -17,7 +18,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
   const phase = ref<'idle' | 'reading' | 'editing' | 'saving' | 'saved' | 'unknown' | 'error'>('idle'), message = ref(''), confirmed = ref(false), pending = ref(false)
   const retained = shallowRef<{ context: ProjectArtSpecContext; draft: ProjectArtSpec } | null>(null)
   const retainedDrafts = new WeakMap<object, Map<string, { context: ProjectArtSpecContext; draft: ProjectArtSpec }>>()
-  const draftKey = (value: ProjectArtSpecContext) => JSON.stringify([value.projectId, value.projectPath])
+  const draftKey = (value: ProjectArtSpecContext) => JSON.stringify([value.projectId, value.projectPath,value.resourceDomainId??null])
   function retainDraft() {
     if (!dirty.value || !context.value || !draft.value) return
     const value = { context: context.value, draft: copy(draft.value) }
@@ -26,6 +27,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
     entries.set(draftKey(context.value), value); retained.value = value
   }
   let epoch = 0, controller: AbortController | null = null
+  const parentTemplate=ref<ProjectArtSpec|null>(null),projectSettingsHash=ref<string|null>(null)
   const observedPath = ref<string | null>(null)
   const blocked = computed(() => {
     void artPendingRevision.value
@@ -43,25 +45,25 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
     catch (error) { return [error instanceof ArtSpecError ? `${error.code} · ${error.field}` : '美术规范字段无效'] }
   })
   const dirty = computed(() => !!draft.value && canonical(draft.value) !== canonical(base.value))
-  const canSave = computed(() => !!context.value && !!provider.value && !!draft.value && hash.value !== undefined && !errors.value.length && !pending.value && !blocked.value && confirmed.value && dirty.value)
+  const canSave = computed(() => !!context.value && !context.value.readOnly && !!provider.value && !!draft.value && hash.value !== undefined && !errors.value.length && !pending.value && !blocked.value && confirmed.value && dirty.value)
   function bind(next: ProjectArtSpecContext | null, writer: ProjectArtSpecProvider | null) {
     if (same(context.value, next) && provider.value === writer) return
     retainDraft()
     epoch++; controller?.abort(); pending.value = false; confirmed.value = false
     context.value = next; retained.value = next ? retainedDrafts.get(next.source)?.get(draftKey(next)) ?? null : null; provider.value = writer; draft.value = null; base.value = null; hash.value = undefined; authorities.value = []
-    observedPath.value = null; inheritanceResolution.value = null; legacyVersion.value = null; legacyConfig = null
+    parentTemplate.value=null;projectSettingsHash.value=null;observedPath.value = null; inheritanceResolution.value = null; legacyVersion.value = null; legacyConfig = null
     phase.value = blocked.value ? 'unknown' : 'idle'
     message.value = phase.value === 'unknown' ? '此工程保存结果未知；请回读核对，不能重复保存。' : ''
   }
   function checkedReceipt(raw: ProjectArtSpecReceipt, captured: ProjectArtSpecContext) {
-    if (!raw || raw.projectId !== captured.projectId || artPath(raw.projectPath) !== artPath(captured.projectPath) || !Array.isArray(raw.authorities) || raw.authorities.length > 8) throw Error('invalid receipt')
+    if (!raw || !sameResourceDomain(raw,captured)||raw.projectId !== captured.projectId || artPath(raw.projectPath) !== artPath(captured.projectPath) || !Array.isArray(raw.authorities) || raw.authorities.length > 8) throw Error('invalid receipt')
     if (raw.inheritanceResolution !== undefined) {
       const resolution = raw.inheritanceResolution
       if (!resolution || !['unlinked', 'not-applicable', 'available'].includes(resolution.state) || !['NO_PROJECT_ASSOCIATION', 'EXPLICIT_NOT_APPLICABLE', 'REVIEWED_SOURCES_AVAILABLE'].includes(resolution.code) || !Array.isArray(resolution.sources) || resolution.sources.length > 8 || resolution.sources.some(pin => !pin || typeof pin.path !== 'string' || !pin.path.startsWith('P0001/') || typeof pin.revision !== 'string' || !/^[a-f0-9]{40}$/.test(pin.revision))) throw Error('invalid inheritance receipt')
     }
     if (raw.config === null) { if (raw.hash !== null) throw Error('invalid missing receipt'); return null }
     if (typeof raw.hash !== 'string' || !/^[a-f0-9]{64}$/.test(raw.hash)) throw Error('invalid receipt hash')
-    return parseProjectArtSpec(raw.config, captured.projectId)
+    const parsed=parseProjectArtSpec(raw.config, captured.projectId);if(parsed.kind==='project'&&(!sameResourceDomain(parsed.spec,captured)||captured.resourceDomainId&&parsed.spec.projectSettingsHash!==raw.projectSettingsHash))throw Error('资源域规范内容不匹配');return parsed
   }
   async function read() {
     const captured = context.value, reader = provider.value, revision = epoch
@@ -75,6 +77,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
       const receipt = await reader.read(captured, signal), parsed = checkedReceipt(receipt, captured)
       if (signal.aborted || revision !== epoch || provider.value !== reader || !same(context.value, captured)) return
       if (dirty.value && draft.value) retained.value = { context: captured, draft: copy(draft.value) }
+      if(captured.resourceDomainId){if(!/^[a-f0-9]{64}$/.test(receipt.projectSettingsHash??'')||!receipt.parent)throw Error('缺少工程技术继承');const parent=parseProjectArtSpec(receipt.parent.config,captured.projectId);if(parent.kind!=='project')throw Error('无效工程技术继承');parentTemplate.value=copy(parent.spec);projectSettingsHash.value=receipt.projectSettingsHash!}
       observedPath.value = receipt.projectPath; hash.value = receipt.hash; authorities.value = copy(receipt.authorities); inheritanceResolution.value = copy(receipt.inheritanceResolution ?? null)
       legacyConfig = parsed?.kind === 'legacy-v2' ? copy(parsed.config) : null
       legacyVersion.value = legacyConfig?.version ?? null
@@ -85,7 +88,8 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
     finally { clearTimeout(timer); if (revision === epoch) pending.value = false }
   }
   function startDraft(name: string) {
-    if (!context.value || pending.value || blocked.value || draft.value) return
+    if (!context.value || context.value.readOnly || pending.value || blocked.value || draft.value) return
+    if(context.value.resourceDomainId){if(!parentTemplate.value||!projectSettingsHash.value){message.value='请先读取当前资源域及工程技术继承。';return}const parent=parentTemplate.value;draft.value={schemaVersion:'project-art-spec-v1',projectId:context.value.projectId,resourceDomainId:context.value.resourceDomainId,projectSettingsHash:projectSettingsHash.value,version:1,project:copy(parent.project),...(parent.imageOutput?{imageOutput:parent.imageOutput}:{}),inheritance:copy(parent.inheritance),overrides:{},categories:{}};phase.value='editing';message.value='资源域草稿尚未保存；工程技术只读继承，目录尚未配置。';return}
     // Explicit local candidate; undefined hash still prevents saving until a real read confirms missing.
     draft.value = { schemaVersion: 'project-art-spec-v1', projectId: context.value.projectId, version: 1,
       project: { name, content: '', engine: 'cocos-creator', designResolution: legacyConfig ? { ...legacyConfig.designResolution } : { width: 0, height: 0 } },
@@ -124,7 +128,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
       if (!record || record.bindingHash !== await artBindingHash(record.projectId, record.projectPath, record.input)) throw Error('invalid frozen binding')
       const state = await writer.status({ ...captured, projectPath: record.projectPath }, record.input.operationId, signal)
       if (signal.aborted || revision !== epoch || writer !== provider.value || !same(context.value, captured)) return
-      if (state.projectId !== record.projectId || artPath(state.projectPath) !== artPath(record.projectPath) || state.operationId !== record.input.operationId || state.bindingHash !== record.bindingHash) throw Error('foreign operation')
+      if (state.resourceDomainId!==captured.resourceDomainId || state.projectId !== record.projectId || artPath(state.projectPath) !== artPath(record.projectPath) || state.operationId !== record.input.operationId || state.bindingHash !== record.bindingHash) throw Error('foreign operation')
       if (state.state === 'pending') { message.value = '原保存仍待确认；不会重新发送。'; return }
       if (state.state === 'rejected') { clearPendingArtWrite(captured, writer, record); hash.value = undefined; phase.value = 'error'; message.value = '原保存已明确拒绝，请重新读取工程再编辑。'; return }
       if (state.state !== 'completed' || !state.receipt) throw Error('unconfirmed original receipt')
@@ -156,5 +160,7 @@ export const useProjectArtSpecStore = defineStore('project-art-spec-editor', () 
     } finally { clearTimeout(timer); if (revision === epoch) pending.value = false }
   }
   function leave() { epoch++; controller?.abort(); pending.value = false; confirmed.value = false; if (phase.value === 'saving') { phase.value = 'unknown'; message.value = '保存结果未知，保护保留。' } else if (phase.value === 'reading') phase.value = 'idle'; retainDraft() }
-  return { inheritanceResolution, context, provider, draft, base, legacyVersion, hash, authorities, phase, message, confirmed, pending, retained, blocked, dirty, errors, canSave, bind, read, startDraft, setValue, touch, restoreRetained, save, recover, leave }
-})
+  return { parentTemplate,projectSettingsHash,inheritanceResolution, context, provider, draft, base, legacyVersion, hash, authorities, phase, message, confirmed, pending, retained, blocked, dirty, errors, canSave, bind, read, startDraft, setValue, touch, restoreRetained, save, recover, leave }
+}
+export const useProjectArtSpecStore=defineStore('project-art-spec-editor',projectArtSpecSetup)
+export const useResourceDomainArtSpecStore=defineStore('resource-domain-art-spec-editor',projectArtSpecSetup)

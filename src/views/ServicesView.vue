@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { sortProjectsByRecentOpen } from '../domain/recent-projects'
 import { computed, nextTick, onActivated, onBeforeUnmount, onDeactivated, onMounted, watch } from 'vue'
 import ProjectStatusTag from '../components/ProjectStatusTag.vue'
 import { Loading, CircleCheck, CircleClose, Link, Minus, QuestionFilled, Warning, Connection, Refresh, Lock } from '@element-plus/icons-vue'
@@ -39,7 +40,7 @@ function label(state: string) { return ({ unknown: '未验证', available: '可�
 function tagType(state: string): 'info' | 'success' | 'danger' | 'warning' { return ({ available: 'success', unavailable: 'danger', degraded: 'warning' })[state] as 'success' | 'danger' | 'warning' || 'info' }
 const projectRows = computed(() => {
   const runtimes = new Map(status.projects?.statuses.map(item => [item.projectId, item]))
-  return (status.projects?.projects ?? []).map(project => ({ project, runtime: runtimes.get(project.id) }))
+  return sortProjectsByRecentOpen(status.projects?.projects ?? []).map(project => ({ project, runtime: runtimes.get(project.id) }))
 })
 const missingStates = computed(() => projectRows.value.some(row => !row.runtime || row.runtime.state === 'unknown'))
 const projectWarnings = computed(() => status.projects?.warnings ?? [])

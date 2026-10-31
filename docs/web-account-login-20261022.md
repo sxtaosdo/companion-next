@@ -63,6 +63,12 @@ The initial npm command reported LOCAL_START_FAILED at its final confirmation ev
 
 Entry: http://127.0.0.1:32180/next/index.html . Use sxaosdo with the existing password and the displayed captcha; never send the password to the agent.
 
+## User-confirmed login acceptance
+
+2026-10-22 05:17 UTC: the user personally confirmed real account login success. Exact messages: “好了” (Sentinel_eff446e6f96c8191a6ffffb5807a0f05) and “已经登录成功了” (Sentinel_d0ec514bf61881918e39ad2ca5fbc950).
+
+The password/captcha login was completed by the user. The agent did not read, submit, reset or modify account credentials. Password-recovery investigation/planning is stopped; no additional logout, session test or service restart was performed for this confirmation. This closes the login acceptance task only; outstanding art/resource-generation tasks retain their separate status and are not marked complete.
+
 
 ## 2026-10-23 fixed-seven-day delivery and Codex reconnect check
 

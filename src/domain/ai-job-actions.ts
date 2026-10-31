@@ -19,7 +19,7 @@ export interface AiJobVariantReceipt {
   width: number; height: number; created: boolean; upscaled: boolean; qualityLimit: 'Upscaling adds no new detail.' | null
   receiptSha256?: string
 }
-export type AiJobActionResult = { kind: 'dispatch'; dispatchAccepted: true; job: AiJobSnapshot; artifact?: 'variant' }
+export type AiJobActionResult = { kind: 'dispatch'; dispatchAccepted: true; job: AiJobSnapshot; artifact?: 'variant'; operationId?: string }
   | { kind: 'selection'; job: AiJobSnapshot } | { kind: 'variant'; receipt: AiJobVariantReceipt }
 export interface AiJobActionsProvider {
   readonly label: string
@@ -28,10 +28,11 @@ export interface AiJobActionsProvider {
   waitForIdle(): Promise<void>
 }
 export type AiJobActionOutcome = 'not-sent' | 'rejected' | 'conflict' | 'unknown'
-export type AiJobActionCode = 'image-transparency-required' | 'image-content-empty' | 'invalid-input' | 'busy' | 'aborted' | 'timeout' | 'unauthorized' | 'forbidden' | 'stale' | 'rejected' | 'unconfirmed' | 'invalid-shape' | 'response-too-large' | 'network-error'
+export type AiJobActionCode = 'image-transparency-required' | 'image-content-empty' | 'art-review-unconfirmed' | 'invalid-input' | 'busy' | 'aborted' | 'timeout' | 'unauthorized' | 'forbidden' | 'stale' | 'rejected' | 'unconfirmed' | 'invalid-shape' | 'response-too-large' | 'network-error'
 const messages: Record<AiJobActionCode, string> = {
   'image-transparency-required':'候选图片没有真实透明像素，未导出；请先取得符合透明要求的图片。',
   'image-content-empty':'候选图片完全透明，没有可见内容，未导出。',
+  'art-review-unconfirmed':'原后台在导入前拒绝：请先完成并确认当前候选的视觉审阅，再重新核对导入。',
   'invalid-input': '本次原任务操作参数或状态不符合已核合同，未发送请求。', busy: '已有原任务操作或请求清理尚未结束，未重复发送。',
   aborted: '已停止等待原任务操作；后台可能已经执行，请刷新同一个原任务。', timeout: '原任务操作等待超时；结果未知，不能重复提交。',
   unauthorized: 'Companion 会话无效（401），操作被拒绝。', forbidden: 'Companion 拒绝本次操作（403），请核对已有同源会话。',
@@ -144,14 +145,15 @@ export function decodeAiJobActionResponse(value: unknown, projectId: string, sub
     if (checked.operation === 'import-variant' && raw.artifact !== 'variant') throw shape()
     if (raw.dispatchAccepted !== true || raw.workerResident !== false || job.revision !== expected.revision || job.state !== expected.state
       || aiJobActionCanonical(job.selectedIds) !== aiJobActionCanonical(expected.selectedIds)) throw shape()
-    return { kind: 'dispatch', dispatchAccepted: true, job, ...(checked.operation === 'import-variant' ? { artifact: 'variant' as const } : {}) }
+    if (raw.operationId !== undefined && (checked.operation !== 'import-variant' || typeof raw.operationId !== 'string' || !/^icon-import-[a-f0-9]{32}$/.test(raw.operationId))) throw shape()
+    return { kind: 'dispatch', dispatchAccepted: true, job, ...(checked.operation === 'import-variant' ? { artifact: 'variant' as const } : {}), ...(typeof raw.operationId === 'string' ? { operationId: raw.operationId } : {}) }
   } catch { throw shape() }
 }
 /** Revalidate even an injected provider result. A normalized dispatch is still a pre-execution acknowledgement. */
 export function validateAiJobActionResult(value: AiJobActionResult, projectId: string, submission: AiJobActionSubmission): AiJobActionResult {
   if (!value || typeof value !== 'object') throw shape()
   if (value.kind === 'dispatch') return decodeAiJobActionResponse({ schemaVersion: 'companion-icons-v1', dispatchAccepted: value.dispatchAccepted, workerResident: false, job: value.job,
-    ...(value.artifact === undefined ? {} : { artifact: value.artifact }) }, projectId, submission)
+    ...(value.artifact === undefined ? {} : { artifact: value.artifact }), ...(value.operationId === undefined ? {} : { operationId: value.operationId }) }, projectId, submission)
   if (value.kind === 'selection') return decodeAiJobActionResponse({ schemaVersion: 'companion-icons-v1', job: value.job }, projectId, submission)
   if (value.kind === 'variant') return decodeAiJobActionResponse({ schemaVersion: 'companion-icons-v1', ...value.receipt }, projectId, submission)
   throw shape()

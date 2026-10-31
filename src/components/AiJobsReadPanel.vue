@@ -10,12 +10,25 @@ import { AI_JOB_STATE_LABELS, isAiCandidateId } from '../domain/ai-jobs-read'
 import type { AiJobsReadProvider } from '../domain/ai-jobs-read'
 import { createAiJobsReadState } from '../stores/ai-jobs-read'
 import type { AiJobActionReadback, AiJobsProject } from '../stores/ai-jobs-read'
+import type { AiVariantImportVerification } from '../stores/ai-job-actions'
+import { aiJobActionCanonical } from '../domain/ai-job-actions'
+import { ANT_TOOLBAR_PROJECT } from '../domain/ant-toolbar-scope'
 const props = withDefaults(defineProps<{ project: AiJobsProject | null; source: object | null; provider?: AiJobsReadProvider | null; workflowStep?: number; compact?: boolean; progressive?: boolean; active?:boolean }>(),{active:true})
 const store = reactive(createAiJobsReadState())
 const previewImage = ref<HTMLImageElement | null>(null)
+const boundTaskNotice = ref('')
+const variantVerification = ref<AiVariantImportVerification|null>(null)
 const reader = computed(() => props.provider === undefined ? aiJobsReadProvider.value : props.provider)
-watch(() => [props.project?.id, props.project?.name, props.project?.path, props.source], () => store.setContext(props.project, props.source), { immediate: true, flush: 'sync' })
+watch(() => [props.project?.id, props.project?.name, props.project?.path, props.source], () => { boundTaskNotice.value = ''; store.setContext(props.project, props.source) }, { immediate: true, flush: 'sync' })
 watch(reader, next => { if (store.provider && store.provider !== next) store.invalidateProvider() }, { flush: 'sync' })
+watch(() => store.status, value => {
+  const proof = variantVerification.value, imported = value?.variantImport
+  if (proof && (!value || value.projectId !== proof.projectId || value.jobId !== proof.jobId || value.requestHash !== proof.requestHash || value.sourceRevision !== proof.sourceRevision || value.revision !== proof.revision || imported?.operationId !== proof.operationId || aiJobActionCanonical(imported?.artifact) !== aiJobActionCanonical(proof.artifact))) variantVerification.value = null
+}, { flush: 'sync' })
+function acceptVariantVerification(proof: AiVariantImportVerification) {
+  const value = store.status, imported = value?.variantImport
+  if (value && value.projectId === proof.projectId && value.jobId === proof.jobId && value.requestHash === proof.requestHash && value.sourceRevision === proof.sourceRevision && value.revision === proof.revision && imported?.operationId === proof.operationId && aiJobActionCanonical(imported.artifact) === aiJobActionCanonical(proof.artifact)) variantVerification.value = proof
+}
 function previewLoaded(event: Event) {
   const image = event.currentTarget as HTMLImageElement
   if (previewImage.value === image) store.previewDisplayed(image.dataset.candidate ?? '', image.dataset.sha ?? '')
@@ -23,13 +36,28 @@ function previewLoaded(event: Event) {
 function previewFailed(event: Event) {
   if (previewImage.value === event.currentTarget) store.previewDisplayFailed()
 }
+function selectMatchingTask(snapshot: import('../domain/ai-jobs-read').AiJobSnapshot) {
+  const found = store.history?.jobs.find(job => job.jobId === snapshot.jobId)
+  if (!found || found.projectId !== snapshot.projectId || found.requestHash !== snapshot.requestHash || found.sourceRevision !== snapshot.sourceRevision || found.revision < snapshot.revision) {
+    boundTaskNotice.value = '原任务未在最新回读中匹配，请核对任务记录；不会自动切换或重发。'
+    return
+  }
+  boundTaskNotice.value = ''
+  store.selectJob(found.jobId)
+}
 async function readCreatedTask(input: { snapshot: import('../domain/ai-jobs-read').AiJobSnapshot; project: AiJobsProject; source: object; jobsReader: AiJobsReadProvider }) {
   const current = () => props.source === input.source && reader.value === input.jobsReader && props.project?.id === input.project.id && props.project.path === input.project.path && props.project.name === input.project.name
   if (!current() || store.busy) return
   await store.readJobs(input.jobsReader)
-  if (current() && store.history?.jobs.some(job => job.jobId === input.snapshot.jobId)) store.selectJob(input.snapshot.jobId)
+  if (current() && store.history) selectMatchingTask(input.snapshot)
 }
-const readStatusSnapshot=computed(()=>({projectId:store.project?.id??'',projectPath:store.project?.path??'',source:props.source,loading:store.busy,error:store.error||store.statusError||'',observedAt:store.statusObservedAt||store.observedAt||'',hasRead:!!store.history,state:store.status?.state??null,historyOnly:!!store.status?.historyOnly}))
+async function refreshHistory() {
+  const active = reader.value, snapshot = props.progressive ? store.status : null, project = props.project, source = props.source
+  if (!active) return
+  await store.readJobs(active)
+  if (snapshot && reader.value === active && props.source === source && props.project?.id === project?.id && props.project?.path === project?.path && props.project?.name === project?.name && store.history) selectMatchingTask(snapshot)
+}
+const readStatusSnapshot=computed(()=>({projectId:store.project?.id??'',projectPath:store.project?.path??'',source:props.source,loading:store.busy,error:store.error||store.statusError||'',observedAt:store.statusObservedAt||store.observedAt||'',hasRead:!!store.history,state:store.status?.state??null,historyOnly:!!store.status?.historyOnly,snapshot:store.status}))
 const workflowSnapshot=computed(()=>store.status ? {state:store.status.state,candidates:store.status.candidates.length,selected:store.status.selectedIds.length,hasImport:[store.status.import,store.status.variantImport].some(receipt=>receipt?.state==='imported_pending_verification'&&receipt.effectApplied===true&&receipt.leaseState==='RELEASED')}:null)
 defineExpose({ readCreatedTask, readStatusSnapshot, workflowSnapshot })
 const actionsByStep: Record<number, readonly AiJobAction[]> = { 1: [], 2: [], 3: ['run-next', 'resume'], 4: ['select'], 5: ['import', 'export-variant', 'import-variant'], 6: [] }
@@ -53,11 +81,12 @@ onBeforeUnmount(() => store.disconnect())
 </script>
 <template>
   <section class="section-card ai-jobs-read" data-testid="ai-jobs-read-panel">
-    <div class="section-heading"><div class="job-status-heading"><h3>{{ props.progressive ? (workflowStep === 4 ? '预览并选用' : workflowStep === 5 ? '输出与导入' : workflowStep === 6 ? '核对导入结果' : '任务进度') : '原图标任务与候选' }}</h3><el-tag class="companion-status-tag" :type="taskStatus.tone" :title="taskStatus.detail" data-testid="job-status-tag"><el-icon class="companion-status-icon" :class="{'is-loading':taskStatus.busy}" aria-hidden="true"><component :is="taskStatusIcon"/></el-icon>{{ taskStatus.text }}</el-tag></div></div>
+    <div class="section-heading"><div class="job-status-heading"><h3>{{ props.progressive ? (workflowStep === 4 ? '视觉审阅' : workflowStep === 5 ? '导入绑定' : workflowStep === 6 ? '运行验收' : '任务进度') : '原图标任务与候选' }}</h3><el-tag class="companion-status-tag" :type="taskStatus.tone" :title="taskStatus.detail" data-testid="job-status-tag"><el-icon class="companion-status-icon" :class="{'is-loading':taskStatus.busy}" aria-hidden="true"><component :is="taskStatusIcon"/></el-icon>{{ taskStatus.text }}</el-tag></div></div>
     <p v-if="!reader" class="form-help">当前构建未接入原任务读取；需原 Companion 同源会话与已配置的任务后端。</p>
     <p v-if="!store.project" class="form-help">请先选择已读取登记的工程。</p>
     <details v-else class="job-secondary" :open="!props.compact && !props.progressive"><summary>工程信息</summary><dl class="job-identity"><dt>工程</dt><dd>{{ store.project.name }} · {{ store.project.id }}</dd><dt>工程路径</dt><dd>{{ store.project.path }}</dd></dl></details>
-    <div class="job-actions"><el-button :disabled="props.active===false || !reader || !store.project || store.busy" :loading="store.loading" @click="reader && store.readJobs(reader)">读取 / 刷新任务历史</el-button><el-button v-if="store.busy" @click="store.clearReads()">取消本页读取</el-button></div>
+    <div class="job-actions"><el-button :disabled="props.active===false || !reader || !store.project || store.busy" :loading="store.loading" @click="refreshHistory">读取 / 刷新任务历史</el-button><el-button v-if="store.busy" @click="store.clearReads()">取消本页读取</el-button></div>
+    <p v-if="boundTaskNotice" role="status">{{ boundTaskNotice }}</p>
     <details v-if="!props.progressive" class="job-secondary"><summary>读取说明</summary>    <p class="form-help">这些读取会由原后台执行 Python、读取文件与 Git，并可能用 Pillow 检查候选。取消页面读取不能证明后台进程已结束。{{ aiJobActionsProvider ? '任务操作在下方逐次确认，接收回执不等于执行完成。' : '这里只读取原任务，不生成、不批准选择、不导入。' }}</p></details>
     <el-alert v-if="store.error" type="error" :closable="false" :title="store.error"/>
     <template v-if="store.history">
@@ -76,7 +105,7 @@ onBeforeUnmount(() => store.disconnect())
       <p v-if="store.status.state === 'imported_pending_verification'">原任务已进入导入后待验证状态；这不等于场景绑定、Preview、Build 或生产验收完成。</p>
       <p v-if="store.status.state === 'running'">原任务仍显示执行中。HTTP 返回或派发接受不代表任务完成。</p>
       <p v-if="store.status.errorCode">原任务错误码：{{ store.status.errorCode }}</p>
-      <details v-if="!props.progressive || workflowStep === 6" class="job-secondary"><summary>验收与导入记录</summary>
+      <details v-if="!props.progressive || workflowStep === 6 || store.status.import || store.status.variantImport" class="job-secondary"><summary>验收与导入记录</summary>
       <p>原协议 productionVerified：false；这不表示独立人工验收通过。</p><details v-if="store.status.resourceSnapshot"><summary>任务封存规范</summary><template v-if="store.status.resourceSnapshot.state === 'sealed'"><p>版本 {{ store.status.resourceSnapshot.version }} · SHA-256 {{ store.status.resourceSnapshot.hash }}</p><p>{{ 'kind' in store.status.resourceSnapshot ? store.status.resourceSnapshot.config.project.content : store.status.resourceSnapshot.config.style.description }}</p><p>此处为原后台已绑定此任务的封存证据，不替代当前配置或运行验收。</p></template><p v-else>原后台无法确认此任务的封存规范。</p></details>
       <section v-if="store.status.productAcceptance" class="job-acceptance" data-testid="job-product-acceptance">
         <h4>{{ store.status.productAcceptance.state === 'blocked' ? '关联工程验收：阻塞' : store.status.productAcceptance.state === 'owner_manual_passed' ? 'Owner 已手工确认：导入与运行可见' : '关联工程验收：证据未确认' }}</h4>
@@ -106,8 +135,8 @@ onBeforeUnmount(() => store.disconnect())
       </template>
     </article>
     <section v-if="store.previewCandidateId" v-show="!props.progressive || workflowStep === 4" aria-live="polite" class="job-preview"><div class="section-heading"><h4>候选预览 · {{ store.previewCandidateId }}</h4><el-button @click="store.clearPreview()">关闭候选预览</el-button></div><p v-if="store.previewLoading">正在核对候选字节与原任务 SHA-256…</p><el-alert v-if="store.previewError" type="error" :closable="false" :title="store.previewError"/><template v-if="store.preview"><img ref="previewImage" :key="`${store.preview.candidateId}/${store.preview.sha256}`" :data-candidate="store.preview.candidateId" :data-sha="store.preview.sha256" :src="`data:image/png;base64,${store.preview.base64}`" alt="已核对任务候选的预览" @load="previewLoaded" @error="previewFailed"/><p>{{ store.preview.width }} × {{ store.preview.height }} · SHA-256 {{ store.preview.sha256 }}</p><p>像素可显示和文件一致不等于风格、用途、透明效果或生产验收通过。</p></template></section>
-    <IconHandoffPanel v-if="store.status && (!props.progressive || (props.workflowStep ?? 4) >= 4)" :project="store.project" :source="props.source" :job="store.status" :reader="store.provider" :active="props.active" :ready="!store.busy && !store.error && !store.statusError && !!store.statusObservedAt"/>
-    <AiJobActionsPanel v-if="aiJobActionsProvider && store.status" :project="store.project" :source="props.source" :job="store.status" :preview="store.preview" :preview-shown="store.previewShown" :reader="store.provider" :provider="aiJobActionsProvider" :allowed-operations="allowedOperations" :offline-only="store.history?.mode === 'offline_import_only' ? true : store.history?.mode === 'generation' ? false : undefined" @readback="(input: AiJobActionReadback) => store.acceptActionReadback(input)"/>
+    <IconHandoffPanel v-if="store.status && (!props.progressive || props.workflowStep === 5 || (props.workflowStep === 6 && store.status.projectId === ANT_TOOLBAR_PROJECT))" :project="store.project" :source="props.source" :job="store.status" :reader="store.provider" :active="props.active" :variant-verification="variantVerification" :ready="!store.busy && !store.error && !store.statusError && !!store.statusObservedAt"/>
+    <AiJobActionsPanel v-if="aiJobActionsProvider && store.status" :project="store.project" :source="props.source" :job="store.status" :preview="store.preview" :preview-shown="store.previewShown" :reader="store.provider" :provider="aiJobActionsProvider" :allowed-operations="allowedOperations" :accept-verified-readback="store.acceptActionReadback" :offline-only="store.history?.mode === 'offline_import_only' ? true : store.history?.mode === 'generation' ? false : undefined" @readback="(input: AiJobActionReadback) => store.acceptActionReadback(input)" @variant-verification="acceptVariantVerification"/>
   </section>
 </template>
 <style scoped>

@@ -35,6 +35,20 @@ describe('existing AI task read panel', () => {
 
 describe('verified read-to-action DOM handoff', () => {
   const writer = (): AiJobActionsProvider => ({ label: 'fake writer', execute: vi.fn(), waitForIdle: async () => {} })
+  it('keeps the same bound task after a progressive history refresh and refuses a changed identity', async () => {
+    const p = provider(); setup(p); await wrapper!.setProps({ progressive: true, workflowStep: 3 })
+    const exposed = wrapper!.vm as unknown as { readCreatedTask: (input: { snapshot: AiJobSnapshot; project: AiJobsProject; source: object; jobsReader: AiJobsReadProvider }) => Promise<void>; readStatusSnapshot: { snapshot: AiJobSnapshot | null } }
+    await exposed.readCreatedTask({ snapshot: job(), project, source: (wrapper!.props() as { source: object }).source, jobsReader: (wrapper!.props() as { provider: AiJobsReadProvider }).provider }); await flushPromises()
+    expect(exposed.readStatusSnapshot.snapshot?.jobId).toBe(jobId)
+    p.readJobs = vi.fn(async () => ({ ...jobs(), jobs: [{ ...job(), revision: 2, state: 'running' as const }] }))
+    await button('读取 / 刷新任务').trigger('click'); await flushPromises()
+    expect(exposed.readStatusSnapshot.snapshot).toMatchObject({ jobId, revision: 2, state: 'running' })
+    p.readJobs = vi.fn(async () => ({ ...jobs(), jobs: [{ ...job(), revision: 3, requestHash: 'd'.repeat(64) }] }))
+    await button('读取 / 刷新任务').trigger('click'); await flushPromises()
+    expect(exposed.readStatusSnapshot.snapshot).toBeNull()
+    expect(wrapper!.text()).toContain('原任务未在最新回读中匹配')
+    expect(p.readStatus).not.toHaveBeenCalled()
+  })
   it('requires this exact image load event before handing visual-review readiness to actions', async () => {
     const p = provider(), preview = { candidateId, sha256: 'c'.repeat(64), width: 1024 as const, height: 1024 as const, mimeType: 'image/png' as const, base64: 'offline-fixture' }
     // Decoder correctness is tested separately with actual PNG/CRC/SHA fixtures; this test isolates DOM readiness.

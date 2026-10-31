@@ -12,6 +12,7 @@ export const useRegisteredProjectStore = defineStore('registered-project', () =>
   const boundSource = shallowRef<CompanionBrowserProvider | null>(null)
   const currentSource = computed(() => directory.connected && directory.provider && directory.provider === companionBrowserProvider.value ? directory.provider : null)
   const projects = computed(() => currentSource.value ? directory.projects : [])
+  const orderedProjects = computed(() => currentSource.value ? directory.orderedProjects : [])
   const project = computed(() => {
     if (invalidated.value || !currentSource.value || boundSource.value !== currentSource.value) return null
     return projects.value.find(item => item.id === requestedId.value && item.path === boundPath.value) ?? null
@@ -53,5 +54,5 @@ export const useRegisteredProjectStore = defineStore('registered-project', () =>
   }
   watch([() => directory.projects, currentSource], resolveSelection, { flush: 'sync' })
   watch(companionBrowserProvider, () => { if (requestedId.value) invalidated.value = true }, { flush: 'sync' })
-  return { directory, requestedId, projects, project, status, currentSource, invalidated, restoreRouteProject }
+  return { directory, requestedId, projects, orderedProjects, project, status, currentSource, invalidated, restoreRouteProject }
 })

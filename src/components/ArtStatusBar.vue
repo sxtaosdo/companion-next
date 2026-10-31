@@ -8,11 +8,11 @@ import { CircleCheck, CircleClose, Loading, Minus, Warning } from '@element-plus
 import InfoTip from './InfoTip.vue'
 import ProjectStatusTag from './ProjectStatusTag.vue'
 import { useRegisteredProjectStore } from '../stores/registered-project'
-import { useArtSpecificationContext } from '../composables/useArtSpecificationContext'
+import { useArtSpecificationContext, type ArtSpecificationState } from '../composables/useArtSpecificationContext'
 import { useCreatorOperationsStore } from '../stores/creator-operations'
 import { companionBrowserProvider } from '../companion-browser-integration'
 import { AI_JOB_STATE_LABELS, type AiJobState } from '../domain/ai-jobs-read'
-const props=withDefaults(defineProps<{projectPicker?:boolean;showCreator?:boolean;showModel?:boolean;service?:{label:string;text:string;tone:'primary'|'info'|'success'|'warning'|'danger';busy?:boolean}|null;jobs?:{projectId:string;projectPath:string;source:object|null;loading:boolean;error:string;observedAt:string;hasRead:boolean;state:AiJobState|null;historyOnly?:boolean}|null}>(),{projectPicker:true,showCreator:false,showModel:false,service:null})
+const props=withDefaults(defineProps<{specificationReadOnly?:boolean;domainSpecification?:ArtSpecificationState|null;projectPicker?:boolean;showCreator?:boolean;showModel?:boolean;service?:{label:string;text:string;tone:'primary'|'info'|'success'|'warning'|'danger';busy?:boolean}|null;jobs?:{projectId:string;projectPath:string;source:object|null;loading:boolean;error:string;observedAt:string;hasRead:boolean;state:AiJobState|null;historyOnly?:boolean}|null}>(),{projectPicker:true,showCreator:false,showModel:false,service:null})
 const emit=defineEmits<{ 'open-specification': [] }>()
 const router=inject(routerKey,null),knowledge=useKnowledgeReadStore()
 // Routed pages own selection through their query watcher; selecting twice cancels the first read.
@@ -21,7 +21,8 @@ function refreshProjects(){if(directory.provider)void directory.refreshProjects(
 const model=computed<State>(()=>knowledge.provider!==knowledgeReadProvider.value||!knowledge.provider?{text:'未读取',tone:'info'}:knowledge.statusLoading?{text:'读取中',tone:'primary',busy:true}:knowledge.serviceError?{text:'读取失败',tone:'danger'}:knowledge.services?.model?.running===true?{text:'已连接',tone:'success'}:knowledge.services?.model?.running===false?{text:'未连接',tone:'info'}:knowledge.services?{text:'未知，待核对',tone:'warning'}:{text:'未读取',tone:'info'})
 const selection=useRegisteredProjectStore(), directory=selection.directory, operations=useCreatorOperationsStore()
 const {art,specification,specificationSource,specificationActionLabel,busy:specBusy,canRefresh,refresh:refreshSpecification}=useArtSpecificationContext()
-function openSpecification(){if(specificationActionLabel.value)emit('open-specification')}
+const visibleSpecification=computed(()=>props.domainSpecification??specification.value)
+function openSpecification(){if(specificationActionLabel.value&&!props.specificationReadOnly)emit('open-specification')}
 
 type Tone='primary'|'info'|'success'|'warning'|'danger'
 interface State { text:string; tone:Tone; busy?:boolean; detail?:string }
@@ -44,19 +45,19 @@ function icon(state:State){return state.busy?Loading:state.tone==='success'?Circ
 </script>
 <template>
  <section class="art-status-bar" aria-label="资源工作区状态" data-testid="art-status-bar">
-  <div class="art-current-project"><span>当前工程</span><el-select v-if="projectPicker && selection.projects.length" :model-value="selection.project?.id ?? ''" aria-label="当前登记工程" placeholder="请选择工程" :disabled="directory.projectLoading" @update:model-value="selectProject"><el-option v-for="project in selection.projects" :key="project.id" :value="project.id" :label="project.name"/></el-select><strong v-else :title="identity">{{ selection.project?.name || (selection.requestedId?'所选工程不可用':'未选择') }}</strong><span v-if="projectPicker && selection.projects.length && selection.requestedId && !selection.project && !directory.projectLoading" role="status">所选工程不可用</span><InfoTip v-if="selection.project" label="当前工程详情" :text="identity"/></div>
+  <div class="art-current-project"><span>当前工程</span><el-select v-if="projectPicker && selection.projects.length" :model-value="selection.project?.id ?? ''" aria-label="当前登记工程" placeholder="请选择工程" :disabled="directory.projectLoading" @update:model-value="selectProject"><el-option v-for="project in selection.orderedProjects" :key="project.id" :value="project.id" :label="project.name"/></el-select><strong v-else :title="identity">{{ selection.project?.name || (selection.requestedId?'所选工程不可用':'未选择') }}</strong><span v-if="projectPicker && selection.projects.length && selection.requestedId && !selection.project && !directory.projectLoading" role="status">所选工程不可用</span><InfoTip v-if="selection.project" label="当前工程详情" :text="identity"/></div>
   <div class="art-status-items" role="status" aria-live="polite">
    <el-tag class="companion-status-tag" size="small" :type="registration.tone" data-status="registration"><el-icon class="companion-status-icon" aria-hidden="true" :class="{'is-loading':registration.busy}"><component :is="icon(registration)"/></el-icon>{{ registration.text }}</el-tag>
    <span v-if="showCreator && selection.project" class="art-creator-state"><span>Creator</span><ProjectStatusTag :status="selection.status" :operation="operation" :passive="selection.currentSource?.runtimeProbesEnabled===false" :stop-acknowledged="operations.isExpectedStopDisconnect(selection.project.id)"/></span>
-   <el-tag class="companion-status-tag" size="small" :type="specification.tone" data-status="specification" :data-spec-state="specification.kind" :title="specification.detail"><el-icon class="companion-status-icon" aria-hidden="true" :class="{'is-loading':specification.busy}"><component :is="icon(specification)"/></el-icon>{{ specification.text }}</el-tag>
-   <small v-if="specificationSource" class="art-spec-source" :title="specificationSource.title">{{ specificationSource.text }}</small>
-   <el-button v-if="specificationActionLabel" size="small" :type="specification.kind==='missing'?'primary':undefined" data-testid="open-art-specification" @click="openSpecification">{{ specificationActionLabel }}</el-button>
+   <el-tag class="companion-status-tag" size="small" :type="visibleSpecification.tone" data-status="specification" :data-spec-state="visibleSpecification.kind" :title="visibleSpecification.detail"><el-icon class="companion-status-icon" aria-hidden="true" :class="{'is-loading':visibleSpecification.busy}"><component :is="icon(visibleSpecification)"/></el-icon>{{ visibleSpecification.text }}</el-tag>
+   <small v-if="!domainSpecification&&specificationSource" class="art-spec-source" :title="specificationSource.title">{{ specificationSource.text }}</small>
+   <el-button v-if="!domainSpecification&&specificationActionLabel" size="small" :type="specification.kind==='missing'?'primary':undefined" data-testid="open-art-specification" :disabled="specificationReadOnly" @click="openSpecification">{{ specificationActionLabel }}</el-button>
    <el-tag class="companion-status-tag" v-if="task" size="small" :type="task.tone" data-status="task"><el-icon class="companion-status-icon" aria-hidden="true" :class="{'is-loading':task.busy}"><component :is="icon(task)"/></el-icon>{{ task.text }}</el-tag>
    <el-tag class="companion-status-tag" v-if="showModel" size="small" :type="model.tone" data-status="model" title="仅表示模型启动器的已有观测，不代表生成模型已就绪"><el-icon class="companion-status-icon" aria-hidden="true" :class="{'is-loading':model.busy}"><component :is="icon(model)"/></el-icon>模型启动器 · {{ model.text }}</el-tag>
    <el-tag class="companion-status-tag" v-if="service" size="small" :type="service.busy?'primary':service.tone" data-status="service"><el-icon class="companion-status-icon" aria-hidden="true" :class="{'is-loading':service.busy}"><component :is="icon(service)"/></el-icon>{{ service.label }} · {{ service.text }}</el-tag>
    <el-button v-if="projectPicker && companionBrowserProvider" :icon="Refresh" text aria-label="刷新登记工程" :loading="directory.projectLoading" @click="refreshProjects"/>
-   <el-button aria-label="读取工程规范" size="small" :loading="specBusy" :disabled="!canRefresh" :title="art.dirty ? '请先保存当前规范草稿；刷新不会丢弃未保存输入' : undefined" @click="refreshSpecification">读取 / 刷新工程规范</el-button>
-   <InfoTip v-if="registration.detail||specification.detail||task?.detail" label="资源状态详情" :text="[registration.detail,specification.detail,task?.detail].filter(Boolean).join('；')"/>
+   <el-button aria-label="读取工程规范" size="small" :loading="specBusy" :disabled="!canRefresh" :title="art.dirty ? '请先保存当前规范草稿；刷新不会丢弃未保存输入' : undefined" @click="refreshSpecification">{{ domainSpecification?'读取 / 刷新工程公共规范':'读取 / 刷新工程规范' }}</el-button>
+   <InfoTip v-if="registration.detail||visibleSpecification.detail||task?.detail" label="资源状态详情" :text="[registration.detail,visibleSpecification.detail,task?.detail].filter(Boolean).join('；')"/>
   </div>
   <div v-if="$slots.default" class="art-status-actions"><slot/></div>
  </section>

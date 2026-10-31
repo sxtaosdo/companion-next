@@ -10,6 +10,7 @@ export interface AiWriteFence {
   operation: 'run-next' | 'resume' | 'select' | 'import' | 'export-variant' | 'import-variant' | 'enqueue' | 'adopt'
   revision: number; requestHash: string | null; sourceRevision: string
   variant?: { candidateId: string; width: number; height: number; fileSha256: string; receiptSha256: string; destinationUrl: string }
+  operationId?: string
 }
 export type AiWriteLockResult<T> = { acquired: false } | { acquired: true; value: T }
 export interface AiWriteCoordinator { run<T>(work: () => Promise<T>): Promise<AiWriteLockResult<T>> }
@@ -20,7 +21,7 @@ const limit = 64 * 1024, maxRecords = 100
 const fields = ['key', 'projectId', 'jobId', 'operation', 'revision', 'requestHash', 'sourceRevision']
 function check(value: unknown): AiWriteFence {
   if (!value || typeof value !== 'object' || Array.isArray(value)
-    || fields.some(field => !Object.hasOwn(value, field)) || Reflect.ownKeys(value).some(key => typeof key !== 'string' || ![...fields, 'variant'].includes(key))) throw new AiWriteCoordinationError()
+    || fields.some(field => !Object.hasOwn(value, field)) || Reflect.ownKeys(value).some(key => typeof key !== 'string' || ![...fields, 'variant', 'operationId'].includes(key))) throw new AiWriteCoordinationError()
   const raw = value as Record<string, unknown>, create = raw.operation === 'enqueue' || raw.operation === 'adopt'
   if (typeof raw.key !== 'string' || raw.key.length < 1 || raw.key.length > 300 || !/^[A-Za-z0-9:/._-]+$/.test(raw.key)
     || !isAiProjectId(raw.projectId) || !isAiJobId(raw.jobId) || !['run-next', 'resume', 'select', 'import', 'export-variant', 'import-variant', 'enqueue', 'adopt'].includes(raw.operation as string)
@@ -39,8 +40,9 @@ function check(value: unknown): AiWriteFence {
       || item.destinationUrl.split('/').some(part => part === '.' || part === '..')) throw new AiWriteCoordinationError()
     variant = { candidateId: item.candidateId, width: item.width, height: item.height, fileSha256: item.fileSha256, receiptSha256: item.receiptSha256, destinationUrl: item.destinationUrl }
   } else if (Object.hasOwn(raw, 'variant')) throw new AiWriteCoordinationError()
+  if (raw.operationId !== undefined && (raw.operation !== 'import-variant' || typeof raw.operationId !== 'string' || !/^icon-import-[a-f0-9]{32}$/.test(raw.operationId))) throw new AiWriteCoordinationError()
   return { key: raw.key, projectId: raw.projectId, jobId: raw.jobId, operation: raw.operation as AiWriteFence['operation'], revision: raw.revision, requestHash: raw.requestHash as string | null, sourceRevision: raw.sourceRevision,
-    ...(variant ? { variant } : {}) }
+    ...(variant ? { variant } : {}), ...(typeof raw.operationId === 'string' ? { operationId: raw.operationId } : {}) }
 }
 export function readAiWriteFences(storage: AiWriteFenceStorage): AiWriteFence[] {
   try {
@@ -71,6 +73,12 @@ export function putAiWriteFence(storage: AiWriteFenceStorage, fence: AiWriteFenc
   write(storage, [...entries, safe])
 }
 export function removeAiWriteFence(storage: AiWriteFenceStorage, key: string): void { write(storage, readAiWriteFences(storage).filter(entry => entry.key !== key)) }
+/** Must be called under AI_WRITE_LOCK_NAME; never replace an already recorded identity. */
+export function recordAiWriteOperationId(storage: AiWriteFenceStorage, key: string, operationId: string): void {
+  const entries = readAiWriteFences(storage), index = entries.findIndex(entry => entry.key === key), current = entries[index]
+  if (!current || current.operation !== 'import-variant' || current.operationId && current.operationId !== operationId) throw new AiWriteCoordinationError()
+  entries[index] = check({ ...current, operationId }); write(storage, entries)
+}
 export function hasPendingAiWrites(storage: AiWriteFenceStorage, projectId: string): boolean {
   if (!isAiProjectId(projectId)) throw new AiWriteCoordinationError()
   return readAiWriteFences(storage).some(entry => entry.projectId === projectId)

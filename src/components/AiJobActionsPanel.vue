@@ -5,12 +5,13 @@ import { aiJobActionsProvider } from '../ai-job-actions-integration'
 import type { AiJobActionsProvider, AiJobAction } from '../domain/ai-job-actions'
 import type { AiJobPreview, AiJobSnapshot, AiJobsReadProvider } from '../domain/ai-jobs-read'
 import { createAiJobActionsState } from '../stores/ai-job-actions'
-import type { AiJobActionReadback } from '../stores/ai-job-actions'
+import type { AiJobActionReadback, AiVariantImportVerification } from '../stores/ai-job-actions'
+import { ANT_TOOLBAR_PROJECT } from '../domain/ant-toolbar-scope'
 import type { AiJobsProject } from '../stores/ai-jobs-read'
 const props = withDefaults(defineProps<{ project: AiJobsProject | null; source: object | null; job: AiJobSnapshot | null; reader: AiJobsReadProvider | null;
-  provider?: AiJobActionsProvider | null; preview?: AiJobPreview | null; previewShown?: boolean; offlineOnly?: boolean; allowedOperations?: readonly AiJobAction[] }>(), { offlineOnly: undefined })
-const emit = defineEmits<{ readback: [payload: AiJobActionReadback] }>()
-const store = reactive(createAiJobActionsState())
+  provider?: AiJobActionsProvider | null; preview?: AiJobPreview | null; previewShown?: boolean; offlineOnly?: boolean; allowedOperations?: readonly AiJobAction[]; acceptVerifiedReadback?: (payload: AiJobActionReadback) => boolean }>(), { offlineOnly: undefined })
+const emit = defineEmits<{ readback: [payload: AiJobActionReadback]; 'variant-verification': [payload: AiVariantImportVerification] }>()
+const store = reactive(createAiJobActionsState({ acceptVerifiedReadback: payload => props.acceptVerifiedReadback?.(payload) === true }))
 const customOpen = ref(false), customWidth = ref(1), customHeight = ref(1)
 const operationVisible = (operation: AiJobAction) => props.allowedOperations?.includes(operation) ?? true
 watch(() => props.allowedOperations, () => { store.revokePendingScope(); customOpen.value = false }, { deep: true, flush: 'sync' })
@@ -19,6 +20,7 @@ watch(() => [props.project?.id, props.project?.name, props.project?.path, props.
   () => { customOpen.value = false; store.setContext(props.project, props.source, props.job, props.reader, writer.value, props.offlineOnly) }, { immediate: true, deep: false, flush: 'sync' })
 watch(() => [props.preview, props.previewShown], () => { void store.recordPreview(props.preview ?? null, props.previewShown === true) }, { immediate: true, flush: 'sync' })
 watch(() => store.readback, payload => { if (payload) emit('readback', payload) }, { flush: 'sync' })
+watch(() => store.variantVerification, payload => { if (payload) emit('variant-verification', payload) }, { flush: 'sync' })
 const labels: Record<AiJobAction, string> = { 'run-next': '执行原任务', resume: '恢复原任务查询', select: '保存候选选择', import: '导入已选母图（1024）', 'export-variant': '导出尺寸 PNG', 'import-variant': '导入当前工程' }
 const explanations: Record<AiJobAction, string> = {
   'run-next': '批准此原任务使用当前已运行的本地生成服务与 GPU。只运行当前 queued / waiting_service 任务，不启动模型服务。',
@@ -43,6 +45,7 @@ const selectedCandidates = computed(() => {
   const ids = 'selectedIds' in input ? input.selectedIds : 'candidateId' in input ? [input.candidateId] : snapshot.selectedIds
   return snapshot.candidates.filter(candidate => ids.includes(candidate.candidateId))
 })
+const frozenGenerationInput = computed(() => { const value=store.confirmation?.submission.snapshot.resourceSnapshot; return value?.state==='sealed'&&'kind' in value&&value.kind==='project-art-spec'?value:null })
 onBeforeUnmount(() => store.leave())
 </script>
 <template>
@@ -73,6 +76,7 @@ onBeforeUnmount(() => store.leave())
       <p v-if="store.job.state === 'import_unknown'">导入可能已写入，写入效果与租约释放相互独立。这里只能读取原任务，不重试导入。</p>
       <p v-if="store.hasPending">此工程存在待核对操作保护记录。离开页面、切换来源或重载不会清除未知结果。</p>
       <el-button :disabled="store.refreshing || store.busy" :loading="store.refreshing" @click="store.refreshStatus()">刷新原任务并核对保护记录</el-button>
+      <el-button v-if="store.job.projectId===ANT_TOOLBAR_PROJECT && store.job.assets.some(asset=>asset.assetId==='ant-bottom-slot-v01') && (store.hasPending||store.job.variantImport)" :disabled="store.refreshing || store.busy || !reader?.queryVariantImport" :loading="store.refreshing" @click="store.inspectVariantImport()">核对尺寸导入原操作</el-button>
     </template>
     <el-dialog v-model="customOpen" title="导出其他尺寸" width="460px" :close-on-click-modal="false"><p>从同一个原任务已保存选择导出一个尺寸；默认使用封存规格。最多 4096 × 4096，且总面积不超过 1600 万像素。</p><label>宽度 <el-input-number v-model="customWidth" :min="1" :max="4096" :precision="0" /></label><label>高度 <el-input-number v-model="customHeight" :min="1" :max="4096" :precision="0" /></label><p>后续仍需核对冻结范围并批准；上采样需额外接受质量限制。</p><template #footer><el-button @click="customOpen = false">取消</el-button><el-button @click="prepareCustom()">核对此尺寸</el-button></template></el-dialog>
     <section v-if="store.confirmation" class="job-confirmation" aria-label="原任务操作确认" data-testid="ai-job-action-confirmation">
@@ -81,6 +85,7 @@ onBeforeUnmount(() => store.leave())
       <dl><dt>工程</dt><dd>{{ store.confirmation.project.name }} · {{ store.confirmation.project.id }}</dd><dt>工程路径</dt><dd>{{ store.confirmation.project.path }}</dd>
         <dt>原任务</dt><dd>{{ store.confirmation.submission.snapshot.jobId }} · r{{ store.confirmation.submission.snapshot.revision }}</dd>
         <dt>源提交</dt><dd>{{ store.confirmation.submission.snapshot.sourceRevision }}</dd><dt>请求 SHA-256</dt><dd>{{ store.confirmation.submission.snapshot.requestHash }}</dd></dl>
+      <section v-if="store.confirmation.operation==='run-next'" aria-label="封存生成输入" data-testid="sealed-generation-input"><template v-if="frozenGenerationInput"><h5>本次封存生成输入</h5><p>视觉要求：{{ frozenGenerationInput.request.visualSpec }}</p><p>生成配置：{{ store.confirmation.submission.snapshot.profile }}</p><ul><li v-for="asset in frozenGenerationInput.request.assets" :key="asset.assetId"><strong>{{ asset.assetId }}</strong><p>内容：{{ asset.prompt }}</p><p>用途：{{ asset.purpose }}</p></li></ul><p v-if="store.confirmation.submission.snapshot.referenceProfile">参考图条件：{{ store.confirmation.submission.snapshot.referenceProfile.references.length }} 张（来自已封存快照）</p><p v-else>任务未声明图片条件参考；参考图是否入模以原任务合同为准。</p></template><p v-else role="status">原任务未提供可展示的封存生成输入，请先核对原记录。</p></section>
       <ul><li v-for="asset in store.confirmation.submission.snapshot.assets" :key="asset.assetId">{{ asset.assetId }} → {{ asset.relativePath }}</li></ul>
       <ul v-if="selectedCandidates.length"><li v-for="candidate in selectedCandidates" :key="candidate.candidateId">{{ candidate.candidateId }} · SHA-256 {{ candidate.fileSha256 }}</li></ul>
       <p v-if="store.confirmation.operation === 'export-variant' && 'width' in store.confirmation.submission.input">本次尺寸：{{ store.confirmation.submission.input.width }} × {{ store.confirmation.submission.input.height }}。目标 SHA 条件固定为 null，禁止覆盖。</p>

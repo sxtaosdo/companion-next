@@ -15,7 +15,7 @@ import { isAiReferencePath } from '../domain/ai-resource-read'
 import AiReferenceCropPanel from '../components/AiReferenceCropPanel.vue'
 import { referenceCropProvider } from '../ai-reference-crop-integration'
 const cropContext = computed(() => props.referenceTools && selection.project && selection.currentSource && referenceCropProvider.value && store.resource && store.provider === aiResourceReadProvider.value && store.project?.id === selection.project.id && store.project.path === selection.project.path && store.resource.projectId === selection.project.id && !store.loading && !store.error ? { projectId: selection.project.id, projectPath: selection.project.path, source: selection.currentSource, hash: store.resource.hash, provider: referenceCropProvider.value } : null)
-const props = withDefaults(defineProps<{ embedded?: boolean; sharedHeader?: boolean; referenceTools?: boolean }>(), { embedded: false, referenceTools: false })
+const props = withDefaults(defineProps<{ embedded?: boolean; sharedHeader?: boolean; readOnly?:boolean; referenceTools?: boolean }>(), { embedded: false, referenceTools: false })
 // The resource workflow already owns entry reads. Its embedded first step must
 // not mount a second registration lifecycle or choose a different project.
 const selection = useRegisteredProjectStore()
@@ -76,7 +76,7 @@ onBeforeUnmount(() => { if (!props.sharedHeader) store.disconnect() })
     </details>
     <ArtProductionFlow v-else-if="!props.embedded"/>
     <template v-else>
-      <ProjectArtSpecPanel ref="specPanel" :shared-header="props.sharedHeader" :project="selection.project" :source="selection.currentSource" :legacy="saved?.schemaVersion === 'project-resource-config-v2' ? saved : null"/>
+      <ProjectArtSpecPanel :read-only="props.readOnly" ref="specPanel" :shared-header="props.sharedHeader" :project="selection.project" :source="selection.currentSource" :legacy="saved?.schemaVersion === 'project-resource-config-v2' ? saved : null"/>
     </template>
     <AiResourceConfigDialog ref="editorDialog" :context="editorContext" :resource="store.resource" :reader="aiResourceReadProvider" :writer="aiResourceSaveProvider" @saved="refreshAfterSave"/>
   </section>

@@ -1,0 +1,20 @@
+/* Source: user-provided workflow prototype; exact source rules below are scoped to the real workflow shell. */
+.app-shell.workflow-prototype-shell {--ink:#253345;--muted:#66758b;--line:#dce3ec;--paper:#f4f6f9;--blue:#315fb2;--soft:#edf3ff;--green:#267a53;--red:#b34645;--amber:#9a691b;--white:#fff;font:14px/1.55 "Microsoft YaHei",system-ui,sans-serif;color:var(--ink);background:var(--paper);display:grid;grid-template-columns:174px minmax(0,1fr);min-height:100vh;--el-color-primary:var(--blue);--el-color-primary-light-9:var(--soft)}
+.app-shell.workflow-prototype-shell .sidebar {border-right:1px solid var(--line);background:#fdfefe;padding:22px 14px;width:auto;position:static;inset:auto;color:var(--ink);z-index:auto;transform:none}
+.app-shell.workflow-prototype-shell .brand {font-weight:700;font-size:16px;margin:0 8px 22px;display:block;padding:0;color:var(--ink);letter-spacing:normal}
+.app-shell.workflow-prototype-shell .brand .prototype-brand-caption {display:block;color:var(--muted);font-size:11px;font-weight:400;margin-top:3px}
+.app-shell.workflow-prototype-shell .nav-list {display:block;margin-top:0}
+.app-shell.workflow-prototype-shell .nav-item {display:block;padding:9px 10px;margin:4px 0;border-radius:5px;color:var(--muted);display:flex;gap:8px;box-shadow:none;font-size:14px}
+.app-shell.workflow-prototype-shell .nav-item.is-active {background:var(--soft);color:var(--blue);font-weight:600;border-left:3px solid var(--blue);box-shadow:none}
+.app-shell.workflow-prototype-shell .nav-item:hover {background:var(--soft);color:var(--blue)}
+.app-shell.workflow-prototype-shell .navigation-icon {font-size:14px;flex-basis:14px}
+.app-shell.workflow-prototype-shell .main-shell {margin-left:0;min-width:0;min-height:100vh}
+.app-shell.workflow-prototype-shell .main-content {padding:0;max-width:none;margin:0}
+.app-shell.workflow-prototype-shell .topbar {height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--line);background:white;font-size:12px;position:static;top:auto;z-index:auto;backdrop-filter:none}
+.app-shell.workflow-prototype-shell .prototype-workflow-breadcrumb {font-weight:500}
+.app-shell.workflow-prototype-shell .sidebar-footer {border-color:var(--line);color:var(--muted)}
+.app-shell.workflow-prototype-shell.navigation-collapsed {grid-template-columns:64px minmax(0,1fr)}
+.app-shell.workflow-prototype-shell .sidebar.is-collapsed {width:64px;padding:18px 8px}
+.app-shell.workflow-prototype-shell .sidebar.is-collapsed .brand {margin:0;display:flex}
+.app-shell.workflow-prototype-shell .sidebar.is-collapsed .brand-mark {color:#fff}
+@media(max-width:700px){.app-shell.workflow-prototype-shell{display:block}.app-shell.workflow-prototype-shell .sidebar{display:none}.app-shell.workflow-prototype-shell .topbar{padding:0 14px;height:44px}.app-shell.workflow-prototype-shell .sidebar.is-open{display:flex;position:fixed;inset:0 auto 0 0;width:174px;min-height:100vh;z-index:30;transform:none}}

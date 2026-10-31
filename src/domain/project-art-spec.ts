@@ -1,3 +1,4 @@
+import {validResourceDomainId} from './art-resource-domains'
 import { decodeAiResourceConfigV2, isAiReferencePath, type AiResourceConfigV2 } from './ai-resource-read'
 
 /** Configuration only. Loading/accepting authority sources and persisting files belong to the host. */
@@ -25,6 +26,8 @@ export interface ArtAuthority {
 export interface ProjectArtSpec {
   schemaVersion: 'project-art-spec-v1'
   projectId: string
+  resourceDomainId?:string
+  projectSettingsHash?:string
   version: number
   project: { name: string; content: string; engine: 'cocos-creator'; visualMode?: '2d' | '3d'; designResolution: { width: number; height: number } }
   imageOutput?: 'transparent-png'
@@ -101,7 +104,7 @@ export function parseProjectArtSpec(value: unknown, expectedProjectId: string): 
   const raw = object(value, 'config')
   if (raw.projectId !== expectedProjectId) fail('PROJECT_MISMATCH', 'projectId')
   if (raw.schemaVersion === 'project-resource-config-v2') return { kind: 'legacy-v2', config: decodeAiResourceConfigV2(raw, expectedProjectId), referencesAsModelInput: false }
-  keys(raw, ['schemaVersion', 'projectId', 'version', 'project', 'inheritance', 'overrides', 'categories', 'imageOutput'], 'config')
+  keys(raw, ['resourceDomainId', 'projectSettingsHash', 'schemaVersion', 'projectId', 'version', 'project', 'inheritance', 'overrides', 'categories', 'imageOutput'], 'config')
   if (raw.schemaVersion !== 'project-art-spec-v1') fail('UNSUPPORTED_SCHEMA', 'schemaVersion')
   if (raw.projectId !== expectedProjectId) fail('PROJECT_MISMATCH', 'projectId')
   if (raw.imageOutput !== undefined && raw.imageOutput !== 'transparent-png') fail('INVALID_CONFIG', 'imageOutput')
@@ -128,8 +131,10 @@ export function parseProjectArtSpec(value: unknown, expectedProjectId: string): 
     if (overrides.transparent === false) fail('IMAGE_OUTPUT_POLICY_CONFLICT', 'overrides.transparent')
     for (const category of ART_CATEGORIES) if (checked[category]?.transparent === false) fail('IMAGE_OUTPUT_POLICY_CONFLICT', `categories.${category}.transparent`)
   }
+  if(raw.resourceDomainId!==undefined&&(!validResourceDomainId(raw.resourceDomainId)||typeof raw.projectSettingsHash!=='string'||!/^[a-f0-9]{64}$/.test(raw.projectSettingsHash)))fail('INVALID_CONFIG','resourceDomainId')
+  if(raw.resourceDomainId===undefined&&raw.projectSettingsHash!==undefined)fail('INVALID_CONFIG','projectSettingsHash')
   return { kind: 'project', spec: {
-    schemaVersion: 'project-art-spec-v1', projectId: expectedProjectId, version: integer(raw.version, 'version', Number.MAX_SAFE_INTEGER),
+    schemaVersion: 'project-art-spec-v1', projectId: expectedProjectId,...(raw.resourceDomainId?{resourceDomainId:raw.resourceDomainId as string,projectSettingsHash:raw.projectSettingsHash as string}:{}), version: integer(raw.version, 'version', Number.MAX_SAFE_INTEGER),
     project,
     ...(raw.imageOutput === undefined ? {} : { imageOutput: 'transparent-png' as const }),
     inheritance: inherited, overrides, categories: checked,

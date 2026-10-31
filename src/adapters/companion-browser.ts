@@ -1,3 +1,4 @@
+import { validLastOpenedAt } from '../domain/recent-projects'
 import { LOG_LEVELS, LOG_SOURCES, RUNTIME_STATES } from '../domain/companion-browser'
 import type { CallCounts, CallLatest, CallPage, CallRecord, CapabilityProfile, CompanionBrowserProvider, DashboardProject, LogFilter, LogLevel, LogRecord, LogSource, ManagedProject, ManagedStatus, RuntimeState } from '../domain/companion-browser'
 
@@ -78,7 +79,8 @@ function decodeProjects(value: unknown): ManagedProject[] {
   return unique(list(value, 'projects', COMPANION_READ_LIMITS.maxProjects).map((raw) => {
     const item = record(raw, 'projects')
     const version = optionalText(item.requiredCreatorVersion, 'projects', 64)
-    return { id: id(item.id, 'projects'), name: text(item.name, 'projects', 256), path: text(item.path, 'projects', 4096), ...(version === undefined ? {} : { requiredCreatorVersion: version }) }
+    if (item.lastOpenedAt !== undefined && !validLastOpenedAt(item.lastOpenedAt)) throw fail('projects', 'invalid-shape')
+    return { id: id(item.id, 'projects'), name: text(item.name, 'projects', 256), path: text(item.path, 'projects', 4096), ...(version === undefined ? {} : { requiredCreatorVersion: version }), ...(item.lastOpenedAt === undefined ? {} : { lastOpenedAt: item.lastOpenedAt as number }) }
   }), (item) => item.id, 'projects')
 }
 function decodeStatuses(value: unknown): ManagedStatus[] {

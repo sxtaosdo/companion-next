@@ -27,6 +27,7 @@ export interface ProjectSpec {
   sizePolicy: 'single-master'
 }
 export interface Project {
+  lastOpenedAt?: number
   id: string
   name: string
   subtitle?: string

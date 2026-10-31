@@ -1,3 +1,4 @@
+import { validLastOpenedAt } from '../domain/recent-projects'
 import type { Project, ReadOnlyCompanionProvider, ServiceState, ServiceStatus, WorkspaceSnapshot } from '../domain/contracts'
 
 /** Only these verified v133 read routes can be requested by this adapter. */
@@ -87,12 +88,13 @@ function decodeProjects(value: unknown): Project[] {
   const ids = new Set<string>()
   return readArray(value, '/api/projects').map((entry) => {
     if (!isRecord(entry) || !validId(entry.id) || !validName(entry.name)
-      || !validVersion(entry.requiredCreatorVersion) || ids.has(entry.id)) throw fail('/api/projects', 'invalid-shape')
+      || !validVersion(entry.requiredCreatorVersion) || (entry.lastOpenedAt !== undefined && !validLastOpenedAt(entry.lastOpenedAt)) || ids.has(entry.id)) throw fail('/api/projects', 'invalid-shape')
     ids.add(entry.id)
     // Explicit field projection. Never spread remote objects into UI data.
     return {
       id: entry.id,
       name: entry.name.trim(),
+      ...(entry.lastOpenedAt === undefined ? {} : { lastOpenedAt: entry.lastOpenedAt as number }),
       ...(entry.requiredCreatorVersion === undefined ? {} : { engineVersion: entry.requiredCreatorVersion }),
       styleApproval: 'unknown',
       protectedAssets: null,

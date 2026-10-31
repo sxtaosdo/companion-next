@@ -2,7 +2,7 @@
 export const RUNTIME_STATES = ['stopped', 'launching', 'bridge-wait', 'ready', 'stopping', 'crashed', 'incompatible', 'error'] as const
 export type RuntimeState = typeof RUNTIME_STATES[number] | 'unknown'
 export type CapabilityProfile = 'read-only' | 'authoring' | 'full-control' | 'unknown'
-export interface ManagedProject { id: string; name: string; path: string; requiredCreatorVersion?: string }
+export interface ManagedProject { id: string; name: string; path: string; requiredCreatorVersion?: string; lastOpenedAt?: number }
 export interface ManagedStatus {
   projectId: string
   state: RuntimeState

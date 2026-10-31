@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { sortProjectsByRecentOpen } from '../domain/recent-projects'
 import ProjectAddWizard from './ProjectAddWizard.vue'
 import AgentRegistrationPanel from './AgentRegistrationPanel.vue'
 import SetupToolScopePanel from './SetupToolScopePanel.vue'
@@ -17,7 +18,7 @@ import { ProjectSetupError,projectScaffoldTarget,setupStageLabel,validateProject
 import { projectSetupProvider } from '../project-setup-integration'
 import { runtimeStateLabel } from '../domain/companion-browser'
 import type { DashboardProject } from '../domain/companion-browser'
-import { projectDisplayPathKey,projectDisplayRank } from '../domain/companion-project-display'
+import { projectDisplayPathKey } from '../domain/companion-project-display'
 const emit=defineEmits<{(event:'dialog-visibility',open:boolean):void}>()
 const projects=useCompanionBrowserStore(),store=useProjectSetupStore(),lane=useProjectOperationLaneStore()
 const scaffold=useProjectScaffoldStore()
@@ -49,10 +50,7 @@ function dashboardStatus(item:DashboardProject){
  if(runtime?.state)return `已添加 · ${runtimeStateLabel(runtime.state)}`
  return item.running?`Dashboard 已启动${item.pid?` · PID ${item.pid}`:''}`:'已添加'
 }
-const dashboardItems=computed(()=>[...projects.dashboard].sort((left,right)=>{
- const rank=(item:DashboardProject)=>projectDisplayRank(item.running?'dashboard-running':projects.statuses.find(s=>s.projectId===registered(item)?.id)?.state,item.lastOpenedAt)
- const a=rank(left),b=rank(right);return b[0]-a[0]||b[1]-a[1]
-}))
+const dashboardItems=computed(()=>sortProjectsByRecentOpen(projects.dashboard,item=>registered(item)?.id??projectDisplayPathKey(item.path)))
 function dashboardDate(value:number){const date=new Date(value);return Number.isFinite(date.getTime())?date.toLocaleString():'时间未知'}
 function selectDashboard(item:DashboardProject){
  if(lane.locked||!projects.connected||!item.exists||!projects.dashboard.includes(item))return
@@ -210,7 +208,7 @@ defineExpose({openForProject:show,openMaintenance:showMaintenance,close})
     <dl v-if="store.registrationReceipt.project"><dt>后台规范路径</dt><dd>{{ store.registrationReceipt.project.path }}</dd><dt>登记名称 / ID</dt><dd>{{ store.registrationReceipt.project.name }} · {{ store.registrationReceipt.project.id }}</dd></dl>
    </article>
 </section><div class="setup-step-actions"><el-button :disabled="lane.locked" @click="goStep(1)">上一步</el-button><el-button v-if="selected&&projectDisplayPathKey(selected.path)===projectDisplayPathKey(path)" :disabled="lane.locked" type="primary" @click="goStep(3)">下一步</el-button></div></section></section><section class="setup-timeline-item" :class="{active:step===3,done:step>3}"><button type="button" class="setup-timeline-heading" :disabled="lane.locked||step<3" :aria-expanded="step===3" @click="goStep(3)"><span class="setup-timeline-node" aria-hidden="true"/>通过 Dashboard 启动 Creator</button><section v-show="step===3" class="setup-step setup-timeline-panel" data-testid="setup-launch-step">
-    <el-select popper-class="project-setup-select-popper" :model-value="projectId" :disabled="lane.locked" aria-label="安装接入登记工程" @update:model-value="selectRegisteredProject" placeholder="选择已登记工程"><el-option v-for="project in projects.projects" :key="project.id" :value="project.id" :label="`${project.name} · ${project.id}`"/></el-select>
+    <el-select popper-class="project-setup-select-popper" :model-value="projectId" :disabled="lane.locked" aria-label="安装接入登记工程" @update:model-value="selectRegisteredProject" placeholder="选择已登记工程"><el-option v-for="project in projects.orderedProjects" :key="project.id" :value="project.id" :label="`${project.name} · ${project.id}`"/></el-select>
     <p v-if="selected">{{ selected.name }} · {{ selected.id }}<br>{{ selected.path }}</p>
     <p>{{ strictOptions?'Bridge 安装、任务复用与工具范围须明确同意；Creator 和 Codex 可独立选择。':'以下五项均需主动勾选。' }}安装可能覆盖未登记的 extensions/creator-ai-bridge 保留目录；失败不保证回滚，Codex 写入或迁移失败也可能留下部分配置。</p>
     <div class="setup-consents">

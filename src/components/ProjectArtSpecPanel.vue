@@ -2,14 +2,33 @@
 import InfoTip from './InfoTip.vue'
 import ArtInheritanceStatus from './ArtInheritanceStatus.vue'
 import {artSettingHelp,artValueHelp} from '../domain/art-spec-field-help'
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { ArtSpecError, validateArtProjectSettings, ART_CATEGORIES, ART_CANON_USAGES, type CanonArtUsage, type ArtUsage, type ArtCategory, type ArtValues } from '../domain/project-art-spec'
+import { computed, inject, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import ArtProjectOverview from './ArtProjectOverview.vue'
+import { ART_OVERVIEW_NAVIGATION, type ArtOverviewData } from '../domain/art-prototype-presentation'
+import { ArtSpecError, validateArtProjectSettings, validateProjectArtBindings, ART_CATEGORIES, ART_CANON_USAGES, type CanonArtUsage, type ArtUsage, type ArtCategory, type ArtValues } from '../domain/project-art-spec'
 import type { AiResourceConfigV2 } from '../domain/ai-resource-read'
 import { projectArtSpecProvider, type ProjectArtSpecProvider } from '../project-art-spec-integration'
-import { useProjectArtSpecStore } from '../stores/project-art-spec'
-const props = defineProps<{ project: { id: string; name: string; path: string } | null; source: object | null; legacy?: AiResourceConfigV2 | null; provider?: ProjectArtSpecProvider | null; sharedHeader?: boolean }>()
-const store = useProjectArtSpecStore(), category = ref<ArtCategory>('icon')
-const section = ref(0), editing = ref(false)
+import { useProjectArtSpecStore,useResourceDomainArtSpecStore } from '../stores/project-art-spec'
+const props = defineProps<{ project: { id: string; name: string; path: string } | null; source: object | null; legacy?: AiResourceConfigV2 | null; provider?: ProjectArtSpecProvider | null; sharedHeader?: boolean;resourceDomainId?:string;readOnly?:boolean }>()
+const store = props.resourceDomainId?useResourceDomainArtSpecStore():useProjectArtSpecStore(), category = ref<ArtCategory>('icon')
+const overviewNavigation = inject(ART_OVERVIEW_NAVIGATION, null)
+const overview = computed<ArtOverviewData | null>(() => {
+  const saved = store.base
+  if (!saved) return null
+  const pins = saved.inheritance.mode === 'none' ? [] : saved.inheritance.sources
+  const authorities = store.authorities.filter(authority => authority.status === 'Accepted' && authority.projectIds.includes(saved.projectId) && pins.some(pin => pin.path === authority.source.path && pin.revision === authority.source.revision))
+  let valid = true
+  try { validateProjectArtBindings(saved, store.authorities) } catch { valid = false }
+  const value = (field: keyof ArtValues) => valid ? authorities.find(authority => Object.hasOwn(authority.locked, field))?.locked[field] ?? saved.overrides[field] ?? authorities.find(authority => Object.hasOwn(authority.defaults, field))?.defaults[field] : undefined
+  const styleFields = ['renderingLanguage','proportions','realism','materials','lighting','palette'] as const
+  const style = valid ? styleFields.map(field => value(field)).filter(item => typeof item === 'string' && item.trim()).join('；') : '继承来源尚未完整核对，请保留原规范并核对来源。'
+  return { projectName: saved.project.name, version: saved.version, content: saved.project.content, visualMode: saved.project.visualMode, width: saved.project.designResolution.width, height: saved.project.designResolution.height, style,
+    inheritance: saved.inheritance.mode === 'none' ? '项目自身设定' : saved.inheritance.mode === 'style' ? '固定版本的全局画风' : '固定版本的全局设定', sources: pins,
+    destination: !props.resourceDomainId && typeof value('destination') === 'string' ? value('destination') as string : null,
+    exportDirectory: !props.resourceDomainId && typeof value('exportDirectory') === 'string' ? value('exportDirectory') as string : null,
+    transparentPng: saved.imageOutput === 'transparent-png' || value('transparent') === true ? true : null, references: overviewNavigation?.references() ?? [] }
+})
+const section = ref(0), editing = ref(false), editorMode = ref<'edit'|'initialize'>('edit')
 const sectionNames = ['项目设定', '通用规范', '素材分类', '核对保存']
 const reached = ref(0)
 const canvasPresets = [
@@ -28,27 +47,29 @@ function chooseCanvas(event:Event){
 let editorRevision=0
 watch(() => store.context, () => { editorRevision++; section.value = 0; reached.value = 0; editing.value = false }, { flush: 'sync' })
 watch(() => store.draft, value => { if (value && !store.base) editing.value = true })
-function openEditor() {
-  if (!store.context || store.pending || store.blocked || (!!writer.value && store.hash === undefined)) return
+function openInitialization() { openEditor('initialize') }
+function openEditor(mode:'edit'|'initialize'='edit') {
+  if (!store.context || props.readOnly || store.pending || store.blocked || (!!writer.value && store.hash === undefined)) return
   if (store.retained && !store.dirty) store.restoreRetained()
   if (!store.draft) store.startDraft(props.project?.name ?? '')
   if (store.draft) {
     if(props.project && store.draft.project.name!==props.project.name){store.draft.project.name=props.project.name;store.touch()}
     if(!store.base && store.legacyVersion===null && store.draft.project.designResolution.width===0 && store.draft.project.designResolution.height===0){store.draft.project.designResolution={width:750,height:1334};canvasChoice.value='mobile-game';store.touch()}
-    editorRevision++; editing.value = true; section.value = 0; reached.value = 0 }
+    editorRevision++; editorMode.value = mode; editing.value = true; section.value = 0; reached.value = 0 }
 }
 function closeEditor() { editorRevision++; editing.value = false }
 function goToSection(index:number){if(index<=reached.value && !store.pending && !store.blocked && (index<=section.value || !currentErrors.value.length))section.value=index}
 function next() { if (currentErrors.value.length) return; section.value = Math.min(3, section.value + 1); reached.value = Math.max(reached.value, section.value) }
 async function saveAndRead() { const context=store.context, provider=store.provider, revision=editorRevision; await store.save(); if (revision!==editorRevision || !editing.value || store.context!==context || store.provider!==provider) return; if (store.phase === 'saved') { await store.read(); if (revision===editorRevision && editing.value && store.context===context && store.provider===provider) editing.value = ['error','unknown'].includes(store.phase) } }
-defineExpose({ openEditor })
+defineExpose({ openEditor, openInitialization })
 const currentErrors = computed(() => {
   if (section.value === 0 && store.draft) { try { validateArtProjectSettings(store.draft.project); return !store.base && !store.draft.project.visualMode ? ['REQUIRED · project.visualMode'] : [] } catch (error) { return [error instanceof ArtSpecError ? `${error.code} · ${error.field}` : 'INVALID_CONFIG · project'] } }
   return store.errors.filter(error => section.value === 3 || (section.value === 1 ? !/ · (?:project|categories)(?:\.|$)/.test(error) : section.value === 2 ? / · categories(?:\.|$)/.test(error) : false))
 })
 
 const writer = computed(() => props.provider === undefined ? projectArtSpecProvider.value : props.provider)
-watch([() => props.project, () => props.source, writer], () => store.bind(props.project && props.source ? { projectId: props.project.id, projectPath: props.project.path, source: props.source } : null, writer.value), { immediate: true, flush: 'sync' })
+watch([() => props.project, () => props.source,()=>props.resourceDomainId,()=>props.readOnly, writer], () => store.bind(props.project && props.source ? { projectId: props.project.id, projectPath: props.project.path, source: props.source,...(props.resourceDomainId?{resourceDomainId:props.resourceDomainId}:{}),readOnly:props.readOnly } : null, writer.value), { immediate: true, flush: 'sync' })
+watch(()=>store.context, target=>{if(!target?.resourceDomainId)return;void nextTick(()=>{if(store.context===target&&store.phase==='idle'&&store.hash===undefined&&!store.dirty&&!store.pending&&!store.blocked)void store.read()})},{immediate:true,flush:'sync'})
 onBeforeUnmount(store.leave)
 const labels: Record<ArtCategory, string> = { ip: '人物 IP', equipment: '装备', skill: '技能', ui: 'UI', icon: '图标' }
 const fieldLabels: Record<keyof ArtValues, string> = { renderingLanguage: '表现形式', proportions: '比例', realism: '写实程度', materials: '材质', lighting: '光照', palette: '色彩', subject: '主体内容', identity: '身份 / 角色编号', allowedChanges: '允许变化', purpose: '用途', view: '视角', state: '状态', textSafeArea: '文本安全区', destination: 'Creator 资源目录', exportDirectory: '导出目录', backgroundColor: '底色', width: '成品宽', height: '成品高', paddingPercent: '居中留白百分比', transparent: '透明 PNG' }
@@ -112,16 +133,17 @@ const friendlyErrors = computed(() => currentErrors.value.map(error => {
     <p v-if="store.pending" role="status">{{ store.phase==='saving' ? '正在保存规范…' : '正在读取规范…' }}</p>
     <p v-else-if="store.blocked || store.phase==='unknown'" role="status">规范结果待核对，不能创建新规范。</p>
     <p v-else-if="store.phase==='error'" role="alert">规范读取失败，请重试。</p>
-    <div v-else-if="store.base" class="art-saved-summary" data-testid="art-saved-summary"><strong>{{ store.base.project.name }} · v{{ store.base.version }}</strong><span>{{ store.base.project.designResolution.width }} × {{ store.base.project.designResolution.height }}</span><button v-if="!sharedHeader" type="button" :disabled="store.pending || store.blocked" @click="openEditor">查看 / 编辑美术规范</button></div>
-    <div v-else-if="store.hash === null || store.legacyVersion !== null"><p>当前工程尚未配置项目美术规范。</p><el-button v-if="!sharedHeader" type="primary" :disabled="store.pending || store.blocked" @click="openEditor">新建美术规范</el-button><small v-if="store.legacyVersion !== null">已有图标配置 v{{ store.legacyVersion }}，新建时保留原文件并带入可兼容字段。</small></div>
+    <div v-else-if="store.base && !overviewNavigation" class="art-saved-summary" data-testid="art-saved-summary"><strong>{{ store.base.project.name }} · v{{ store.base.version }}</strong><span>{{ store.base.project.designResolution.width }} × {{ store.base.project.designResolution.height }}</span><button v-if="!sharedHeader" type="button" :disabled="readOnly || store.pending || store.blocked" @click="openEditor()">查看 / 编辑美术规范</button></div>
+    <div v-else-if="!store.base && (store.hash === null || store.legacyVersion !== null)"><p>当前工程尚未配置项目美术规范。</p><el-button v-if="!sharedHeader" type="primary" :disabled="readOnly || store.pending || store.blocked" @click="openEditor()">新建美术规范</el-button><small v-if="store.legacyVersion !== null">已有图标配置 v{{ store.legacyVersion }}，新建时保留原文件并带入可兼容字段。</small></div>
     <p v-else-if="!store.pending && !store.draft">请读取当前工程美术规范。</p>
-    <p v-if="store.dirty && !editing" role="status">有未保存的规范草稿。<button type="button" @click="openEditor">继续编辑</button></p>
+    <ArtProjectOverview v-if="overviewNavigation && store.context" :overview="overview" :busy="store.pending || (overviewNavigation.busy?.() ?? false)" :can-edit="!readOnly && !!writer && !store.pending && !store.blocked && store.hash !== undefined" :can-references="overviewNavigation.canReferences()" :can-manage-specs="!!project" @initialize="openInitialization" @edit="openEditor()" @references="overviewNavigation.openReferences()" @specs="overviewNavigation.openSpecs()"/>
+    <p v-if="store.dirty && !editing" role="status">有未保存的规范草稿。<button type="button" @click="openEditor()">继续编辑</button></p>
     <p v-if="store.blocked" role="status">保存结果待核对。<button type="button" :disabled="store.pending || !writer" @click="store.recover">核对原保存结果</button></p>
   </template>
-  <el-dialog class="project-setup-dialog art-spec-dialog" modal-class="project-setup-overlay" :model-value="editing" :title="store.base ? '编辑项目美术规范' : '新建项目美术规范'" width="min(760px, calc(100vw - 24px))" :close-on-click-modal="false" :close-on-press-escape="!store.pending" :show-close="!store.pending" @update:model-value="!$event && closeEditor()">
+  <el-dialog class="project-setup-dialog art-spec-dialog" modal-class="project-setup-overlay" :model-value="editing" :title="editorMode==='initialize' ? '初始化项目美术规范 · 四步流程' : store.base ? '编辑项目美术规范' : '新建项目美术规范'" width="min(760px, calc(100vw - 24px))" :close-on-click-modal="false" :close-on-press-escape="!store.pending" :show-close="!store.pending" @update:model-value="!$event && closeEditor()">
    <template #header="{titleId,titleClass}"><div class="art-dialog-title"><span :id="titleId" :class="titleClass">{{ store.base ? '编辑项目美术规范' : '新建项目美术规范' }}</span><InfoTip label="美术规范填写说明" :text="artSettingHelp.wizard"/></div></template>
    <template v-if="store.draft">
-    <p class="art-project">{{ project?.name }} · {{ project?.path }}</p>
+    <p v-if="resourceDomainId" role="status">当前资源域：{{ resourceDomainId }}。项目名称、引擎、画幅及图片格式继承工程，只读；全局锁定保持不变。</p><p v-if="resourceDomainId==='shared'" role="status">修改此公共规范会影响蚂蚁与厨房；两边引用同一份公共记录。</p><p class="art-project">{{ project?.name }} · {{ project?.path }}</p>
     <p v-if="!writer" class="art-notice" role="status">工程保存接口未接入；仅可保留草稿。</p>
     <p v-if="store.message && ['error','unknown','saving'].includes(store.phase)" role="status">{{ store.message }}</p>
     <p v-if="store.retained">有此工程保留的草稿。<button type="button" :disabled="store.pending || store.blocked" @click="store.restoreRetained">恢复此工程草稿</button></p>
@@ -135,7 +157,7 @@ const friendlyErrors = computed(() => currentErrors.value.map(error => {
      </nav>
      <div class="art-wizard-body" data-testid="art-spec-wizard">
        <h3 data-testid="art-current-section" class="visually-hidden">{{ sectionNames[section] }}</h3>
-    <fieldset v-if="section === 0" :disabled="store.pending || store.blocked" data-testid="art-project-section"><legend>项目设定</legend>
+    <fieldset v-if="section === 0" :disabled="store.pending || store.blocked || !!resourceDomainId" data-testid="art-project-section"><legend>项目设定</legend>
       <div class="art-grid"><label><span class="art-field-title">项目名称<InfoTip label="项目名称说明" :text="artSettingHelp.name"/><small class="art-field-kind">自动带入</small></span><input :value="project?.name" aria-label="美术项目名称" readonly></label><label><span class="art-field-title">引擎<InfoTip label="引擎说明" :text="artSettingHelp.engine"/><small class="art-field-kind">自动带入</small></span><input value="Cocos Creator" aria-label="项目引擎" readonly></label></div>
       <label><span class="art-field-title">2D / 3D 表现<span v-if="!store.base" class="art-required" aria-hidden="true">*</span><InfoTip label="2D / 3D 表现说明" :text="artSettingHelp.visualMode"/><small class="art-field-kind">{{ store.base ? '旧规范可保留未指定' : '必选' }}</small></span><select v-model="store.draft.project.visualMode" aria-label="项目视觉表现" :aria-required="!store.base" @change="store.touch"><option :value="undefined" :disabled="!store.base">{{ store.base ? '未指定（旧规范）' : '请选择' }}</option><option value="2d">2D</option><option value="3d">3D</option></select></label>
       <label><span class="art-field-title">项目内容说明 <span class="art-required" aria-hidden="true">*</span><InfoTip label="项目内容填写说明" :text="artSettingHelp.content"/><small class="art-field-kind">必填</small></span><textarea v-model="store.draft.project.content" aria-label="美术项目内容" aria-required="true" rows="3" maxlength="1500" placeholder="写清游戏类型、核心玩法、世界观或场景、目标用户和美术主题。例：面向休闲玩家的蚂蚁经营小游戏，收集食材扩建厨房，明亮卡通风格。" @input="store.touch"/></label>
@@ -154,7 +176,7 @@ const friendlyErrors = computed(() => currentErrors.value.map(error => {
     </fieldset>
     <fieldset :disabled="store.pending || store.blocked" data-testid="art-project-values"><legend>通用规范</legend>
       <label><span class="art-field-title">画风说明<InfoTip label="画风说明" :text="artValueHelp.renderingLanguage"/><small class="art-field-kind">可选</small></span><span v-if="lock('renderingLanguage','project')!==undefined" class="art-lock">继承锁定</span><textarea :value="String(shown('renderingLanguage','project'))" :disabled="lock('renderingLanguage','project')!==undefined" aria-label="项目画风说明" rows="3" maxlength="1500" @input="update($event,'renderingLanguage','project')"/></label>
-      <div class="art-grid"><label v-for="field in (['destination','exportDirectory'] as const)" :key="field"><span class="art-field-title">{{ fieldLabels[field] }}<InfoTip :label="`${fieldLabels[field]}说明`" :text="artValueHelp[field]"/><small class="art-field-kind">工程内相对目录</small></span><input :value="shown(field,'project')" :disabled="lock(field,'project')!==undefined" :aria-label="`项目${fieldLabels[field]}`" @input="update($event,field,'project')"></label></div>
+      <p v-if="resourceDomainId" role="status">目录待核对，当前资源域未配置导出或导入目标；不会沿用工程旧目录。</p><div v-else class="art-grid"><label v-for="field in (['destination','exportDirectory'] as const)" :key="field"><span class="art-field-title">{{ fieldLabels[field] }}<InfoTip :label="`${fieldLabels[field]}说明`" :text="artValueHelp[field]"/><small class="art-field-kind">工程内相对目录</small></span><input :value="shown(field,'project')" :disabled="lock(field,'project')!==undefined" :aria-label="`项目${fieldLabels[field]}`" @input="update($event,field,'project')"></label></div>
       <p class="art-secondary" data-testid="art-output-policy">{{ store.draft.imageOutput==='transparent-png' ? '图片输出：透明 PNG' : '旧规范输出设置保持不变。' }}<InfoTip label="图片输出说明" :text="artSettingHelp.imageOutput"/></p>
       <p v-if="legacyTechnical" class="art-secondary" data-testid="art-legacy-values">旧尺寸、留白及背景设置已保留，在资源规划时核对。</p>
     </fieldset>

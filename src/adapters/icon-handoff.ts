@@ -1,11 +1,12 @@
+import { createIconSceneBindingProvider, type SceneBindingPath } from './icon-scene-binding'
 import { IconHandoffError, validateIconHandoffInput, decodeIconHandoffResponse, type IconHandoffProvider } from '../domain/icon-handoff'
-export type IconHandoffFetch=(path:`/api/icons/${string}/handoff`,init:RequestInit)=>Promise<Response>
+export type IconHandoffFetch=(path:`/api/icons/${string}/handoff`|SceneBindingPath,init:RequestInit)=>Promise<Response>
 /** Existing authenticated same-origin route. The packet route only reads original task/artifact evidence. */
 export function createIconHandoffProvider(options:{fetch:IconHandoffFetch;timeoutMs?:number}):IconHandoffProvider {
  if(typeof options?.fetch!=='function')throw Error('Explicit handoff transport required')
  const timeout=options.timeoutMs??20_000;if(!Number.isFinite(timeout)||timeout<1||timeout>20_000)throw Error('Invalid handoff timeout')
  let busy=false,idle=Promise.resolve()
- return {label:'原图标任务交接包',waitForIdle:()=>idle,async prepare(projectId,input,snapshot,signal){
+ return {sceneBinding:createIconSceneBindingProvider({fetch:options.fetch,origin:'http://127.0.0.1:32180',timeoutMs:timeout}),label:'原图标任务交接包',waitForIdle:()=>idle,async prepare(projectId,input,snapshot,signal){
   if(busy)throw new IconHandoffError('busy','not-sent');if(signal?.aborted)throw new IconHandoffError('aborted','not-sent')
   const checked=validateIconHandoffInput(projectId,input,snapshot),body=JSON.stringify(checked);if(new TextEncoder().encode(body).byteLength>4096)throw new IconHandoffError('invalid-input','not-sent')
   busy=true;let finish!:()=>void;idle=new Promise(resolve=>{finish=resolve});let active=0,processing=false,invoked=false,timedOut=false

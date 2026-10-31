@@ -1,12 +1,15 @@
+import { orderedProjects as orderProjectRows, validLastOpenedAt } from '../domain/recent-projects'
 import { defineStore } from 'pinia'
 import { CompanionBrowserError } from '../adapters/companion-browser'
-import { ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import type { CompanionBrowserProvider, ManagedProject, ManagedStatus, DashboardProject, LogRecord, LogFilter, CallCounts, CallRecord, CallLatest } from '../domain/companion-browser'
 import { CompanionEventError, type CompanionCallUpdate, type CompanionEventProvider } from '../domain/companion-live'
 import { mergeCalls } from '../domain/companion-browser'
 export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  const provider=shallowRef<CompanionBrowserProvider|null>(null),connected=ref(false)
  const projects=shallowRef<ManagedProject[]>([]),statuses=shallowRef<ManagedStatus[]>([]),dashboard=shallowRef<DashboardProject[]>([]),warnings=ref<string[]>([])
+ const projectOpenings=shallowRef<Array<Pick<DashboardProject,'path'|'lastOpenedAt'>>>([])
+ const orderedProjects=computed(()=>orderProjectRows(projects.value,[...projectOpenings.value,...dashboard.value]).map(item=>item.project))
  const dashboardLoading=ref(false),dashboardError=ref(''),dashboardRead=ref(false),dashboardObservedAt=ref('')
  const projectLoading=ref(false),backgroundProjectRead=ref(false),projectError=ref(''),observedAt=ref(''),projectSnapshotRevision=ref(0)
  const logs=shallowRef<LogRecord[]>([]),logsLoading=ref(false),logsError=ref(''),logsRead=ref(false)
@@ -30,7 +33,7 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  /** Navigation suspends transport without changing the explicit realtime choice. */
  function suspendReads(){setLivePageActive(false);cancelQueries()}
  function reconcileLiveProvider(next:CompanionEventProvider|null){if(liveEnabled.value&&next!==eventProvider)stopLiveTransport()}
- function clearData(){connected.value=false;projects.value=[];statuses.value=[];dashboard.value=[];dashboardRead.value=false;dashboardError.value='';dashboardObservedAt.value='';warnings.value=[];observedAt.value='';logs.value=[];logsRead.value=false;counts.value=null;sessionId.value='';sessionEpoch++;callProjectId.value='';resetCalls()}
+ function clearData(){connected.value=false;projects.value=[];projectOpenings.value=[];statuses.value=[];dashboard.value=[];dashboardRead.value=false;dashboardError.value='';dashboardObservedAt.value='';warnings.value=[];observedAt.value='';logs.value=[];logsRead.value=false;counts.value=null;sessionId.value='';sessionEpoch++;callProjectId.value='';resetCalls()}
  function disconnect(){epoch++;cancelReads();provider.value=null;clearData();projectPollingPaused.value=false;projectError.value='';logsError.value='';countsError.value='';callError.value=''}
  async function connect(next:CompanionBrowserProvider){disconnect();const identity=epoch;provider.value=next;const pending=refreshProjects(),projectVersion=versions.projects;await pending;if(identity===epoch&&versions.projects===projectVersion&&provider.value===next&&connected.value)await refreshCounts()}
  /** A bounded page-entry read, separate from manual reconnect and live polling.
@@ -75,7 +78,10 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
   const read=begin('projects');backgroundProjectRead.value=background&&connected.value;projectLoading.value=true;if(!observedAt.value)projectError.value=''
   try{const result=await active.loadProjects(read.signal);if(!read.current())return
    // Retain identical snapshots so live reads do not rebuild unchanged cards or filters.
-   if(JSON.stringify(projects.value)!==JSON.stringify(result.projects))projects.value=result.projects
+   const sourceProjects=result.projects.map(({lastOpenedAt,...project})=>project)
+   const openings=result.projects.filter(project=>validLastOpenedAt(project.lastOpenedAt)).map(project=>({path:project.path,lastOpenedAt:project.lastOpenedAt!}))
+   if(JSON.stringify(projectOpenings.value)!==JSON.stringify(openings))projectOpenings.value=openings
+   if(JSON.stringify(projects.value)!==JSON.stringify(sourceProjects))projects.value=sourceProjects
    if(JSON.stringify(statuses.value)!==JSON.stringify(result.statuses))statuses.value=result.statuses
    // Normal workspace keeps explicit Dashboard observations across Bridge polling.
    if(active.dashboardDiscoveryEnabled!==false&&JSON.stringify(dashboard.value)!==JSON.stringify(result.dashboard))dashboard.value=result.dashboard
@@ -243,5 +249,5 @@ export const useCompanionBrowserStore=defineStore('companion-browser',()=>{
  function setLiveVisibility(visible:boolean){if(liveVisible.value===visible)return;liveVisible.value=visible;if(!liveEnabled.value)return;clearLiveWork();if(visible&&livePageActive.value)resumeLive();else liveState.value='suspended'}
  watch(provider,next=>{if(liveEnabled.value&&next!==boundReadProvider)stopLiveTransport()},{flush:'sync'})
  watch(logFilter,()=>{cancel('logs');logsLoading.value=false;logsRead.value=false;logs.value=[];logsError.value='';if(liveEnabled.value)queueLiveLogs(liveEpoch)},{deep:true,flush:'sync'})
- return {provider,connected,projects,statuses,dashboard,dashboardLoading,dashboardError,dashboardRead,dashboardObservedAt,refreshDashboard,cancelDashboardRead,warnings,projectLoading,backgroundProjectRead,projectError,observedAt,projectSnapshotRevision,logs,logsLoading,logsError,logsRead,logFilter,counts,countsLoading,countsError,callProjectId,failedOnly,records,callLoading,callError,callRead,total,retained,nextBefore,sessionId,livePreferred,liveEnabled,liveVisible,livePageActive,liveState,liveError,liveRetries,logsPaused,projectPollingPaused,startLive,stopLive,ensureLive,setLiveVisibility,setLivePageActive,pauseLogs,pauseProjectPolling,readProjectEntry,connect,disconnect,cancelReads,suspendReads,reconcileLiveProvider,refreshProjects,refreshLogs,refreshCounts,setCallContext,loadCalls}
+ return {provider,connected,projects,orderedProjects,projectOpenings,statuses,dashboard,dashboardLoading,dashboardError,dashboardRead,dashboardObservedAt,refreshDashboard,cancelDashboardRead,warnings,projectLoading,backgroundProjectRead,projectError,observedAt,projectSnapshotRevision,logs,logsLoading,logsError,logsRead,logFilter,counts,countsLoading,countsError,callProjectId,failedOnly,records,callLoading,callError,callRead,total,retained,nextBefore,sessionId,livePreferred,liveEnabled,liveVisible,livePageActive,liveState,liveError,liveRetries,logsPaused,projectPollingPaused,startLive,stopLive,ensureLive,setLiveVisibility,setLivePageActive,pauseLogs,pauseProjectPolling,readProjectEntry,connect,disconnect,cancelReads,suspendReads,reconcileLiveProvider,refreshProjects,refreshLogs,refreshCounts,setCallContext,loadCalls}
 })
