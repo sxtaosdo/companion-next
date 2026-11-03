@@ -16,7 +16,7 @@ import DevelopmentWorkflowView from './views/DevelopmentWorkflowView.vue'
 export const routes: RouteRecordRaw[] = [
   { path: '/', redirect: '/overview' },
   { path: '/projects', component: CompanionBrowserView, meta: { title: '工程、日志与调用', description: '读取原 Companion 真实记录；管理写操作继续逐项迁移。', workspaceIndependent: true } },
-  { path: '/workflow', component: DevelopmentWorkflowView, meta: { title: '开发工作流', description: '只读核对 GSD 目标与阶段、OpenSpec 规格与变更及对应验收证据。', workspaceIndependent: true } },
+  { path: '/workflow', component: DevelopmentWorkflowView, meta: { title: '开发工作流', description: '管理 GSD 目标、OpenSpec 计划和技术执行记录；产品验收分别核对。', workspaceIndependent: true } },
   { path: '/art-resources', component: ArtWorkspaceView, meta: { title: '美术资源', workspaceIndependent: true } },
   { path: '/ai-icons', redirect: to => ({path:'/art-resources',query:{...to.query,type:'icon'}}) },
   { path: '/knowledge', component: KnowledgeReadView, meta: { title: '检索与文档', description: '选择知识库，检索关键词并阅读文档。', workspaceIndependent: true } },

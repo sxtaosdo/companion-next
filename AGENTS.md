@@ -1,5 +1,9 @@
 # Companion Next execution constraints
 
+## 2026-11-03 本轮 Owner 批准
+
+两后台本机适配明确批准 local-auto、Mac 本地准备及实际部署，覆盖旧账号交互必需的限定。模式由本机配置显式选择；account 不因故障降级。本机授权沿用宿主会话及 Host/Origin/权限边界，不扩大 Creator、GPU 或外部平台授权。Windows 未实测时必须单列。
+
 User instruction, 2026-10-21 11:52:23 UTC:
 
 > 你对cocos creator的所有操作都要用开发者后台

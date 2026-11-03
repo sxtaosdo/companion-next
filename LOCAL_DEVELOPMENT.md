@@ -158,3 +158,9 @@ AI变体只读结论：通用asset_import接受绝对sourcePath与db://assets/..
 证据：C:/Users/33272/AppData/Local/Temp/companion-dashboard-rework-20261020-1421（delivery-summary.json、candidate-browser.json、deployed-browser.json、deployment.json、http-verification.json、final-protection.json、post-static-baseline.json）。文档提交不改变实际部署源码6cc9c28。
 
 知识库拆页已只读评估，未改路由/导航/结构：建议三个子页“检索与文档（默认）／问答／连接与同步”，二级入口；ID/切片/原始回执留详情，问答方式页内切换。实施需保留选中库、搜索结果/条件/返回位置和跨页UNKNOWN保护，旧knowledge及models链接兼容；问答/Agent/同步不能因已有入口称真实验收通过。待用户确认方案后才实施。
+# 本机核心准备（2026-11-03）
+
+分别准备 Node 22 和 Node 25/ABI 141，保持原锁文件。首次用目标 Node 25 执行 `scripts/runtime-gate.mjs host-start -- scripts/start-companion.mjs --no-browser`，建立只含认证模式和 Node 路径的本机配置。Mac 双击入口从配置读取 Node，不修改系统 PATH。
+
+local-auto 为本次批准的默认准备模式。account 使用既有账号提供方，切换运行中实例须正常维护。可选的 `companion-start.local.json` 继续严格校验原已批准的美术绑定；缺少该文件仍能启动核心管理，不启用生成。
+

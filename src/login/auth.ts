@@ -2,13 +2,19 @@ import { safeCompanionReturnTo } from '../domain/companion-session-recovery'
 export class LoginFailure extends Error {
   constructor(public readonly code: string) { super(code) }
 }
-export interface LoginConfig { available: boolean; configured: boolean; captchaRequired?: boolean }
+export interface LoginConfig { available: boolean; configured: boolean; captchaRequired?: boolean; authMode?: 'account' | 'local-auto' }
 export interface Captcha { captchaId: string; image: string }
 export interface LoginForm { username: string; password: string; captchaId?: string; verifyCode?: string }
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value)
 async function request(fetcher: typeof fetch, path: string, init?: RequestInit): Promise<unknown> {
+  const controller = new AbortController()
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => { timer = setTimeout(() => { controller.abort(); reject(new LoginFailure('AUTH_TIMEOUT')) }, 5000) })
+  try { return await Promise.race([read(), deadline]) }
+  finally { clearTimeout(timer) }
+  async function read(): Promise<unknown> {
   let response: Response
-  try { response = await fetcher(path, { credentials: 'same-origin', cache: 'no-store', redirect: 'error', ...init }) } catch { throw new LoginFailure('AUTH_PROVIDER_UNAVAILABLE') }
+  try { response = await fetcher(path, { credentials: 'same-origin', cache: 'no-store', redirect: 'error', ...init, signal: controller.signal }) } catch { throw new LoginFailure('AUTH_PROVIDER_UNAVAILABLE') }
   let data: unknown
   try { data = await response.json() } catch { throw new LoginFailure('AUTH_INVALID_RESPONSE') }
   if (!response.ok) {
@@ -21,11 +27,24 @@ async function request(fetcher: typeof fetch, path: string, init?: RequestInit):
     throw new LoginFailure(response.status === 403 ? 'AUTH_ACCESS_DENIED' : 'AUTH_INVALID_RESPONSE')
   }
   return data
+  }
 }
 export async function readLoginConfig(fetcher: typeof fetch): Promise<LoginConfig> {
   const data = await request(fetcher, '/api/auth/config')
   if (!object(data) || typeof data.available !== 'boolean' || typeof data.configured !== 'boolean') throw new LoginFailure('AUTH_INVALID_RESPONSE')
-  return { available: data.available, configured: data.configured, ...(data.captchaRequired === false ? { captchaRequired: false } : {}) }
+  if (data.authMode !== undefined && data.authMode !== 'account' && data.authMode !== 'local-auto') throw new LoginFailure('AUTH_INVALID_RESPONSE')
+  return { available: data.available, configured: data.configured, ...(data.captchaRequired === false ? { captchaRequired: false } : {}), ...(data.authMode !== undefined ? { authMode: data.authMode } : {}) }
+}
+const localSessions = new WeakMap<typeof fetch, Promise<void>>()
+/** Same-origin local capability only; never used as a fallback for an account error. */
+export function authorizeLocalSession(fetcher: typeof fetch): Promise<void> {
+  const pending = localSessions.get(fetcher)
+  if (pending) return pending
+  const operation = request(fetcher, '/api/auth/local-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(data => {
+    if (!object(data) || Object.keys(data).length !== 1 || data.authenticated !== true) throw new LoginFailure('AUTH_INVALID_RESPONSE')
+  }).finally(() => { if (localSessions.get(fetcher) === operation) localSessions.delete(fetcher) })
+  localSessions.set(fetcher, operation)
+  return operation
 }
 export async function readCaptcha(fetcher: typeof fetch): Promise<Captcha> {
   const data = await request(fetcher, '/api/auth/captcha')
@@ -58,5 +77,5 @@ export function finishLogin(search: string, origin: string, embeddedParent: Pick
 }
 export function loginError(error: unknown): string {
   const code = error instanceof LoginFailure ? error.code : 'AUTH_PROVIDER_UNAVAILABLE'
-  return ({ AUTH_RATE_LIMITED: '登录尝试过多，请稍后重试。', AUTH_INVALID_CREDENTIALS: '用户名或密码不正确，请重新输入。', AUTH_ACCOUNT_NOT_ALLOWED: '此账号不允许登录开发者后台。', AUTH_NOT_CONFIGURED: '尚未配置允许登录的账号，当前拒绝登录。', AUTH_PROVIDER_UNAVAILABLE: '认证服务暂不可用，请稍后重试。', AUTH_ACCESS_DENIED: '访问被拒绝，请检查登录权限。', UI_SESSION_REQUIRED: '当前浏览器会话未建立，请重新登录。', AUTH_INVALID_RESPONSE: '登录响应无效，请稍后重试。' } as Record<string, string>)[code] ?? '登录失败，请稍后重试。'
+  return ({ AUTH_TIMEOUT: '会话连接超时，请重试进入；未重复提交操作。', AUTH_RATE_LIMITED: '登录尝试过多，请稍后重试。', AUTH_INVALID_CREDENTIALS: '用户名或密码不正确，请重新输入。', AUTH_ACCOUNT_NOT_ALLOWED: '此账号不允许登录开发者后台。', AUTH_NOT_CONFIGURED: '尚未配置允许登录的账号，当前拒绝登录。', AUTH_PROVIDER_UNAVAILABLE: '认证服务暂不可用，请稍后重试。', AUTH_ACCESS_DENIED: '访问被拒绝，请检查登录权限。', UI_SESSION_REQUIRED: '当前浏览器会话未建立，请重新登录。', AUTH_INVALID_RESPONSE: '登录响应无效，请稍后重试。' } as Record<string, string>)[code] ?? '登录失败，请稍后重试。'
 }

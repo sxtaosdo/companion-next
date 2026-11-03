@@ -6,7 +6,7 @@ See COOL-ADMIN-LICENSE.txt. -->
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import PicCaptcha from './PicCaptcha.vue'
-import { finishLogin, loginError, LoginFailure, readCaptcha, readLoginConfig, submitLogin, verifyLoginSession } from './auth'
+import { authorizeLocalSession, finishLogin, loginError, LoginFailure, readCaptcha, readLoginConfig, submitLogin, verifyLoginSession } from './auth'
 const phase = ref<'checking' | 'ready' | 'blocked' | 'complete'>('checking')
 const saving = ref(false)
 const captchaLoading = ref(false)
@@ -15,29 +15,42 @@ const captchaImage = ref('')
 const error = ref('')
 const form = reactive({ username: '', password: '', captchaId: '', verifyCode: '' })
 let active = true, revision = 0
+let initializing = false
+const fetcher = window.fetch.bind(window)
 async function refreshCaptcha() {
   if (!active || !captchaRequired.value || saving.value || captchaLoading.value || phase.value !== 'ready') return
   const current = ++revision
   captchaLoading.value = true
   form.captchaId = ''; form.verifyCode = ''; captchaImage.value = ''
   try {
-    const data = await readCaptcha(window.fetch.bind(window))
+    const data = await readCaptcha(fetcher)
     if (active && current === revision) { form.captchaId = data.captchaId; captchaImage.value = data.image }
   } catch (failure) { if (active && current === revision) error.value = loginError(failure) }
   finally { if (active && current === revision) captchaLoading.value = false }
 }
 async function initialize() {
-  if (saving.value || phase.value === 'checking' && captchaLoading.value) return
+  if (initializing || saving.value || phase.value === 'checking' && captchaLoading.value) return
+  initializing = true
   phase.value = 'checking'; error.value = ''
   try {
-    const config = await readLoginConfig(window.fetch.bind(window))
+    const config = await readLoginConfig(fetcher)
     if (!active) return
+    if (config.authMode === 'local-auto') {
+      await authorizeLocalSession(fetcher)
+      if (!active) return
+      await verifyLoginSession(fetcher)
+      if (!active) return
+      phase.value = 'complete'
+      finishLogin(window.location.search, window.location.origin, window.parent === window ? null : window.parent, target => window.location.replace(target), window.location.hash)
+      return
+    }
     if (!config.configured || !config.available) {
       phase.value = 'blocked'; error.value = loginError(new LoginFailure(!config.configured ? 'AUTH_NOT_CONFIGURED' : 'AUTH_PROVIDER_UNAVAILABLE')); return
     }
     captchaRequired.value = config.captchaRequired !== false
     phase.value = 'ready'; if (captchaRequired.value) await refreshCaptcha()
   } catch (failure) { if (active) { phase.value = 'blocked'; error.value = loginError(failure) } }
+  finally { initializing = false }
 }
 async function toLogin() {
   if (!active || saving.value || captchaLoading.value || phase.value !== 'ready') return

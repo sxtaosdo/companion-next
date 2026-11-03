@@ -4,6 +4,7 @@ import { createRequire } from 'node:module';
 import { dirname, resolve, join, win32 } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {DEPENDENCIES} from '../../cocos-mcp/mcp/src/companion/dependency-contract.mjs';
+import { loadHostProfile, coreStartupEnvironment } from './host-profile.mjs';
 
 export const STARTUP_BUDGET_MS = 65_000;
 export const READ_BUDGET_MS = 10_000;
@@ -14,6 +15,7 @@ const host = resolve(root, '../cocos-mcp/mcp');
 export const DAEMON_ENTRY = join(host, DEPENDENCIES.daemon.entry);
 export class StartupError extends Error { constructor(code, { stage, reason, exitCode, officialReason, officialExitCode } = {}) { super(code); this.code = code; if (stage) this.stage = stage; if (reason) this.reason = reason; if (Number.isSafeInteger(exitCode)) this.exitCode = exitCode; if (officialReason) this.officialReason = officialReason; if (Number.isSafeInteger(officialExitCode)) this.officialExitCode = officialExitCode; } }
 export const LOCAL_STARTUP_CONFIG = join(root, 'companion-start.local.json');
+export const LOCAL_HOST_PROFILE = join(root, 'companion-host.local.json');
 // This allowlist is the Owner-approved machine binding, not a generation default.
 export const APPROVED_STARTUP_CONFIG = Object.freeze({
   CREATOR_AI_ICONS_STUDIO_ROOT: 'D:/code/shidai3/P9000/ai-game-studio',
@@ -267,6 +269,7 @@ export async function startCompanion({ noBrowser = false, feature = 'management'
     throw error;
   }
   const { client, status } = observed, lateReady = !!startFailure;
+  await deps.checkAuthMode?.(client);
   const receipt = { url: NEXT, pid: status.identity.pid, lateReady,
     ...(startFailure ? { officialReason: ['cli-readiness-deadline', 'cli-timeout', 'cli-error', 'cli-protocol'].includes(startFailure.reason) ? startFailure.reason : 'cli-unconfirmed' } : {}) };
   if(feature==='workflow'){
@@ -288,20 +291,25 @@ export function startupFailureSummary(error) {
 export async function main(args = process.argv.slice(2)) {
   if (args.includes('--help')) { console.log('npm start [-- --no-browser] [--workflow]\nStarts/reuses account and Companion. --workflow also verifies the controlled executable and knowledge health; it does not start knowledge or model services. Closing the new browser window does not stop the daemon.'); return; }
   if (args.some(arg => !['--no-browser','--workflow'].includes(arg))) throw new StartupError('UNKNOWN_OPTION');
-  const env = startupEnvironment();
-  console.log('Project-local resource configuration loaded. New daemon processes use it; an already running daemon keeps its configuration until an approved maintenance restart.');
+  const profile = loadHostProfile(LOCAL_HOST_PROFILE, { create: true });
+  const env = existsSync(LOCAL_STARTUP_CONFIG)
+    ? { ...startupEnvironment(), COMPANION_AUTH_MODE: profile.authMode }
+    : coreStartupEnvironment(process.env, profile);
+  console.log('Machine profile loaded (' + profile.authMode + '). Existing daemon identity is verified before reuse; optional resource services are not started.');
   delete process.env.DEBUG; delete process.env.PWDEBUG;
   const { CompanionApiClient } = await import(pathToFileURL(join(host, 'dist/companion-api-client.js')).href);
   const result = await startCompanion({ noBrowser: args.includes('--no-browser'),feature:args.includes('--workflow')?'workflow':'management' }, {
     checkWorkflow:async()=>{const {createSubmissionPreflight}=await import(pathToFileURL(join(host,'src/companion/workflow-operations/integration/submission-preflight.mjs')).href);await createSubmissionPreflight()();},
-    ensureAuth: () => ensureAccountProvider(), start: () => officialStart(env), discover: () => CompanionApiClient.discover(),
+    ensureAuth: () => profile.authMode === 'account' ? ensureAccountProvider() : Promise.resolve(), start: () => officialStart(env), discover: () => CompanionApiClient.discover(),
+    checkAuthMode: async client => {
+      const config = await client.request('GET', '/api/auth/config', undefined, AbortSignal.timeout(5000));
+      if (config?.authMode !== profile.authMode) throw new StartupError('HOST_AUTH_MODE_MISMATCH', { stage: 'auth-mode', reason: 'existing-daemon-requires-normal-maintenance' });
+    },
     createBrowser: async () => {
       const { chromium } = createRequire(join(host, 'package.json'))('playwright');
-      const executablePath = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', 'C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(existsSync);
-      if (!executablePath) throw new StartupError('EDGE_NOT_FOUND');
       const browserEnv = { ...env };
       for (const name of ['CREATOR_AI_DAEMON_TOKEN', 'COMPANION_KNOWLEDGE_CREDENTIAL_FILE', 'WEKNORA_API_KEY', 'KNOWLEDGE_SYNC_API_KEY']) delete browserEnv[name];
-      return chromium.launch({ executablePath, headless: false, env: browserEnv });
+      return chromium.launch({ channel: 'msedge', headless: false, env: browserEnv });
     },
   });
   if (result.lateReady) console.log('Official CLI did not confirm startup (' + result.officialReason + '); the authenticated daemon is now OPEN. No second start was issued.');

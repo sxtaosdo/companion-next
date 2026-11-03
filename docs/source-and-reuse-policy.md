@@ -22,7 +22,11 @@
 4. 不为“复用”引入无关整套系统，不重复建设已存在的状态、存储或认证机制；需要额外依赖或扩大功能、权限时，按用户授权范围先提出具体方案。
 5. 以实际行为验证接线结果。源码合入、构建成功、运行进程已加载和真实页面验收分别报告；模拟测试不能替代真实流程验收。
 
-## 当前认证工作的复用边界
+## 2026-11-03 本轮本机模式
+
+本机配置显式选择 local-auto 时，复用原 Companion Cookie 和可信启动票据，网页通过受同源、Host、loopback 约束的本机会话进入，不查询运营身份提供方。account 模式继续使用下述提供方、账号许可和七天会话。失败不切换模式，本机模式不冒充七天账号会话。
+
+## 账号模式认证复用边界
 
 The current approved browser login reuses the existing Cool-admin/Midway authentication provider. Companion adapts its existing Cookie session; it does not implement password hashing, copy signing keys, initialize an account database, or create accounts. The original Companion CLI authorization remains compatible, but a terminal-command guide is not the requested browser login experience.
 

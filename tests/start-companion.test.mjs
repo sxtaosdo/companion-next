@@ -117,7 +117,7 @@ test('e2e generation accepts only the complete explicit approved profile',()=>{
   {CREATOR_AI_ICONS_ENDPOINT:'http://0.0.0.0:8188'},
   {CREATOR_AI_ICONS_ENDPOINT:'https://paid.example'},
   {CREATOR_AI_ICONS_LEASE:'D:/other'},
-  {CREATOR_AI_ICONS_GENERATION_PROJECT_IDS:'04c4cde24ee76d83'},
+  {CREATOR_AI_ICONS_GENERATION_PROJECT_IDS:'unapproved-project'},
   {CREATOR_AI_ICONS_GENERATION_PROJECT_IDS:'16ad921aa0fb06d6,04c4cde24ee76d83'},
   {CREATOR_AI_ICONS_MODE:'offline_import_only'},
  ])assert.throws(()=>validateStartupConfiguration({...profile,...drift}),StartupError);

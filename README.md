@@ -1,3 +1,13 @@
+## 2026-11-03 本机自动授权与双平台核心启动
+
+本次批准默认在首次启动时建立不提交的 `companion-host.local.json`，显式选择 `local-auto`。核心管理无需密码或验证码，不依赖运营认证、知识库或美术生成服务；原 `account` 模式保留且失败不自动降级。
+
+使用已核验 Node 25 执行 `scripts/runtime-gate.mjs host-start -- scripts/start-companion.mjs`，仅启动服务增加 `--no-browser`。Mac 完成一次准备后可双击“启动开发后台.command”。前端仍使用 Node 22，宿主要求 Node 25/ABI 141。旧运行实例模式不一致时通过正常维护切换，不强制覆盖。
+
+网页会话五秒超时，失败可重试，恢复不自动重发业务操作。CLI/MCP 沿用原受信本机接口，Creator 动作仍必须从后台 UI 发起。正式工作区使用 `build:companion-workspace`，登录资源使用 `build:companion-login`，其他构建模式保持专项兼容。
+
+GSD 保存目标，OpenSpec 保存规格与计划，Companion 保存技术执行记录；产品正式状态与生产验收仍由各自权威合同决定。本轮不迁移账本。源码、构建和现场验收分别留证，以下部署记录按原日期阅读。
+
 Execution and acceptance: [single checklist](docs/execution-checklist.md). Test/build and host-start use separate enforced runtime gates.
 
 2026-10-21 启动入口及开机验收收尾：Next入口代码已提交f0bac11 / 1.3.173.193；熟悉的cocos-mcp根目录和web目录均使用 `npm run start:next`，本仓用 `npm start`。用户已亲自从新入口打开，随后仅只读核实，Companion仍PID21872/OPEN，无重复启动、重启或终止服务，没有操作用户当前标签。旧仓两个package仅新增本任务别名，保留未提交，不混入并行发布；旧start与22条原并行修改保持。
@@ -97,7 +107,7 @@ Execution and acceptance: [single checklist](docs/execution-checklist.md). Test/
 
 2026-10-17接续：新96变体已在独立工程完成场景保存/跨会话重开、真实Preview/Profiler/WebMobile/Smoke；证据521fcf8、说明c80b890/.18，两张750×1334钱袋图已查看，运行诊断为空，累计554.154/1800秒且测试进程/端口全关。原工具scene_validate弃用warn误判false及可选等待跳过均保留。随后原任务历史/status与96PNG真实读取200，源796a233保持、currentHead=c80b890，82项定向回归/strict类型通过，未发现需改业务代码的确切缺陷。当前页面实际版本1.3.173、部署源仍3074d37/.25；用户要求的[新开发者后台](http://127.0.0.1:32180/next/index.html)已通过正式入口打开，认证Edge核页面200/六资源SHA/0页面错误，用户窗口保留。模型与Creator未为接续回归或开页启动；[本片记录](docs/history-read-regression-20261017.md)区分源码、部署、实际读取与整体缺口，下列旧“未做运行验收”是原时间事实。
 
-**当前版本：`v1.3.173.267`**
+**当前版本：`v1.3.173.268`**
 
 2026-10-17 新尺寸变体入口本机交付：尺寸回执旁“导入当前工程”已实现并部署3074d37/1.3.173.25（页面产品仍1.3.173），新隔离任务一次96×96导入、PNG/meta与UUID/SpriteFrame及真实预览通过，母图未导入。3883项完整回归、类型/构建和六HTTP SHA通过；自有进程/端口关闭，累计412.673/1800秒，无云上传。新资源未做场景/Preview/Build，productionVerified固定false。[唯一计划与证据](docs/variant-ui-import-20261017.md)。下列05:40记录保留原时间。
 
