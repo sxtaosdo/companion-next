@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { COMPANION_SESSION_REQUIRED_EVENT, installCompanionSessionRecovery, isSessionRestoredMessage, safeCompanionReturnTo } from '../src/domain/companion-session-recovery'
+import { loginDestination } from '../src/login/auth'
 const origin = 'http://127.0.0.1:32180'
 const settle = () => new Promise(resolve => setTimeout(resolve, 15))
 const disposals: Array<() => void> = []
@@ -62,7 +63,25 @@ describe('session-required transport guidance', () => {
   })
 })
 describe('safe return and trusted iframe messages', () => {
-  it.each(['/next/index.html?mode=edit#/art-resources?project=abc'])('preserves internal page, query and route: %s', value => expect(safeCompanionReturnTo(value)).toBe(value))
+  const versionedPath = `/game-meta-${'a1'.repeat(32)}/index.html`
+  it('preserves versioned Game Meta paths and safely merges the inherited route', () => {
+    expect(safeCompanionReturnTo(`${versionedPath}?mode=edit#/projects?project=abc`)).toBe(`${versionedPath}?mode=edit#/projects?project=abc`)
+    const search = `?returnTo=${encodeURIComponent(`${versionedPath}?mode=edit`)}`
+    expect(loginDestination(search, '#/projects?project=abc')).toBe(`${versionedPath}?mode=edit#/projects?project=abc`)
+    expect(loginDestination(search, '#/projects?token=secret')).toBe('/next/index.html#/overview')
+    expect(loginDestination(search, '#//evil.test')).toBe('/next/index.html#/overview')
+  })
+  it.each([
+    `/game-meta-${'a'.repeat(63)}/index.html`, `/game-meta-${'a'.repeat(65)}/index.html`,
+    `/game-meta-${'A'.repeat(64)}/index.html`, `/game-meta-${'g'.repeat(64)}/index.html`,
+    `/game-meta-%61${'a'.repeat(63)}/index.html`, `/x/../game-meta-${'a'.repeat(64)}/index.html`,
+    `/game-meta-${'a'.repeat(64)}/%69ndex.html`, `/game-meta-${'a'.repeat(64)}/index.html/`,
+    `//evil.test${versionedPath}`, `${versionedPath}?access_token=secret`,
+    `${versionedPath}#/projects?refresh_token=secret`, `${versionedPath}#https://evil.test`,
+    `${versionedPath}#//evil.test`, `${versionedPath}#/%2fevil.test`, `${versionedPath}?bad=%`,
+  ])('rejects unsafe versioned return path %s', value => expect(safeCompanionReturnTo(value)).toBeNull())
+  it.each(['/next/index.html?mode=edit#/art-resources?project=abc', '/game-meta/index.html', '/game-meta/index.html?mode=edit#/projects?project=abc'])('preserves internal page, query and route: %s', value => expect(safeCompanionReturnTo(value)).toBe(value))
+  it.each(['/game-meta/', '/game-meta/index.html/', '/game-meta/../game-meta/index.html', '/game-meta/%2e%2e/game-meta/index.html', '/game-meta/%69ndex.html', '//evil.test/game-meta/index.html', '/game-meta/index.html?token=secret', '/game-meta/index.html?%61ccess_token=secret', '/game-meta/index.html#/projects?refresh_token=secret', '/game-meta/index.html#https://evil.test', '/game-meta/index.html?bad=%'])('rejects unsafe Game Meta return path %s', value => expect(safeCompanionReturnTo(value)).toBeNull())
   it.each(['/', '/next/'])('normalizes %s to Next', value => expect(safeCompanionReturnTo(value)).toBe('/next/index.html'))
   it.each(['https://evil.test', '//evil.test/next/index.html', '/%2f/evil.test', '/next/index.html\\evil', '/next/index.html%0a', '/login', '/next/index.html?token=secret', '/next/index.html?access_token=secret', '/next/index.html#/projects?refresh_token=secret', '/next/index.html#/projects?token=secret', '/next/index.html#https://evil.test', '/next/../login', '/next/index.html?bad=%', null])('rejects unsafe return path %s', value => expect(safeCompanionReturnTo(value)).toBeNull())
   it('requires exact message schema, origin and iframe source', () => {

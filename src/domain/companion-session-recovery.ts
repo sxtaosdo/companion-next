@@ -10,8 +10,12 @@ export function safeCompanionReturnTo(value: unknown): string | null {
   if (/[\\\u0000-\u001f\u007f]/.test(decoded) || decoded.startsWith('//')) return null
   try {
     const url = new URL(value, 'http://127.0.0.1')
-    if (url.origin !== 'http://127.0.0.1' || !['/', '/next/', '/next/index.html'].includes(url.pathname)) return null
+    const versionedGameMeta = /^\/game-meta-[0-9a-f]{64}\/index\.html$/.test(url.pathname)
+    if (url.origin !== 'http://127.0.0.1' || (!['/', '/next/', '/next/index.html', '/game-meta/index.html'].includes(url.pathname) && !versionedGameMeta)) return null
+    // Game Meta endpoints are exact routes, not normalized or encoded path variants.
+    if ((url.pathname === '/game-meta/index.html' || versionedGameMeta) && value.split(/[?#]/, 1)[0] !== url.pathname) return null
     if (url.hash && !url.hash.startsWith('#/')) return null
+    if (versionedGameMeta && url.hash && decodeURIComponent(url.hash).startsWith('#//')) return null
     // Authorization codes and credentials must never be copied into a return URL.
     const sensitive = (params: URLSearchParams) => [...params.keys()].some(key => /^(?:code|token|access_token|refresh_token|password|secret|authorization)$/i.test(key))
     if (sensitive(url.searchParams) || sensitive(new URLSearchParams(url.hash.split('?').slice(1).join('?')))) return null
