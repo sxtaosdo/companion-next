@@ -12,9 +12,37 @@ import ArtWorkbenchManager from '../components/ArtWorkbenchManager.vue'
 import AiResourceReadView from './AiResourceReadView.vue'
 import ImageAssetsView from './ImageAssetsView.vue'
 import { useAiResourceReadStore } from '../stores/ai-resource-read'
+import { useArtWorkbenchStore } from '../stores/art-workbench'
+import { companionBrowserProvider } from '../companion-browser-integration'
 import { useRegisteredProjectPage } from '../composables/use-registered-project-page'
 const route=useRoute(),router=useRouter(),selection=useRegisteredProjectPage(),resourceReads=useAiResourceReadStore()
 const domains=useArtResourceDomainsStore(),projectSpec=useProjectArtSpecStore(),domainSpec=useResourceDomainArtSpecStore()
+const workbench=useArtWorkbenchStore(),statusBar=ref<InstanceType<typeof ArtStatusBar>|null>(null)
+const refreshing=ref(false),refreshMessage=ref('')
+let refreshTarget:{id:string;path:string;source:object|null}|null=null
+const hasDraft=computed(()=>projectSpec.dirty||domainSpec.dirty||workbench.dirty)
+const refreshDisabled=computed(()=>refreshing.value||hasDraft.value||projectSpec.pending||domainSpec.pending||workbench.busy||domains.phase==='reading'||!selection.directory||selection.directory.projectLoading||!companionBrowserProvider.value)
+async function refreshAll(){
+ if(refreshDisabled.value)return
+ const project=selection.project,source=selection.currentSource,provider=companionBrowserProvider.value
+ const previousRevision=selection.directory.projectSnapshotRevision
+ refreshTarget=project?{id:project.id,path:project.path,source}:null
+ refreshing.value=true;refreshMessage.value='';await nextTick()
+ try{
+  if(selection.directory.provider)await selection.directory.refreshProjects()
+  else if(provider)await selection.directory.connect(provider)
+  if(selection.directory.projectError){refreshMessage.value='工程列表刷新失败，请重试。';return}
+  if(selection.directory.projectSnapshotRevision<=previousRevision){refreshMessage.value='工程列表刷新未确认，请重试。';return}
+  if(!project){refreshMessage.value='工程列表已刷新，请选择工程。';return}
+  if(selection.project?.id!==project.id||selection.project.path!==project.path||selection.currentSource!==source){refreshMessage.value='工程状态发生变化，请重新选择工程。';return}
+  await domains.read()
+  if(domains.phase!=='ready'){refreshMessage.value='资源域刷新未确认，请重试。';return}
+  if(selection.project?.id!==project.id||selection.project.path!==project.path||selection.currentSource!==source){refreshMessage.value='工程状态发生变化，请重新选择工程。';return}
+  const refreshed=await statusBar.value?.refreshPublicSpecification()
+  if(selection.project?.id!==project.id||selection.project.path!==project.path||selection.currentSource!==source){refreshMessage.value='工程状态发生变化，请重新选择工程。';return}
+  refreshMessage.value=refreshed?'工程数据已刷新。':'工程规范未能确认，请重试。'
+ }catch{refreshMessage.value='工程数据刷新未完成，请重试。'}finally{refreshTarget=null;refreshing.value=false}
+}
 const domainSpecification=computed<ArtSpecificationState|null>(()=>{
  if(!domains.selected)return null
  const context=domainSpec.context,project=selection.project
@@ -29,7 +57,7 @@ const domainSpecification=computed<ArtSpecificationState|null>(()=>{
 })
 const domainNorm=ref<InstanceType<typeof ProjectArtSpecPanel>|null>(null)
 const domainWriter=globalThis.location.hostname==='127.0.0.1'?createProjectArtSpecProvider((...args)=>fetch(...args),globalThis.location.origin):null
-watch([()=>selection.project,()=>selection.currentSource],()=>{domains.bind(selection.project&&selection.currentSource?{projectId:selection.project.id,projectPath:selection.project.path,source:selection.currentSource}:null);if(selection.project)void domains.read()},{immediate:true,flush:'sync'})
+watch([()=>selection.project,()=>selection.currentSource],()=>{const p=selection.project,s=selection.currentSource;domains.bind(p&&s?{projectId:p.id,projectPath:p.path,source:s}:null);if(p&&!(refreshing.value&&refreshTarget?.id===p.id&&refreshTarget.path===p.path&&refreshTarget.source===s))void domains.read()},{immediate:true,flush:'sync'})
 function selectDomain(id:string|undefined){domains.select(id);current.value={step:view.value==='norm'?0:view.value==='specs'?1:2,reached:2}}
 function chooseDomain(event:Event){const value=(event.target as HTMLSelectElement).value;domains.select(value||undefined);current.value={step:view.value==='norm'?0:view.value==='specs'?1:2,reached:2}}
 const specificationEditor=ref<InstanceType<typeof AiResourceReadView>|null>(null),manager=ref<InstanceType<typeof ArtWorkbenchManager>|null>(null)
@@ -58,15 +86,19 @@ onBeforeUnmount(()=>resourceReads.disconnect())
 </script>
 <template>
  <section class="art-workspace" data-testid="art-workspace">
-  <ArtStatusBar :domain-specification="domainSpecification" :specification-read-only="domains.legacyReadOnly||!!domains.selected" @open-specification="openSpecification" :service="referencesOpen?referenceService:null" :show-creator="current.step>=4" :show-model="current.step===2||current.step===3"><el-button @click="references" :aria-expanded="referencesOpen" aria-controls="art-references">参考素材</el-button></ArtStatusBar>
-  <div class="art-domain-bar"><label>资源域<select :value="domains.selected??''" :disabled="domains.phase!=='ready'" @change="chooseDomain"><option value="">{{ domains.catalog?.legacy.readOnly?'原工程记录 · 未分配（只读）':'工程公共规范' }}</option><option v-for="domain in domains.catalog?.domains??[]" :key="domain.id" :value="domain.id">{{ domain.name }} · {{ domain.configured?'已配置':'未配置' }}</option></select></label><el-button :disabled="!selection.project||domains.phase==='reading'" @click="domains.read()">读取 / 刷新资源域</el-button><span v-if="domains.phase==='reading'" role="status">正在读取资源域…</span><span v-if="domains.error" role="alert">{{ domains.error }}；未改动原记录。</span><details v-if="domains.selectedDescriptor"><summary>资源域独立目录绑定</summary><span>独立目录绑定未配置；图标规格中的导入、导出目录分别核对。不会自动迁移原工程数据。</span></details></div>
+  <ArtStatusBar ref="statusBar" unified-refresh :refresh-busy="refreshing" :refresh-disabled="refreshDisabled" :domain-specification="domainSpecification" :specification-read-only="domains.legacyReadOnly||!!domains.selected" @refresh-all="refreshAll" @open-specification="openSpecification" :service="referencesOpen?referenceService:null" :show-creator="current.step>=4" :show-model="current.step===2||current.step===3"><el-button @click="references" :aria-expanded="referencesOpen" aria-controls="art-references">参考素材</el-button></ArtStatusBar>
+  <p v-if="hasDraft" role="status">请先保存未完成的草稿，再刷新工程数据。</p><p v-else-if="refreshMessage" role="status">{{ refreshMessage }}</p>
+  <div class="art-refresh-content" :inert="refreshing ? 'true' : undefined">
+  <div class="art-domain-bar"><label>资源域<select :value="domains.selected??''" :disabled="domains.phase!=='ready'" @change="chooseDomain"><option value="">{{ domains.catalog?.legacy.readOnly?'原工程记录 · 未分配（只读）':'工程公共规范' }}</option><option v-for="domain in domains.catalog?.domains??[]" :key="domain.id" :value="domain.id">{{ domain.name }} · {{ domain.configured?'已配置':'未配置' }}</option></select></label><span v-if="domains.phase==='reading'" role="status">正在读取资源域…</span><span v-if="domains.error" role="alert">{{ domains.error }}；未改动原记录。</span><details v-if="domains.selectedDescriptor"><summary>资源域独立目录绑定</summary><span>独立目录绑定未配置；图标规格中的导入、导出目录分别核对。不会自动迁移原工程数据。</span></details></div>
   <p v-if="selection.project&&domains.phase==='ready'&&!domains.selected&&(domains.catalog?.domains.filter(d=>d.configured).length??0)>1" role="status">请选择资源域，查看对应素材需求。</p><p v-if="selection.project&&domains.phase==='ready'&&!domains.selected&&!domains.catalog?.legacy.hasConfig&&!domains.catalog?.domains.some(d=>d.configured)" role="status">当前工程尚未配置美术规范，请先配置项目规范和资源域。</p>
   <nav class="art-task-tabs" role="tablist" aria-label="美术工作台管理视图" @keydown="keyTab"><button v-for="value in views" :id="'art-manage-'+value" :key="value" role="tab" type="button" :aria-selected="view===value" :tabindex="view===value?0:-1" aria-controls="art-management" @click="selectView(value)">{{ titles[value] }}</button></nav>
   <section v-if="referenceVisited" v-show="referencesOpen" id="art-references" class="reference-tools" aria-label="参考素材工具"><div class="section-heading"><h2>参考素材采集</h2><el-button @click="referencesOpen=false">收起</el-button></div><AiResourceReadView embedded shared-header reference-tools/><ImageAssetsView embedded :active="referencesOpen&&route.path==='/art-resources'" @status-change="referenceService=$event"/></section>
   <section id="art-management" role="tabpanel" :aria-labelledby="'art-manage-'+view" class="art-current-stage" data-testid="art-current-stage"><header class="section-heading"><h2>{{ titles[view] }}</h2></header><div v-show="view==='norm'"><ProjectArtSpecPanel v-if="domains.selected" :key="domains.selected" ref="domainNorm" :project="selection.project" :source="selection.currentSource" :provider="domainWriter" :resource-domain-id="domains.selected" :read-only="domains.phase!=='ready'"/><AiResourceReadView v-else ref="specificationEditor" embedded shared-header :read-only="domains.legacyReadOnly"/></div><ArtWorkbenchManager v-show="view!=='norm'" ref="manager" :view="view==='specs'?'specs':'needs'" :resource-domain-id="domains.selected" :read-only="domains.legacyReadOnly" :shared-available="domains.catalog?.domains.some(domain=>domain.id==='shared')??false" @open-domain="selectDomain" @open-management="selectView" @open-references="openReferences" @stage-change="view!=='norm'&&(current=$event)"/></section>
+  </div>
  </section>
 </template>
 <style scoped>
+.art-refresh-content{display:grid;gap:16px}
 .art-domain-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.art-domain-bar label{display:flex;align-items:center;gap:8px}.art-domain-bar select{font:inherit;max-width:100%;padding:6px;background:var(--el-bg-color);color:var(--el-text-color-primary);border:1px solid var(--el-border-color);border-radius:4px}.art-workspace{display:grid;gap:16px}.art-task-tabs{display:flex;gap:6px;border-bottom:1px solid var(--el-border-color);padding-bottom:8px}.art-task-tabs button{font:inherit;font-size:14px;padding:9px 20px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--el-text-color-regular);cursor:pointer}.art-task-tabs button[aria-selected=true]{background:var(--el-color-primary-light-9);color:var(--el-color-primary);border-color:var(--el-color-primary-light-7);font-weight:600}.art-task-tabs button:focus-visible,.resource-steps button:focus-visible{outline:2px solid var(--el-color-primary);outline-offset:2px}.resource-steps button:disabled{cursor:default;opacity:.55}.art-current-stage{display:grid;gap:12px}.reference-tools{border:1px solid var(--el-border-color);padding:14px;border-radius:8px}.art-current-stage h2{margin:0}
 
 /* Declaration bodies below are reused from the approved prototype. */
