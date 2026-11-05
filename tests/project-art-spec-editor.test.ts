@@ -159,6 +159,12 @@ describe('new art output policy and compatible project drafts', () => {
     expect(store.draft).not.toHaveProperty('imageOutput');expect(store.draft!.overrides).toMatchObject({transparent:false,backgroundColor:'#123456',destination:legacy.destination.directory,exportDirectory:'art/final/icons'})
     expect(store.draft!.project).not.toHaveProperty('visualMode')
   })
+  it('defaults a new draft over legacy data to the available P0001 style without writing the old configuration',async()=>{
+    const store=useProjectArtSpecStore(),host=provider(),legacy=resourceView(context.projectId).config!,pin={path:'P0001/art/master-style-reference.md',revision:'a'.repeat(40)}
+    const authorities=[{source:pin,status:'Accepted' as const,kind:'art-style' as const,projectIds:[context.projectId],allowedUsages:['project-art' as const],categories:['icon' as const],locked:{},defaults:{},requiresImageReference:true}]
+    const original=JSON.stringify(legacy);host.read=vi.fn(async()=>({...receipt(),config:legacy,authorities}));store.bind(context,host);await store.read();store.startDraft('Existing legacy')
+    expect(store.draft!.inheritance).toEqual({mode:'style',usage:'project-art',sources:[pin]});expect(JSON.stringify(legacy)).toBe(original);expect(host.save).not.toHaveBeenCalled()
+  })
   it('keeps new metadata through ambiguous save recovery and project-isolated drafts',async()=>{
     const {store,host}=await setup();store.draft!.project.visualMode='2d';store.draft!.imageOutput='transparent-png';store.touch();store.confirmed=true
     let completed!:ProjectArtSpecReceipt;host.save=vi.fn(async(binding,input)=>{completed={...receipt({...input.config,version:2},'b'.repeat(64)),operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed'}};throw new ProjectArtSpecWriteError('unknown')})

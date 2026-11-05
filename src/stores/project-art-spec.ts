@@ -95,7 +95,7 @@ function projectArtSpecSetup() {
       project: { name, content: '', engine: 'cocos-creator', designResolution: legacyConfig ? { ...legacyConfig.designResolution } : { width: 0, height: 0 } },
       ...(legacyConfig ? {} : { imageOutput: 'transparent-png' as const }),
       inheritance: { mode: 'none', reason: '' }, overrides: legacyConfig ? { width: legacyConfig.iconSize.width, height: legacyConfig.iconSize.height, transparent: legacyConfig.background.transparent, backgroundColor: legacyConfig.background.color, destination: legacyConfig.destination.directory, exportDirectory: legacyConfig.destination.exportDirectory, paddingPercent: legacyConfig.composition.paddingPercent } : { destination: 'assets/art', exportDirectory: 'art/final', transparent: true }, categories: {} }
-    if (!legacyConfig) { const styles = authorities.value.filter(a => a.kind === 'art-style' && a.allowedUsages.includes('project-art')); if (styles.length) draft.value.inheritance = { mode: 'style', usage: 'project-art', sources: styles.map(a => ({ ...a.source })) } }
+    { const styles = authorities.value.filter(a => a.kind === 'art-style' && a.allowedUsages.includes('project-art')); if (styles.length) draft.value.inheritance = { mode: 'style', usage: 'project-art', sources: styles.map(a => ({ ...a.source })) } }
     phase.value = 'editing'; message.value = '未保存草稿；请填写项目设定，保存前需读取工程原文件。'
   }
   function setValue(layer: 'project' | ArtCategory, key: keyof ArtValues, value: string | number | boolean) {
