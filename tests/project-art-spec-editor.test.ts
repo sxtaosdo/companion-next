@@ -2,6 +2,7 @@ import { resourceView } from './fixtures/ai-resource-read'
 // @ts-ignore Node test runtime provides webcrypto; no browser dependency or Node types required.
 import { webcrypto } from 'node:crypto'
 import { artBindingHash, pendingArtWrite } from '../src/domain/project-art-pending'
+import {readArtDraft} from '../src/domain/project-art-draft'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { useProjectArtSpecStore } from '../src/stores/project-art-spec'
@@ -14,6 +15,41 @@ function provider(): ProjectArtSpecProvider { return { label: 'test host', endpo
 async function setup() { const store = useProjectArtSpecStore(), host = provider(); store.bind(context, host); await store.read(); store.draft!.project.content = 'Changed content'; store.touch(); store.confirmed = true; return { store, host } }
 beforeEach(() => { vi.stubGlobal('crypto',webcrypto); const data=new Map<string,string>();Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:(key:string)=>data.get(key)??null,setItem:(key:string,value:string)=>{data.set(key,value)},removeItem:(key:string)=>{data.delete(key)},clear:()=>data.clear()}}); setActivePinia(createPinia()) })
 describe('project art editor real-provider boundary', () => {
+  it('restores an incomplete new project draft after a fresh store and isolates projects',async()=>{
+    const host=provider();host.read=vi.fn(async()=>receipt(null,null))
+    const first=useProjectArtSpecStore(createPinia());first.bind(context,host);await first.read();first.startDraft('Project');first.draft!.project.content='尚未填写完成的内容';first.draft!.project.designResolution.width=0
+    const reloaded=useProjectArtSpecStore(createPinia()),fresh={...context,source:{}};reloaded.bind(fresh,host);await reloaded.read();expect(reloaded.retained).not.toBeNull();reloaded.restoreRetained()
+    expect(reloaded.draft!.project.content).toBe('尚未填写完成的内容');expect(reloaded.draft!.project.designResolution.width).toBe(0);expect(host.save).not.toHaveBeenCalled()
+    const other=useProjectArtSpecStore(createPinia()),otherContext={...fresh,projectId:'ffffffffffffffff',projectPath:'/other'};host.read=vi.fn(async()=>({...receipt(null,null),projectId:otherContext.projectId,projectPath:otherContext.projectPath}));other.bind(otherContext,host);await other.read();expect(other.retained).toBeNull()
+  })
+  it('preserves a browser draft when the underlying legacy configuration changes',async()=>{
+    const host=provider();host.read=vi.fn(async()=>receipt(null,null));const first=useProjectArtSpecStore(createPinia());first.bind(context,host);await first.read();first.startDraft('Project');first.draft!.project.content='保留的内容'
+    const legacy=resourceView(context.projectId).config!;host.read=vi.fn(async()=>({...receipt(),config:legacy}));const reopened=useProjectArtSpecStore(createPinia());reopened.bind({...context,source:{}},host);await reopened.read();expect(reopened.draftStorageConflict).toBe(true);reopened.startDraft('Project');expect(reopened.draft).toBeNull();expect(reopened.draftStorageMessage).toContain('原浏览器草稿已保留')
+  })
+  it('reports browser storage failures without discarding the in-memory draft',async()=>{
+    const host=provider();host.read=vi.fn(async()=>receipt(null,null));const store=useProjectArtSpecStore(createPinia());store.bind(context,host);await store.read()
+    vi.spyOn(window.localStorage,'setItem').mockImplementation(()=>{throw Error('storage full')});store.startDraft('Project');store.draft!.project.content='仍在页面中的内容'
+    expect(store.draft!.project.content).toBe('仍在页面中的内容');expect(store.draftStorageMessage).toContain('未能保存草稿')
+  })
+  it('keeps the newer in-memory draft when storage failed and the project is switched',async()=>{
+    const host=provider();host.read=vi.fn(async ctx=>({...receipt(null,null),projectId:ctx.projectId,projectPath:ctx.projectPath}));const store=useProjectArtSpecStore(createPinia());store.bind(context,host);await store.read();store.startDraft('Project');store.draft!.project.content='A'
+    vi.spyOn(window.localStorage,'setItem').mockImplementation(()=>{throw Error('storage full')});store.draft!.project.content='B'
+    store.bind({...context,projectId:'ffffffffffffffff',projectPath:'/other'},host);await store.read();store.bind(context,host);await store.read();store.restoreRetained()
+    expect(store.draft!.project.content).toBe('B')
+  })
+  it('preserves a newer draft from another page when a prior save completes',async()=>{
+    const host=provider();host.read=vi.fn(async()=>receipt(null,null));const first=useProjectArtSpecStore(createPinia());first.bind(context,host);await first.read();first.startDraft('Project');first.draft!.project.content='A';first.draft!.project.visualMode='2d';first.draft!.project.designResolution={width:750,height:1334}
+    const second=useProjectArtSpecStore(createPinia());second.bind({...context,source:{}},host);await second.read();second.restoreRetained()
+    let release!:()=>void;const wait=new Promise<void>(r=>{release=r});host.save=vi.fn(async(binding,input)=>{await wait;return {...receipt({...input.config,version:1},'b'.repeat(64)),operation:{operationId:input.operationId,bindingHash:await artBindingHash(binding.projectId,binding.projectPath,input),state:'completed' as const}}})
+    first.confirmed=true;const saving=first.save();await vi.waitFor(()=>expect(host.save).toHaveBeenCalled());second.draft!.project.content='B';release();await saving
+    expect(first.phase).toBe('saved');expect(readArtDraft(context,host)?.record.draft.project.content).toBe('B');expect(first.draftStorageMessage).toContain('其他页面更新的草稿已保留')
+  })
+  it('does not acquire another page’s draft version by switching projects',async()=>{
+    const host=provider();host.read=vi.fn(async ctx=>({...receipt(null,null),projectId:ctx.projectId,projectPath:ctx.projectPath}));const first=useProjectArtSpecStore(createPinia());first.bind(context,host);await first.read();first.startDraft('Project');first.draft!.project.content='A'
+    const second=useProjectArtSpecStore(createPinia());second.bind({...context,source:{}},host);await second.read();second.restoreRetained();second.draft!.project.content='B';first.draft!.project.content='A2'
+    first.bind({...context,projectId:'ffffffffffffffff',projectPath:'/other'},host);await first.read();first.bind(context,host);await first.read();first.restoreRetained()
+    expect(first.draft!.project.content).toBe('A2');expect(readArtDraft(context,host)?.record.draft.project.content).toBe('B');expect(first.draftStorageMessage).toContain('其他页面变化')
+  })
   it('preselects reviewed style only for a new draft and preserves a saved independent spec',async()=>{
     const store=useProjectArtSpecStore(),host=provider(),pin={path:'P0001/art/master-style-reference.md',revision:'a'.repeat(40)};
     const authorities=[{source:pin,status:'Accepted' as const,kind:'art-style' as const,projectIds:[context.projectId],allowedUsages:['project-art' as const],categories:['icon' as const],locked:{palette:'青绿/橙/白'},defaults:{},requiresImageReference:true}];

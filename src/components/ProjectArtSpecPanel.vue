@@ -49,7 +49,7 @@ watch(() => store.context, () => { editorRevision++; section.value = 0; reached.
 watch(() => store.draft, value => { if (value && !store.base) editing.value = true })
 function openInitialization() { openEditor('initialize') }
 function openEditor(mode:'edit'|'initialize'='edit') {
-  if (!store.context || props.readOnly || store.pending || store.blocked || (!!writer.value && store.hash === undefined)) return
+  if (!store.context || props.readOnly || store.pending || store.blocked || (store.draftStorageConflict && !store.base) || (!!writer.value && store.hash === undefined)) return
   if (store.retained && !store.dirty) store.restoreRetained()
   if (!store.draft) store.startDraft(props.project?.name ?? '')
   if (store.draft) {
@@ -137,6 +137,7 @@ const friendlyErrors = computed(() => currentErrors.value.map(error => {
     <div v-else-if="!store.base && (store.hash === null || store.legacyVersion !== null)"><p>当前工程尚未配置项目美术规范。</p><el-button v-if="!sharedHeader" type="primary" :disabled="readOnly || store.pending || store.blocked" @click="openEditor()">新建美术规范</el-button><small v-if="store.legacyVersion !== null">已有图标配置 v{{ store.legacyVersion }}，新建时保留原文件并带入可兼容字段。</small></div>
     <p v-else-if="!store.pending && !store.draft">请读取当前工程美术规范。</p>
     <ArtProjectOverview v-if="overviewNavigation && store.context" :overview="overview" :busy="store.pending || (overviewNavigation.busy?.() ?? false)" :can-edit="!readOnly && !!writer && !store.pending && !store.blocked && store.hash !== undefined" :can-references="overviewNavigation.canReferences()" :can-manage-specs="!!project" @initialize="openInitialization" @edit="openEditor()" @references="overviewNavigation.openReferences()" @specs="overviewNavigation.openSpecs()"/>
+    <p v-if="store.draftStorageMessage && !editing" role="status">{{ store.draftStorageMessage }}</p>
     <p v-if="store.dirty && !editing" role="status">有未保存的规范草稿。<button type="button" @click="openEditor()">继续编辑</button></p>
     <p v-if="store.blocked" role="status">保存结果待核对。<button type="button" :disabled="store.pending || !writer" @click="store.recover">核对原保存结果</button></p>
   </template>
@@ -145,6 +146,7 @@ const friendlyErrors = computed(() => currentErrors.value.map(error => {
    <template v-if="store.draft">
     <p v-if="resourceDomainId" role="status">当前资源域：{{ resourceDomainId }}。项目名称、引擎、画幅及图片格式继承工程，只读；全局锁定保持不变。</p><p v-if="resourceDomainId==='shared'" role="status">修改此公共规范会影响蚂蚁与厨房；两边引用同一份公共记录。</p><p class="art-project">{{ project?.name }} · {{ project?.path }}</p>
     <p v-if="!writer" class="art-notice" role="status">工程保存接口未接入；仅可保留草稿。</p>
+    <p v-if="store.draftStorageMessage" role="status">{{ store.draftStorageMessage }}</p>
     <p v-if="store.message && ['error','unknown','saving'].includes(store.phase)" role="status">{{ store.message }}</p>
     <p v-if="store.retained">有此工程保留的草稿。<button type="button" :disabled="store.pending || store.blocked" @click="store.restoreRetained">恢复此工程草稿</button></p>
     <div class="art-wizard-layout">
