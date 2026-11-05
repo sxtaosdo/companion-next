@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, toRaw } from 'vue'
+import { computed, inject, toRaw, toRef } from 'vue'
 import { routerKey } from 'vue-router'
 import { Refresh } from '@element-plus/icons-vue'
 import { useKnowledgeReadStore } from '../stores/knowledge-read'
@@ -20,7 +20,7 @@ function selectProject(id:string){if(router)void router.push({path:router.curren
 function refreshProjects(){if(directory.provider)void directory.refreshProjects();else if(companionBrowserProvider.value)void directory.connect(companionBrowserProvider.value)}
 const model=computed<State>(()=>knowledge.provider!==knowledgeReadProvider.value||!knowledge.provider?{text:'未读取',tone:'info'}:knowledge.statusLoading?{text:'读取中',tone:'primary',busy:true}:knowledge.serviceError?{text:'读取失败',tone:'danger'}:knowledge.services?.model?.running===true?{text:'已连接',tone:'success'}:knowledge.services?.model?.running===false?{text:'未连接',tone:'info'}:knowledge.services?{text:'未知，待核对',tone:'warning'}:{text:'未读取',tone:'info'})
 const selection=useRegisteredProjectStore(), directory=selection.directory, operations=useCreatorOperationsStore()
-const {art,specification,specificationSource,specificationActionLabel,busy:specBusy,canRefresh,refresh:refreshSpecification}=useArtSpecificationContext()
+const {art,specification,specificationSource,specificationActionLabel,busy:specBusy,canRefresh,refresh:refreshSpecification}=useArtSpecificationContext(toRef(props,'refreshBusy'))
 async function refreshPublicSpecification(){if(!canRefresh.value)return false;await refreshSpecification();return specification.value.kind==='configured'||specification.value.kind==='missing'}
 defineExpose({refreshPublicSpecification})
 const visibleSpecification=computed(()=>props.domainSpecification??specification.value)

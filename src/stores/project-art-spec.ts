@@ -72,7 +72,7 @@ function projectArtSpecSetup() {
     if (blocked.value) { await recover(); return }
     inheritanceResolution.value = null; pending.value = true; phase.value = 'reading'; confirmed.value = false; hash.value = undefined; legacyVersion.value = null; controller = new AbortController()
     const signal = controller.signal
-    const timer = setTimeout(() => { controller?.abort(); if (revision === epoch) { phase.value = 'error'; message.value = '读取等待超时；原读取仍待清理，不发送并发请求。' } }, 20_000)
+    const timer = setTimeout(() => { if (revision === epoch) { controller?.abort(); phase.value = 'error'; message.value = '读取等待超时；原读取仍待清理，不发送并发请求。' } }, 20_000)
     try {
       const receipt = await reader.read(captured, signal), parsed = checkedReceipt(receipt, captured)
       if (signal.aborted || revision !== epoch || provider.value !== reader || !same(context.value, captured)) return

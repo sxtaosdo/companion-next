@@ -130,6 +130,35 @@ describe('shared project art specification status and actions',()=>{
   expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('missing');expect(wrapper!.get('[data-testid="open-art-specification"]').text()).toBe('新建美术规范')
   expect(art.draft).toBeNull();expect(provider.save).not.toHaveBeenCalled()
  })
+ it('automatically resumes a cancelled initial read after the panel changes its read-only binding',async()=>{
+  const pending:Array<{resolve:(value:ProjectArtSpecReceipt)=>void}> = []
+  const provider=modern(vi.fn(()=>new Promise<ProjectArtSpecReceipt>(resolve=>pending.push({resolve}))))
+  const {art,source}=await enter(provider);expect(pending).toHaveLength(1)
+  art.bind({projectId:id,projectPath:project.path,source,readOnly:true},provider);await flushPromises()
+  expect(pending).toHaveLength(2)
+  art.bind({projectId:id,projectPath:project.path,source,readOnly:false},provider);await flushPromises();expect(pending).toHaveLength(3)
+  pending[0]!.resolve(receipt(specification()));pending[1]!.resolve(receipt(specification()));pending[2]!.resolve(receipt(null));await flushPromises()
+  expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('missing')
+  expect(wrapper!.get('[data-testid="open-art-specification"]').text()).toBe('新建美术规范')
+  expect(provider.save).not.toHaveBeenCalled()
+ })
+ it('automatically resumes when an outgoing panel cancels a read without changing the project',async()=>{
+  const pending:Array<{resolve:(value:ProjectArtSpecReceipt)=>void}> = []
+  const provider=modern(vi.fn(()=>new Promise<ProjectArtSpecReceipt>(resolve=>pending.push({resolve}))))
+  const {art}=await enter(provider);expect(pending).toHaveLength(1)
+  art.leave();await flushPromises();expect(pending).toHaveLength(2)
+  pending[1]!.resolve(receipt(null));await flushPromises()
+  pending[0]!.resolve(receipt(specification()));await flushPromises()
+  expect(wrapper!.get('[data-testid="open-art-specification"]').text()).toBe('新建美术规范');expect(art.base).toBeNull()
+ })
+ it('does not start a competing automatic read during the unified manual refresh',async()=>{
+  const provider=modern(vi.fn(async()=>receipt(null))),{art,source}=await enter(provider)
+  expect(provider.read).toHaveBeenCalledTimes(1)
+  await wrapper!.setProps({refreshBusy:true});art.bind({projectId:id,projectPath:project.path,source,readOnly:true},provider);await flushPromises()
+  expect(provider.read).toHaveBeenCalledTimes(1)
+  art.bind({projectId:id,projectPath:project.path,source,readOnly:false},provider);await art.read();await flushPromises()
+  await wrapper!.setProps({refreshBusy:false});await flushPromises();expect(provider.read).toHaveBeenCalledTimes(2)
+ })
  it('does not classify read failure as missing, auto-retry it, or offer new creation',async()=>{
   const provider=modern(vi.fn(async()=>{throw Error('isolated read failure')})),{pinia,selection}=await enter(provider)
   expect(wrapper!.get('[data-status="specification"]').attributes('data-spec-state')).toBe('error');expect(tag('specification').classes()).toContain('el-tag--danger')

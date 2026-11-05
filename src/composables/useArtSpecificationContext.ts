@@ -1,4 +1,4 @@
-import { computed, nextTick, onScopeDispose, watch } from 'vue'
+import { computed, nextTick, onScopeDispose, watch, type Ref } from 'vue'
 import { useRegisteredProjectStore } from '../stores/registered-project'
 import { useProjectArtSpecStore } from '../stores/project-art-spec'
 import { useAiResourceReadStore } from '../stores/ai-resource-read'
@@ -20,7 +20,7 @@ const automaticReads = new WeakMap<object, ReadBinding>()
 const sameBinding = (a: ReadBinding | undefined, b: ReadBinding) => !!a && a.projectId === b.projectId && a.projectPath === b.projectPath && a.source === b.source && a.provider === b.provider
 
 /** One shared state projection. Only a newly bound project gets one automatic specification read; never writes or migration. */
-export function useArtSpecificationContext() {
+export function useArtSpecificationContext(pauseAutomatic?: Ref<boolean | undefined>) {
   const selection = useRegisteredProjectStore(), art = useProjectArtSpecStore(), resource = useAiResourceReadStore()
   let active = true
   onScopeDispose(() => { active = false })
@@ -29,12 +29,12 @@ export function useArtSpecificationContext() {
     art.bind(project && source ? { projectId: project.id, projectPath: project.path, source } : null, provider)
     resource.setContext(project, source)
     if (resource.provider && resource.provider !== aiResourceReadProvider.value) resource.invalidateProvider()
-    if (!project || !source || !provider || art.hash !== undefined || art.dirty || art.pending || art.blocked) return
+    if (pauseAutomatic?.value || !project || !source || !provider || art.hash !== undefined || art.dirty || art.pending || art.blocked) return
     const binding = { projectId: project.id, projectPath: project.path, source, provider }
     // Child props and outgoing panels can still call bind/leave in this render.
     // Wait for that lifecycle to settle, then capture the single read attempt.
     void nextTick(() => {
-      if (!active || selection.project?.id !== binding.projectId || selection.project.path !== binding.projectPath
+      if (!active || pauseAutomatic?.value || selection.project?.id !== binding.projectId || selection.project.path !== binding.projectPath
         || selection.currentSource !== binding.source || projectArtSpecProvider.value !== binding.provider
         || art.context?.projectId !== binding.projectId || art.context.projectPath !== binding.projectPath
         || art.context.source !== binding.source || art.provider !== binding.provider
@@ -43,6 +43,23 @@ export function useArtSpecificationContext() {
       void art.read()
     })
   }, { immediate: true, flush: 'sync' })
+  // A panel can change its read-only binding (or leave) after the initial
+  // request starts. That aborts the old request without changing selection;
+  // retry once for the settled binding, but never retry failed reads or drafts.
+  watch([() => art.context, () => art.phase, () => pauseAutomatic?.value], () => {
+    if (pauseAutomatic?.value || art.phase !== 'idle' || art.pending || art.dirty || art.blocked || art.hash !== undefined) return
+    automaticReads.delete(art)
+    const project = selection.project, source = selection.currentSource, provider = projectArtSpecProvider.value, context = art.context
+    if (!project || !source || !provider || !context || context.projectId !== project.id || context.projectPath !== project.path || context.source !== source || art.provider !== provider) return
+    const binding = { projectId: project.id, projectPath: project.path, source, provider }
+    void nextTick(() => {
+      if (!active || pauseAutomatic?.value || art.context !== context || selection.project?.id !== binding.projectId || selection.project.path !== binding.projectPath
+        || selection.currentSource !== binding.source || projectArtSpecProvider.value !== binding.provider || art.provider !== provider
+        || art.phase !== 'idle' || art.hash !== undefined || art.dirty || art.pending || art.blocked || sameBinding(automaticReads.get(art), binding)) return
+      automaticReads.set(art, binding)
+      void art.read()
+    })
+  }, { immediate: true, flush: 'post' })
   const primaryBound = computed(() => !!selection.project && !!selection.currentSource && !!projectArtSpecProvider.value
     && art.context?.projectId === selection.project.id && art.context.projectPath === selection.project.path
     && art.context.source === selection.currentSource && art.provider === projectArtSpecProvider.value)
