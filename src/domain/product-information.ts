@@ -7,6 +7,7 @@ export const frontendIdentity = { name: 'Companion Next', version, releaseDate: 
 export const legacyReference = { inspectedVersion: '0.3.148', currentTarget: 'v150 后端', targetStatus: 'v148 原UI / 完整后端源码已核；v150指定状态和启动合同另核。现场旧UI版本字面量0.3.142与后端不同，不据此覆盖旧资产；Vue迁移与宿主业务集成分别验收', bridgeProtocol: '0.4.0（v148 关于页声明，非当前探测）' } as const
 
 export const frontendChanges = [
+  { version: '1.3.205', date: '2026-11-06', title: '美术工作台操作精简（候选）', changes: ['规格与需求的常用操作集中显示，低频读取与参考操作收入更多菜单；保存和结果待核对保护保持不变。', '工作台状态栏单行展示，窄屏可横向滚动；状态仍以实际读取结果为准。'] },
   { version: '1.3.205', date: '2026-11-05', title: '美术规范默认画风（候选）', changes: ['项目美术方向卡片移除重复的初始化和编辑按钮，使用顶部规范入口。', '新建项目美术规范填写时自动在浏览器保存草稿，重新进入可恢复；正式规范仍需确认保存。', '新建项目美术规范时默认继承 P0001 画风，保留已有规范和旧配置。'] },
   { version: '1.3.205', date: '2026-11-04', title: 'Game Meta 登录返回兼容（候选）', changes: ['原账号与显式本机授权的登录页面可返回精确 Game Meta 固定入口及摘要版本入口，安全保留页面路由；沿用原来源及凭据参数检查。实际部署与平台验收状态以 Game Meta 记录为准。'] },
   { version: '1.3.205', date: '2026-11-03', title: '双平台本机自动授权', changes: ['显式本机模式无需密码或验证码，沿用宿主会话与工程权限；账号模式保留且失败不自动降级。', '登录与会话恢复增加五秒超时及并发合并，恢复后不重放业务操作。', '核心启动不再要求运营认证与Windows美术路径；复用本机Edge，新增Mac启动入口。', '工作流执行记录与产品验收分别说明；Windows实机验证另行记录。'] },
