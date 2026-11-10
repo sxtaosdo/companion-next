@@ -4,6 +4,12 @@
 param([switch]$StartOnly, [switch]$NoBrowser)
 $ErrorActionPreference = 'Stop'
 Remove-Item Env:WEKNORA_API_KEY, Env:KNOWLEDGE_SYNC_API_KEY -ErrorAction SilentlyContinue
+$node = (Get-Command node.exe -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
+$nodeVersion = & $node --version
+$nodeMatch = [regex]::Match([string]$nodeVersion, '^v26\.(\d+)\.\d+$')
+if ($LASTEXITCODE -ne 0 -or -not $nodeMatch.Success -or [int]$nodeMatch.Groups[1].Value -lt 13) {
+    throw 'Use the installed Node.js 26.13.0 or a later Node 26 release.'
+}
 $readerReference = 'D:/services/weknora/cli/private/pilot-recovery-reader.dpapi'
 # Persist only the existing path, never a key. Reject an unrelated prior configuration.
 $savedReference = [Environment]::GetEnvironmentVariable('COMPANION_KNOWLEDGE_CREDENTIAL_FILE', 'User')
@@ -26,8 +32,8 @@ $env:CREATOR_AI_OWNER_REVIEW_ROOT = 'D:/code/shidai3/P8000/public-image-review'
 $env:CREATOR_AI_OWNER_CACHE = 'C:/Users/33272/AppData/Local/Temp/companion-owner-host-implementation-20261018/directed-acceptance-cache'
 $daemonArguments = @('D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js', 'daemon', 'start')
 if (-not $StartOnly) { $daemonArguments += '--restart' }
-& 'C:/Program Files/nodejs/node.exe' @daemonArguments
+& $node @daemonArguments
 if ($LASTEXITCODE -ne 0) { throw 'Guarded Companion restart did not succeed; stop here.' }
 if (-not $NoBrowser) {
-    & 'C:/Program Files/nodejs/node.exe' 'D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js' ui
+    & $node 'D:/code/shidai3/P8000/cocos-mcp/mcp/dist/companion/creator-ai.js' ui
 }

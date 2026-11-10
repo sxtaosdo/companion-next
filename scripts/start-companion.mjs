@@ -93,7 +93,7 @@ export function startupEnvironment(env = process.env, configuration) {
 }
 export function ensureAccountProvider(run = execFile) {
   return new Promise((done, reject) => {
-    run(DEPENDENCIES.account.node,
+    run(process.execPath,
       [DEPENDENCIES.account.entry, ...DEPENDENCIES.account.args],
       { cwd: DEPENDENCIES.account.cwd, windowsHide: true, timeout: 125_000, maxBuffer: 32 * 1024 },
       (error, stdout) => {
