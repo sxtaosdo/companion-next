@@ -12,9 +12,9 @@ export function verifyRuntime(lane, version = process.versions.node, abi = proce
   if (!match) throw new Error('RUNTIME_VERSION_INVALID');
   const major = Number(match[1]), minor = Number(match[2]);
   if (lane === 'frontend') {
-    if (major !== 22 || minor < 12) throw new Error('FRONTEND_REQUIRES_NODE_22_12_OR_NEWER_WITHIN_22');
+    if (major !== 26 || minor < 13) throw new Error('FRONTEND_REQUIRES_NODE_26_13_OR_NEWER_WITHIN_26');
   } else if (lane === 'host-start') {
-    if (major !== 25 || String(abi) !== '141') throw new Error('HOST_START_REQUIRES_NODE_25_ABI_141');
+    if (major !== 26 || minor < 13 || String(abi) !== '147') throw new Error('HOST_START_REQUIRES_NODE_26_ABI_147');
   } else throw new Error('UNKNOWN_RUNTIME_LANE');
 }
 
@@ -42,7 +42,10 @@ export function main(args = process.argv.slice(2)) {
     if (mode !== '--' || command.length === 0) throw new Error('USAGE: runtime-gate.mjs <frontend|host-start> <--check|-- node-arguments...>');
     console.error(JSON.stringify({ ...evidence, command }));
     // Use the verified executable. No shell, PATH fallback, installation or runtime switching.
-    const child = spawnSync(process.execPath, command, { cwd: projectRoot, env: process.env, stdio: 'inherit', windowsHide: true });
+    const env = lane === 'frontend' && command[0] === 'node_modules/vitest/vitest.mjs'
+      ? { ...process.env, NODE_OPTIONS: [process.env.NODE_OPTIONS, '--no-experimental-webstorage'].filter(Boolean).join(' ') }
+      : process.env;
+    const child = spawnSync(process.execPath, command, { cwd: projectRoot, env, stdio: 'inherit', windowsHide: true });
     if (child.error) throw new Error(`CHILD_START_FAILED: ${child.error.code ?? child.error.message}`);
     if (child.signal) throw new Error(`CHILD_TERMINATED: ${child.signal}`);
     return child.status ?? 1;

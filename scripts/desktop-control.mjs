@@ -6,6 +6,7 @@ import {spawn,execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {recoverLocalStart} from './desktop-recovery.mjs';
 import {continueAccountReady,inspectContinuation} from './desktop-continue.mjs';
+import {verifyRuntime} from './runtime-gate.mjs';
 import http from 'node:http';
 const execFileAsync=promisify(execFile);
 const powershell='C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe';
@@ -16,8 +17,8 @@ export function createFence(directory){safeParent(directory);const file=join(dir
 function assertFence(fence){const s=lstatSync(fence.file);if(!s.isFile()||s.isSymbolicLink()||s.nlink!==1||digest(readFileSync(fence.file))!==fence.digest)throw Error('START_RECORD_CHANGED');}
 export function removeFence(fence){assertFence(fence);unlinkSync(fence.file);}
 const OUTPUT_LIMIT=32*1024;
-const GATE_REASONS=new Set(['RUNTIME_VERSION_INVALID','HOST_START_REQUIRES_NODE_25_ABI_141','PACKAGE_LOCK_IDENTITY_MISMATCH','PACKAGE_LOCK_DEPENDENCY_MISMATCH','UNKNOWN_RUNTIME_LANE']);
-const START_REASONS=new Set(['ACCOUNT_PROVIDER_UNCONFIRMED','LOCAL_CONFIG_MISSING','LOCAL_CONFIG_UNREADABLE','LOCAL_CONFIG_FILE_INVALID','LOCAL_CONFIG_JSON_INVALID','LOCAL_CONFIG_KEYS_INVALID','LOCAL_CONFIG_VALUE_INVALID','LOCAL_CONFIG_PATH_INVALID','LOCAL_CONFIG_MODE_INVALID','LOCAL_CONFIG_BINDING_NOT_APPROVED','INCOMPLETE_DAEMON_OVERRIDE','UNEXPECTED_DAEMON_URL','OFFICIAL_START_UNCONFIRMED','OFFICIAL_START_FAILED','OFFICIAL_START_PORT_OCCUPIED','DAEMON_READINESS_UNCONFIRMED','DAEMON_IDENTITY_UNVERIFIED','DAEMON_DISCOVERY_UNCONFIRMED','DAEMON_AUTH_REJECTED','DAEMON_START_IDENTITY_CHANGED','LOCAL_START_UNCONFIRMED']);
+const GATE_REASONS=new Set(['RUNTIME_VERSION_INVALID','HOST_START_REQUIRES_NODE_26_ABI_147','HOST_START_REQUIRES_NODE_25_ABI_141','PACKAGE_LOCK_IDENTITY_MISMATCH','PACKAGE_LOCK_DEPENDENCY_MISMATCH','UNKNOWN_RUNTIME_LANE']);
+const START_REASONS=new Set(['ACCOUNT_PROVIDER_UNCONFIRMED','LOCAL_CONFIG_MISSING','LOCAL_CONFIG_UNREADABLE','LOCAL_CONFIG_FILE_INVALID','LOCAL_CONFIG_JSON_INVALID','LOCAL_CONFIG_KEYS_INVALID','LOCAL_CONFIG_VALUE_INVALID','LOCAL_CONFIG_PATH_INVALID','LOCAL_CONFIG_MODE_INVALID','LOCAL_CONFIG_BINDING_NOT_APPROVED','INCOMPLETE_DAEMON_OVERRIDE','UNEXPECTED_DAEMON_URL','OFFICIAL_START_UNCONFIRMED','OFFICIAL_START_FAILED','OFFICIAL_START_PORT_OCCUPIED','DAEMON_READINESS_UNCONFIRMED','DAEMON_RUNTIME_MISMATCH','DAEMON_IDENTITY_UNVERIFIED','DAEMON_DISCOVERY_UNCONFIRMED','DAEMON_AUTH_REJECTED','DAEMON_START_IDENTITY_CHANGED','LOCAL_START_UNCONFIRMED']);
 // Only publish fixed, non-secret reason codes. Child text and gate metadata never reach disk or UI.
 export function classifyStartOutput(stderr,truncated=false){
  if(truncated)return {stage:'unknown',reason:'OUTPUT_LIMIT'};
@@ -53,9 +54,10 @@ async function main(){const [action,internal]=process.argv.slice(2);if(!['start'
  emit(action,await inspectContinuation({directory,locked:true,query,observe}));return;
  }
  if(action==='continue'){
+ verifyRuntime('host-start');
  const directory=join(process.env.LOCALAPPDATA||'', 'CompanionNext','desktop-launch');if(!process.env.LOCALAPPDATA)throw Error('STATE_DIRECTORY_UNAVAILABLE');
  const observe=observeAccount;
- const value=await continueAccountReady({directory,locked:true,observe,start:async(account)=>{const {startupEnvironment,startCompanion,officialStart}=await import('./start-companion.mjs');const env=startupEnvironment();const {CompanionApiClient}=await import(pathToFileURL(resolve(root,'../cocos-mcp/mcp/dist/companion-api-client.js')).href);const result=await startCompanion({noBrowser:true},{ensureAuth:async()=>{if(JSON.stringify(await observe())!==JSON.stringify(account))throw Error('ACCOUNT_CHANGED')},start:()=>officialStart(env),discover:()=>CompanionApiClient.discover()});return {state:'ready',pid:result.pid}}});emit(action,value);return;
+ const value=await continueAccountReady({directory,locked:true,observe,start:async(account)=>{const {startupEnvironment,startCompanion,officialStart}=await import('./start-companion.mjs');const env=startupEnvironment();const {CompanionApiClient}=await import(pathToFileURL(resolve(root,'../cocos-mcp/mcp/dist/companion-api-client.js')).href);const result=await startCompanion({noBrowser:true},{expectedNodeVersion:process.version,ensureAuth:async()=>{if(JSON.stringify(await observe())!==JSON.stringify(account))throw Error('ACCOUNT_CHANGED')},start:()=>officialStart(env),discover:()=>CompanionApiClient.discover()});return {state:'ready',pid:result.pid}}});emit(action,value);return;
  }
  if(action==='recover'){const directory=join(process.env.LOCALAPPDATA||'', 'CompanionNext','desktop-launch');if(!process.env.LOCALAPPDATA)throw Error('STATE_DIRECTORY_UNAVAILABLE');await recoverLocalStart({directory,locked:true,observe:async()=>{const {stdout}=await execFileAsync(powershell,['-NoProfile','-NonInteractive','-File',join(root,'scripts','desktop-observation.ps1')],{windowsHide:true,timeout:15000,maxBuffer:16384});return JSON.parse(stdout)}});emit(action,{state:'recovered'});return;}
  if(action==='start'){const directory=join(process.env.LOCALAPPDATA||'', 'CompanionNext','desktop-launch');if(!process.env.LOCALAPPDATA)throw Error('STATE_DIRECTORY_UNAVAILABLE');const started=await startOnce({stateDirectory:directory});if(started.state!=='ready'){emit(action,started);return;}try{emit(action,{...await diagnosis(),start:'confirmed'});}catch{emit(action,{state:'unknown',reason:'DIAGNOSIS_UNAVAILABLE',start:'confirmed'});}return;}

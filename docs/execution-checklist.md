@@ -33,17 +33,17 @@ manifest 格式（占位值必须替换为真实值；不支持“自动接受�
 
 | 入口 | 必须满足 | 实际机械检查 |
 | --- | --- | --- |
-| `test`、`test:*`、`test:watch`、`build`、`build:*` | Node22 且至少22.12 | `scripts/runtime-gate.mjs frontend` 在工具加载前拒绝错误运行时，记录 execPath/version/ABI、package 和 lock 哈希，用同一 execPath 执行子工具 |
-| `start` | Node25、ABI141，匹配当前原生宿主产物 | `scripts/runtime-gate.mjs host-start` 通过后才进入原 start-companion.mjs；不替换该启动功能，也不证明服务已经就绪 |
+| `test`、`test:*`、`test:watch`、`build`、`build:*` | 本机 Node.js 26.13.0 起的 Node 26 | `scripts/runtime-gate.mjs frontend` 在工具加载前拒绝错误运行时，记录 execPath/version/ABI、package 和 lock 哈希，用同一 execPath 执行子工具 |
+| `start` | 本机 Node 26、ABI 147，匹配宿主原生依赖 | `scripts/runtime-gate.mjs host-start` 通过后才进入原 start-companion.mjs；不替换该启动功能，也不证明服务已经就绪 |
 | `preflight` | 明确任务 manifest、HEAD 和哈希 | `scripts/task-preflight.mjs` 只读验证声明的文件和 owner 重叠；不代表业务验收 |
 | `preflight -- --delivery <绝对JSON路径>` | 严格 host product-build 契约及候选字节一致 | 校验既有 consumer 源码pin、严格key集、manifest/entry/package SHA、包名/版本和预期版本/源码revision；不启动候选或daemon |
 
-- [ ] 使用已有正确的可执行文件，不升级/卸载 Node、不安装依赖、不改变系统 PATH 或全局 NODE_OPTIONS。现有前端通过值是 `D:/code/shidai3/P8000/dual-game-build/node_modules/node/bin/node.exe`（22.23.3）；当前宿主路径为 `C:/Program Files/nodejs/node.exe`（25.2.1）。其他22.x小版本仅通过版本范围检查，不代表已实际跑过本项目全套测试。
-- [ ] 可先只检查：`<Node22> scripts/runtime-gate.mjs frontend --check`；`<Node25> scripts/runtime-gate.mjs host-start --check`。`--check` 不执行子程序，**不算构建/测试/启动成功**。
-- [ ] 从项目 cwd 用正确 Node 执行入口，例如 `<Node22> scripts/runtime-gate.mjs frontend -- node_modules/vitest/vitest.mjs run <测试路径>`。不要让检查后的子工具又通过 PATH 换回另一个 Node。保存完整命令、cwd、运行时身份、退出码、原始日志、测试文件/用例总数。
-- [ ] 门禁自身验证：用现有 Node22 调 `scripts/runtime-gate.mjs frontend -- --test tests/runtime-gate.test.mjs tests/task-preflight.test.mjs`；测试子进程需要 `COMPANION_GATE_TEST_NODE25` 指向已有 Node25（仅该次测试环境），另可明确 `COMPANION_GATE_TEST_NODE22`。缺Node25证据会失败，不能静默跳过或伪报跨版本测试通过。测试不会启动服务或 Creator。
+- [ ] 使用本机已安装的 Node.js 26.13.0，构建、测试和宿主共用该可执行文件。
+- [ ] 可先只检查：`node scripts/runtime-gate.mjs frontend --check`；`node scripts/runtime-gate.mjs host-start --check`。`--check` 不执行子程序，**不算构建/测试/启动成功**。
+- [ ] 从项目 cwd 用正确 Node 执行入口，例如 `node scripts/runtime-gate.mjs frontend -- node_modules/vitest/vitest.mjs run <测试路径>`。不要让检查后的子工具又通过 PATH 换回另一个 Node。保存完整命令、cwd、运行时身份、退出码、原始日志、测试文件/用例总数。
+- [ ] 门禁验证运行 `npm run test:runtime-gate`，覆盖旧版本、过早的 Node 26 小版本、后续主版本和宿主 ABI。测试使用合成子命令。
 
-门禁不自动切换运行时、不下载工具、不读认证配置、不更改存储兼容 flag。前端包同时含宿主启动入口，因此不把整个 package engines 独占锁为22。既有预检失败日志必须保留，不能改断言使它“通过”。
+门禁用当前 Node 执行子工具，并保留 package 和 lock 摘要。已有预检失败日志继续作为历史记录。
 
 ## 3. 实施与复现（需真实证据）
 

@@ -12,7 +12,8 @@ function Read-StartupDiagnosticHint([string]$fencePath) {
   if($d.schemaVersion -cne 'desktop-start-diagnostic-v1' -or $d.id -cne $pending.id -or $d.state -cne 'unknown'){return $fallback}
   switch -CaseSensitive ($d.reason) {
    'ACCOUNT_PROVIDER_UNCONFIRMED' {return '认证服务尚未确认就绪；启动结果待核对，未自动重试。'}
-   'HOST_START_REQUIRES_NODE_25_ABI_141' {return '本机运行环境版本不符合要求；请核对 Node 25 安装。'}
+   'HOST_START_REQUIRES_NODE_26_ABI_147' {return '本机运行环境版本不符合要求；请核对本机 Node.js 26 安装。'}
+   'HOST_START_REQUIRES_NODE_25_ABI_141' {return '本机运行环境版本不符合要求；请核对本机 Node.js 26 安装。'}
    'DAEMON_READINESS_UNCONFIRMED' {return '后台尚未确认就绪；请使用只读诊断，未自动重试。'}
    'LOCAL_CONFIG_MISSING' {return '启动配置文件缺失；请恢复本机已批准的配置。'}
    'OFFICIAL_START_PORT_OCCUPIED' {return '后台端口已被占用；未结束其他进程，请核对端口。'}

@@ -18,6 +18,16 @@ test('cold and already running paths each use only official start, then bounded 
     assert.equal(result.url,NEXT);assert.equal(starts,1);assert.equal(spawns,runningBefore?0:1);assert.deepEqual(requests,[['GET','/v1/daemon/inflight']]);
   }
 });
+test('an already running daemon on an older Node cannot be reused', async () => {
+  const status = ready(123);
+  status.identity.nodeVersion = 'v25.9.0';
+  await assert.rejects(startCompanion({ noBrowser: true }, {
+    start: async () => {},
+    discover: async () => ({ baseUrl: BASE, request: async () => status }),
+    expectedNodeVersion: process.version,
+    checkAuthMode: () => assert.fail('must not use old daemon'),
+  }), { code: 'DAEMON_RUNTIME_MISMATCH' });
+});
 test('unconfirmed startup is not retried and does not open a browser',async()=>{
   let calls=0;await assert.rejects(startCompanion({}, {start:async()=>{calls++;throw Error('timeout')},discover:()=>assert.fail('discover'),createBrowser:()=>assert.fail('browser')}),/timeout/);assert.equal(calls,1);
 });
@@ -88,8 +98,8 @@ test('permission refusal is not retried as readiness and persistent generation r
 });
 
 const { ensureAccountProvider } = await import('../scripts/start-companion.mjs');
-test('account dependency uses existing Node22 backend-only launcher and validates exact readiness',async()=>{
- let count=0;const result=await ensureAccountProvider((command,args,options,callback)=>{count++;assert.match(command,/dual-game-build/);assert.equal(args[1],'--backend-only');assert.equal(options.windowsHide,true);callback(null,JSON.stringify({ready:true,port:18001,pid:42}));});assert.equal(result.pid,42);assert.equal(count,1);
+test('account dependency uses the local Node for the backend-only launcher and validates exact readiness',async()=>{
+ let count=0;const result=await ensureAccountProvider((command,args,options,callback)=>{count++;assert.equal(command,process.execPath);assert.equal(args[1],'--backend-only');assert.equal(options.windowsHide,true);callback(null,JSON.stringify({ready:true,port:18001,pid:42}));});assert.equal(result.pid,42);assert.equal(count,1);
  for(const bad of ['{}',JSON.stringify({ready:true,port:8001,pid:42}),'invalid'])await assert.rejects(ensureAccountProvider((_c,_a,_o,callback)=>callback(null,bad)),/ACCOUNT_PROVIDER_UNCONFIRMED/);
 });
 test('unconfirmed auth dependency prevents Companion startup and browser creation without retry',async()=>{

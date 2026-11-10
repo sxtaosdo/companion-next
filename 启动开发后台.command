@@ -1,12 +1,14 @@
 #!/bin/zsh
 set -eu
 cd -- "${0:A:h}"
-runtime="${COMPANION_NODE:-}"
-if [[ -z "$runtime" && -f companion-host.local.json ]]; then
-  runtime="$(/usr/bin/python3 -c 'import json; print(json.load(open("companion-host.local.json"))["nodeHost"])')"
-fi
-if [[ -z "$runtime" || ! -x "$runtime" ]]; then
-  print -u2 '缺少本机 Node 25 配置。请先按 LOCAL_DEVELOPMENT.md 完成一次本机准备。'
+runtime="$(command -v node || true)"
+for installed_node in /usr/local/bin/node /opt/homebrew/bin/node; do
+  if [[ -z "$runtime" && -x "$installed_node" ]]; then
+    runtime="$installed_node"
+  fi
+done
+if [[ "$runtime" != /* || ! -x "$runtime" ]]; then
+  print -u2 '请安装本机 Node.js 26.13.0 或更新的 Node 26。'
   exit 1
 fi
 exec "$runtime" scripts/runtime-gate.mjs host-start -- scripts/start-companion.mjs

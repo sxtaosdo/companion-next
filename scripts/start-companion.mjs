@@ -5,6 +5,7 @@ import { dirname, resolve, join, win32 } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {DEPENDENCIES} from '../../cocos-mcp/mcp/src/companion/dependency-contract.mjs';
 import { loadHostProfile, coreStartupEnvironment } from './host-profile.mjs';
+import { verifyRuntime } from './runtime-gate.mjs';
 
 export const STARTUP_BUDGET_MS = 65_000;
 export const READ_BUDGET_MS = 10_000;
@@ -269,6 +270,9 @@ export async function startCompanion({ noBrowser = false, feature = 'management'
     throw error;
   }
   const { client, status } = observed, lateReady = !!startFailure;
+  if (deps.expectedNodeVersion && status.identity.nodeVersion !== deps.expectedNodeVersion) {
+    throw new StartupError('DAEMON_RUNTIME_MISMATCH', { stage: 'health', reason: 'existing-daemon-requires-normal-maintenance' });
+  }
   await deps.checkAuthMode?.(client);
   const receipt = { url: NEXT, pid: status.identity.pid, lateReady,
     ...(startFailure ? { officialReason: ['cli-readiness-deadline', 'cli-timeout', 'cli-error', 'cli-protocol'].includes(startFailure.reason) ? startFailure.reason : 'cli-unconfirmed' } : {}) };
@@ -291,6 +295,7 @@ export function startupFailureSummary(error) {
 export async function main(args = process.argv.slice(2)) {
   if (args.includes('--help')) { console.log('npm start [-- --no-browser] [--workflow]\nStarts/reuses account and Companion. --workflow also verifies the controlled executable and knowledge health; it does not start knowledge or model services. Closing the new browser window does not stop the daemon.'); return; }
   if (args.some(arg => !['--no-browser','--workflow'].includes(arg))) throw new StartupError('UNKNOWN_OPTION');
+  verifyRuntime('host-start');
   const profile = loadHostProfile(LOCAL_HOST_PROFILE, { create: true });
   const env = existsSync(LOCAL_STARTUP_CONFIG)
     ? { ...startupEnvironment(), COMPANION_AUTH_MODE: profile.authMode }
@@ -299,6 +304,7 @@ export async function main(args = process.argv.slice(2)) {
   delete process.env.DEBUG; delete process.env.PWDEBUG;
   const { CompanionApiClient } = await import(pathToFileURL(join(host, 'dist/companion-api-client.js')).href);
   const result = await startCompanion({ noBrowser: args.includes('--no-browser'),feature:args.includes('--workflow')?'workflow':'management' }, {
+    expectedNodeVersion: process.version,
     checkWorkflow:async()=>{const {createSubmissionPreflight}=await import(pathToFileURL(join(host,'src/companion/workflow-operations/integration/submission-preflight.mjs')).href);await createSubmissionPreflight()();},
     ensureAuth: () => profile.authMode === 'account' ? ensureAccountProvider() : Promise.resolve(), start: () => officialStart(env), discover: () => CompanionApiClient.discover(),
     checkAuthMode: async client => {
